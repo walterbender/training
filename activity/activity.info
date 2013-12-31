@@ -1,0 +1,10 @@
+[Activity]
+name = Training
+exec = sugar-activity activity.TrainingActivity
+bundle_id = org.sugarlabs.Training
+icon = activity-training
+activity_version = 1
+show_launcher = yes
+license = GPLv3
+single_instance = yes
+summary = a series of training exercises
