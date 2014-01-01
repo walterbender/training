@@ -27,7 +27,7 @@ class Exercises():
     def __init__(self, canvas, parent=None):
         self._activity = parent
         self._canvas = canvas
-        self._completed = False
+        self.completed = False
         _logger.error('__init__')
 
     def _run_task(self, msg, task, data):
@@ -57,7 +57,7 @@ class Exercises():
             self._activity.current_task += 1
             self._activity.metadata['current task'] = \
                 str(self._activity.current_task)
-            if not self._completed:
+            if not self.completed:
                 self.task_master()
             else:
                 self._activity.alert_task(
@@ -78,7 +78,6 @@ class Exercises():
         if self._activity.current_task == 0:
 
             def task(self, task_data):
-                _logger.error('in task')
                 if task_data['attempt'] == 0:
                     _logger.debug('first attempt: saving nick value as %s' % 
                                   profile.get_nick_name())
@@ -99,7 +98,6 @@ class Exercises():
         if self._activity.current_task == 1:
 
             def task(self, task_data):
-                _logger.error('in task')
                 return profile.get_nick_name() == \
                     self._activity.metadata['nick']
 
@@ -110,21 +108,57 @@ class Exercises():
         if self._activity.current_task == 2:
 
             def task(self, task_data):
-                _logger.error('in task')
+                if task_data['attempt'] == 0:
+                    _logger.debug('first attempt: saving favorites list')
+
+                    favorites_list = get_favorites()
+                    self._activity.metadata['favorites'] = \
+                        json.dumps(favorites_list)
+                    return False
+                else:
+                    favorites_list = get_favorites()
+                    saved_favorites = \
+                        json.loads(self._activity.metadata['favorites'])
+                    return len(favorites_list) > len(saved_favorites)
+
+            self._run_task(_('Add a favorite'), task, None)
+
+        if self._activity.current_task == 3:
+
+            def task(self, task_data):
+                if task_data['attempt'] == 0:
+                    _logger.debug('first attempt: saving favorites list')
+
+                    favorites_list = get_favorites()
+                    self._activity.metadata['favorites'] = \
+                        json.dumps(favorites_list)
+                    return False
+                else:
+                    favorites_list = get_favorites()
+                    saved_favorites = \
+                        json.loads(self._activity.metadata['favorites'])
+                    return len(favorites_list) < len(saved_favorites)
+
+            self._run_task(_('Remove a favorite'), task, None)
+
+        if self._activity.current_task == 4:
+
+            def task(self, task_data):
                 return True
 
             _logger.error('calling _run_task with %s' %
                           _('Mission accomplished'))
 
+            self.completed = True
             self._run_task(_('You are a Sugar Zen master.'), task, None)
 
-            '''
-            import time
-            _logger.debug('2')
+        if self._activity.current_task == 5:
+            self.completed = True
             self._activity.alert_task(
+                title=_('Congratulations'),
+                msg=_('All tasks completed.'))
 
-            _logger.error('going to sleep')
-            # time.sleep(3)
+            '''
             try:
                 yield
             except:
@@ -133,13 +167,17 @@ class Exercises():
                 raise
             finally:
                 _logger.debug('finally')
-
-            '''
-            
-            '''
-            for name in ['Clipboard', ACCOUNT_NAME]:
-
-                _logger.debug(root.find_child(name=name, role_name='menu item'))
             '''
 
         _logger.error('...')
+
+
+def get_favorites():
+    from sugar3 import env
+    import os
+
+    favorites_path = env.get_profile_path('favorite_activities')
+    if os.path.exists(favorites_path):
+        favorites_data = json.load(open(favorites_path))
+        favorites_list = favorites_data['favorites']
+    return favorites_list

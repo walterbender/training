@@ -75,8 +75,14 @@ class TrainingActivity(activity.Activity):
             alert.props.msg = '---'
         else:
             alert.props.msg = msg
+
 	def _task_alert_response_cb(alert, response_id, self):
             self.remove_alert(alert)
+            if not self._exercises.completed:
+                self._exercises.task_master()
+            else:
+                self.close()
+
 	alert.connect('response', _task_alert_response_cb, self)
 	self.add_alert(alert)
 	alert.show()
