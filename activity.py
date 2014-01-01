@@ -12,6 +12,10 @@
 
 from gi.repository import Gtk, Gdk, GConf
 import dbus
+import os
+from shutil import copy
+import json
+from gettext import gettext as _
 
 from sugar3.activity import activity
 from sugar3 import profile
@@ -23,9 +27,6 @@ from sugar3.graphics.colorbutton import ColorToolButton
 from sugar3.graphics.alert import NotifyAlert
 
 from toolbar_utils import button_factory, separator_factory
-
-from gettext import gettext as _
-
 from exercises import Exercises
 
 import logging
@@ -110,3 +111,24 @@ class TrainingActivity(activity.Activity):
         stop_button.props.accelerator = '<Ctrl>q'
         toolbox.toolbar.insert(stop_button, -1)
         stop_button.show()
+
+    def add_badge(self, msg, icon="training-trophy", name="Sugar"):
+        badge = {
+            'icon': icon,
+            'from': name,
+            'message': msg
+        }
+        icon_path = os.path.join(activity.get_bundle_path(),
+                                 'icons',
+                                 (icon + '.svg'))
+        sugar_icons = os.path.join(
+            os.path.expanduser('~'),
+            '.icons')
+        copy(icon_path, sugar_icons)
+
+        if 'comments' in self.metadata:
+            comments = json.loads(self.metadata['comments'])
+            comments.append(badge)
+            self.metadata['comments'] = json.dumps(comments)
+        else:
+            self.metadata['comments'] = json.dumps([badge])

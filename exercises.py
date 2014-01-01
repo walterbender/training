@@ -98,8 +98,13 @@ class Exercises():
         if self._activity.current_task == 1:
 
             def task(self, task_data):
-                return profile.get_nick_name() == \
+                result = profile.get_nick_name() == \
                     self._activity.metadata['nick']
+                if result:
+                    self._activity.add_badge(
+                        message=_('Congratulations!'
+                                  'You changed your nickname.'))
+                return result
 
             _logger.error('calling _run_task with %s' %
                           _('Change your nick back'))
@@ -137,7 +142,12 @@ class Exercises():
                     favorites_list = get_favorites()
                     saved_favorites = \
                         json.loads(self._activity.metadata['favorites'])
-                    return len(favorites_list) < len(saved_favorites)
+                    result = len(favorites_list) < len(saved_favorites)
+                    if result:
+                        self._activity.add_badge(
+                            message=_('Congratulations! You changed '
+                                      'your favorite activities.'))
+                    return result
 
             self._run_task(_('Remove a favorite'), task, None)
 
