@@ -60,13 +60,21 @@ class TrainingActivity(activity.Activity):
             _logger.debug('reading current task from metadata')
             _logger.debug(self.current_task)
 
-        _logger.debug('starting execises...')
         self._exercises = Exercises(canvas, parent=self)
+        _logger.debug('starting execises at %d' % self.current_task)
+        self._exercises.task_master()
+        _logger.debug('finishing execises at %d' % self.current_task)
 
-    def alert_task(self, text):
+    def alert_task(self, title=None, msg=None):
         alert = NotifyAlert()
-        alert.props.title = _('Your task, should you choose to accept it')
-        alert.props.msg = text
+        if title is None:
+            alert.props.title = _('Your task, should you choose to accept it')
+        else:
+            alert.props.title = title
+        if msg is None:
+            alert.props.msg = '---'
+        else:
+            alert.props.msg = msg
 	def _task_alert_response_cb(alert, response_id, self):
             self.remove_alert(alert)
 	alert.connect('response', _task_alert_response_cb, self)
