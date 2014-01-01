@@ -102,8 +102,7 @@ class Exercises():
                     self._activity.metadata['nick']
                 if result:
                     self._activity.add_badge(
-                        message=_('Congratulations!'
-                                  'You changed your nickname.'))
+                        _('Congratulations! You changed your nickname.'))
                 return result
 
             _logger.error('calling _run_task with %s' %
@@ -145,8 +144,8 @@ class Exercises():
                     result = len(favorites_list) < len(saved_favorites)
                     if result:
                         self._activity.add_badge(
-                            message=_('Congratulations! You changed '
-                                      'your favorite activities.'))
+                            _('Congratulations! You changed your '
+                              'favorite activities.'))
                     return result
 
             self._run_task(_('Remove a favorite'), task, None)
