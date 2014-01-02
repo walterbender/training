@@ -10,7 +10,7 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-from gi.repository import Gtk, Gdk, GConf
+from gi.repository import Gtk, Gdk, GConf, GObject
 import dbus
 import os
 from shutil import copy
@@ -18,16 +18,18 @@ import json
 from gettext import gettext as _
 
 from sugar3.activity import activity
-from sugar3 import profile
 from sugar3.graphics.toolbarbox import ToolbarBox
+from sugar3.graphics.toolbutton import ToolButton
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity.widgets import StopButton
 from sugar3.graphics.objectchooser import ObjectChooser
 from sugar3.graphics.colorbutton import ColorToolButton
 from sugar3.graphics.alert import NotifyAlert
+from sugar3.graphics import style
 
 from toolbar_utils import button_factory, separator_factory
 from exercises import Exercises
+import emptypanel
 
 import logging
 _logger = logging.getLogger('training-activity')
@@ -43,28 +45,31 @@ class TrainingActivity(activity.Activity):
         except dbus.exceptions.DBusException, e:
             _logger.error(str(e))
 
-        self.nick = profile.get_nick_name()
-
         self._setup_toolbars()
 
-        # Create a canvas
-        canvas = Gtk.DrawingArea()
-        canvas.set_size_request(Gdk.Screen.width(), \
-                                Gdk.Screen.height())
-        self.set_canvas(canvas)
-        canvas.show()
+        emptypanel.show(self, 'training-trophy', 'foo', 'bar',
+                        self._callback)
+
         self.show_all()
 
-        self.current_task = 0
-        if 'current task' in self.metadata:
-            self.current_task = int(self.metadata['current task'])
-            _logger.debug('reading current task from metadata')
-            _logger.debug(self.current_task)
+        self.current_task = self.read_task_data('current_task')
+        if self.current_task is None:
+            self.current_task = 0
+        _logger.debug(self.current_task)
 
-        self._exercises = Exercises(canvas, parent=self)
+        self._exercises = Exercises(self)
         _logger.debug('starting execises at %d' % self.current_task)
         self._exercises.task_master()
         _logger.debug('finishing execises at %d' % self.current_task)
+
+    def _callback(self, button):
+        _logger.debug('CALLBACK')
+
+    def __stop_clicked_cb(self, button):
+        self.destroy()
+
+    def __ok_clicked_cb(self, button):
+        self.destroy()
 
     def alert_task(self, title=None, msg=None):
         alert = NotifyAlert()
@@ -89,7 +94,7 @@ class TrainingActivity(activity.Activity):
 	alert.show()
 
     def write_file(self, file_path):
-        self.metadata['current task'] = self.current_task
+        self.write_task_data('current_task', 0)
 
     def _setup_toolbars(self):
 	''' Setup the toolbars. '''
@@ -121,9 +126,7 @@ class TrainingActivity(activity.Activity):
         icon_path = os.path.join(activity.get_bundle_path(),
                                  'icons',
                                  (icon + '.svg'))
-        sugar_icons = os.path.join(
-            os.path.expanduser('~'),
-            '.icons')
+        sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')
         copy(icon_path, sugar_icons)
 
         if 'comments' in self.metadata:
@@ -132,3 +135,32 @@ class TrainingActivity(activity.Activity):
             self.metadata['comments'] = json.dumps(comments)
         else:
             self.metadata['comments'] = json.dumps([badge])
+
+    def read_task_data(self, uid):
+        data_path = os.path.join(self.get_activity_root(), 'data',
+                                 'training_data')
+        uid_data = None
+        if os.path.exists(data_path):
+            fd = open(data_path, 'r')
+            json_data = fd.read()
+            fd.close()
+            data = json.loads(json_data)
+            if uid in data:
+                uid_data = data[uid]
+        return uid_data
+
+    def write_task_data(self, uid, uid_data):
+        data_path = os.path.join(self.get_activity_root(), 'data',
+                                 'training_data')
+        data = {}
+        if os.path.exists(data_path):
+            fd = open(data_path, 'r')
+            json_data = fd.read()
+            fd.close()
+            data = json.loads(json_data)
+        data[uid] = uid_data
+        json_data = json.dumps(data)
+        fd = open(data_path, 'w')
+        fd.write(json_data)
+        fd.close()
+
