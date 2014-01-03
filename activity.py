@@ -59,14 +59,26 @@ class TrainingActivity(activity.Activity):
             _logger.debug(self.current_task)
             self.button_label = Gtk.Label(_('Resume'))
 
+        self._progressbar = ProgressBar()
+
         self.empty_widgets = Gtk.EventBox()
         self.show_prompt('training-trophy', self._prompt_cb)
 
         self.show_all()
 
         self._exercises = Exercises(self)
+        self._update_progress()
+
+    def _update_progress(self):
+        self._progressbar.set_progress(
+            (self.current_task + 1) /
+            float(self._exercises.get_number_of_tasks()))
+        self._progressbar.set_message(
+            _('Progress to date: %d / %d' %
+              (self.current_task, self._exercises.get_number_of_tasks())))
 
     def _prompt_cb(self, button):
+        self._update_progress()
         self._exercises.task_master()
 
     def __stop_clicked_cb(self, button):
@@ -151,6 +163,9 @@ class TrainingActivity(activity.Activity):
         hbox.pack_start(open_image_btn, True, False, 0)
         mvbox.pack_start(hbox, False, False, style.DEFAULT_PADDING)
 
+        vbox.pack_end(self._progressbar, False, True, 0)
+        self._progressbar.show()
+
         self.empty_widgets.add(vbox)
         self.empty_widgets.show_all()
         self.set_canvas(self.empty_widgets)
@@ -202,3 +217,33 @@ class TrainingActivity(activity.Activity):
         fd.write(json_data)
         fd.close()
 
+
+class ProgressBar(Gtk.VBox):
+
+    def __init__(self):
+        Gtk.VBox.__init__(self)
+        self.set_spacing(style.DEFAULT_PADDING)
+        self.set_border_width(style.DEFAULT_SPACING * 2)
+
+        self._progress = Gtk.ProgressBar()
+        self.pack_start(self._progress, True, True, 0)
+        self._progress.show()
+
+        self._label = Gtk.Label()
+        self._label.set_line_wrap(True)
+        self._label.set_property('xalign', 0.5)
+        self._label.modify_fg(Gtk.StateType.NORMAL,
+                              style.COLOR_BUTTON_GREY.get_gdk_color())
+        self.pack_start(self._label, True, True, 0)
+        self._label.show()
+
+        alignment_box = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
+                                          xscale=0, yscale=0)
+        self.pack_start(alignment_box, True, True, 0)
+        alignment_box.show()
+
+    def set_message(self, message):
+        self._label.set_text(message)
+
+    def set_progress(self, fraction):
+        self._progress.props.fraction = fraction

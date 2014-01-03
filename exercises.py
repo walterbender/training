@@ -47,6 +47,9 @@ class Exercises():
                            RemoveFavoriteTask(self._activity),
                            FinishedAllTasks(self._activity)]
 
+    def get_number_of_tasks(self):
+        return len(self._task_list)
+
     def _run_task(self, task_number):
         ''' To run a task, we need a message to display,
             a task method to call that returns True or False,
