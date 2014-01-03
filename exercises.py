@@ -65,7 +65,7 @@ class Exercises():
             task_key = 'task %d' % self._activity.current_task
             _logger.debug(self._activity.metadata)
             
-            task_data = read_task_data(self._activity, uid)
+            task_data = self._activity.read_task_data(uid)
             if task_data is None:
                 self._activity.alert_task(msg=msg)
                 _logger.debug('first time on task %s' % (msg))
@@ -87,7 +87,7 @@ class Exercises():
                 task_data['attempt'] += 1
                 _logger.debug(retry)
                 self._activity.alert_task(title=retry, msg=msg)
-            write_task_data(self._activity, uid, task_data)
+            self._activity.write_task_data(uid, task_data)
         else:
             self.completed = True
             self._activity.alert_task(

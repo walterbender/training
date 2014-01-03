@@ -26,10 +26,10 @@ from sugar3.graphics.objectchooser import ObjectChooser
 from sugar3.graphics.colorbutton import ColorToolButton
 from sugar3.graphics.alert import NotifyAlert
 from sugar3.graphics import style
+from sugar3.graphics.icon import Icon
 
 from toolbar_utils import button_factory, separator_factory
 from exercises import Exercises
-import emptypanel
 
 import logging
 _logger = logging.getLogger('training-activity')
@@ -47,23 +47,29 @@ class TrainingActivity(activity.Activity):
 
         self._setup_toolbars()
 
-        emptypanel.show(self, 'training-trophy', 'foo', 'bar',
-                        self._callback)
-
-        self.show_all()
+        self.prompt_label = Gtk.Label(
+            '<span foreground="%s"><b>%s</b></span>' %
+            (style.COLOR_BUTTON_GREY.get_html(), _('Sugar Training Activity')))
 
         self.current_task = self.read_task_data('current_task')
         if self.current_task is None:
             self.current_task = 0
-        _logger.debug(self.current_task)
+
+        if self.current_task == 0:
+            self.button_label = Gtk.Label(_('Begin'))
+        else:
+            _logger.debug(self.current_task)
+            self.button_label = Gtk.Label(_('Resume'))
+
+        self.empty_widgets = Gtk.EventBox()
+        self.show_prompt('training-trophy', self._prompt_cb)
+
+        self.show_all()
 
         self._exercises = Exercises(self)
-        _logger.debug('starting execises at %d' % self.current_task)
-        self._exercises.task_master()
-        _logger.debug('finishing execises at %d' % self.current_task)
 
-    def _callback(self, button):
-        _logger.debug('CALLBACK')
+    def _prompt_cb(self, button):
+        self._exercises.task_master()
 
     def __stop_clicked_cb(self, button):
         self.destroy()
@@ -116,6 +122,40 @@ class TrainingActivity(activity.Activity):
         stop_button.props.accelerator = '<Ctrl>q'
         toolbox.toolbar.insert(stop_button, -1)
         stop_button.show()
+
+    def show_prompt(self, icon_name, btn_callback):
+        self.empty_widgets.modify_bg(Gtk.StateType.NORMAL,
+                                     style.COLOR_WHITE.get_gdk_color())
+
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        mvbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        vbox.pack_start(mvbox, True, False, 0)
+
+        image_icon = Icon(pixel_size=style.LARGE_ICON_SIZE,
+                          icon_name=icon_name,
+                          stroke_color=style.COLOR_BUTTON_GREY.get_svg(),
+                          fill_color=style.COLOR_TRANSPARENT.get_svg())
+        mvbox.pack_start(image_icon, False, False, style.DEFAULT_PADDING)
+
+        self.prompt_label.set_use_markup(True)
+        mvbox.pack_start(self.prompt_label, False, False,
+                         style.DEFAULT_PADDING)
+
+        hbox = Gtk.Box()
+        open_image_btn = Gtk.Button()
+        open_image_btn.connect('clicked', btn_callback)
+        add_image = Gtk.Image.new_from_stock(Gtk.STOCK_ADD,
+                                             Gtk.IconSize.BUTTON)
+        buttonbox = Gtk.Box()
+        buttonbox.pack_start(add_image, False, True, 0)
+        buttonbox.pack_end(self.button_label, True, True, 5)
+        open_image_btn.add(buttonbox)
+        hbox.pack_start(open_image_btn, True, False, 0)
+        mvbox.pack_start(hbox, False, False, style.DEFAULT_PADDING)
+
+        self.empty_widgets.add(vbox)
+        self.empty_widgets.show_all()
+        self.set_canvas(self.empty_widgets)
 
     def add_badge(self, msg, icon="training-trophy", name="Sugar"):
         badge = {
