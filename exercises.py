@@ -63,7 +63,6 @@ class Exercises():
             _logger.error('_run_task %d' % self._activity.current_task)
 
             task_key = 'task %d' % self._activity.current_task
-            _logger.debug(self._activity.metadata)
             
             task_data = self._activity.read_task_data(uid)
             if task_data is None:
@@ -79,8 +78,8 @@ class Exercises():
                     title=_('Congratulations'),
                     msg=success)
                 self._activity.current_task += 1
-                self._activity.metadata['current task'] = \
-                    str(self._activity.current_task)
+                self._activity.write_task_data('current_task',
+                                              self._activity.current_task)
                 if not self.completed:
                     self.task_master()
             else:
@@ -144,15 +143,14 @@ class ChangeNickTask(Task):
         if task_data['attempt'] == 0:
             _logger.debug('first attempt: saving nick value as %s' % 
                           profile.get_nick_name())
-            self._activity.metadata['nick'] = profile.get_nick_name()
+            self._activity.write_task_data('nick', profile.get_nick_name())
             return False
         else:
+            target = self._activity.read_task_data('nick')
             _logger.debug('%d attempt: comparing %s to %s' % 
-                          (task_data['attempt'],
-                           profile.get_nick_name(),
-                           self._activity.metadata['nick']))
-            return not profile.get_nick_name() == \
-                self._activity.metadata['nick']
+                          (task_data['attempt'], profile.get_nick_name(),
+                           target))
+            return not profile.get_nick_name() == target
 
     def get_prompt(self):
         return _('Change your nick')
@@ -164,16 +162,17 @@ class RestoreNickTask(Task):
         self.name = _('Restore Nick Task')
         self.uid = 'nick2'
         self._activity = activity
+        self._target = self._activity.read_task_data('nick')
 
     def test(self, exercises, task_data):
-        result = profile.get_nick_name() == self._activity.metadata['nick']
+        result = profile.get_nick_name() == self._target
         if result:
             self._activity.add_badge(
                 _('Congratulations! You changed your nickname.'))
         return result
 
     def get_prompt(self):
-        return _('Restore your nick to %s' % (self._activity.metadata['nick']))
+        return _('Restore your nick to %s' % (self._target))
 
 
 class AddFavoriteTask(Task):
@@ -187,11 +186,11 @@ class AddFavoriteTask(Task):
         if task_data['attempt'] == 0:
             _logger.debug('first attempt: saving favorites list')
             favorites_list = get_favorites()
-            self._activity.metadata['favorites'] = json.dumps(favorites_list)
+            self._activity.write_task_data('favorites', favorites_list)
             return False
         else:
             favorites_list = get_favorites()
-            saved_favorites = json.loads(self._activity.metadata['favorites'])
+            saved_favorites = self._activity.read_task_data('favorites')
             return len(favorites_list) > len(saved_favorites)
 
     def get_prompt(self):
@@ -208,11 +207,11 @@ class RemoveFavoriteTask(Task):
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
             favorites_list = get_favorites()
-            self._activity.metadata['favorites'] = json.dumps(favorites_list)
+            self._activity.write_task_data('favorites', favorites_list)
             return False
         else:
             favorites_list = get_favorites()
-            saved_favorites = json.loads(self._activity.metadata['favorites'])
+            saved_favorites = self._activity.read_task_data('favorites')
             result = len(favorites_list) < len(saved_favorites)
             if result:
                 self._activity.add_badge(

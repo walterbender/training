@@ -54,8 +54,6 @@ class TrainingActivity(activity.Activity):
         self.current_task = self.read_task_data('current_task')
         if self.current_task is None:
             self.current_task = 0
-
-        if self.current_task == 0:
             self.button_label = Gtk.Label(_('Begin'))
         else:
             _logger.debug(self.current_task)
@@ -100,7 +98,7 @@ class TrainingActivity(activity.Activity):
 	alert.show()
 
     def write_file(self, file_path):
-        self.write_task_data('current_task', 0)
+        self.write_task_data('current_task', self.current_task)
 
     def _setup_toolbars(self):
 	''' Setup the toolbars. '''
