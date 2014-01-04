@@ -12,12 +12,15 @@
 
 import os
 import json
+from time import sleep
 from gettext import gettext as _
 
 from gi.repository import Gtk
+from gi.repository import GObject
 
 from sugar3 import profile
 from sugar3 import env
+from sugar3.graphics import style
 
 import logging
 _logger = logging.getLogger('training-activity-exercises')
@@ -25,15 +28,39 @@ _logger = logging.getLogger('training-activity-exercises')
 ACCOUNT_NAME = 'mock'
 
 
-def get_centered_image(file_path):
-    box = Gtk.Box()
-    alignment_box = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
-                                      xscale=0, yscale=0)
-    box.pack_start(alignment_box, True, False, 5)
-    alignment_box.show()
-    image = Gtk.Image.new_from_file(file_path)
-    alignment_box.add(image)
-    image.show()
+def make_graphic(graphics):
+    ''' graphics is [{'title':, 'path':, 'label':, }]'''
+    box = Gtk.VBox()
+    for i in range(len(graphics)):
+        title = graphics[i].get('title', None)
+        path = graphics[i].get('path', None)
+        label = graphics[i].get('label', None)
+        if title is not None:
+            title_label = Gtk.Label(
+                '<span foreground="%s" size="large"><b>%s</b></span>' %
+                (style.COLOR_BLACK.get_html(), title))
+            title_label.set_use_markup(True)
+            title_label.set_line_wrap(True)
+            title_label.set_property('xalign', 0.5)
+            box.pack_start(title_label, True, True, 0)
+            title_label.show()
+        if path is not None:
+            alignment_box = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
+                                              xscale=0, yscale=0)
+            box.pack_start(alignment_box, True, False, 5)
+            image = Gtk.Image.new_from_file(path)
+            alignment_box.add(image)
+            image.show()
+            alignment_box.show()
+        if label is not None:
+            label_label = Gtk.Label(
+                '<span foreground="%s">%s</span>' %
+                (style.COLOR_BUTTON_GRAY.get_html(), text))
+            label_label.set_use_markup(True)
+            label_label.set_line_wrap(True)
+            label_label.set_property('xalign', 0.5)
+            box.pack_start(label_label, True, True, 0)
+            label_label.show()
     return box
 
 
@@ -50,7 +77,6 @@ class Exercises():
     def __init__(self, activity):
         self._activity = activity
         self._current_task = None
-        self.completed = False
 
         self._task_list = [ChangeNickTask(self._activity),
                            RestoreNickTask(self._activity),
@@ -66,58 +92,69 @@ class Exercises():
             a task method to call that returns True or False,
             and perhaps some data '''
 
-        if task_number < len(self._task_list):
-            msg = self._task_list[task_number].get_prompt()
-            success = self._task_list[task_number].get_success()
-            retry = self._task_list[task_number].get_retry()
-            data = self._task_list[task_number].get_data()
-            test = self._task_list[task_number].test
-            uid = self._task_list[task_number].uid
-            graphics = self._task_list[task_number].get_graphics()
+        prompt = self._task_list[task_number].get_prompt()
+        data = self._task_list[task_number].get_data()
+        test = self._task_list[task_number].test
+        uid = self._task_list[task_number].uid
+        graphics = self._task_list[task_number].get_graphics()
+        success = self._task_list[task_number].get_success()
+        retry = self._task_list[task_number].get_retry()
 
-            _logger.error('_run_task %d' % self._activity.current_task)
+        # Set up the task the first time through
+        if self._current_task is None:
+            self._current_task = self._activity.current_task
             if graphics is not None:
-                self._activity.scroll_window.add(graphics)
+                self.scroll_window = Gtk.ScrolledWindow()
+                self.scroll_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+                self.scroll_window.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                              Gtk.PolicyType.AUTOMATIC)
+                self.scroll_window.add(graphics)
                 graphics.show()
+                self.scroll_window.show()
+                self._activity.box.pack_start(self.scroll_window, True, True, 0)
                 self._activity.prompt_window.hide()
-                self._activity.scroll_window.show()
+                self._activity.box.show()
 
-            task_data = self._activity.read_task_data(uid)
-            if task_data is None:
-                self._activity.alert_task(msg=msg)
-                _logger.debug('first time on task %s' % (msg))
-                task_data = {}
-                task_data['task'] = msg
-                task_data['attempt'] = 0
-                task_data['data'] = data
-            if test(self, task_data):
-                _logger.debug('success %d' % self._activity.current_task)
-                self._activity.alert_task(
-                    title=_('Congratulations'),
-                    msg=success)
-                self._activity.current_task += 1
-                self._activity.write_task_data('current_task',
-                                               self._activity.current_task)
-                if graphics is not None:
-                    self._activity.scroll_window.remove(graphics)
-                    self._activity.scroll_window.hide()
-                    self._activity.prompt_window.show()
-                if not self.completed:
-                    self.task_master()
-            else:
-                task_data['attempt'] += 1
-                _logger.debug(retry)
-                self._activity.alert_task(title=retry, msg=msg)
+        task_data = self._activity.read_task_data(uid)
+        if task_data is None:
+            self._activity.label_task(msg=prompt)
+            task_data = {}
+            task_data['task'] = prompt
+            task_data['attempt'] = 0
+            task_data['data'] = data
             self._activity.write_task_data(uid, task_data)
+
+        GObject.timeout_add(5000, self._test, test, task_data,
+                            uid, graphics, retry, success)
+
+    def _test(self, test, task_data, uid, graphics, retry, success):
+        if test(self, task_data):
+            self._activity.label_task(msg=success)
+            self._current_task = None
+            self._activity.current_task += 1
+            self._activity.write_task_data('current_task',
+                                           self._activity.current_task)
+            if graphics is not None:
+                self.scroll_window.destroy()
+            self._activity.label_task(msg='continue')
+            self._activity.button_label.set_text(_('Continue to next task'))
+            self._activity.prompt_window.show()
         else:
-            self.completed = True
-            self._activity.alert_task(
-                title=_('Congratulations'),
-                msg=_('All tasks completed.'))
+            task_data['attempt'] += 1
+            self._activity.label_task(msg=retry)
+            self._activity.write_task_data(uid, task_data)
+            self._run_task(self._activity.current_task)
+
 
     def task_master(self):
-        self._run_task(self._activity.current_task)
-
+        _logger.debug('task master: running task %d' % 
+                       (self._activity.current_task))
+        # Do we have more tasks to run?
+        if self._activity.current_task < len(self._task_list):
+            self._run_task(self._activity.current_task)
+        else:
+            self._activity.complete = True
+            self._activity.button_label.set_text(_('Finished!'))
 
 class Task():
     ''' Generate class for defining tasks '''
@@ -179,7 +216,7 @@ class ChangeNickTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Home_fav-menu.png')
-        return get_centered_image(file_path)
+        return make_graphic([{'title':self.get_prompt(), 'path':file_path}])
 
 
 class RestoreNickTask(Task):
@@ -204,7 +241,7 @@ class RestoreNickTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Home_fav-menu.png')
-        return get_centered_image(file_path)
+        return make_graphic([{'title':self.get_prompt(), 'path':file_path}])
 
 
 class AddFavoriteTask(Task):
@@ -218,12 +255,12 @@ class AddFavoriteTask(Task):
         if task_data['attempt'] == 0:
             _logger.debug('first attempt: saving favorites list')
             favorites_list = get_favorites()
-            self._activity.write_task_data('favorites', favorites_list)
+            self._activity.write_task_data('favorites', len(favorites_list))
             return False
         else:
-            favorites_list = get_favorites()
-            saved_favorites = self._activity.read_task_data('favorites')
-            return len(favorites_list) > len(saved_favorites)
+            favorites_count = len(get_favorites())
+            saved_favorites_count = self._activity.read_task_data('favorites')
+            return favorites_count > saved_favorites_count
 
     def get_prompt(self):
         return _('Add a favorite')
@@ -232,7 +269,7 @@ class AddFavoriteTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
-        return get_centered_image(file_path)
+        return make_graphic([{'title':self.get_prompt(), 'path':file_path}])
 
 
 class RemoveFavoriteTask(Task):
@@ -245,12 +282,12 @@ class RemoveFavoriteTask(Task):
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
             favorites_list = get_favorites()
-            self._activity.write_task_data('favorites', favorites_list)
+            self._activity.write_task_data('favorites', len(favorites_list))
             return False
         else:
-            favorites_list = get_favorites()
-            saved_favorites = self._activity.read_task_data('favorites')
-            result = len(favorites_list) < len(saved_favorites)
+            favorites_count = len(get_favorites())
+            saved_favorites_count = self._activity.read_task_data('favorites')
+            result = favorites_count < saved_favorites_count
             if result:
                 self._activity.add_badge(
                     _('Congratulations! You changed your '
@@ -264,7 +301,8 @@ class RemoveFavoriteTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
-        return get_centered_image(file_path)
+        return make_graphic([{'title':self.get_prompt(), 'path':file_path}])
+
 
 class FinishedAllTasks(Task):
 
@@ -274,7 +312,8 @@ class FinishedAllTasks(Task):
         self._activity = activity
 
     def test(self, exercises, task_data):
+        self._activity.completed = True
         return True
 
     def get_prompt(self):
-        return _('You are a Sugar Zen master.')
+        return _('You are a Sugar Zenmaster.')

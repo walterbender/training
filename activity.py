@@ -11,6 +11,7 @@
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 from gi.repository import Gtk
+from gi.repository import Gdk
 import dbus
 import os
 from shutil import copy
@@ -21,11 +22,10 @@ from sugar3.activity import activity
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity.widgets import StopButton
-from sugar3.graphics.alert import NotifyAlert
 from sugar3.graphics import style
 from sugar3.graphics.icon import Icon
 
-from toolbar_utils import separator_factory
+from toolbar_utils import separator_factory, label_factory
 from exercises import Exercises
 
 import logging
@@ -56,24 +56,18 @@ class TrainingActivity(activity.Activity):
             self.current_task = 0
             self.button_label = Gtk.Label(_('Begin'))
         else:
-            _logger.debug(self.current_task)
             self.button_label = Gtk.Label(_('Resume'))
 
         self._progressbar = ProgressBar()
 
         self.prompt_window = Gtk.EventBox()
-        self.scroll_window = Gtk.ScrolledWindow()
-        self.scroll_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        self.scroll_window.set_policy(Gtk.PolicyType.AUTOMATIC,
-                                        Gtk.PolicyType.AUTOMATIC)
         self.show_prompt('training-trophy', self._prompt_cb)
         self.box.pack_start(self.prompt_window, True, True, 0)
-        self.box.pack_start(self.scroll_window, True, True, 0)
 
         self.prompt_window.show()
         self.box.show()
-        # self.show_all()
 
+        self.completed = False
         self._exercises = Exercises(self)
         self._update_progress()
 
@@ -88,27 +82,8 @@ class TrainingActivity(activity.Activity):
         self._update_progress()
         self._exercises.task_master()
 
-    def alert_task(self, title=None, msg=None):
-        alert = NotifyAlert()
-        if title is None:
-            alert.props.title = _('Your task, should you choose to accept it')
-        else:
-            alert.props.title = title
-        if msg is None:
-            alert.props.msg = '---'
-        else:
-            alert.props.msg = msg
-
-        def _task_alert_response_cb(alert, response_id, self):
-            self.remove_alert(alert)
-            if not self._exercises.completed:
-                self._exercises.task_master()
-            else:
-                self.close()
-
-        alert.connect('response', _task_alert_response_cb, self)
-        self.add_alert(alert)
-        alert.show()
+    def label_task(self, msg=''):
+        self.task_label.set_text(msg)
 
     def write_file(self, file_path):
         self.write_task_data('current_task', self.current_task)
@@ -126,6 +101,9 @@ class TrainingActivity(activity.Activity):
         self.set_toolbar_box(toolbox)
         toolbox.show()
         self.toolbar = toolbox.toolbar
+
+        self.task_label = label_factory(
+            toolbox.toolbar, '', width=int(Gdk.Screen.width() / 2))
 
         separator_factory(toolbox.toolbar, True, False)
         stop_button = StopButton(self)
