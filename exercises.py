@@ -25,6 +25,18 @@ _logger = logging.getLogger('training-activity-exercises')
 ACCOUNT_NAME = 'mock'
 
 
+def get_centered_image(file_path):
+    box = Gtk.Box()
+    alignment_box = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
+                                      xscale=0, yscale=0)
+    box.pack_start(alignment_box, True, False, 5)
+    alignment_box.show()
+    image = Gtk.Image.new_from_file(file_path)
+    alignment_box.add(image)
+    image.show()
+    return box
+
+
 def get_favorites():
     favorites_path = env.get_profile_path('favorite_activities')
     if os.path.exists(favorites_path):
@@ -167,11 +179,7 @@ class ChangeNickTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Home_fav-menu.png')
-        box = Gtk.Box()
-        image = Gtk.Image.new_from_file(file_path)
-        box.pack_start(image, False, False, 0)
-        image.show()
-        return box
+        return get_centered_image(file_path)
 
 
 class RestoreNickTask(Task):
@@ -196,11 +204,7 @@ class RestoreNickTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Home_fav-menu.png')
-        box = Gtk.Box()
-        image = Gtk.Image.new_from_file(file_path)
-        box.pack_start(image, False, False, 0)
-        image.show()
-        return box
+        return get_centered_image(file_path)
 
 
 class AddFavoriteTask(Task):
@@ -228,11 +232,7 @@ class AddFavoriteTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
-        box = Gtk.Box()
-        image = Gtk.Image.new_from_file(file_path)
-        box.pack_start(image, False, False, 0)
-        image.show()
-        return box
+        return get_centered_image(file_path)
 
 
 class RemoveFavoriteTask(Task):
@@ -264,11 +264,7 @@ class RemoveFavoriteTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
-        box = Gtk.Box()
-        image = Gtk.Image.new_from_file(file_path)
-        box.pack_start(image, False, False, 0)
-        image.show()
-        return box
+        return get_centered_image(file_path)
 
 class FinishedAllTasks(Task):
 
