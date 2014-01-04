@@ -44,6 +44,9 @@ class TrainingActivity(activity.Activity):
 
         self._setup_toolbars()
 
+        self.box = Gtk.VBox()
+        self.set_canvas(self.box)
+
         self.prompt_label = Gtk.Label(
             '<span foreground="%s"><b>%s</b></span>' %
             (style.COLOR_BUTTON_GREY.get_html(), _('Sugar Training Activity')))
@@ -58,18 +61,25 @@ class TrainingActivity(activity.Activity):
 
         self._progressbar = ProgressBar()
 
-        self.empty_widgets = Gtk.EventBox()
+        self.prompt_window = Gtk.EventBox()
+        self.scroll_window = Gtk.ScrolledWindow()
+        self.scroll_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        self.scroll_window.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                        Gtk.PolicyType.AUTOMATIC)
         self.show_prompt('training-trophy', self._prompt_cb)
+        self.box.pack_start(self.prompt_window, True, True, 0)
+        self.box.pack_start(self.scroll_window, True, True, 0)
 
-        self.show_all()
+        self.prompt_window.show()
+        self.box.show()
+        # self.show_all()
 
         self._exercises = Exercises(self)
         self._update_progress()
 
     def _update_progress(self):
         self._progressbar.set_progress(
-            (self.current_task + 1) /
-            float(self._exercises.get_number_of_tasks()))
+            self.current_task / float(self._exercises.get_number_of_tasks()))
         self._progressbar.set_message(
             _('Progress to date: %d / %d' %
               (self.current_task, self._exercises.get_number_of_tasks())))
@@ -77,12 +87,6 @@ class TrainingActivity(activity.Activity):
     def _prompt_cb(self, button):
         self._update_progress()
         self._exercises.task_master()
-
-    def __stop_clicked_cb(self, button):
-        self.destroy()
-
-    def __ok_clicked_cb(self, button):
-        self.destroy()
 
     def alert_task(self, title=None, msg=None):
         alert = NotifyAlert()
@@ -111,7 +115,6 @@ class TrainingActivity(activity.Activity):
 
     def _setup_toolbars(self):
         ''' Setup the toolbars. '''
-
         self.max_participants = 1  # No sharing
 
         toolbox = ToolbarBox()
@@ -131,7 +134,7 @@ class TrainingActivity(activity.Activity):
         stop_button.show()
 
     def show_prompt(self, icon_name, btn_callback):
-        self.empty_widgets.modify_bg(Gtk.StateType.NORMAL,
+        self.prompt_window.modify_bg(Gtk.StateType.NORMAL,
                                      style.COLOR_WHITE.get_gdk_color())
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -163,9 +166,8 @@ class TrainingActivity(activity.Activity):
         vbox.pack_end(self._progressbar, False, True, 0)
         self._progressbar.show()
 
-        self.empty_widgets.add(vbox)
-        self.empty_widgets.show_all()
-        self.set_canvas(self.empty_widgets)
+        self.prompt_window.add(vbox)
+        self.prompt_window.show_all()
 
     def add_badge(self, msg, icon="training-trophy", name="Sugar"):
         badge = {

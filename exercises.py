@@ -61,8 +61,14 @@ class Exercises():
             data = self._task_list[task_number].get_data()
             test = self._task_list[task_number].test
             uid = self._task_list[task_number].uid
+            graphics = self._task_list[task_number].get_graphics()
 
             _logger.error('_run_task %d' % self._activity.current_task)
+            if graphics is not None:
+                self._activity.scroll_window.add(graphics)
+                graphics.show()
+                self._activity.prompt_window.hide()
+                self._activity.scroll_window.show()
 
             task_data = self._activity.read_task_data(uid)
             if task_data is None:
@@ -80,6 +86,10 @@ class Exercises():
                 self._activity.current_task += 1
                 self._activity.write_task_data('current_task',
                                                self._activity.current_task)
+                if graphics is not None:
+                    self._activity.scroll_window.remove(graphics)
+                    self._activity.scroll_window.hide()
+                    self._activity.prompt_window.show()
                 if not self.completed:
                     self.task_master()
             else:
@@ -94,9 +104,7 @@ class Exercises():
                 msg=_('All tasks completed.'))
 
     def task_master(self):
-        _logger.debug('task_master')
         self._run_task(self._activity.current_task)
-        _logger.debug('...')
 
 
 class Task():
@@ -128,8 +136,8 @@ class Task():
         raise NotImplementedError
 
     def get_graphics(self):
-        ''' A box containing graphics to present with the task '''
-        return Gtk.Box()
+        ''' Graphics to present with the task '''
+        return None
 
 
 class ChangeNickTask(Task):
@@ -155,6 +163,16 @@ class ChangeNickTask(Task):
     def get_prompt(self):
         return _('Change your nick')
 
+    def get_graphics(self):
+        file_path = os.path.join(os.path.expanduser('~'), 'Activities',
+                                 'Help.activity', 'images',
+                                 'Home_fav-menu.png')
+        box = Gtk.Box()
+        image = Gtk.Image.new_from_file(file_path)
+        box.pack_start(image, False, False, 0)
+        image.show()
+        return box
+
 
 class RestoreNickTask(Task):
 
@@ -173,6 +191,16 @@ class RestoreNickTask(Task):
 
     def get_prompt(self):
         return _('Restore your nick to %s' % (self._target))
+
+    def get_graphics(self):
+        file_path = os.path.join(os.path.expanduser('~'), 'Activities',
+                                 'Help.activity', 'images',
+                                 'Home_fav-menu.png')
+        box = Gtk.Box()
+        image = Gtk.Image.new_from_file(file_path)
+        box.pack_start(image, False, False, 0)
+        image.show()
+        return box
 
 
 class AddFavoriteTask(Task):
@@ -195,6 +223,16 @@ class AddFavoriteTask(Task):
 
     def get_prompt(self):
         return _('Add a favorite')
+
+    def get_graphics(self):
+        file_path = os.path.join(os.path.expanduser('~'), 'Activities',
+                                 'Help.activity', 'images',
+                                 'Journal_main_annotated.png')
+        box = Gtk.Box()
+        image = Gtk.Image.new_from_file(file_path)
+        box.pack_start(image, False, False, 0)
+        image.show()
+        return box
 
 
 class RemoveFavoriteTask(Task):
@@ -222,6 +260,15 @@ class RemoveFavoriteTask(Task):
     def get_prompt(self):
         return _('Remove a favorite')
 
+    def get_graphics(self):
+        file_path = os.path.join(os.path.expanduser('~'), 'Activities',
+                                 'Help.activity', 'images',
+                                 'Journal_main_annotated.png')
+        box = Gtk.Box()
+        image = Gtk.Image.new_from_file(file_path)
+        box.pack_start(image, False, False, 0)
+        image.show()
+        return box
 
 class FinishedAllTasks(Task):
 
