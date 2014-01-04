@@ -10,7 +10,7 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-from gi.repository import Gtk, Gdk, GConf, GObject
+from gi.repository import Gtk
 import dbus
 import os
 from shutil import copy
@@ -19,16 +19,13 @@ from gettext import gettext as _
 
 from sugar3.activity import activity
 from sugar3.graphics.toolbarbox import ToolbarBox
-from sugar3.graphics.toolbutton import ToolButton
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity.widgets import StopButton
-from sugar3.graphics.objectchooser import ObjectChooser
-from sugar3.graphics.colorbutton import ColorToolButton
 from sugar3.graphics.alert import NotifyAlert
 from sugar3.graphics import style
 from sugar3.graphics.icon import Icon
 
-from toolbar_utils import button_factory, separator_factory
+from toolbar_utils import separator_factory
 from exercises import Exercises
 
 import logging
@@ -98,24 +95,24 @@ class TrainingActivity(activity.Activity):
         else:
             alert.props.msg = msg
 
-	def _task_alert_response_cb(alert, response_id, self):
+        def _task_alert_response_cb(alert, response_id, self):
             self.remove_alert(alert)
             if not self._exercises.completed:
                 self._exercises.task_master()
             else:
                 self.close()
 
-	alert.connect('response', _task_alert_response_cb, self)
-	self.add_alert(alert)
-	alert.show()
+        alert.connect('response', _task_alert_response_cb, self)
+        self.add_alert(alert)
+        alert.show()
 
     def write_file(self, file_path):
         self.write_task_data('current_task', self.current_task)
 
     def _setup_toolbars(self):
-	''' Setup the toolbars. '''
+        ''' Setup the toolbars. '''
 
-	self.max_participants = 1  # No sharing
+        self.max_participants = 1  # No sharing
 
         toolbox = ToolbarBox()
         # Activity toolbar

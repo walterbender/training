@@ -14,8 +14,10 @@ import os
 import json
 from gettext import gettext as _
 
+from gi.repository import Gtk
+
 from sugar3 import profile
-from sugar3.test import uitree
+from sugar3 import env
 
 import logging
 _logger = logging.getLogger('training-activity-exercises')
@@ -24,9 +26,6 @@ ACCOUNT_NAME = 'mock'
 
 
 def get_favorites():
-    from sugar3 import env
-    import os
-
     favorites_path = env.get_profile_path('favorite_activities')
     if os.path.exists(favorites_path):
         favorites_data = json.load(open(favorites_path))
@@ -65,8 +64,6 @@ class Exercises():
 
             _logger.error('_run_task %d' % self._activity.current_task)
 
-            task_key = 'task %d' % self._activity.current_task
-            
             task_data = self._activity.read_task_data(uid)
             if task_data is None:
                 self._activity.alert_task(msg=msg)
@@ -82,7 +79,7 @@ class Exercises():
                     msg=success)
                 self._activity.current_task += 1
                 self._activity.write_task_data('current_task',
-                                              self._activity.current_task)
+                                               self._activity.current_task)
                 if not self.completed:
                     self.task_master()
             else:
@@ -144,13 +141,13 @@ class ChangeNickTask(Task):
 
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
-            _logger.debug('first attempt: saving nick value as %s' % 
+            _logger.debug('first attempt: saving nick value as %s' %
                           profile.get_nick_name())
             self._activity.write_task_data('nick', profile.get_nick_name())
             return False
         else:
             target = self._activity.read_task_data('nick')
-            _logger.debug('%d attempt: comparing %s to %s' % 
+            _logger.debug('%d attempt: comparing %s to %s' %
                           (task_data['attempt'], profile.get_nick_name(),
                            target))
             return not profile.get_nick_name() == target
