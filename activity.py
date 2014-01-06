@@ -75,8 +75,9 @@ class TrainingActivity(activity.Activity):
         self._progressbar.set_progress(
             self.current_task / float(self._exercises.get_number_of_tasks()))
         self._progressbar.set_message(
-            _('Progress to date: %d / %d' %
-              (self.current_task, self._exercises.get_number_of_tasks())))
+            _('Progress to date: %(current)d / %(total)d' %
+              {'current': self.current_task,
+               'total': self._exercises.get_number_of_tasks()}))
 
     def _prompt_cb(self, button):
         self._update_progress()
