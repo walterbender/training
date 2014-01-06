@@ -29,14 +29,14 @@ ACCOUNT_NAME = 'mock'
 
 
 def make_graphic(graphics):
-    ''' graphics is [{'title':, 'path':, 'label':, }]'''
+    ''' graphics is [{'title':, 'path':, 'caption':, }]'''
     box = Gtk.VBox()
     for i in range(len(graphics)):
         title = graphics[i].get('title', None)
         path = graphics[i].get('path', None)
-        label = graphics[i].get('label', None)
+        caption = graphics[i].get('caption', None)
         if title is not None:
-            title_label = Gtk.Label(
+            title_label= Gtk.Label(
                 '<span foreground="%s" size="large"><b>%s</b></span>' %
                 (style.COLOR_BLACK.get_html(), title))
             title_label.set_use_markup(True)
@@ -52,15 +52,15 @@ def make_graphic(graphics):
             alignment_box.add(image)
             image.show()
             alignment_box.show()
-        if label is not None:
-            label_label = Gtk.Label(
+        if caption is not None:
+            caption_label = Gtk.Label(
                 '<span foreground="%s">%s</span>' %
                 (style.COLOR_BUTTON_GRAY.get_html(), text))
-            label_label.set_use_markup(True)
-            label_label.set_line_wrap(True)
-            label_label.set_property('xalign', 0.5)
-            box.pack_start(label_label, True, True, 0)
-            label_label.show()
+            caption_label.set_use_markup(True)
+            caption_label.set_line_wrap(True)
+            caption_label.set_property('xalign', 0.5)
+            box.pack_start(caption_label, True, True, 0)
+            caption_label.show()
     return box
 
 
@@ -117,7 +117,7 @@ class Exercises():
 
         task_data = self._activity.read_task_data(uid)
         if task_data is None:
-            self._activity.label_task(msg=prompt)
+            # self._activity.label_task(msg=prompt)
             task_data = {}
             task_data['task'] = prompt
             task_data['attempt'] = 0
@@ -129,19 +129,19 @@ class Exercises():
 
     def _test(self, test, task_data, uid, graphics, retry, success):
         if test(self, task_data):
-            self._activity.label_task(msg=success)
+            # self._activity.label_task(msg=success)
             self._current_task = None
             self._activity.current_task += 1
             self._activity.write_task_data('current_task',
                                            self._activity.current_task)
             if graphics is not None:
                 self.scroll_window.destroy()
-            self._activity.label_task(msg='continue')
+            # self._activity.label_task(msg='continue')
             self._activity.button_label.set_text(_('Continue to next task'))
             self._activity.prompt_window.show()
         else:
             task_data['attempt'] += 1
-            self._activity.label_task(msg=retry)
+            # self._activity.label_task(msg=retry)
             self._activity.write_task_data(uid, task_data)
             self._run_task(self._activity.current_task)
 
