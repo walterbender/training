@@ -84,6 +84,13 @@ class Exercises():
                            RemoveFavoriteTask(self._activity),
                            FinishedAllTasks(self._activity)]
 
+    def get_help_info(self):
+        _logger.debug('get_help_info for task %d' % self._current_task)
+        if self._current_task is None:
+            return (None, None)
+        else:
+            return self._task_list[self._current_task].get_help_info()
+
     def get_number_of_tasks(self):
         return len(self._task_list)
 
@@ -99,6 +106,12 @@ class Exercises():
         graphics = self._task_list[task_number].get_graphics()
         success = self._task_list[task_number].get_success()
         retry = self._task_list[task_number].get_retry()
+        title, help_file = self._task_list[task_number].get_help_info()
+
+        if title is None or help_file is None:
+            self._activity.help_button.set_sensitive(False)
+        else:
+            self._activity.help_button.set_sensitive(True)
 
         # Set up the task the first time through
         if self._current_task is None:
@@ -145,7 +158,6 @@ class Exercises():
             self._activity.write_task_data(uid, task_data)
             self._run_task(self._activity.current_task)
 
-
     def task_master(self):
         _logger.debug('task master: running task %d' % 
                        (self._activity.current_task))
@@ -155,6 +167,7 @@ class Exercises():
         else:
             self._activity.complete = True
             self._activity.button_label.set_text(_('Finished!'))
+
 
 class Task():
     ''' Generate class for defining tasks '''
@@ -183,6 +196,9 @@ class Task():
     def get_prompt(self):
         ''' String to present to the user to define the task '''
         raise NotImplementedError
+
+    def get_help_info(self):
+        return (None, None)
 
     def get_graphics(self):
         ''' Graphics to present with the task '''
@@ -265,6 +281,9 @@ class AddFavoriteTask(Task):
     def get_prompt(self):
         return _('Add a favorite')
 
+    def get_help_info(self):
+        return ('Home', 'home_view.html')
+
     def get_graphics(self):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
@@ -296,6 +315,9 @@ class RemoveFavoriteTask(Task):
 
     def get_prompt(self):
         return _('Remove a favorite')
+
+    def get_help_info(self):
+        return ('Home', 'home_view.html')
 
     def get_graphics(self):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',

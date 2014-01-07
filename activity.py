@@ -25,7 +25,9 @@ from sugar3.activity.widgets import StopButton
 from sugar3.graphics import style
 from sugar3.graphics.icon import Icon
 
-from toolbar_utils import separator_factory, label_factory
+from jarabe.view.viewhelp import ViewHelp
+
+from toolbar_utils import separator_factory, label_factory, button_factory
 from exercises import Exercises
 
 import logging
@@ -41,6 +43,8 @@ class TrainingActivity(activity.Activity):
             super(TrainingActivity, self).__init__(handle)
         except dbus.exceptions.DBusException, e:
             _logger.error(str(e))
+
+        self.connect('realize', self.__realize_cb)
 
         self._setup_toolbars()
 
@@ -103,6 +107,11 @@ class TrainingActivity(activity.Activity):
         toolbox.show()
         self.toolbar = toolbox.toolbar
 
+        self.help_button = button_factory('help-toolbar',
+            toolbox.toolbar, self._help_cb, tooltip=_('help'),
+            accelerator=_('<Ctrl>H'))
+        self.help_button.set_sensitive(False)
+
         self.task_label = label_factory(
             toolbox.toolbar, '', width=int(Gdk.Screen.width() / 2))
 
@@ -112,6 +121,18 @@ class TrainingActivity(activity.Activity):
         toolbox.toolbar.insert(stop_button, -1)
         stop_button.show()
 
+    def __realize_cb(self, window):
+        self.window_xid = window.get_window().get_xid()
+
+    def _help_cb(self, button):
+        title, help_file = self._exercises.get_help_info()
+        _logger.debug('%s: %s' % (title, help_file))
+        if not hasattr(self, 'window_xid'):
+            self.window_xid = self.get_window().get_xid()
+        if title is not None and help_file is not None:
+            self.viewhelp = ViewHelp(title, help_file, self.window_xid)
+            self.viewhelp.show()
+            
     def show_prompt(self, icon_name, btn_callback):
         self.prompt_window.modify_bg(Gtk.StateType.NORMAL,
                                      style.COLOR_WHITE.get_gdk_color())
