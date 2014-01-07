@@ -286,7 +286,7 @@ class EnterEmailTask(Task):
         if self.entries[0] is None:
             return False
         else:
-            self._activity.write_task_data('email-address',
+            self._activity.write_task_data('email_address',
                                            self.entries[0])
             return True
 

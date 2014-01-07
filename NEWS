@@ -1,11 +1,16 @@
 NEWS
 
+1.2
+
+* Using _ instead of - in all dictionary keys
+
 1.1
 
-* added help
-* added HTML content
-* add initial task for entering email address
-* record start and end times for each task
+* Added help (pulled from help activity)
+* Added support for HTML/JS content
+* Added initial task for entering email address
+* Recording start and end times for each task
+* Created new icon based on One Academy
 
 1
 
