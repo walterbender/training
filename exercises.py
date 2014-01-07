@@ -228,6 +228,9 @@ class ChangeNickTask(Task):
     def get_prompt(self):
         return _('Change your nick')
 
+    def get_help_info(self):
+        return ('My Settings', 'my_settings.html')
+
     def get_graphics(self):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
@@ -252,6 +255,9 @@ class RestoreNickTask(Task):
 
     def get_prompt(self):
         return _('Restore your nick to %s' % (self._target))
+
+    def get_help_info(self):
+        return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
