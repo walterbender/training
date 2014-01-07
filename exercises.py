@@ -22,6 +22,7 @@ from gi.repository import WebKit
 from sugar3 import profile
 from sugar3 import env
 from sugar3.graphics import style
+from sugar3.graphics.toolbutton import ToolButton
 
 import logging
 _logger = logging.getLogger('training-activity-exercises')
@@ -37,13 +38,68 @@ def make_html_graphic(uri):
 
     return web_view
 
-def make_graphic(graphics):
-    ''' graphics is [{'title':, 'path':, 'caption':, }]'''
+
+def make_entry_graphic(task, dictionary):
+    ''' dictionary is [{'title':, 'text':, 'caption': }, ]'''
     box = Gtk.VBox()
-    for i in range(len(graphics)):
-        title = graphics[i].get('title', None)
-        path = graphics[i].get('path', None)
-        caption = graphics[i].get('caption', None)
+    for i in range(len(dictionary)):
+        text = dictionary[i].get('text', '')
+        title = dictionary[i].get('title', None)
+        maxwidth = dictionary[i].get('max', 60)
+        tooltip = dictionary[i].get('tooltip', None)
+        caption = dictionary[i].get('caption', None)
+        if title is not None:
+            title_label= Gtk.Label(
+                '<span foreground="%s" size="large"><b>%s</b></span>' %
+                (style.COLOR_BLACK.get_html(), title))
+            title_label.set_use_markup(True)
+            title_label.set_line_wrap(True)
+            title_label.set_property('xalign', 0.5)
+            box.pack_start(title_label, True, True, 0)
+            title_label.show()
+        alignment_box = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
+                                          xscale=0, yscale=0)
+        box.pack_start(alignment_box, True, False, 5)
+        entry = Gtk.Entry()
+        entry.set_text(text)
+        if tooltip is not None and hasattr(entry, 'set_tooltip_text'):
+            entry.set_tooltip_text(tooltip)
+        entry.set_width_chars(maxwidth)
+        toolitem = Gtk.ToolItem()
+        toolitem.add(entry)
+        entry.show()
+        hbox = Gtk.HBox()
+        hbox.pack_start(toolitem, False, False, 5)
+        toolitem.show()
+        def _button_cb(button):
+            _logger.debug(entry.get_text())
+            task.entries[i] = entry.get_text()
+        button = ToolButton('dialog-ok')
+        button.connect('clicked', _button_cb)
+        button.show()
+        hbox.pack_start(button, False, False, 5)
+        alignment_box.add(hbox)
+        hbox.show()
+        alignment_box.show()
+        if caption is not None:
+            caption_label = Gtk.Label(
+                '<span foreground="%s">%s</span>' %
+                (style.COLOR_BUTTON_GREY.get_html(), caption))
+            caption_label.set_use_markup(True)
+            caption_label.set_line_wrap(True)
+            caption_label.set_property('xalign', 0.5)
+            box.pack_start(caption_label, True, True, 0)
+            caption_label.show()
+    return box
+
+
+def make_image_graphic(dictionary):
+    ''' dictionary is [{'title':, 'path':, 'caption': }, ]'''
+    box = Gtk.VBox()
+    for i in range(len(dictionary)):
+        title = dictionary[i].get('title', None)
+        path = dictionary[i].get('path', None)
+        caption = dictionary[i].get('caption', None)
         if title is not None:
             title_label= Gtk.Label(
                 '<span foreground="%s" size="large"><b>%s</b></span>' %
@@ -64,7 +120,7 @@ def make_graphic(graphics):
         if caption is not None:
             caption_label = Gtk.Label(
                 '<span foreground="%s">%s</span>' %
-                (style.COLOR_BUTTON_GRAY.get_html(), text))
+                (style.COLOR_BUTTON_GREY.get_html(), caption))
             caption_label.set_use_markup(True)
             caption_label.set_line_wrap(True)
             caption_label.set_property('xalign', 0.5)
@@ -87,7 +143,8 @@ class Exercises():
         self._activity = activity
         self._current_task = None
 
-        self._task_list = [ChangeNickTask(self._activity),
+        self._task_list = [EnterEmailTask(self._activity),
+                           ChangeNickTask(self._activity),
                            RestoreNickTask(self._activity),
                            AddFavoriteTask(self._activity),
                            RemoveFavoriteTask(self._activity),
@@ -214,6 +271,30 @@ class Task():
         return None
 
 
+class EnterEmailTask(Task):
+
+    def __init__(self, activity):
+        self.name = _('Enter Email Task')
+        self.uid = 'email'
+        self.entries = [None]
+        self._activity = activity
+
+    def test(self, exercises, task_data):
+        if self.entries[0] is None:
+            return False
+        else:
+            self._activity.write_task_data('email-address',
+                                           self.entries[0])
+            return True
+
+    def get_prompt(self):
+        return _('Please enter your email address.')
+
+    def get_graphics(self):
+        return make_entry_graphic(
+            self, [{'title': 'email address', 'caption': self.get_prompt()}])
+
+
 class ChangeNickTask(Task):
 
     def __init__(self, activity):
@@ -244,7 +325,8 @@ class ChangeNickTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Home_fav-menu.png')
-        return make_graphic([{'title':self.get_prompt(), 'path':file_path}])
+        return make_image_graphic([{'title':self.get_prompt(),
+                                    'path':file_path}])
 
 
 class RestoreNickTask(Task):
@@ -272,7 +354,8 @@ class RestoreNickTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Home_fav-menu.png')
-        return make_graphic([{'title':self.get_prompt(), 'path':file_path}])
+        return make_image_graphic([{'title':self.get_prompt(),
+                                    'path':file_path}])
 
 
 class AddFavoriteTask(Task):
@@ -304,7 +387,8 @@ class AddFavoriteTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
-        return make_graphic([{'title':self.get_prompt(), 'path':file_path}])
+        return make_image_graphic([{'title':self.get_prompt(),
+                                    'path':file_path}])
         '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'html',
@@ -345,7 +429,8 @@ class RemoveFavoriteTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
-        return make_graphic([{'title':self.get_prompt(), 'path':file_path}])
+        return make_image_graphic([{'title':self.get_prompt(),
+                                    'path':file_path}])
 
 
 class FinishedAllTasks(Task):

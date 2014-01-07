@@ -196,7 +196,10 @@ class TrainingActivity(activity.Activity):
             fd = open(data_path, 'r')
             json_data = fd.read()
             fd.close()
-            data = json.loads(json_data)
+            if len(json_data) > 0:
+                data = json.loads(json_data)
+            else:
+                data = {}
             if uid in data:
                 uid_data = data[uid]
         return uid_data
@@ -209,7 +212,8 @@ class TrainingActivity(activity.Activity):
             fd = open(data_path, 'r')
             json_data = fd.read()
             fd.close()
-            data = json.loads(json_data)
+            if len(json_data) > 0:
+                data = json.loads(json_data)
         data[uid] = uid_data
         json_data = json.dumps(data)
         fd = open(data_path, 'w')

@@ -1,0 +1,124 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-01-07 12:46-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: activity/activity.info:2
+msgid "Training"
+msgstr ""
+
+#: activity/activity.info:3
+msgid "a series of training exercises"
+msgstr ""
+
+#: activity.py:56
+msgid "Sugar Training Activity"
+msgstr ""
+
+#: activity.py:61
+msgid "Begin"
+msgstr ""
+
+#: activity.py:63
+msgid "Resume"
+msgstr ""
+
+#: activity.py:82
+#, python-format
+msgid "Progress to date: %(current)d / %(total)d"
+msgstr ""
+
+#: activity.py:111
+msgid "help"
+msgstr ""
+
+#: activity.py:112
+msgid "<Ctrl>H"
+msgstr ""
+
+#: exercises.py:219
+msgid "Continue to next task"
+msgstr ""
+
+#: exercises.py:235
+msgid "Finished!"
+msgstr ""
+
+#: exercises.py:252
+msgid "Success!"
+msgstr ""
+
+#: exercises.py:256
+msgid "Keep trying"
+msgstr ""
+
+#: exercises.py:277
+msgid "Enter Email Task"
+msgstr ""
+
+#: exercises.py:291
+msgid "Please enter your email address."
+msgstr ""
+
+#: exercises.py:301
+msgid "Change Nick Task"
+msgstr ""
+
+#: exercises.py:319
+msgid "Change your nick"
+msgstr ""
+
+#: exercises.py:335
+msgid "Restore Nick Task"
+msgstr ""
+
+#: exercises.py:344
+msgid "Congratulations! You changed your nickname."
+msgstr ""
+
+#: exercises.py:348
+#, python-format
+msgid "Restore your nick to %s"
+msgstr ""
+
+#: exercises.py:364
+msgid "Add Favorite Task"
+msgstr ""
+
+#: exercises.py:380
+msgid "Add a favorite"
+msgstr ""
+
+#: exercises.py:403
+msgid "Remove Favorite Task"
+msgstr ""
+
+#: exercises.py:418
+msgid "Congratulations! You changed your favorite activities."
+msgstr ""
+
+#: exercises.py:423
+msgid "Remove a favorite"
+msgstr ""
+
+#: exercises.py:439
+msgid "Finished All Tasks"
+msgstr ""
+
+#: exercises.py:448
+msgid "You are a Sugar Zenmaster."
+msgstr ""
