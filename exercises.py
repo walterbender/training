@@ -17,6 +17,7 @@ from gettext import gettext as _
 
 from gi.repository import Gtk
 from gi.repository import GObject
+from gi.repository import WebKit
 
 from sugar3 import profile
 from sugar3 import env
@@ -27,6 +28,14 @@ _logger = logging.getLogger('training-activity-exercises')
 
 ACCOUNT_NAME = 'mock'
 
+
+def make_html_graphic(uri):
+    web_view = WebKit.WebView()
+    web_view.set_full_content_zoom(True)
+    web_view.show()
+    web_view.load_uri(uri)
+
+    return web_view
 
 def make_graphic(graphics):
     ''' graphics is [{'title':, 'path':, 'caption':, }]'''
@@ -291,10 +300,17 @@ class AddFavoriteTask(Task):
         return ('Home', 'home_view.html')
 
     def get_graphics(self):
+        '''
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
         return make_graphic([{'title':self.get_prompt(), 'path':file_path}])
+        '''
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                                 'Help.activity', 'html',
+                                 'home_view.html')
+        _logger.debug(url)
+        return make_html_graphic('file://' + url)
 
 
 class RemoveFavoriteTask(Task):
