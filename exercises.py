@@ -12,7 +12,7 @@
 
 import os
 import json
-from time import sleep
+import time
 from gettext import gettext as _
 
 from gi.repository import Gtk
@@ -198,6 +198,7 @@ class Exercises():
         if task_data is None:
             # self._activity.label_task(msg=prompt)
             task_data = {}
+            task_data['start_time'] = time.time()
             task_data['task'] = prompt
             task_data['attempt'] = 0
             task_data['data'] = data
@@ -208,19 +209,21 @@ class Exercises():
 
     def _test(self, test, task_data, uid, graphics, retry, success):
         if test(self, task_data):
-            # self._activity.label_task(msg=success)
+            # Record end time
+            task_data = self._activity.read_task_data(uid)
+            task_data['end_time'] = time.time()
+            self._activity.write_task_data(uid, task_data)
+
             self._current_task = None
             self._activity.current_task += 1
             self._activity.write_task_data('current_task',
                                            self._activity.current_task)
             if graphics is not None:
                 self.scroll_window.destroy()
-            # self._activity.label_task(msg='continue')
             self._activity.button_label.set_text(_('Continue to next task'))
             self._activity.prompt_window.show()
         else:
             task_data['attempt'] += 1
-            # self._activity.label_task(msg=retry)
             self._activity.write_task_data(uid, task_data)
             self._run_task(self._activity.current_task)
 
@@ -383,7 +386,6 @@ class AddFavoriteTask(Task):
         return ('Home', 'home_view.html')
 
     def get_graphics(self):
-        '''
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
@@ -395,6 +397,7 @@ class AddFavoriteTask(Task):
                                  'home_view.html')
         _logger.debug(url)
         return make_html_graphic('file://' + url)
+        '''
 
 
 class RemoveFavoriteTask(Task):
