@@ -21,6 +21,7 @@ from gi.repository import WebKit
 
 from sugar3 import profile
 from sugar3 import env
+from sugar3.test import uitree
 from sugar3.graphics import style
 from sugar3.graphics.toolbutton import ToolButton
 
@@ -142,6 +143,7 @@ class Exercises():
     def __init__(self, activity):
         self._activity = activity
         self._current_task = None
+        self.counter = 0
 
         self._task_list = [EnterEmailTask(self._activity),
                            ChangeNickTask(self._activity),
@@ -149,6 +151,42 @@ class Exercises():
                            AddFavoriteTask(self._activity),
                            RemoveFavoriteTask(self._activity),
                            FinishedAllTasks(self._activity)]
+
+        # self._uitester()
+        # _logger.error(uitree.get_root().dump())
+        for node in uitree.get_root().get_children():
+            _logger.error('%s (%s)' % (node.name, node.role_name))
+            for node1 in node.get_children():
+                if node1.name in ['Journal', 'Log Activity']:
+                    continue
+                _logger.error('1  %s (%s)' % (node1.name, node1.role_name))
+                for node2 in node1.get_children():
+                    _logger.error('2    %s (%s)' % (node2.name, node2.role_name))
+                    for node3 in node2.get_children():
+                        _logger.error('3      %s (%s)' % (node3.name, node3.role_name))
+                        for node4 in node3.get_children():
+                            _logger.error('4        %s (%s)' % (node4.name, node4.role_name))
+                            for node5 in node4.get_children():
+                                _logger.error('5          %s (%s)' % (node5.name, node5.role_name))
+                                for node6 in node5.get_children():
+                                    _logger.error('6            %s (%s)' % (node6.name, node6.role_name))
+                                    for node7 in node6.get_children():
+                                        _logger.error('7              %s (%s)' % (node7.name, node7.role_name))
+                                        for node8 in node7.get_children():
+                                            _logger.error('8              %s (%s)' % (node8.name, node8.role_name))
+
+    def _uitester(self):
+        _logger.error('uitree')
+        _logger.error(uitree.get_root())
+        for node in uitree.get_root().get_children():
+            _logger.error('%s (%s)' % (node.name, node.role_name))
+            for node1 in node.get_children():
+                _logger.error('> %s (%s)' % (node1.name, node1.role_name))
+                for node2 in node1.get_children():
+                    _logger.error('> > %s (%s)' % (node2.name, node2.role_name))
+        self.counter += 1
+        if self.counter < 10:
+            GObject.timeout_add(2000, self._uitester)
 
     def get_help_info(self):
         _logger.debug('get_help_info for task %d' % self._current_task)
@@ -198,7 +236,7 @@ class Exercises():
         if task_data is None:
             # self._activity.label_task(msg=prompt)
             task_data = {}
-            task_data['start_time'] = time.time()
+            task_data['start_time'] = int(time.time())
             task_data['task'] = prompt
             task_data['attempt'] = 0
             task_data['data'] = data
@@ -211,7 +249,7 @@ class Exercises():
         if test(self, task_data):
             # Record end time
             task_data = self._activity.read_task_data(uid)
-            task_data['end_time'] = time.time()
+            task_data['end_time'] = int(time.time())
             self._activity.write_task_data(uid, task_data)
 
             self._current_task = None
