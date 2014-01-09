@@ -4,6 +4,7 @@ NEWS
 
 * Using _ instead of - in all dictionary keys
 * Tweaked icon to make it Sugar compliant
+* Save integer timestamps
 
 1.1
 

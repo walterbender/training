@@ -34,6 +34,10 @@ import logging
 _logger = logging.getLogger('training-activity')
 
 
+FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
+              'xx-large']
+
+
 class TrainingActivity(activity.Activity):
     ''' A series of training exercises '''
 
@@ -45,50 +49,93 @@ class TrainingActivity(activity.Activity):
             _logger.error(str(e))
 
         self.connect('realize', self.__realize_cb)
+        self._overall_progress = 0
+        self._font_size = FONT_SIZES[4]
 
         self._setup_toolbars()
 
-        self.box = Gtk.VBox()
-        self.set_canvas(self.box)
+        self.modify_bg(Gtk.StateType.NORMAL,
+                       style.COLOR_WHITE.get_gdk_color())
 
-        self.prompt_label = Gtk.Label(
-            '<span foreground="%s"><b>%s</b></span>' %
-            (style.COLOR_BUTTON_GREY.get_html(), _('Sugar Training Activity')))
+        self.grid = Gtk.Grid()
+        self.grid.set_row_spacing(style.DEFAULT_SPACING)
+        self.grid.set_column_spacing(style.DEFAULT_SPACING)
+
+        self.prompt_title = _('Welcome to One Academy')
+        self.prompt_message = _('Are you ready to learn?')
+        self.create_prompt()
 
         self.current_task = self.read_task_data('current_task')
         if self.current_task is None:
             self.current_task = 0
-            self.button_label = Gtk.Label(_('Begin'))
+            self.button_label = Gtk.Label(_("Let's go!"))
         else:
             self.button_label = Gtk.Label(_('Resume'))
 
-        self._progressbar = ProgressBar()
-
-        self.prompt_window = Gtk.EventBox()
-        self.show_prompt('training-trophy', self._prompt_cb)
-        self.box.pack_start(self.prompt_window, True, True, 0)
-
+        self.create_prompt_window()
+        self.grid.attach(self.prompt_window, 0, 0, 1, 1)
         self.prompt_window.show()
-        self.box.show()
+
+        self._progressbar = ProgressBar()
+        self.grid.attach(self._progressbar, 0, 1, 1, 1)
+        self._progressbar.show()
+
+        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
+        center_in_panel.add(self.grid)
+        self.grid.show()
+        self.set_canvas(center_in_panel)
+        center_in_panel.show()
 
         self.completed = False
         self._exercises = Exercises(self)
-        self._update_progress()
+        self.update_progress()
 
-    def _update_progress(self):
-        self._progressbar.set_progress(
-            self.current_task / float(self._exercises.get_number_of_tasks()))
+    def create_prompt(self):
+        if not hasattr(self, 'prompt_label'):
+            self.prompt_label = Gtk.Label()
+            self.prompt_label.set_use_markup(True)
+            self.prompt_label.set_justify(Gtk.Justification.CENTER)
+        self.prompt_label.set_markup(
+            '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
+            (style.COLOR_BLACK.get_html(),
+             FONT_SIZES[5],
+             self.prompt_title) +
+            '<span foreground="%s" size="%s">%s</span>' %
+            (style.COLOR_BLACK.get_html(),
+             FONT_SIZES[4],
+             self.prompt_message))
+
+    def create_prompt_window(self):
+        self.prompt_window = Gtk.EventBox()
+        offset = style.GRID_CELL_SIZE
+        width = Gdk.Screen.width()
+        height = Gdk.Screen.height() - offset * 3
+        self.prompt_window.set_size_request(width, height)
+        self.show_prompt('one-academy', self._prompt_cb)
+
+    def update_progress(self):
+        section, index = self._exercises.get_section_index(self.current_task)
+        section_count = self._exercises.get_number_of_tasks_in_section(section)
+        logging.debug('section %d, task %d/%d' %
+                      (section, index, section_count))
+        self._progressbar.set_progress(index / float(section_count))
         self._progressbar.set_message(
             _('Progress to date: %(current)d / %(total)d' %
-              {'current': self.current_task,
-               'total': self._exercises.get_number_of_tasks()}))
+              {'current': index, 'total': section_count}))
+
+        logging.debug('overall: %d / %d' %
+                      (self.current_task,
+                       self._exercises.get_number_of_tasks()))
+        self._overall_progress = int((self.current_task * 100.) \
+            / self._exercises.get_number_of_tasks())
+        self.progress_label.set_markup(
+            '<span foreground="%s" size="%s"><b>%s</b></span>' %
+            (style.COLOR_WHITE.get_html(), FONT_SIZES[5],
+             _('Overall: %d%%' % (self._overall_progress))))
 
     def _prompt_cb(self, button):
-        self._update_progress()
+        self.update_progress()
         self._exercises.task_master()
-
-    def label_task(self, msg=''):
-        self.task_label.set_text(msg)
 
     def write_file(self, file_path):
         self.write_task_data('current_task', self.current_task)
@@ -112,8 +159,8 @@ class TrainingActivity(activity.Activity):
             accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)
 
-        self.task_label = label_factory(
-            toolbox.toolbar, '', width=int(Gdk.Screen.width() / 2))
+        self.progress_label = label_factory(toolbox.toolbar, '', width=200)
+        self.progress_label.set_use_markup(True)
 
         separator_factory(toolbox.toolbar, True, False)
         stop_button = StopButton(self)
@@ -141,13 +188,11 @@ class TrainingActivity(activity.Activity):
         mvbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         vbox.pack_start(mvbox, True, False, 0)
 
-        image_icon = Icon(pixel_size=style.LARGE_ICON_SIZE,
+        image_icon = Icon(pixel_size=style.XLARGE_ICON_SIZE,
                           icon_name=icon_name,
                           stroke_color=style.COLOR_BUTTON_GREY.get_svg(),
                           fill_color=style.COLOR_TRANSPARENT.get_svg())
         mvbox.pack_start(image_icon, False, False, style.DEFAULT_PADDING)
-
-        self.prompt_label.set_use_markup(True)
         mvbox.pack_start(self.prompt_label, False, False,
                          style.DEFAULT_PADDING)
 
@@ -162,9 +207,6 @@ class TrainingActivity(activity.Activity):
         open_image_btn.add(buttonbox)
         hbox.pack_start(open_image_btn, True, False, 0)
         mvbox.pack_start(hbox, False, False, style.DEFAULT_PADDING)
-
-        vbox.pack_end(self._progressbar, False, True, 0)
-        self._progressbar.show()
 
         self.prompt_window.add(vbox)
         self.prompt_window.show_all()

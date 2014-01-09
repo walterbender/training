@@ -16,6 +16,7 @@ import time
 from gettext import gettext as _
 
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GObject
 from gi.repository import WebKit
 
@@ -33,6 +34,10 @@ ACCOUNT_NAME = 'mock'
 
 def make_html_graphic(uri):
     web_view = WebKit.WebView()
+    offset = style.GRID_CELL_SIZE
+    width = Gdk.Screen.width() - offset * 2
+    height = Gdk.Screen.height() - offset * 2
+    web_view.set_size_request(width, height)
     web_view.set_full_content_zoom(True)
     web_view.show()
     web_view.load_uri(uri)
@@ -43,6 +48,10 @@ def make_html_graphic(uri):
 def make_entry_graphic(task, dictionary):
     ''' dictionary is [{'title':, 'text':, 'caption': }, ]'''
     box = Gtk.VBox()
+    offset = style.GRID_CELL_SIZE
+    width = Gdk.Screen.width() - offset * 2
+    height = Gdk.Screen.height() - offset * 2
+    box.set_size_request(width, height)
     for i in range(len(dictionary)):
         text = dictionary[i].get('text', '')
         title = dictionary[i].get('title', None)
@@ -97,6 +106,10 @@ def make_entry_graphic(task, dictionary):
 def make_image_graphic(dictionary):
     ''' dictionary is [{'title':, 'path':, 'caption': }, ]'''
     box = Gtk.VBox()
+    offset = style.GRID_CELL_SIZE
+    width = Gdk.Screen.width() - offset * 2
+    height = Gdk.Screen.height() - offset * 2
+    box.set_size_request(width, height)
     for i in range(len(dictionary)):
         title = dictionary[i].get('title', None)
         path = dictionary[i].get('path', None)
@@ -143,15 +156,17 @@ class Exercises():
     def __init__(self, activity):
         self._activity = activity
         self._current_task = None
+        self._current_section = None
         self.counter = 0
 
-        self._task_list = [EnterEmailTask(self._activity),
-                           ChangeNickTask(self._activity),
-                           RestoreNickTask(self._activity),
-                           AddFavoriteTask(self._activity),
-                           RemoveFavoriteTask(self._activity),
-                           FinishedAllTasks(self._activity)]
+        self._task_list = [[EnterEmailTask(self._activity)],
+                           [ChangeNickTask(self._activity),
+                            RestoreNickTask(self._activity)],
+                           [AddFavoriteTask(self._activity),
+                            RemoveFavoriteTask(self._activity)],
+                           [FinishedAllTasks(self._activity)]]
 
+        '''
         # self._uitester()
         # _logger.error(uitree.get_root().dump())
         for node in uitree.get_root().get_children():
@@ -187,30 +202,30 @@ class Exercises():
         self.counter += 1
         if self.counter < 10:
             GObject.timeout_add(2000, self._uitester)
+        '''
 
     def get_help_info(self):
         _logger.debug('get_help_info for task %d' % self._current_task)
         if self._current_task is None:
             return (None, None)
         else:
-            return self._task_list[self._current_task].get_help_info()
+            section, index = self.get_section_index(self._current_task)
+            return self._task_list[section][index].get_help_info()
 
-    def get_number_of_tasks(self):
-        return len(self._task_list)
-
-    def _run_task(self, task_number):
+    def _run_task(self, section, task_number):
         ''' To run a task, we need a message to display,
             a task method to call that returns True or False,
             and perhaps some data '''
 
-        prompt = self._task_list[task_number].get_prompt()
-        data = self._task_list[task_number].get_data()
-        test = self._task_list[task_number].test
-        uid = self._task_list[task_number].uid
-        graphics = self._task_list[task_number].get_graphics()
-        success = self._task_list[task_number].get_success()
-        retry = self._task_list[task_number].get_retry()
-        title, help_file = self._task_list[task_number].get_help_info()
+        prompt = self._task_list[section][task_number].get_prompt()
+        data = self._task_list[section][task_number].get_data()
+        test = self._task_list[section][task_number].test
+        uid = self._task_list[section][task_number].uid
+        graphics = self._task_list[section][task_number].get_graphics()
+        success = self._task_list[section][task_number].get_success()
+        retry = self._task_list[section][task_number].get_retry()
+        title, help_file = \
+            self._task_list[section][task_number].get_help_info()
 
         if title is None or help_file is None:
             self._activity.help_button.set_sensitive(False)
@@ -225,12 +240,17 @@ class Exercises():
                 self.scroll_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
                 self.scroll_window.set_policy(Gtk.PolicyType.AUTOMATIC,
                                               Gtk.PolicyType.AUTOMATIC)
+                offset = style.GRID_CELL_SIZE
+                width = Gdk.Screen.width()
+                height = Gdk.Screen.height() - offset * 3
+                self.scroll_window.set_size_request(width, height)
                 self.scroll_window.add(graphics)
                 graphics.show()
                 self.scroll_window.show()
-                self._activity.box.pack_start(self.scroll_window, True, True, 0)
-                self._activity.prompt_window.hide()
-                self._activity.box.show()
+                self._activity.prompt_window.destroy()
+                self._activity.grid.attach(
+                    self.scroll_window, 0, 0, 1, 1)
+                self._activity.grid.show()
 
         task_data = self._activity.read_task_data(uid)
         if task_data is None:
@@ -256,24 +276,54 @@ class Exercises():
             self._activity.current_task += 1
             self._activity.write_task_data('current_task',
                                            self._activity.current_task)
+
+            self._activity.button_label.set_text(_('Next'))
             if graphics is not None:
                 self.scroll_window.destroy()
-            self._activity.button_label.set_text(_('Continue to next task'))
+                self._activity.create_prompt_window()
+                self._activity.grid.attach(
+                    self._activity.prompt_window, 0, 0, 1, 1)
+            self._activity.update_progress()
             self._activity.prompt_window.show()
         else:
             task_data['attempt'] += 1
             self._activity.write_task_data(uid, task_data)
-            self._run_task(self._activity.current_task)
+            section, index = self.get_section_index(
+                self._activity.current_task)
+            self._run_task(section, index)
 
     def task_master(self):
         _logger.debug('task master: running task %d' % 
                        (self._activity.current_task))
         # Do we have more tasks to run?
-        if self._activity.current_task < len(self._task_list):
-            self._run_task(self._activity.current_task)
+        if self._activity.current_task < self.get_number_of_tasks():
+            section, index = self.get_section_index(
+                self._activity.current_task)
+            self._run_task(section, index)
         else:
             self._activity.complete = True
             self._activity.button_label.set_text(_('Finished!'))
+
+    def get_number_of_sections(self):
+        return len(self._task_list)
+
+    def get_number_of_tasks_in_section(self, section_index):
+        return len(self._task_list[section_index])
+
+    def get_section_index(self, target):
+        count = 0
+        for section_index, section in enumerate(self._task_list):
+            for task_index in range(len(section)):
+                if count == target:
+                    return section_index, task_index
+                count += 1
+        return -1, -1
+
+    def get_number_of_tasks(self):
+        count = 0
+        for section in self._task_list:
+            count += len(section)
+        return count
 
 
 class Task():
