@@ -51,47 +51,16 @@ class TrainingActivity(activity.Activity):
         self.modify_bg(Gtk.StateType.NORMAL,
                        style.COLOR_WHITE.get_gdk_color())
 
-        self.grid = Gtk.Grid()
-        self.grid.set_row_spacing(style.DEFAULT_SPACING)
-        self.grid.set_column_spacing(style.DEFAULT_SPACING)
-
-        self._progressbar = ProgressBar()
-        self.grid.attach(self._progressbar, 0, 0, 1, 1)
-        self._progressbar.show()
+        self._exercises = Exercises(self)
 
         center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-        center_in_panel.add(self.grid)
-        self.grid.show()
+        center_in_panel.add(self._exercises)
+        self._exercises.show()
         self.set_canvas(center_in_panel)
         center_in_panel.show()
 
         self.completed = False
-        self._exercises = Exercises(self)
-        self.update_progress()
         self._exercises.task_master()
-
-    def update_progress(self):
-        current_task = self._exercises.current_task
-        section, index = self._exercises.get_section_index()
-        if section < 0:  # Initial condition
-            return
-        section_count = self._exercises.get_number_of_tasks_in_section(section)
-        logging.debug('section %d, task %d/%d' %
-                      (section, index, section_count))
-        self._progressbar.set_progress(index / float(section_count))
-        self._progressbar.set_message(
-            _('Progress to date: %(current)d / %(total)d' %
-              {'current': index, 'total': section_count}))
-
-        logging.debug('overall: %d / %d' %
-                      (current_task,
-                       self._exercises.get_number_of_tasks()))
-        self._overall_progress = int((current_task * 100.) \
-            / self._exercises.get_number_of_tasks())
-        self.progress_label.set_markup(
-            '<span foreground="%s" size="%s"><b>%s</b></span>' %
-            (style.COLOR_WHITE.get_html(), 'x-large',
-             _('Overall: %d%%' % (self._overall_progress))))
 
     def write_file(self, file_path):
         self._exercises.write_task_data('current_task',
@@ -137,7 +106,7 @@ class TrainingActivity(activity.Activity):
             self.viewhelp = ViewHelp(title, help_file, self.window_xid)
             self.viewhelp.show()
 
-    def add_badge(self, msg, icon="training-trophy", name="Sugar"):
+    def add_badge(self, msg, icon="training-trophy", name="One Academy"):
         badge = {
             'icon': icon,
             'from': name,
@@ -156,37 +125,3 @@ class TrainingActivity(activity.Activity):
         else:
             self.metadata['comments'] = json.dumps([badge])
 
-
-class ProgressBar(Gtk.VBox):
-
-    def __init__(self):
-        Gtk.VBox.__init__(self)
-        self.set_spacing(style.DEFAULT_PADDING)
-        self.set_border_width(style.DEFAULT_SPACING * 2)
-
-        self._progress = Gtk.ProgressBar()
-        width = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
-        height = 10
-        self._progress.set_size_request(width, height)
-
-        self.pack_start(self._progress, True, True, 0)
-        self._progress.show()
-
-        self._label = Gtk.Label()
-        self._label.set_line_wrap(True)
-        self._label.set_property('xalign', 0.5)
-        self._label.modify_fg(Gtk.StateType.NORMAL,
-                              style.COLOR_BUTTON_GREY.get_gdk_color())
-        self.pack_start(self._label, True, True, 0)
-        self._label.show()
-
-        alignment_box = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
-                                          xscale=0, yscale=0)
-        self.pack_start(alignment_box, True, True, 0)
-        alignment_box.show()
-
-    def set_message(self, message):
-        self._label.set_text(message)
-
-    def set_progress(self, fraction):
-        self._progress.props.fraction = fraction

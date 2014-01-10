@@ -81,7 +81,6 @@ class IntroTask(Task):
     def __init__(self, activity):
         self.name = _('Intro Task')
         self.uid = 'introtask'
-        self.entries = [None]
         self._activity = activity
 
     def get_prompt(self):
@@ -94,14 +93,15 @@ class IntroTask(Task):
         return self._activity.button_was_pressed
 
     def get_graphics(self):
-        return self._activity.make_intro_graphic(
-            '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
-            (style.COLOR_BLACK.get_html(),
-             FONT_SIZES[5], _('Welcome to One Academy')) +
-            '<span foreground="%s" size="%s">%s</span>' %
-            (style.COLOR_BLACK.get_html(),
-             FONT_SIZES[4], _('Are you ready to learn?')),
-            'one-academy', button_label=_("Let's go!"))
+        return self._activity.make_badge_graphic(
+            [{'prompt':
+              '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
+              (style.COLOR_BLACK.get_html(),
+               FONT_SIZES[5], _('Welcome to One Academy')) +
+              '<span foreground="%s" size="%s">%s</span>' %
+              (style.COLOR_BLACK.get_html(),
+               FONT_SIZES[4], _('Are you ready to learn?')),
+              'image': 'one-academy'}], button_label=_("Let's go!"))
 
 
 class EnterNameTask(Task):
@@ -134,12 +134,15 @@ class EnterNameTask(Task):
         return self._activity.make_entry_graphic(
             self, [{'title': 'name',
                     'caption':
-                    _('See that progress bar at the bottom of your screen?\n\
+                    '<span foreground="%s" size="%s">%s</span>\n\n\n' %
+                    (style.COLOR_BLACK.get_html(),
+                     FONT_SIZES[5],
+                     _('See that progress bar at the bottom of your screen?\n\
 It fills up when you complete tasks.\n\
 Complete tasks to earn badges...\n\
 Earn all the badges and you’ll be XO-Certified!\n\n\n\
 Time for the first task:\n\
-Write your full name in the box below, then press Next')}])
+Write your full name in the box below, then press Next'))}])
 
 
 class EnterEmailTask(Task):
@@ -170,9 +173,57 @@ class EnterEmailTask(Task):
         return self.name
 
     def get_graphics(self):
+        target = self._activity.read_task_data('name').split()[0]
         return self._activity.make_entry_graphic(
             self, [{'title': 'email address',
-                    'caption': _('Please enter your email address.')}])
+                    'caption':
+                    '<span foreground="%s" size="%s">%s</span>\n\n\n' %
+                    (style.COLOR_BLACK.get_html(),
+                     FONT_SIZES[5],
+                     _('Nice work %s!\n\
+You’ve almost filled the bar!\n\n\n\
+Here’s another tricky one:\n\
+Write your email address in the box below, then press Next' % target))}])
+
+
+class BadgeOneTask(Task):
+    def __init__(self, activity):
+        self.name = _('Badge One')
+        self.uid = 'badge1'
+        self._activity = activity
+
+    def get_prompt(self):
+        pass
+
+    def get_pause_time(self):
+        return 1000
+
+    def after_button_press(self):
+        target = self._activity.read_task_data('name').split()[0]
+        self._activity._activity.add_badge(
+            _("Congratulations %s!\n\
+You’ve earned your first badge!" % target),
+            icon='badge-intro')
+
+    def test(self, exercises, task_data):
+        return self._activity.button_was_pressed
+
+    def get_graphics(self):
+        target = self._activity.read_task_data('name').split()[0]
+        return self._activity.make_badge_graphic(
+            [{'prompt':
+              '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
+              (style.COLOR_BLACK.get_html(),
+               FONT_SIZES[5], _("Congratulations %s!\n\
+You’ve earned your first badge!" % target)),
+              'image': 'badge-intro'},
+             {'prompt':
+              '<span foreground="%s" size="%s">%s</span>' %
+              (style.COLOR_BLACK.get_html(),
+               FONT_SIZES[4],
+               _('Most badges require you to complete multiple tasks.\n\
+Press Continue to start on your next one!'))}],
+            button_label=_("Continue"))
 
 
 class ChangeNickTask(Task):
@@ -215,13 +266,9 @@ class RestoreNickTask(Task):
         self.name = _('Restore Nick Task')
         self.uid = 'nick2'
         self._activity = activity
-        self._target = self._activity.read_task_data('nick')
 
     def test(self, exercises, task_data):
         result = profile.get_nick_name() == self._target
-        if result:
-            self._activity.add_badge(
-                _('Congratulations! You changed your nickname.'))
         return result
 
     def get_prompt(self):
@@ -231,12 +278,53 @@ class RestoreNickTask(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
+        target = self._activity.read_task_data('nick')
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Home_fav-menu.png')
         return self._activity.make_image_graphic(
-            [{'title': _('Restore your nick to %s' % (self._target)),
+            [{'title': _('Restore your nick to %s' % (target)),
               'path': file_path}])
+
+
+class BadgeTwoTask(Task):
+    def __init__(self, activity):
+        self.name = _('Badge Two')
+        self.uid = 'badge2'
+        self._activity = activity
+
+    def get_prompt(self):
+        pass
+
+    def get_pause_time(self):
+        return 1000
+
+    def after_button_press(self):
+        target = self._activity.read_task_data('name').split()[0]
+        self._activity._activity.add_badge(
+            _("Congratulations %s!\n\
+You’ve earned your second badge!" % target),
+            icon='badge-intro')
+
+    def test(self, exercises, task_data):
+        return self._activity.button_was_pressed
+
+    def get_graphics(self):
+        target = self._activity.read_task_data('name').split()[0]
+        return self._activity.make_badge_graphic(
+            [{'prompt':
+              '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
+              (style.COLOR_BLACK.get_html(),
+               FONT_SIZES[5], _("Congratulations %s!\n\
+You’ve earned your second badge!" % target)),
+              'image': 'badge-intro'},
+             {'prompt':
+              '<span foreground="%s" size="%s">%s</span>' %
+              (style.COLOR_BLACK.get_html(),
+               FONT_SIZES[4],
+               _('Most badges require you to complete multiple tasks.\n\
+Press Continue to start on your next one!'))}],
+            button_label=_("Continue"))
 
 
 class AddFavoriteTask(Task):
@@ -314,6 +402,46 @@ class RemoveFavoriteTask(Task):
             [{'title': _('Remove a favorite'), 'path': file_path}])
 
 
+class BadgeThreeTask(Task):
+    def __init__(self, activity):
+        self.name = _('Badge Three')
+        self.uid = 'badge3n'
+        self._activity = activity
+
+    def get_prompt(self):
+        pass
+
+    def get_pause_time(self):
+        return 1000
+
+    def after_button_press(self):
+        target = self._activity.read_task_data('name').split()[0]
+        self._activity._activity.add_badge(
+            _("Congratulations %s!\n\
+You’ve earned your third badge!" % target),
+            icon='badge-intro')
+
+    def test(self, exercises, task_data):
+        return self._activity.button_was_pressed
+
+    def get_graphics(self):
+        target = self._activity.read_task_data('name').split()[0]
+        return self._activity.make_badge_graphic(
+            [{'prompt':
+              '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
+              (style.COLOR_BLACK.get_html(),
+               FONT_SIZES[5], _("Congratulations %s!\n\
+You’ve earned your third badge!" % target)),
+              'image': 'badge-intro'},
+             {'prompt':
+              '<span foreground="%s" size="%s">%s</span>' %
+              (style.COLOR_BLACK.get_html(),
+               FONT_SIZES[4],
+               _('Most badges require you to complete multiple tasks.\n\
+Press Continue to start on your next one!'))}],
+            button_label=_("Continue"))
+
+
 class FinishedAllTasks(Task):
 
     def __init__(self, activity):
@@ -331,6 +459,54 @@ class FinishedAllTasks(Task):
     def get_graphics(self):
         return self._activity.make_image_graphic(
             [{'title': _('You are a Sugar Zenmaster.')}])
+
+
+class ProgressSummary(Task):
+    _SECTIONS = [{'name': _('Welcome to One Academy'),
+                  'icon': 'badge-intro'},
+                 {'name': _('Getting to Know the XO'),
+                  'icon': 'badge-intro'},
+                 {'name': _('More sections listed here'),
+                  'icon': 'badge-intro'}]
+
+    def __init__(self, activity, progress):
+        self.name = _('Progress Summary')
+        self.uid = 'progress%d' % progress
+        self._activity = activity
+        self._progress = progress
+
+    def get_prompt(self):
+        pass
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, exercises, task_data):
+        return self._activity.button_was_pressed
+
+    def get_graphics(self):
+        target = self._activity.read_task_data('name').split()[0]
+        colors = []
+        for i in range(len(self._SECTIONS)):
+            # TO DO: make the icon grey
+            if i < self._progress: 
+                colors.append(style.COLOR_BLACK.get_html())
+            else:
+                colors.append(style.COLOR_BUTTON_GREY.get_html())
+        return self._activity.make_summary_graphic(
+            [{'prompt':
+              '<span foreground="%s" size="%s">%s</span>\n\n\n' %
+              (colors[0], FONT_SIZES[5], self._SECTIONS[0]['name']),
+               'image': self._SECTIONS[0]['icon']},
+             {'prompt':
+              '<span foreground="%s" size="%s">%s</span>\n\n\n' %
+              (colors[1], FONT_SIZES[5], self._SECTIONS[1]['name']),
+               'image': self._SECTIONS[1]['icon']},
+             {'prompt':
+              '<span foreground="%s" size="%s">%s</span>\n\n\n' %
+              (colors[2], FONT_SIZES[5], self._SECTIONS[2]['name']),
+               'image': self._SECTIONS[2]['icon']}],
+            button_label=_("Continue"))
 
 
 class UITest(Task):

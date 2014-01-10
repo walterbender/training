@@ -1,5 +1,14 @@
 NEWS
 
+1.4
+
+* Fixed problem with flow
+* Moved task class to separate file
+* Added badge tasks
+* Added summary tasks
+* Reworked calculations for progress bar in consideraton of badge and
+  summary tasks
+
 1.3
 
 * Keep progress on screen at all times

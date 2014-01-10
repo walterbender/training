@@ -27,15 +27,20 @@ import logging
 _logger = logging.getLogger('training-activity-exercises')
 
 from tasks import *
+from progressbar import ProgressBar
 
 
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
               'xx-large']
 
 
-class Exercises():
+class Exercises(Gtk.Grid):
 
     def __init__(self, activity):
+        Gtk.Grid.__init__(self)
+        self.set_row_spacing(style.DEFAULT_SPACING)
+        self.set_column_spacing(style.DEFAULT_SPACING)
+
         self._activity = activity
         self.button_was_pressed = True
         self.current_task = None
@@ -46,16 +51,27 @@ class Exercises():
 
         self._task_list = [[IntroTask(self),
                             EnterNameTask(self),
-                            EnterEmailTask(self)],
+                            EnterEmailTask(self),
+                            BadgeOneTask(self)],
+                           [ProgressSummary(self, 1)],
                            [ChangeNickTask(self),
-                            RestoreNickTask(self)],
+                            RestoreNickTask(self),
+                            BadgeTwoTask(self)],
+                           [ProgressSummary(self, 2)],
                            [AddFavoriteTask(self),
-                            RemoveFavoriteTask(self)],
+                            RemoveFavoriteTask(self),
+                            BadgeThreeTask(self)],
+                           [ProgressSummary(self, 3)],
                            [FinishedAllTasks(self)]]
 
         self.current_task = self.read_task_data('current_task')
         if self.current_task is None:
             self.current_task = 0
+
+        self._progressbar = ProgressBar()
+        self.attach(self._progressbar, 0, 0, 1, 1)
+        self._progressbar.show()
+
         _logger.error('LEAVING INIT %d' % self.current_task)
 
     def create_task_button(self, label=_('Next')):
@@ -70,7 +86,7 @@ class Exercises():
             _logger.error('INCREMENTING TASK COUNTER')
             self.write_task_data('current_task', self.current_task)
             _logger.error('WRITING CURRENT TASK %d' % (self.current_task))
-            self._activity.update_progress()
+            self.update_progress()
             self.task_master()
 
         self.task_button = Gtk.Button(label)
@@ -110,7 +126,6 @@ class Exercises():
         if self.first_time:
             _logger.error('CREATING SCROLLED WINDOW')
             self.scroll_window = Gtk.ScrolledWindow()
-            self.scroll_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
             self.scroll_window.set_policy(Gtk.PolicyType.AUTOMATIC,
                                           Gtk.PolicyType.AUTOMATIC)
             offset = style.GRID_CELL_SIZE
@@ -123,17 +138,17 @@ class Exercises():
             self.scroll_window.show()
             if self.grid_row_zero is None:
                 _logger.error('ADDING ROW 0')
-                self._activity.grid.insert_row(0)
+                self.insert_row(0)
                 self.grid_row_zero = True
             _logger.error('ATTACHING SCROLL WINDOW TO GRID')
-            self._activity.grid.attach(self.scroll_window, 0, 0, 1, 1)
-            self._activity.grid.show()
+            self.attach(self.scroll_window, 0, 0, 1, 1)
+            self.show()
 
             _logger.error('SETTING BUTTON INSENSITIVE')
             self.task_button.set_sensitive(False)
             self.task_button.show()
             _logger.error('UPDATE PROGRESS')
-            self._activity.update_progress()
+            self.update_progress()
 
         task_data = self.read_task_data(uid)
         if task_data is None:
@@ -174,6 +189,8 @@ class Exercises():
             self._run_task(section, index)
 
     def task_master(self):
+        _logger.error('UPDATING PROGRESS')
+        self.update_progress()
         _logger.error('TASK MASTER: RUNNING TASK %d' % (self.current_task))
         if hasattr(self, 'scroll_window'):
             _logger.error('DESTROYING SCROLL WINDOW')
@@ -240,14 +257,47 @@ class Exercises():
             json_data = fd.read()
             fd.close()
             if len(json_data) > 0:
-                data = json.loads(json_data)
+                try:
+                    data = json.loads(json_data)
+                except ValueError, e:
+                    _logger.error('Cannot load training data: %s' % e)
         data[uid] = uid_data
         json_data = json.dumps(data)
         fd = open(data_path, 'w')
         fd.write(json_data)
         fd.close()
 
-    def make_intro_graphic(self, prompt, image, button_label=_('Next')):
+    def update_progress(self):
+        current_task = self.current_task
+        section, task_index = self.get_section_index()
+        task_index += 1  # Count the current task
+        if section < 0:  # Initial condition
+            return
+        tasks_in_section = self.get_number_of_tasks_in_section(section)
+        if tasks_in_section > 1:
+            tasks_in_section -= 1 # Don't count badge at end of section task
+        _logger.debug('section %d, task %d/%d' %
+                      (section, task_index, tasks_in_section))
+        self._progressbar.set_progress(task_index / float(tasks_in_section))
+        if task_index > tasks_in_section:  # Must be a badge task
+            self._progressbar.set_message(_('Complete'))
+        elif task_index == 1 and tasks_in_section == 1:  # Must be a summary
+            self._progressbar.set_message(_('Progress Summary'))
+        else:
+            self._progressbar.set_message(
+                _('Progress to date: %(current)d / %(total)d' %
+                  {'current': task_index, 'total': tasks_in_section}))
+
+        _logger.debug('overall: %d / %d' %
+                      (current_task, self.get_number_of_tasks()))
+        overall_progress = int((current_task * 100.) \
+                               / self.get_number_of_tasks())
+        self._activity.progress_label.set_markup(
+            '<span foreground="%s" size="%s"><b>%s</b></span>' %
+            (style.COLOR_WHITE.get_html(), 'x-large',
+             _('Overall: %d%%' % (overall_progress))))
+
+    def make_badge_graphic(self, dictionary, button_label=_('Next')):
         grid = Gtk.Grid()
         grid.set_row_spacing(style.DEFAULT_SPACING)
         grid.set_column_spacing(style.DEFAULT_SPACING)
@@ -255,22 +305,65 @@ class Exercises():
         center_in_panel.add(grid)
         grid.show()
 
-        label = Gtk.Label()
-        label.set_use_markup(True)
-        label.set_justify(Gtk.Justification.CENTER)
-        label.set_markup(prompt)
-        grid.attach(label, 0, 0, 1, 1)
-        label.show()
+        row = 0
+        for i in range(len(dictionary)):
+            prompt = dictionary[i].get('prompt', '') 
+            image = dictionary[i].get('image', None)
 
-        icon = Icon(pixel_size=style.XLARGE_ICON_SIZE,
-                    icon_name=image,
-                    stroke_color=style.COLOR_BUTTON_GREY.get_svg(),
-                    fill_color=style.COLOR_TRANSPARENT.get_svg())
-        grid.attach(icon, 0, 1, 1, 1)
-        icon.show()
+            label = Gtk.Label()
+            label.set_use_markup(True)
+            label.set_justify(Gtk.Justification.CENTER)
+            label.set_markup(prompt)
+            grid.attach(label, 0, row, 1, 1)
+            row += 1
+            label.show()
+
+            if image is not None:
+                icon = Icon(pixel_size=style.XLARGE_ICON_SIZE,
+                            icon_name=image,
+                            stroke_color=style.COLOR_BUTTON_GREY.get_svg(),
+                            fill_color=style.COLOR_TRANSPARENT.get_svg())
+                grid.attach(icon, 0, row, 1, 1)
+                icon.show()
+                row += 1
 
         self.create_task_button()
-        grid.attach(self.task_button, 0, 2, 1, 1)
+        grid.attach(self.task_button, 0, row, 1, 1)
+        self.task_button.set_label(button_label)
+        self.task_button.show()
+        return center_in_panel
+
+    def make_summary_graphic(self, dictionary, button_label=_('Next')):
+        grid = Gtk.Grid()
+        grid.set_row_spacing(style.DEFAULT_SPACING)
+        grid.set_column_spacing(style.DEFAULT_SPACING)
+        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
+        center_in_panel.add(grid)
+        grid.show()
+
+        row = 0
+        for i in range(len(dictionary)):
+            prompt = dictionary[i].get('prompt', '') 
+            image = dictionary[i].get('image', None)
+
+            label = Gtk.Label()
+            label.set_use_markup(True)
+            label.set_justify(Gtk.Justification.CENTER)
+            label.set_markup(prompt)
+            grid.attach(label, 0, row, 1, 1)
+            label.show()
+
+            if image is not None:
+                icon = Icon(pixel_size=style.XLARGE_ICON_SIZE,
+                            icon_name=image,
+                            stroke_color=style.COLOR_BUTTON_GREY.get_svg(),
+                            fill_color=style.COLOR_TRANSPARENT.get_svg())
+                grid.attach(icon, 1, row, 1, 1)
+                icon.show()
+            row += 1
+
+        self.create_task_button()
+        grid.attach(self.task_button, 0, row, 1, 1)
         self.task_button.set_label(button_label)
         self.task_button.show()
         return center_in_panel
