@@ -8,6 +8,7 @@ NEWS
 * Added summary tasks
 * Reworked calculations for progress bar in consideraton of badge and
   summary tasks
+* Made Page class to simplify defining tasks
 
 1.3
 

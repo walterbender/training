@@ -80,7 +80,7 @@ class TrainingActivity(activity.Activity):
         toolbox.show()
         self.toolbar = toolbox.toolbar
 
-        self.help_button = button_factory('help-toolbar',
+        self.help_button = button_factory('toolbar-help',
             toolbox.toolbar, self._help_cb, tooltip=_('help'),
             accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)

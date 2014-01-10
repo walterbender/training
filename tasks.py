@@ -12,6 +12,8 @@
 
 import os
 import json
+from gi.repository import Gdk
+from gi.repository import Gtk
 from gettext import gettext as _
 
 import logging
@@ -21,6 +23,8 @@ from sugar3 import env
 from sugar3 import profile
 from sugar3.graphics import style
 from sugar3.test import uitree
+
+from page import Page
 
 
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
@@ -39,7 +43,7 @@ class Task():
     ''' Generate class for defining tasks '''
 
     def __init__(self, activity):
-        self.name = 'Generic Task'
+        self._name = 'Generic Task'
         self.uid = None
         self._activity = activity
 
@@ -65,7 +69,7 @@ class Task():
     def get_pause_time(self):
         return 5000
 
-    def get_prompt(self):
+    def get_name(self):
         ''' String to present to the user to define the task '''
         raise NotImplementedError
 
@@ -79,12 +83,12 @@ class Task():
 
 class IntroTask(Task):
     def __init__(self, activity):
-        self.name = _('Intro Task')
+        self._name = _('Intro Task')
         self.uid = 'introtask'
         self._activity = activity
 
-    def get_prompt(self):
-        pass
+    def get_name(self):
+        return self._name
 
     def get_pause_time(self):
         return 1000
@@ -93,21 +97,20 @@ class IntroTask(Task):
         return self._activity.button_was_pressed
 
     def get_graphics(self):
-        return self._activity.make_badge_graphic(
-            [{'prompt':
-              '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
-              (style.COLOR_BLACK.get_html(),
-               FONT_SIZES[5], _('Welcome to One Academy')) +
-              '<span foreground="%s" size="%s">%s</span>' %
-              (style.COLOR_BLACK.get_html(),
-               FONT_SIZES[4], _('Are you ready to learn?')),
-              'image': 'one-academy'}], button_label=_("Let's go!"))
+        page = Page(self._activity)
+        page.add_text(_('Welcome to One Academy\n\n'), bold=True,
+                      size='x-large', justify=Gtk.Justification.CENTER)
+        page.add_icon('one-academy', stroke=style.COLOR_BLACK.get_svg())
+        page.add_text(_('\nAre you ready to learn?\n\n'),
+                      justify=Gtk.Justification.CENTER)
+        page.add_task_button(button_label=_("Let's go!"))
+        return page
 
 
 class EnterNameTask(Task):
 
     def __init__(self, activity):
-        self.name = _('Enter Name Task')
+        self._name = _('Enter Name Task')
         self.uid = 'nametask'
         self.entries = []
         self._activity = activity
@@ -117,7 +120,7 @@ class EnterNameTask(Task):
 
     def test(self, exercises, task_data):
         if len(self.entries) == 0:
-            _logger.error('MISSING ENTRY')
+            _logger.error('missing entry')
             return False
         if len(self.entries[0].get_text()) == 0:
             return False
@@ -127,28 +130,29 @@ class EnterNameTask(Task):
     def after_button_press(self):
         self._activity.write_task_data('name', self.entries[0].get_text())
 
-    def get_prompt(self):
-        return self.name
+    def get_name(self):
+        return self._name
 
     def get_graphics(self):
-        return self._activity.make_entry_graphic(
-            self, [{'title': 'name',
-                    'caption':
-                    '<span foreground="%s" size="%s">%s</span>\n\n\n' %
-                    (style.COLOR_BLACK.get_html(),
-                     FONT_SIZES[5],
-                     _('See that progress bar at the bottom of your screen?\n\
+        page = Page(self._activity)
+        page.add_text(_('See that progress bar at the bottom of your screen?\n\
 It fills up when you complete tasks.\n\
 Complete tasks to earn badges...\n\
 Earn all the badges and you’ll be XO-Certified!\n\n\n\
 Time for the first task:\n\
-Write your full name in the box below, then press Next'))}])
+Write your full name in the box below, then press Next.\n\n'),
+                      size='x-large')
+        page.add_entry(self)
+        page.add_text('\n\n')
+        page.add_task_button()
+        return page
 
 
 class EnterEmailTask(Task):
+    # TODO: Add confirmation
 
     def __init__(self, activity):
-        self.name = _('Enter Email Task')
+        self._name = _('Enter Email Task')
         self.uid = 'email'
         self.entries = []
         self._activity = activity
@@ -158,7 +162,7 @@ class EnterEmailTask(Task):
 
     def test(self, exercises, task_data):
         if len(self.entries) == 0:
-            _logger.error('MISSING ENTRY')
+            _logger.error('missing entry')
             return False
         if len(self.entries[0].get_text()) == 0:
             return False
@@ -169,31 +173,31 @@ class EnterEmailTask(Task):
         self._activity.write_task_data('email_address',
                                        self.entries[0].get_text())
 
-    def get_prompt(self):
-        return self.name
+    def get_name(self):
+        return self._name
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        return self._activity.make_entry_graphic(
-            self, [{'title': 'email address',
-                    'caption':
-                    '<span foreground="%s" size="%s">%s</span>\n\n\n' %
-                    (style.COLOR_BLACK.get_html(),
-                     FONT_SIZES[5],
-                     _('Nice work %s!\n\
+        page = Page(self._activity)
+        page.add_text(_('Nice work %s!\n\
 You’ve almost filled the bar!\n\n\n\
 Here’s another tricky one:\n\
-Write your email address in the box below, then press Next' % target))}])
+Write your email address in the box below, then press Next\n\n' % target),
+                      size='x-large')
+        page.add_entry(self)
+        page.add_text('\n\n')
+        page.add_task_button()
+        return page
 
 
 class BadgeOneTask(Task):
     def __init__(self, activity):
-        self.name = _('Badge One')
+        self._name = _('Badge One')
         self.uid = 'badge1'
         self._activity = activity
 
-    def get_prompt(self):
-        pass
+    def get_name(self):
+        return self._name
 
     def get_pause_time(self):
         return 1000
@@ -210,69 +214,98 @@ You’ve earned your first badge!" % target),
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        return self._activity.make_badge_graphic(
-            [{'prompt':
-              '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
-              (style.COLOR_BLACK.get_html(),
-               FONT_SIZES[5], _("Congratulations %s!\n\
-You’ve earned your first badge!" % target)),
-              'image': 'badge-intro'},
-             {'prompt':
-              '<span foreground="%s" size="%s">%s</span>' %
-              (style.COLOR_BLACK.get_html(),
-               FONT_SIZES[4],
-               _('Most badges require you to complete multiple tasks.\n\
-Press Continue to start on your next one!'))}],
-            button_label=_("Continue"))
+        page = Page(self._activity)
+        page.add_text(_("Congratulations %s!\n\
+You’ve earned your first badge!\n\n" % target), bold=True, size='x-large')
+        page.add_icon('badge-intro')
+        page.add_text(_('\n\nMost badges require you to complete multiple \
+tasks.\n\
+Press Continue to start on your next one!\n\n'))
+        page.add_task_button(button_label=_("Continue"))
+        return page
 
 
 class ChangeNickTask(Task):
 
     def __init__(self, activity):
-        self.name = _('Change Nick Task')
+        self._name = _('Change Nick Task')
         self.uid = 'nick1'
         self._activity = activity
 
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
-            _logger.error('first attempt: saving nick value as %s' %
+            _logger.debug('first attempt: saving nick value as %s' %
                           profile.get_nick_name())
             self._activity.write_task_data('nick', profile.get_nick_name())
             return False
         else:
             target = self._activity.read_task_data('nick')
-            _logger.error('%d attempt: comparing %s to %s' %
+            _logger.debug('%d attempt: comparing %s to %s' %
                           (task_data['attempt'], profile.get_nick_name(),
                            target))
             return not profile.get_nick_name() == target
 
-    def get_prompt(self):
-        return self.name
+    def after_button_press(self):
+        _logger.error('how to jump to home view?')
+
+    def get_name(self):
+        return self._name
 
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
-        file_path = os.path.join(os.path.expanduser('~'), 'Activities',
-                                 'Help.activity', 'images',
-                                 'Home_fav-menu.png')
-        return self._activity.make_image_graphic(
-            [{'title': _('Change your nick'), 'path': file_path}])
+        path = os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Help.activity', 'images', 'Home_fav-menu.png')
+        page = Page(self._activity)
+        page.add_text(_('<b>Changing the Nickname</b>\n\
+In this lesson we’re going to learn how to change our\n\
+nickname on the XO.\n\
+You entered your nickname on the screen shown below\n\
+when you first started the XO up. Remember?\n\n'),
+                      size='x-large')
+        page.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+        page.add_text(_('\n\n<b>What is the nickname?</b>\n\
+The nickname is your name on the XO, and will appear\n\
+all around Sugar as well as being visible on networks.\n\n\
+Watch the animation below to see how it’s done:\n\n'),
+                      size='x-large')
+        page.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+        page.add_text(_("\n\n<b>Step-by-step:</b>\n\
+1. Go to the home screen\n\
+2. Right click on the central icon\n\
+3. Do other things\n\
+4. Type in a new nickname\n\
+5. Click yes to restart Sugar\n\
+6. Reopen the One Academy activity to complete\n\n\
+<b>Are you ready to try?</b>\n\
+Watch the animation again if you like.\n\
+When you’re ready to try, hit the \"My Turn\"\n\
+button below to go to the home screen.\n\n"),
+                      size='x-large')
+        page.add_task_button(button_label=_('My turn'))
+        return page
+        '''
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Help.activity', 'html',
+                            'home_view.html')
+        _logger.debug(url)
+        return make_html_graphic('file://' + url)
+        '''
 
 
 class RestoreNickTask(Task):
 
     def __init__(self, activity):
-        self.name = _('Restore Nick Task')
+        self._name = _('Restore Nick Task')
         self.uid = 'nick2'
         self._activity = activity
 
     def test(self, exercises, task_data):
-        result = profile.get_nick_name() == self._target
-        return result
+        return self._activity.button_was_pressed
 
-    def get_prompt(self):
-        return self.name
+    def get_name(self):
+        return self._name
 
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
@@ -282,19 +315,26 @@ class RestoreNickTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Home_fav-menu.png')
-        return self._activity.make_image_graphic(
-            [{'title': _('Restore your nick to %s' % (target)),
-              'path': file_path}])
+        page = Page(self._activity)
+        page.add_text(_('Nice one!\n\n\
+You changed your nickname to %s!' % profile.get_nick_name()),
+                      size='x-large')
+        page.add_icon('badge-intro')
+        page.add_text(_('\n\nYou can change it back any time you like.\n\
+Press Continue to learn about the Frame.\n\n'),
+                      size='x-large')
+        page.add_task_button(button_label=_('Continue'))
+        return page
 
 
 class BadgeTwoTask(Task):
     def __init__(self, activity):
-        self.name = _('Badge Two')
+        self._name = _('Badge Two')
         self.uid = 'badge2'
         self._activity = activity
 
-    def get_prompt(self):
-        pass
+    def get_name(self):
+        return self._name
 
     def get_pause_time(self):
         return 1000
@@ -311,32 +351,27 @@ You’ve earned your second badge!" % target),
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        return self._activity.make_badge_graphic(
-            [{'prompt':
-              '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
-              (style.COLOR_BLACK.get_html(),
-               FONT_SIZES[5], _("Congratulations %s!\n\
-You’ve earned your second badge!" % target)),
-              'image': 'badge-intro'},
-             {'prompt':
-              '<span foreground="%s" size="%s">%s</span>' %
-              (style.COLOR_BLACK.get_html(),
-               FONT_SIZES[4],
-               _('Most badges require you to complete multiple tasks.\n\
-Press Continue to start on your next one!'))}],
-            button_label=_("Continue"))
+        page = Page(self._activity)
+        page.add_text(_("Congratulations %s!\n\
+You’ve earned your second badge!\n\n" % target), bold=True, size='x-large')
+        page.add_icon('badge-intro')
+        page.add_text(_('\n\nMost badges require you to complete multiple \
+tasks.\n\
+Press Continue to start on your next one!\n\n'))
+        page.add_task_button(button_label=_("Continue"))
+        return page
 
 
 class AddFavoriteTask(Task):
 
     def __init__(self, activity):
-        self.name = _('Add Favorite Task')
+        self._name = _('Add Favorite Task')
         self.uid = 'favorites1'
         self._activity = activity
 
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
-            _logger.error('first attempt: saving favorites list')
+            _logger.debug('first attempt: saving favorites list')
             favorites_list = get_favorites()
             self._activity.write_task_data('favorites', len(favorites_list))
             return False
@@ -345,31 +380,28 @@ class AddFavoriteTask(Task):
             saved_favorites_count = self._activity.read_task_data('favorites')
             return favorites_count > saved_favorites_count
 
-    def get_prompt(self):
-        return self.name
+    def get_name(self):
+        return self._name
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
 
     def get_graphics(self):
-        file_path = os.path.join(os.path.expanduser('~'), 'Activities',
+        path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
-        return self._activity.make_image_graphic(
-            [{'title': _('Add a favorite'), 'path': file_path}])
-        '''
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                                 'Help.activity', 'html',
-                                 'home_view.html')
-        _logger.error(url)
-        return make_html_graphic('file://' + url)
-        '''
+        page = Page(self._activity)
+        page.add_text(_('Try adding a favorite to your homeview.\n\n'),
+                      size='x-large')
+        page.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+        page.add_task_button()
+        return page
 
 
 class RemoveFavoriteTask(Task):
 
     def __init__(self, activity):
-        self.name = _('Remove Favorite Task')
+        self._name = _('Remove Favorite Task')
         self.uid = 'favorites2'
         self._activity = activity
 
@@ -381,35 +413,34 @@ class RemoveFavoriteTask(Task):
         else:
             favorites_count = len(get_favorites())
             saved_favorites_count = self._activity.read_task_data('favorites')
-            result = favorites_count < saved_favorites_count
-            if result:
-                self._activity.add_badge(
-                    _('Congratulations! You changed your '
-                      'favorite activities.'))
-            return result
+            return favorites_count < saved_favorites_count
 
-    def get_prompt(self):
-        return self.name
+    def get_name(self):
+        return self._name
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
 
     def get_graphics(self):
-        file_path = os.path.join(os.path.expanduser('~'), 'Activities',
-                                 'Help.activity', 'images',
-                                 'Journal_main_annotated.png')
-        return self._activity.make_image_graphic(
-            [{'title': _('Remove a favorite'), 'path': file_path}])
+        path = os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Help.activity', 'images',
+                            'Journal_main_annotated.png')
+        page = Page(self._activity)
+        page.add_text(_('Now try removing a favorite to your homeview.\n\n'),
+                      size='x-large')
+        page.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+        page.add_task_button()
+        return page
 
 
 class BadgeThreeTask(Task):
     def __init__(self, activity):
-        self.name = _('Badge Three')
+        self._name = _('Badge Three')
         self.uid = 'badge3n'
         self._activity = activity
 
-    def get_prompt(self):
-        pass
+    def get_name(self):
+        return self._name
 
     def get_pause_time(self):
         return 1000
@@ -426,26 +457,21 @@ You’ve earned your third badge!" % target),
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        return self._activity.make_badge_graphic(
-            [{'prompt':
-              '<span foreground="%s" size="%s"><b>%s</b></span>\n\n\n' %
-              (style.COLOR_BLACK.get_html(),
-               FONT_SIZES[5], _("Congratulations %s!\n\
-You’ve earned your third badge!" % target)),
-              'image': 'badge-intro'},
-             {'prompt':
-              '<span foreground="%s" size="%s">%s</span>' %
-              (style.COLOR_BLACK.get_html(),
-               FONT_SIZES[4],
-               _('Most badges require you to complete multiple tasks.\n\
-Press Continue to start on your next one!'))}],
-            button_label=_("Continue"))
+        page = Page(self._activity)
+        page.add_text(_("Congratulations %s!\n\
+You’ve earned your third badge!\n\n" % target), bold=True, size='x-large')
+        page.add_icon('badge-intro')
+        page.add_text(_('\n\nMost badges require you to complete multiple \
+tasks.\n\
+Press Continue to start on your next one!\n\n'))
+        page.add_task_button(button_label=_("Continue"))
+        return page
 
 
 class FinishedAllTasks(Task):
 
     def __init__(self, activity):
-        self.name = _('Finished All Tasks')
+        self._name = _('Finished All Tasks')
         self.uid = 'finished'
         self._activity = activity
 
@@ -453,12 +479,14 @@ class FinishedAllTasks(Task):
         self._activity.completed = True
         return True
 
-    def get_prompt(self):
-        return self.name
+    def get_name(self):
+        return self._name
 
     def get_graphics(self):
-        return self._activity.make_image_graphic(
-            [{'title': _('You are a Sugar Zenmaster.')}])
+        page = Page(self._activity)
+        page.add_text(_('You are a Sugar Zenmaster.\n\n'))
+        page.add_task_button(button_label=_("Continue"))
+        return page
 
 
 class ProgressSummary(Task):
@@ -470,13 +498,13 @@ class ProgressSummary(Task):
                   'icon': 'badge-intro'}]
 
     def __init__(self, activity, progress):
-        self.name = _('Progress Summary')
+        self._name = _('Progress Summary')
         self.uid = 'progress%d' % progress
         self._activity = activity
         self._progress = progress
 
-    def get_prompt(self):
-        pass
+    def get_name(self):
+        return self._name
 
     def get_pause_time(self):
         return 1000
@@ -487,32 +515,31 @@ class ProgressSummary(Task):
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
         colors = []
+        strokes = []
         for i in range(len(self._SECTIONS)):
-            # TO DO: make the icon grey
             if i < self._progress: 
                 colors.append(style.COLOR_BLACK.get_html())
+                strokes.append(style.COLOR_BLACK.get_svg())
             else:
                 colors.append(style.COLOR_BUTTON_GREY.get_html())
-        return self._activity.make_summary_graphic(
-            [{'prompt':
-              '<span foreground="%s" size="%s">%s</span>\n\n\n' %
-              (colors[0], FONT_SIZES[5], self._SECTIONS[0]['name']),
-               'image': self._SECTIONS[0]['icon']},
-             {'prompt':
-              '<span foreground="%s" size="%s">%s</span>\n\n\n' %
-              (colors[1], FONT_SIZES[5], self._SECTIONS[1]['name']),
-               'image': self._SECTIONS[1]['icon']},
-             {'prompt':
-              '<span foreground="%s" size="%s">%s</span>\n\n\n' %
-              (colors[2], FONT_SIZES[5], self._SECTIONS[2]['name']),
-               'image': self._SECTIONS[2]['icon']}],
-            button_label=_("Continue"))
+                strokes.append(style.COLOR_BUTTON_GREY.get_svg())
+        page = Page(self._activity)
+        for i in range(len(self._SECTIONS)):
+            page.add_text_and_icon(self._SECTIONS[i]['name'],
+                                   self._SECTIONS[i]['icon'],
+                                   size='x-large',
+                                   icon_size=style.LARGE_ICON_SIZE,
+                                   color=colors[i],
+                                   stroke=strokes[i])
+        page.add_text('\n\n')
+        page.add_task_button(button_label=_("Continue"))
+        return page
 
 
 class UITest(Task):
 
     def __init__(self, activity):
-        self.name = _('UI Test Task')
+        self._name = _('UI Test Task')
         self.uid = 'uitest'
         self._activity = activity
 
@@ -520,13 +547,13 @@ class UITest(Task):
         return self._uitester()
 
     def _uitester(self):
-        _logger.error('uitree')
-        _logger.error(uitree.get_root())
+        _logger.debug('uitree')
+        _logger.debug(uitree.get_root())
         for node in uitree.get_root().get_children():
-            _logger.error('%s (%s)' % (node.name, node.role_name))
+            _logger.debug('%s (%s)' % (node.name, node.role_name))
             for node1 in node.get_children():
-                _logger.error('> %s (%s)' % (node1.name, node1.role_name))
+                _logger.debug('> %s (%s)' % (node1.name, node1.role_name))
                 for node2 in node1.get_children():
-                    _logger.error('> > %s (%s)' %
+                    _logger.debug('> > %s (%s)' %
                                   (node2.name, node2.role_name))
         return True

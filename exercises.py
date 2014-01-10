@@ -42,6 +42,7 @@ class Exercises(Gtk.Grid):
         self.set_column_spacing(style.DEFAULT_SPACING)
 
         self._activity = activity
+        self._graphics = None
         self.button_was_pressed = True
         self.current_task = None
         self.first_time = True
@@ -106,15 +107,9 @@ class Exercises(Gtk.Grid):
             and perhaps some data '''
         _logger.error('RUN TASK %d %d' % (section, task_index))
 
-        prompt = self._task_list[section][task_index].get_prompt()
-        data = self._task_list[section][task_index].get_data()
-        test = self._task_list[section][task_index].test
         uid = self._task_list[section][task_index].uid
-        success = self._task_list[section][task_index].get_success()
-        retry = self._task_list[section][task_index].get_retry()
         title, help_file = \
             self._task_list[section][task_index].get_help_info()
-        pause = self._task_list[section][task_index].get_pause_time()
 
         if title is None or help_file is None:
             self._activity.help_button.set_sensitive(False)
@@ -124,50 +119,36 @@ class Exercises(Gtk.Grid):
         _logger.error('FIRST TIME: %s' % (str(self.first_time)))
         # Set up the task the first time through
         if self.first_time:
-            _logger.error('CREATING SCROLLED WINDOW')
-            self.scroll_window = Gtk.ScrolledWindow()
-            self.scroll_window.set_policy(Gtk.PolicyType.AUTOMATIC,
-                                          Gtk.PolicyType.AUTOMATIC)
-            offset = style.GRID_CELL_SIZE
-            width = Gdk.Screen.width()
-            height = Gdk.Screen.height() - offset * 3
-            self.scroll_window.set_size_request(width, height)
-            graphics = self._task_list[section][task_index].get_graphics()
-            self.scroll_window.add(graphics)
-            graphics.show()
-            self.scroll_window.show()
+            self._graphics = \
+                self._task_list[section][task_index].get_graphics()
             if self.grid_row_zero is None:
-                _logger.error('ADDING ROW 0')
                 self.insert_row(0)
                 self.grid_row_zero = True
-            _logger.error('ATTACHING SCROLL WINDOW TO GRID')
-            self.attach(self.scroll_window, 0, 0, 1, 1)
-            self.show()
+            self.attach(self._graphics, 0, 0, 1, 1)
+            self._graphics.show()
 
-            _logger.error('SETTING BUTTON INSENSITIVE')
             self.task_button.set_sensitive(False)
             self.task_button.show()
-            _logger.error('UPDATE PROGRESS')
             self.update_progress()
 
         task_data = self.read_task_data(uid)
         if task_data is None:
             task_data = {}
             task_data['start_time'] = int(time.time())
-            task_data['task'] = prompt
+            task_data['task'] = self._task_list[section][task_index].get_name()
             task_data['attempt'] = 0
-            task_data['data'] = data
+            task_data['data'] = self._task_list[section][task_index].get_data()
             self.write_task_data(uid, task_data)
 
         if self.first_time:
-            _logger.error('SETTING FIRSTTIME FALSE')
             self.first_time = False
 
-        _logger.error('CALL TEST IN %d MSEC' % pause)
-        GObject.timeout_add(pause, self._test, test, task_data,
-                            uid, retry, success)
+        GObject.timeout_add(
+            self._task_list[section][task_index].get_pause_time(),
+            self._test, self._task_list[section][task_index].test,
+            task_data, uid)
 
-    def _test(self, test, task_data, uid, retry, success):
+    def _test(self, test, task_data, uid):
         _logger.error('IN TEST')
         if test(self, task_data):
             _logger.error('PASSED')
@@ -177,13 +158,11 @@ class Exercises(Gtk.Grid):
             task_data = self.read_task_data(uid)
             task_data['end_time'] = int(time.time())
             self.write_task_data(uid, task_data)
-            _logger.error('WRITING TASK DATA')
         else:
             _logger.error('FAILED')
             if 'attempt' in task_data:
                 task_data['attempt'] += 1
             self.write_task_data(uid, task_data)
-            _logger.error('WRITING TASK DATA')
             section, index = self.get_section_index()
             _logger.error('%d %d %d' % (self.current_task, section, index))
             self._run_task(section, index)
@@ -192,9 +171,9 @@ class Exercises(Gtk.Grid):
         _logger.error('UPDATING PROGRESS')
         self.update_progress()
         _logger.error('TASK MASTER: RUNNING TASK %d' % (self.current_task))
-        if hasattr(self, 'scroll_window'):
-            _logger.error('DESTROYING SCROLL WINDOW')
-            self.scroll_window.destroy()
+        if self._graphics is not None:
+            _logger.error('DESTROYING GRAPHICS WINDOW')
+            self._graphics.destroy()
         if hasattr(self, 'task_button'):
             _logger.error('DESTROYING TASK BUTTON')
             self.task_button.destroy()
@@ -207,7 +186,7 @@ class Exercises(Gtk.Grid):
             _logger.error('BACK FROM RUN TASK')
         else:
             self._activity.complete = True
-            self.task_button_label.set_text(_('Finished!'))
+            _logger.error('FIN')
 
     def get_number_of_sections(self):
         return len(self._task_list)
@@ -296,203 +275,3 @@ class Exercises(Gtk.Grid):
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
              _('Overall: %d%%' % (overall_progress))))
-
-    def make_badge_graphic(self, dictionary, button_label=_('Next')):
-        grid = Gtk.Grid()
-        grid.set_row_spacing(style.DEFAULT_SPACING)
-        grid.set_column_spacing(style.DEFAULT_SPACING)
-        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-        center_in_panel.add(grid)
-        grid.show()
-
-        row = 0
-        for i in range(len(dictionary)):
-            prompt = dictionary[i].get('prompt', '') 
-            image = dictionary[i].get('image', None)
-
-            label = Gtk.Label()
-            label.set_use_markup(True)
-            label.set_justify(Gtk.Justification.CENTER)
-            label.set_markup(prompt)
-            grid.attach(label, 0, row, 1, 1)
-            row += 1
-            label.show()
-
-            if image is not None:
-                icon = Icon(pixel_size=style.XLARGE_ICON_SIZE,
-                            icon_name=image,
-                            stroke_color=style.COLOR_BUTTON_GREY.get_svg(),
-                            fill_color=style.COLOR_TRANSPARENT.get_svg())
-                grid.attach(icon, 0, row, 1, 1)
-                icon.show()
-                row += 1
-
-        self.create_task_button()
-        grid.attach(self.task_button, 0, row, 1, 1)
-        self.task_button.set_label(button_label)
-        self.task_button.show()
-        return center_in_panel
-
-    def make_summary_graphic(self, dictionary, button_label=_('Next')):
-        grid = Gtk.Grid()
-        grid.set_row_spacing(style.DEFAULT_SPACING)
-        grid.set_column_spacing(style.DEFAULT_SPACING)
-        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-        center_in_panel.add(grid)
-        grid.show()
-
-        row = 0
-        for i in range(len(dictionary)):
-            prompt = dictionary[i].get('prompt', '') 
-            image = dictionary[i].get('image', None)
-
-            label = Gtk.Label()
-            label.set_use_markup(True)
-            label.set_justify(Gtk.Justification.CENTER)
-            label.set_markup(prompt)
-            grid.attach(label, 0, row, 1, 1)
-            label.show()
-
-            if image is not None:
-                icon = Icon(pixel_size=style.XLARGE_ICON_SIZE,
-                            icon_name=image,
-                            stroke_color=style.COLOR_BUTTON_GREY.get_svg(),
-                            fill_color=style.COLOR_TRANSPARENT.get_svg())
-                grid.attach(icon, 1, row, 1, 1)
-                icon.show()
-            row += 1
-
-        self.create_task_button()
-        grid.attach(self.task_button, 0, row, 1, 1)
-        self.task_button.set_label(button_label)
-        self.task_button.show()
-        return center_in_panel
-
-    def make_html_graphic(self, uri, button_label=_('Next')):
-        grid = Gtk.Grid()
-        grid.set_row_spacing(style.DEFAULT_SPACING)
-        grid.set_column_spacing(style.DEFAULT_SPACING)
-        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-        center_in_panel.add(grid)
-        grid.show()
-
-        web_view = WebKit.WebView()
-        offset = style.GRID_CELL_SIZE
-        width = Gdk.Screen.width() - offset * 2
-        height = Gdk.Screen.height() - offset * 2
-        web_view.set_size_request(width, height)
-        web_view.set_full_content_zoom(True)
-        web_view.load_uri(uri)
-        grid.attach(web_view, 0, 0, 1, 1)
-        web_view.show()
-
-        self.create_task_button()
-        grid.attach(self.task_button, 0, 1, 1, 1)
-        self.task_button.set_label(button_label)
-        self.task_button.show()
-        return center_in_panel
-
-    def make_entry_graphic(self, task, dictionary, button_label=_('Next')):
-        ''' dictionary is [{'title':, 'text':, 'caption': }, ]'''
-
-        _logger.error('MAKE ENTRY GRAPHIC')
-        grid = Gtk.Grid()
-        grid.set_row_spacing(style.DEFAULT_SPACING)
-        grid.set_column_spacing(style.DEFAULT_SPACING)
-        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-        center_in_panel.add(grid)
-        grid.show()
-        g = 0
-        for i in range(len(dictionary)):
-            text = dictionary[i].get('text', '')
-            title = dictionary[i].get('title', None)
-            maxwidth = dictionary[i].get('max', 60)
-            tooltip = dictionary[i].get('tooltip', None)
-            caption = dictionary[i].get('caption', None)
-            if title is not None:
-                title_label = Gtk.Label(
-                    '<span foreground="%s" size="x-large"><b>%s</b></span>' %
-                    (style.COLOR_BLACK.get_html(), title))
-                title_label.set_use_markup(True)
-                title_label.set_line_wrap(True)
-                title_label.set_property('xalign', 0.5)
-                grid.attach(title_label, 0, g, 1, 1)
-                g += 1
-                title_label.show()
-            if caption is not None:
-                caption_label = Gtk.Label(
-                    '<span background="%s" foreground="%s" size="x-large">\
-%s</span>' %
-                    (style.COLOR_WHITE.get_html(),
-                     style.COLOR_BUTTON_GREY.get_html(), caption))
-                caption_label.set_use_markup(True)
-                caption_label.set_line_wrap(True)
-                caption_label.set_property('xalign', 0.5)
-                grid.attach(caption_label, 0, g, 1, 1)
-                g += 1
-                caption_label.show()
-
-            entry = Gtk.Entry()
-            task.entries.append(entry)
-            _logger.error('APPENDING NEW ENTRY')
-            _logger.error(task.entries)
-            entry.set_text(text)
-            if tooltip is not None and hasattr(entry, 'set_tooltip_text'):
-                entry.set_tooltip_text(tooltip)
-                entry.set_width_chars(maxwidth)
-            grid.attach(entry, 0, g, 1, 1)
-            entry.show()
-            g += 1
-
-        self.create_task_button()
-        grid.attach(self.task_button, 0, g, 1, 1)
-        self.task_button.set_label(button_label)
-        self.task_button.show()
-        return center_in_panel
-
-    def make_image_graphic(self, dictionary, button_label=_('Next')):
-        ''' dictionary is [{'title':, 'path':, 'caption': }, ]'''
-        grid = Gtk.Grid()
-        grid.set_row_spacing(style.DEFAULT_SPACING)
-        grid.set_column_spacing(style.DEFAULT_SPACING)
-        row = 0
-        for i in range(len(dictionary)):
-            title = dictionary[i].get('title', None)
-            path = dictionary[i].get('path', None)
-            caption = dictionary[i].get('caption', None)
-            if title is not None:
-                title_label = Gtk.Label(
-                    '<span foreground="%s" size="x-large"><b>%s</b></span>' %
-                    (style.COLOR_BLACK.get_html(), title))
-                title_label.set_use_markup(True)
-                title_label.set_line_wrap(True)
-                title_label.set_property('xalign', 0.5)
-                grid.attach(title_label, 0, row, 1, 1)
-                row += 1
-                title_label.show()
-            if path is not None:
-                alignment_box = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
-                                                  xscale=0, yscale=0)
-                grid.attach(alignment_box, 0, row, 1, 1)
-                row += 1
-                image = Gtk.Image.new_from_file(path)
-                alignment_box.add(image)
-                image.show()
-                alignment_box.show()
-            if caption is not None:
-                caption_label = Gtk.Label(
-                    '<span background="%s" foreground="%s" size="x-large">\
-%s</span>' %
-                    (style.COLOR_WHITE.get_html(),
-                     style.COLOR_BUTTON_GREY.get_html(), caption))
-                caption_label.set_use_markup(True)
-                caption_label.set_line_wrap(True)
-                caption_label.set_property('xalign', 0.5)
-                grid.attach(caption_label, 0, row, 1, 1)
-                row += 1
-                caption_label.show()
-        self.create_task_button()
-        grid.attach(self.task_button, 0, row, 1, 1)
-        self.task_button.set_label(button_label)
-        self.task_button.show()
-        return grid
