@@ -21,6 +21,7 @@ from gettext import gettext as _
 from sugar3.activity import activity
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.activity.widgets import ActivityToolbarButton
+from sugar3.graphics.toolbarbox import ToolbarButton
 from sugar3.activity.widgets import StopButton
 from sugar3.graphics import style
 
@@ -28,6 +29,7 @@ from jarabe.view.viewhelp import ViewHelp
 
 from toolbar_utils import separator_factory, label_factory, button_factory
 from exercises import Exercises
+from tasks import FONT_SIZES
 
 import logging
 _logger = logging.getLogger('training-activity')
@@ -44,7 +46,7 @@ class TrainingActivity(activity.Activity):
             _logger.error(str(e))
 
         self.connect('realize', self.__realize_cb)
-        self._overall_progress = 0
+        self.font_size = 5
 
         self._setup_toolbars()
 
@@ -80,6 +82,26 @@ class TrainingActivity(activity.Activity):
         toolbox.show()
         self.toolbar = toolbox.toolbar
 
+        view_toolbar = Gtk.Toolbar()
+        view_toolbar_button = ToolbarButton(
+                page=view_toolbar,
+                icon_name='toolbar-view')
+        toolbox.toolbar.insert(view_toolbar_button, 1)
+        view_toolbar.show()
+        view_toolbar_button.show()
+
+        button_factory('view-fullscreen', view_toolbar,
+                       self._fullscreen_cb, tooltip=_('Fullscreen'),
+                       accelerator='<Alt>Return')
+
+        self._font_larger = button_factory('resize+', view_toolbar,
+                                           self._font_larger_cb,
+                                           tooltip=_('Increase font size'))
+
+        self._font_smaller = button_factory('resize-', view_toolbar,
+                                            self._font_smaller_cb,
+                                            tooltip=_('Decrease font size'))
+
         self.help_button = button_factory('toolbar-help',
             toolbox.toolbar, self._help_cb, tooltip=_('help'),
             accelerator=_('<Ctrl>H'))
@@ -96,6 +118,26 @@ class TrainingActivity(activity.Activity):
 
     def __realize_cb(self, window):
         self.window_xid = window.get_window().get_xid()
+
+    def _fullscreen_cb(self, button):
+        ''' Hide the Sugar toolbars. '''
+        self.fullscreen()
+
+    def _font_larger_cb(self, button):
+        if self.font_size < len(FONT_SIZES) - 1:
+            self.font_size += 1
+        else:
+            self._font_larger.set_sensitive(False)
+        self._font_smaller.set_sensitive(True)
+        self._exercises.reload_task()
+
+    def _font_smaller_cb(self, button):
+        if self.font_size > 0:
+            self.font_size -= 1
+        else:
+            self._font_smaller.set_sensitive(False)
+        self._font_larger.set_sensitive(True)
+        self._exercises.reload_task()
 
     def _help_cb(self, button):
         title, help_file = self._exercises.get_help_info()

@@ -49,11 +49,11 @@ class Task():
         self._activity = activity
         self._font_size = 5
 
-    def set_font_size(size):
+    def set_font_size(self, size):
         if size < len(FONT_SIZES):
             self._font_size = size
 
-    def get_font_size(size):
+    def get_font_size(self):
         self._font_size = size
 
     font_size = GObject.property(type=object, setter=set_font_size,

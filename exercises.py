@@ -116,17 +116,8 @@ class Exercises(Gtk.Grid):
                 self._activity.help_button.set_sensitive(False)
             else:
                 self._activity.help_button.set_sensitive(True)
-            self._graphics, self._task_button = \
-                self._task_list[section][task_index].get_graphics()
-            if self.grid_row_zero is None:
-                self.insert_row(0)
-                self.grid_row_zero = True
-            self.attach(self._graphics, 0, 0, 1, 1)
-            self._graphics.show()
 
-            self._task_button.set_sensitive(False)
-            self._task_button.show()
-            self._update_progress()
+            self._load_task()
 
             self._task_data = self.read_task_data(self._uid)
             if self._task_data is None:
@@ -167,22 +158,48 @@ class Exercises(Gtk.Grid):
         _logger.error('UPDATING PROGRESS')
         self._update_progress()
         _logger.error('TASK MASTER: RUNNING TASK %d' % (self.current_task))
+        self._destroy_task()
+        self._activity.button_was_pressed = False
+        # Do we have more tasks to run?
+        if self.current_task < self.get_number_of_tasks():
+            section, task_index = self.get_section_index()
+            self.first_time = True
+            self._run_task(section, task_index)
+            _logger.error('BACK FROM RUN TASK')
+        else:
+            self._activity.complete = True
+            _logger.error('FIN')
+
+    def reload_task(self):
+        self._destroy_task()
+        self._load_task()
+
+    def _destroy_task(self):
         if self._graphics is not None:
             _logger.error('DESTROYING GRAPHICS WINDOW')
             self._graphics.destroy()
         if hasattr(self, 'task_button'):
             _logger.error('DESTROYING TASK BUTTON')
             self._task_button.destroy()
-        self._activity.button_was_pressed = False
-        # Do we have more tasks to run?
-        if self.current_task < self.get_number_of_tasks():
-            section, index = self.get_section_index()
-            self.first_time = True
-            self._run_task(section, index)
-            _logger.error('BACK FROM RUN TASK')
-        else:
-            self._activity.complete = True
-            _logger.error('FIN')
+
+    def _load_task(self):
+        section, task_index = self.get_section_index()
+
+        self._task_list[section][task_index].set_font_size(
+            self._activity.font_size)
+
+        self._graphics, self._task_button = \
+            self._task_list[section][task_index].get_graphics()
+        if self.grid_row_zero is None:
+            self.insert_row(0)
+            self.grid_row_zero = True
+        self.attach(self._graphics, 0, 0, 1, 1)
+        self._graphics.show()
+
+        self._task_button.set_sensitive(False)
+        self._task_button.show()
+
+        self._update_progress()
 
     def get_number_of_sections(self):
         return len(self._task_list)
