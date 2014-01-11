@@ -16,12 +16,9 @@ import time
 from gettext import gettext as _
 
 from gi.repository import Gtk
-from gi.repository import Gdk
 from gi.repository import GObject
-from gi.repository import WebKit
 
 from sugar3.graphics import style
-from sugar3.graphics.icon import Icon
 
 import logging
 _logger = logging.getLogger('training-activity-exercises')
@@ -30,13 +27,10 @@ from tasks import *
 from progressbar import ProgressBar
 
 
-FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
-              'xx-large']
-
-
 class Exercises(Gtk.Grid):
 
     def __init__(self, activity):
+        ''' Initialize the task list '''
         Gtk.Grid.__init__(self)
         self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
@@ -79,22 +73,18 @@ class Exercises(Gtk.Grid):
         alignment.add(self._progress_bar)
         self._progress_bar.show()
 
-        _logger.error('LEAVING INIT %d' % self.current_task)
-
     def task_button_cb(self, button):
-        _logger.error('BUTTON PRESS')
+        ''' The button at the bottom of the page for each task: used to
+            advance to the next task. '''
         self.button_was_pressed = True
         section, task_index = self.get_section_index()
         self._task_list[section][task_index].after_button_press()
         self.current_task += 1
-        _logger.error('INCREMENTING TASK COUNTER')
         self.write_task_data('current_task', self.current_task)
-        _logger.error('WRITING CURRENT TASK %d' % (self.current_task))
-        self._update_progress()
         self.task_master()
 
     def get_help_info(self):
-        _logger.error('get_help_info for task %d' % self.current_task)
+        ''' Uses help from the Help activity '''
         if self.current_task is None:
             return (None, None)
         else:
@@ -102,12 +92,9 @@ class Exercises(Gtk.Grid):
             return self._task_list[section][index].get_help_info()
 
     def _run_task(self, section, task_index):
-        ''' To run a task, we need a message to display,
-            a task method to call that returns True or False,
-            and perhaps some data '''
-        _logger.error('RUN TASK %d %d' % (section, task_index))
+        '''To run a task, we need graphics to display, a test to call that
+            returns True or False, and perhaps some data '''
 
-        # Set up the task the first time through
         if self.first_time:
             self._uid = self._task_list[section][task_index].uid
             title, help_file = \
@@ -138,51 +125,44 @@ class Exercises(Gtk.Grid):
             self._task_data, self._uid)
 
     def _test(self, test, task_data, uid):
-        _logger.error('IN TEST')
+        ''' Is the task complete? '''
         if test(self, task_data):
-            _logger.error('PASSED')
             self._task_button.set_sensitive(True)
-            _logger.error('BUTTON ENABLED')
-            # Record end time
             task_data = self.read_task_data(uid)
             task_data['end_time'] = int(time.time())
             self.write_task_data(uid, task_data)
         else:
-            _logger.error('FAILED')
             self._task_data['attempt'] += 1
             self.write_task_data(uid, task_data)
             section, index = self.get_section_index()
             self._run_task(section, index)
 
     def task_master(self):
-        _logger.error('UPDATING PROGRESS')
-        self._update_progress()
-        _logger.error('TASK MASTER: RUNNING TASK %d' % (self.current_task))
+        ''' 'nough said. '''
+        _logger.debug('Task Master: Running task %d' % (self.current_task))
         self._destroy_task()
         self._activity.button_was_pressed = False
-        # Do we have more tasks to run?
         if self.current_task < self.get_number_of_tasks():
             section, task_index = self.get_section_index()
             self.first_time = True
             self._run_task(section, task_index)
-            _logger.error('BACK FROM RUN TASK')
         else:
             self._activity.complete = True
-            _logger.error('FIN')
 
     def reload_task(self):
+        ''' When changing font size, we regenerate the task '''
         self._destroy_task()
         self._load_task()
 
     def _destroy_task(self):
+        ''' Destroy the graphics from the previous task '''
         if self._graphics is not None:
-            _logger.error('DESTROYING GRAPHICS WINDOW')
             self._graphics.destroy()
         if hasattr(self, 'task_button'):
-            _logger.error('DESTROYING TASK BUTTON')
             self._task_button.destroy()
 
     def _load_task(self):
+        ''' Load the graphics for a task and define the task button '''
         section, task_index = self.get_section_index()
 
         self._task_list[section][task_index].set_font_size(
@@ -260,16 +240,18 @@ class Exercises(Gtk.Grid):
         fd.close()
 
     def _update_progress(self):
-        current_task = self.current_task
         section, task_index = self.get_section_index()
-        task_index += 1  # Count the current task
-        if section < 0:  # Initial condition
+        if section < 0:  # We haven't started yet
             return
         tasks_in_section = self.get_number_of_tasks_in_section(section)
+
+        # Adjust numbers:
+        #    Count the current task
+        #    Don't count badge at end of section task
+        task_index += 1
         if tasks_in_section > 1:
-            tasks_in_section -= 1 # Don't count badge at end of section task
-        _logger.debug('section %d, task %d/%d' %
-                      (section, task_index, tasks_in_section))
+            tasks_in_section -= 1
+
         self._progress_bar.set_progress(task_index / float(tasks_in_section))
         if task_index > tasks_in_section:  # Must be a badge task
             self._progress_bar.set_message(_('Complete'))
@@ -280,11 +262,8 @@ class Exercises(Gtk.Grid):
                 _('Progress to date: %(current)d / %(total)d' %
                   {'current': task_index, 'total': tasks_in_section}))
 
-        _logger.debug('overall: %d / %d' %
-                      (current_task, self.get_number_of_tasks()))
-        overall_progress = int((current_task * 100.) \
-                               / self.get_number_of_tasks())
         self._activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
-             _('Overall: %d%%' % (overall_progress))))
+             _('Overall: %d%%' % (int((self.current_task * 100.)
+                                      / self.get_number_of_tasks())))))

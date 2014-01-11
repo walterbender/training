@@ -11,7 +11,6 @@
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 from gi.repository import Gtk
-from gi.repository import Gdk
 import dbus
 import os
 from shutil import copy
@@ -88,8 +87,8 @@ class TrainingActivity(activity.Activity):
 
         view_toolbar = Gtk.Toolbar()
         view_toolbar_button = ToolbarButton(
-                page=view_toolbar,
-                icon_name='toolbar-view')
+            page=view_toolbar,
+            icon_name='toolbar-view')
         toolbox.toolbar.insert(view_toolbar_button, 1)
         view_toolbar.show()
         view_toolbar_button.show()
@@ -108,8 +107,9 @@ class TrainingActivity(activity.Activity):
         self._set_font_buttons_sensitivity()
 
         self.help_button = button_factory('toolbar-help',
-            toolbox.toolbar, self._help_cb, tooltip=_('help'),
-            accelerator=_('<Ctrl>H'))
+                                          toolbox.toolbar,
+                                          self._help_cb, tooltip=_('help'),
+                                          accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)
 
         self.progress_label = label_factory(toolbox.toolbar, '', width=200)

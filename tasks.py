@@ -12,7 +12,6 @@
 
 import os
 import json
-from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
 from gettext import gettext as _
@@ -54,7 +53,7 @@ class Task():
             self._font_size = size
 
     def get_font_size(self):
-        self._font_size = size
+        return self._font_size
 
     font_size = GObject.property(type=object, setter=set_font_size,
                                  getter=get_font_size)
@@ -152,13 +151,14 @@ class EnterNameTask(Task):
 
     def get_graphics(self):
         graphics = Graphics(self._activity)
-        graphics.add_text(_('See that progress bar at the bottom of your screen?\n\
+        graphics.add_text(
+            _('See that progress bar at the bottom of your screen?\n\
 It fills up when you complete tasks.\n\
 Complete tasks to earn badges...\n\
 Earn all the badges and you’ll be XO-Certified!\n\n\n\
 Time for the first task:\n\
 Write your full name in the box below, then press Next.\n\n'),
-                          size=FONT_SIZES[self._font_size])
+            size=FONT_SIZES[self._font_size])
         self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
@@ -233,7 +233,7 @@ class ConfirmEmailTask(Task):
         if len(entry0) == 0 or len(entry1) == 0:
             return False
         if entry0 != entry1:
-            return False            
+            return False
         if '@' not in entry0:  # Need better validation
             return False
         return True
@@ -400,10 +400,6 @@ class RestoreNickTask(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
-        target = self._activity.read_task_data('nick')
-        file_path = os.path.join(os.path.expanduser('~'), 'Activities',
-                                 'Help.activity', 'images',
-                                 'Home_fav-menu.png')
         graphics = Graphics(self._activity)
         graphics.add_text(_('Nice one!\n\n\
 You changed your nickname to %s!' % profile.get_nick_name()),
@@ -483,8 +479,8 @@ class AddFavoriteTask(Task):
 
     def get_graphics(self):
         path = os.path.join(os.path.expanduser('~'), 'Activities',
-                                 'Help.activity', 'images',
-                                 'Journal_main_annotated.png')
+                            'Help.activity', 'images',
+                            'Journal_main_annotated.png')
         graphics = Graphics(self._activity)
         graphics.add_text(_('Try adding a favorite to your homeview.\n\n'),
                           size=FONT_SIZES[self._font_size])
@@ -619,11 +615,10 @@ class ProgressSummary(Task):
         return self._activity.button_was_pressed
 
     def get_graphics(self):
-        target = self._activity.read_task_data('name').split()[0]
         colors = []
         strokes = []
         for i in range(len(self._SECTIONS)):
-            if i < self._progress: 
+            if i < self._progress:
                 colors.append(style.COLOR_BLACK.get_html())
                 strokes.append(style.COLOR_BLACK.get_svg())
             else:
