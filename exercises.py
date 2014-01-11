@@ -54,6 +54,7 @@ class Exercises(Gtk.Grid):
         self._task_list = [[IntroTask(self),
                             EnterNameTask(self),
                             EnterEmailTask(self),
+                            ConfirmEmailTask(self),
                             BadgeOneTask(self)],
                            [ProgressSummary(self, 1)],
                            [ChangeNickTask(self),

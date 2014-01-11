@@ -155,7 +155,7 @@ class EnterEmailTask(Task):
 
     def __init__(self, activity):
         self._name = _('Enter Email Task')
-        self.uid = 'email'
+        self.uid = 'email1'
         self.entries = []
         self._activity = activity
 
@@ -186,6 +186,55 @@ You’ve almost filled the bar!\n\n\n\
 Here’s another tricky one:\n\
 Write your email address in the box below, then press Next\n\n' % target),
                       size='x-large')
+        self.entries.append(graphics.add_entry())
+        graphics.add_text('\n\n')
+        button = graphics.add_button(_('Next'),
+                                     self._activity.task_button_cb)
+        return graphics, button
+
+
+class ConfirmEmailTask(Task):
+    # TODO: Add confirmation
+
+    def __init__(self, activity):
+        self._name = _('Confirm Email Task')
+        self.uid = 'email2'
+        self.entries = []
+        self._activity = activity
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, exercises, task_data):
+        if len(self.entries) < 2:
+            _logger.error('missing entry')
+            return False
+        entry0 = self.entries[0].get_text()
+        entry1 = self.entries[1].get_text()
+
+        if len(entry0) == 0 or len(entry1) == 0:
+            return False
+        if entry0 != entry1:
+            return False            
+        if '@' not in entry0:  # Need better validation
+            return False
+        return True
+
+    def after_button_press(self):
+        self._activity.write_task_data('email_address',
+                                       self.entries[1].get_text())
+
+    def get_name(self):
+        return self._name
+
+    def get_graphics(self):
+        target = self._activity.read_task_data('email_address')
+        graphics = Graphics(self._activity)
+        self.entries.append(graphics.add_entry(text=target))
+        graphics.add_text('\n\n')
+        graphics.add_text(_('Please confirm that you typed your\n\
+email address correctly by typing it again below.\n\n'),
+                          size='x-large')
         self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
