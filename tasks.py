@@ -232,6 +232,9 @@ class ChangeNickTask(Task):
         self.uid = 'nick1'
         self._activity = activity
 
+    def get_pause_time(self):
+        return 1000
+
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
             _logger.debug('first attempt: saving nick value as %s' %
@@ -255,6 +258,11 @@ class ChangeNickTask(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
+        def button_callback(widget):
+            from jarabe.model import shell
+            _logger.debug('My turn button clicked')
+            shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images', 'Home_fav-menu.png')
         page = Page(self._activity)
@@ -283,7 +291,9 @@ Watch the animation again if you like.\n\
 When you’re ready to try, hit the \"My Turn\"\n\
 button below to go to the home screen.\n\n"),
                       size='x-large')
-        page.add_task_button(button_label=_('My turn'))
+        page.add_button(_('My turn'), button_callback)
+        page.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        page.add_task_button(button_label=_('Continue'))
         return page
         '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
@@ -303,6 +313,9 @@ class RestoreNickTask(Task):
 
     def test(self, exercises, task_data):
         return self._activity.button_was_pressed
+
+    def get_pause_time(self):
+        return 1000
 
     def get_name(self):
         return self._name

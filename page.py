@@ -127,3 +127,12 @@ class Page(Gtk.ScrolledWindow):
             image = Gtk.Image.new_from_file(image)
         self._attach(image)
         image.show()
+
+    def add_button(self, label, callback, arg=None):
+        button = Gtk.Button(label)
+        self._attach(button)
+        if arg is None:
+            button.connect('clicked', callback)
+        else:
+            button.connect('clicked', callback, arg)
+        button.show()
