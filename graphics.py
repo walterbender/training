@@ -23,7 +23,7 @@ import logging
 _logger = logging.getLogger('training-activity-page')
 
 
-class Page(Gtk.ScrolledWindow):
+class Graphics(Gtk.ScrolledWindow):
     ''' An aligned grid in a scrolling window '''
 
     def __init__(self, activity):
@@ -54,12 +54,6 @@ class Page(Gtk.ScrolledWindow):
         self._grid.attach(widget1, 0, self._row, 1, 1)
         self._grid.attach(widget2, 1, self._row, 1, 1)
         self._row += 1
-
-    def add_task_button(self, button_label=_('Next')):
-        self._activity.create_task_button()
-        self._attach(self._activity.task_button)
-        self._activity.task_button.set_label(button_label)
-        self._activity.task_button.show()
 
     def add_icon(self, icon_name, stroke=style.COLOR_BUTTON_GREY.get_svg(),
                  fill=style.COLOR_TRANSPARENT.get_svg(),
@@ -113,12 +107,12 @@ class Page(Gtk.ScrolledWindow):
         self._attach(web_view)
         web_view.show()
 
-    def add_entry(self, task, text=''):
+    def add_entry(self, text=''):
         entry = Gtk.Entry()
-        task.entries.append(entry)
         entry.set_text(text)
         self._attach(entry)
         entry.show()
+        return entry
 
     def add_image(self, image, width=None, height=None):
         if False:  # width is not None and height is not None:
@@ -128,11 +122,12 @@ class Page(Gtk.ScrolledWindow):
         self._attach(image)
         image.show()
 
-    def add_button(self, label, callback, arg=None):
-        button = Gtk.Button(label)
+    def add_button(self, button_label, callback, arg=None):
+        button = Gtk.Button(button_label)
         self._attach(button)
         if arg is None:
             button.connect('clicked', callback)
         else:
             button.connect('clicked', callback, arg)
         button.show()
+        return button

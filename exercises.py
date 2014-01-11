@@ -43,6 +43,7 @@ class Exercises(Gtk.Grid):
 
         self._activity = activity
         self._graphics = None
+        self._task_button = None
         self.button_was_pressed = True
         self.current_task = None
         self.first_time = True
@@ -75,23 +76,17 @@ class Exercises(Gtk.Grid):
 
         _logger.error('LEAVING INIT %d' % self.current_task)
 
-    def create_task_button(self, label=_('Next')):
-        _logger.error('CREATING TASK BUTTON %s' % label)
-
-        def __button_cb(button, self):
-            _logger.error('BUTTON PRESS')
-            self.button_was_pressed = True
-            section, task_index = self.get_section_index()
-            self._task_list[section][task_index].after_button_press()
-            self.current_task += 1
-            _logger.error('INCREMENTING TASK COUNTER')
-            self.write_task_data('current_task', self.current_task)
-            _logger.error('WRITING CURRENT TASK %d' % (self.current_task))
-            self.update_progress()
-            self.task_master()
-
-        self.task_button = Gtk.Button(label)
-        self.task_button.connect('clicked', __button_cb, self)
+    def task_button_cb(self, button):
+        _logger.error('BUTTON PRESS')
+        self.button_was_pressed = True
+        section, task_index = self.get_section_index()
+        self._task_list[section][task_index].after_button_press()
+        self.current_task += 1
+        _logger.error('INCREMENTING TASK COUNTER')
+        self.write_task_data('current_task', self.current_task)
+        _logger.error('WRITING CURRENT TASK %d' % (self.current_task))
+        self.update_progress()
+        self.task_master()
 
     def get_help_info(self):
         _logger.error('get_help_info for task %d' % self.current_task)
@@ -107,19 +102,16 @@ class Exercises(Gtk.Grid):
             and perhaps some data '''
         _logger.error('RUN TASK %d %d' % (section, task_index))
 
-        uid = self._task_list[section][task_index].uid
-        title, help_file = \
-            self._task_list[section][task_index].get_help_info()
-
-        if title is None or help_file is None:
-            self._activity.help_button.set_sensitive(False)
-        else:
-            self._activity.help_button.set_sensitive(True)
-
-        _logger.error('FIRST TIME: %s' % (str(self.first_time)))
         # Set up the task the first time through
         if self.first_time:
-            self._graphics = \
+            self._uid = self._task_list[section][task_index].uid
+            title, help_file = \
+                self._task_list[section][task_index].get_help_info()
+            if title is None or help_file is None:
+                self._activity.help_button.set_sensitive(False)
+            else:
+                self._activity.help_button.set_sensitive(True)
+            self._graphics, self._task_button = \
                 self._task_list[section][task_index].get_graphics()
             if self.grid_row_zero is None:
                 self.insert_row(0)
@@ -127,32 +119,32 @@ class Exercises(Gtk.Grid):
             self.attach(self._graphics, 0, 0, 1, 1)
             self._graphics.show()
 
-            self.task_button.set_sensitive(False)
-            self.task_button.show()
+            self._task_button.set_sensitive(False)
+            self._task_button.show()
             self.update_progress()
 
-        task_data = self.read_task_data(uid)
-        if task_data is None:
-            task_data = {}
-            task_data['start_time'] = int(time.time())
-            task_data['task'] = self._task_list[section][task_index].get_name()
-            task_data['attempt'] = 0
-            task_data['data'] = self._task_list[section][task_index].get_data()
-            self.write_task_data(uid, task_data)
+            self._task_data = self.read_task_data(self._uid)
+            if self._task_data is None:
+                self._task_data = {}
+                self._task_data['start_time'] = int(time.time())
+                self._task_data['task'] = \
+                    self._task_list[section][task_index].get_name()
+                self._task_data['data'] = \
+                    self._task_list[section][task_index].get_data()
+                self.write_task_data(self._uid, self._task_data)
 
-        if self.first_time:
             self.first_time = False
 
         GObject.timeout_add(
             self._task_list[section][task_index].get_pause_time(),
             self._test, self._task_list[section][task_index].test,
-            task_data, uid)
+            self._task_data, self._uid)
 
     def _test(self, test, task_data, uid):
         _logger.error('IN TEST')
         if test(self, task_data):
             _logger.error('PASSED')
-            self.task_button.set_sensitive(True)
+            self._task_button.set_sensitive(True)
             _logger.error('BUTTON ENABLED')
             # Record end time
             task_data = self.read_task_data(uid)
@@ -160,11 +152,7 @@ class Exercises(Gtk.Grid):
             self.write_task_data(uid, task_data)
         else:
             _logger.error('FAILED')
-            if 'attempt' in task_data:
-                task_data['attempt'] += 1
-            self.write_task_data(uid, task_data)
             section, index = self.get_section_index()
-            _logger.error('%d %d %d' % (self.current_task, section, index))
             self._run_task(section, index)
 
     def task_master(self):
@@ -176,7 +164,7 @@ class Exercises(Gtk.Grid):
             self._graphics.destroy()
         if hasattr(self, 'task_button'):
             _logger.error('DESTROYING TASK BUTTON')
-            self.task_button.destroy()
+            self._task_button.destroy()
         self._activity.button_was_pressed = False
         # Do we have more tasks to run?
         if self.current_task < self.get_number_of_tasks():

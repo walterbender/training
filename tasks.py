@@ -24,7 +24,7 @@ from sugar3 import profile
 from sugar3.graphics import style
 from sugar3.test import uitree
 
-from page import Page
+from graphics import Graphics
 
 
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
@@ -97,14 +97,15 @@ class IntroTask(Task):
         return self._activity.button_was_pressed
 
     def get_graphics(self):
-        page = Page(self._activity)
-        page.add_text(_('Welcome to One Academy\n\n'), bold=True,
+        graphics = Graphics(self._activity)
+        graphics.add_text(_('Welcome to One Academy\n\n'), bold=True,
                       size='x-large', justify=Gtk.Justification.CENTER)
-        page.add_icon('one-academy', stroke=style.COLOR_BLACK.get_svg())
-        page.add_text(_('\nAre you ready to learn?\n\n'),
+        graphics.add_icon('one-academy', stroke=style.COLOR_BLACK.get_svg())
+        graphics.add_text(_('\nAre you ready to learn?\n\n'),
                       justify=Gtk.Justification.CENTER)
-        page.add_task_button(button_label=_("Let's go!"))
-        return page
+        button = graphics.add_button(_("Let's go!"),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class EnterNameTask(Task):
@@ -134,18 +135,19 @@ class EnterNameTask(Task):
         return self._name
 
     def get_graphics(self):
-        page = Page(self._activity)
-        page.add_text(_('See that progress bar at the bottom of your screen?\n\
+        graphics = Graphics(self._activity)
+        graphics.add_text(_('See that progress bar at the bottom of your screen?\n\
 It fills up when you complete tasks.\n\
 Complete tasks to earn badges...\n\
 Earn all the badges and you’ll be XO-Certified!\n\n\n\
 Time for the first task:\n\
 Write your full name in the box below, then press Next.\n\n'),
                       size='x-large')
-        page.add_entry(self)
-        page.add_text('\n\n')
-        page.add_task_button()
-        return page
+        self.entries.append(graphics.add_entry())
+        graphics.add_text('\n\n')
+        button = graphics.add_button(_('Next'),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class EnterEmailTask(Task):
@@ -178,16 +180,17 @@ class EnterEmailTask(Task):
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        page = Page(self._activity)
-        page.add_text(_('Nice work %s!\n\
+        graphics = Graphics(self._activity)
+        graphics.add_text(_('Nice work %s!\n\
 You’ve almost filled the bar!\n\n\n\
 Here’s another tricky one:\n\
 Write your email address in the box below, then press Next\n\n' % target),
                       size='x-large')
-        page.add_entry(self)
-        page.add_text('\n\n')
-        page.add_task_button()
-        return page
+        self.entries.append(graphics.add_entry())
+        graphics.add_text('\n\n')
+        button = graphics.add_button(_('Next'),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class BadgeOneTask(Task):
@@ -214,15 +217,16 @@ You’ve earned your first badge!" % target),
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        page = Page(self._activity)
-        page.add_text(_("Congratulations %s!\n\
+        graphics = Graphics(self._activity)
+        graphics.add_text(_("Congratulations %s!\n\
 You’ve earned your first badge!\n\n" % target), bold=True, size='x-large')
-        page.add_icon('badge-intro')
-        page.add_text(_('\n\nMost badges require you to complete multiple \
+        graphics.add_icon('badge-intro')
+        graphics.add_text(_('\n\nMost badges require you to complete multiple \
 tasks.\n\
 Press Continue to start on your next one!\n\n'))
-        page.add_task_button(button_label=_("Continue"))
-        return page
+        button = graphics.add_button(_("Continue"),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class ChangeNickTask(Task):
@@ -265,21 +269,21 @@ class ChangeNickTask(Task):
 
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images', 'Home_fav-menu.png')
-        page = Page(self._activity)
-        page.add_text(_('<b>Changing the Nickname</b>\n\
+        graphics = Graphics(self._activity)
+        graphics.add_text(_('<b>Changing the Nickname</b>\n\
 In this lesson we’re going to learn how to change our\n\
 nickname on the XO.\n\
 You entered your nickname on the screen shown below\n\
 when you first started the XO up. Remember?\n\n'),
                       size='x-large')
-        page.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
-        page.add_text(_('\n\n<b>What is the nickname?</b>\n\
+        graphics.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+        graphics.add_text(_('\n\n<b>What is the nickname?</b>\n\
 The nickname is your name on the XO, and will appear\n\
 all around Sugar as well as being visible on networks.\n\n\
 Watch the animation below to see how it’s done:\n\n'),
                       size='x-large')
-        page.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
-        page.add_text(_("\n\n<b>Step-by-step:</b>\n\
+        graphics.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+        graphics.add_text(_("\n\n<b>Step-by-step:</b>\n\
 1. Go to the home screen\n\
 2. Right click on the central icon\n\
 3. Do other things\n\
@@ -291,10 +295,11 @@ Watch the animation again if you like.\n\
 When you’re ready to try, hit the \"My Turn\"\n\
 button below to go to the home screen.\n\n"),
                       size='x-large')
-        page.add_button(_('My turn'), button_callback)
-        page.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        page.add_task_button(button_label=_('Continue'))
-        return page
+        graphics.add_button(_('My turn'), button_callback)
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Continue'),
+                                     self._activity.task_button_cb)
+        return graphics, button
         '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'html',
@@ -328,16 +333,17 @@ class RestoreNickTask(Task):
         file_path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Home_fav-menu.png')
-        page = Page(self._activity)
-        page.add_text(_('Nice one!\n\n\
+        graphics = Graphics(self._activity)
+        graphics.add_text(_('Nice one!\n\n\
 You changed your nickname to %s!' % profile.get_nick_name()),
                       size='x-large')
-        page.add_icon('badge-intro')
-        page.add_text(_('\n\nYou can change it back any time you like.\n\
+        graphics.add_icon('badge-intro')
+        graphics.add_text(_('\n\nYou can change it back any time you like.\n\
 Press Continue to learn about the Frame.\n\n'),
                       size='x-large')
-        page.add_task_button(button_label=_('Continue'))
-        return page
+        button = graphics.add_button(_('Continue'),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class BadgeTwoTask(Task):
@@ -364,15 +370,16 @@ You’ve earned your second badge!" % target),
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        page = Page(self._activity)
-        page.add_text(_("Congratulations %s!\n\
+        graphics = Graphics(self._activity)
+        graphics.add_text(_("Congratulations %s!\n\
 You’ve earned your second badge!\n\n" % target), bold=True, size='x-large')
-        page.add_icon('badge-intro')
-        page.add_text(_('\n\nMost badges require you to complete multiple \
+        graphics.add_icon('badge-intro')
+        graphics.add_text(_('\n\nMost badges require you to complete multiple \
 tasks.\n\
 Press Continue to start on your next one!\n\n'))
-        page.add_task_button(button_label=_("Continue"))
-        return page
+        button = graphics.add_button(_("Continue"),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class AddFavoriteTask(Task):
@@ -403,12 +410,13 @@ class AddFavoriteTask(Task):
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                                  'Help.activity', 'images',
                                  'Journal_main_annotated.png')
-        page = Page(self._activity)
-        page.add_text(_('Try adding a favorite to your homeview.\n\n'),
+        graphics = Graphics(self._activity)
+        graphics.add_text(_('Try adding a favorite to your homeview.\n\n'),
                       size='x-large')
-        page.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
-        page.add_task_button()
-        return page
+        graphics.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+        button = graphics.add_button(_('Next'),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class RemoveFavoriteTask(Task):
@@ -438,12 +446,13 @@ class RemoveFavoriteTask(Task):
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images',
                             'Journal_main_annotated.png')
-        page = Page(self._activity)
-        page.add_text(_('Now try removing a favorite to your homeview.\n\n'),
+        graphics = Graphics(self._activity)
+        graphics.add_text(_('Now try removing a favorite to your homeview.\n\n'),
                       size='x-large')
-        page.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
-        page.add_task_button()
-        return page
+        graphics.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+        button = graphics.add_button(_('Next'),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class BadgeThreeTask(Task):
@@ -470,15 +479,16 @@ You’ve earned your third badge!" % target),
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        page = Page(self._activity)
-        page.add_text(_("Congratulations %s!\n\
+        graphics = Graphics(self._activity)
+        graphics.add_text(_("Congratulations %s!\n\
 You’ve earned your third badge!\n\n" % target), bold=True, size='x-large')
-        page.add_icon('badge-intro')
-        page.add_text(_('\n\nMost badges require you to complete multiple \
+        graphics.add_icon('badge-intro')
+        graphics.add_text(_('\n\nMost badges require you to complete multiple \
 tasks.\n\
 Press Continue to start on your next one!\n\n'))
-        page.add_task_button(button_label=_("Continue"))
-        return page
+        button = graphics.add_button(_("Continue"),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class FinishedAllTasks(Task):
@@ -496,10 +506,11 @@ class FinishedAllTasks(Task):
         return self._name
 
     def get_graphics(self):
-        page = Page(self._activity)
-        page.add_text(_('You are a Sugar Zenmaster.\n\n'))
-        page.add_task_button(button_label=_("Continue"))
-        return page
+        graphics = Graphics(self._activity)
+        graphics.add_text(_('You are a Sugar Zenmaster.\n\n'))
+        button = graphics.add_button(_("Continue"),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class ProgressSummary(Task):
@@ -536,17 +547,18 @@ class ProgressSummary(Task):
             else:
                 colors.append(style.COLOR_BUTTON_GREY.get_html())
                 strokes.append(style.COLOR_BUTTON_GREY.get_svg())
-        page = Page(self._activity)
+        graphics = Graphics(self._activity)
         for i in range(len(self._SECTIONS)):
-            page.add_text_and_icon(self._SECTIONS[i]['name'],
+            graphics.add_text_and_icon(self._SECTIONS[i]['name'],
                                    self._SECTIONS[i]['icon'],
                                    size='x-large',
                                    icon_size=style.LARGE_ICON_SIZE,
                                    color=colors[i],
                                    stroke=strokes[i])
-        page.add_text('\n\n')
-        page.add_task_button(button_label=_("Continue"))
-        return page
+        graphics.add_text('\n\n')
+        button = graphics.add_button(_("Continue"),
+                                     self._activity.task_button_cb)
+        return graphics, button
 
 
 class UITest(Task):
