@@ -1,5 +1,10 @@
 NEWS
 
+1.5
+
+* Consolidation of code
+* Added task to verify email address
+
 1.4
 
 * Fixed problem with flow

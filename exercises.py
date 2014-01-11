@@ -132,6 +132,7 @@ class Exercises(Gtk.Grid):
             if self._task_data is None:
                 self._task_data = {}
                 self._task_data['start_time'] = int(time.time())
+                self._task_data['attempt'] = 0
                 self._task_data['task'] = \
                     self._task_list[section][task_index].get_name()
                 self._task_data['data'] = \
@@ -157,6 +158,8 @@ class Exercises(Gtk.Grid):
             self.write_task_data(uid, task_data)
         else:
             _logger.error('FAILED')
+            self._task_data['attempt'] += 1
+            self.write_task_data(uid, task_data)
             section, index = self.get_section_index()
             self._run_task(section, index)
 

@@ -14,6 +14,7 @@ import os
 import json
 from gi.repository import Gdk
 from gi.repository import Gtk
+from gi.repository import GObject
 from gettext import gettext as _
 
 import logging
@@ -46,6 +47,17 @@ class Task():
         self._name = 'Generic Task'
         self.uid = None
         self._activity = activity
+        self._font_size = 5
+
+    def set_font_size(size):
+        if size < len(FONT_SIZES):
+            self._font_size = size
+
+    def get_font_size(size):
+        self._font_size = size
+
+    font_size = GObject.property(type=object, setter=set_font_size,
+                                 getter=get_font_size)
 
     def test(self, exercises, task_data):
         ''' The test to determine if task is completed '''
@@ -86,6 +98,7 @@ class IntroTask(Task):
         self._name = _('Intro Task')
         self.uid = 'introtask'
         self._activity = activity
+        self._font_size = 5
 
     def get_name(self):
         return self._name
@@ -98,11 +111,13 @@ class IntroTask(Task):
 
     def get_graphics(self):
         graphics = Graphics(self._activity)
-        graphics.add_text(_('Welcome to One Academy\n\n'), bold=True,
-                      size='x-large', justify=Gtk.Justification.CENTER)
+        graphics.add_text(_('Welcome to One Academy\n\n'),
+                          bold=True,
+                          size=FONT_SIZES[self._font_size],
+                          justify=Gtk.Justification.CENTER)
         graphics.add_icon('one-academy', stroke=style.COLOR_BLACK.get_svg())
         graphics.add_text(_('\nAre you ready to learn?\n\n'),
-                      justify=Gtk.Justification.CENTER)
+                          justify=Gtk.Justification.CENTER)
         button = graphics.add_button(_("Let's go!"),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -115,6 +130,7 @@ class EnterNameTask(Task):
         self.uid = 'nametask'
         self.entries = []
         self._activity = activity
+        self._font_size = 5
 
     def get_pause_time(self):
         return 1000
@@ -142,7 +158,7 @@ Complete tasks to earn badges...\n\
 Earn all the badges and you’ll be XO-Certified!\n\n\n\
 Time for the first task:\n\
 Write your full name in the box below, then press Next.\n\n'),
-                      size='x-large')
+                          size=FONT_SIZES[self._font_size])
         self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
@@ -158,6 +174,7 @@ class EnterEmailTask(Task):
         self.uid = 'email1'
         self.entries = []
         self._activity = activity
+        self._font_size = 5
 
     def get_pause_time(self):
         return 1000
@@ -185,7 +202,7 @@ class EnterEmailTask(Task):
 You’ve almost filled the bar!\n\n\n\
 Here’s another tricky one:\n\
 Write your email address in the box below, then press Next\n\n' % target),
-                      size='x-large')
+                          size=FONT_SIZES[self._font_size])
         self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
@@ -201,6 +218,7 @@ class ConfirmEmailTask(Task):
         self.uid = 'email2'
         self.entries = []
         self._activity = activity
+        self._font_size = 5
 
     def get_pause_time(self):
         return 1000
@@ -234,7 +252,7 @@ class ConfirmEmailTask(Task):
         graphics.add_text('\n\n')
         graphics.add_text(_('Please confirm that you typed your\n\
 email address correctly by typing it again below.\n\n'),
-                          size='x-large')
+                          size=FONT_SIZES[self._font_size])
         self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
@@ -247,6 +265,7 @@ class BadgeOneTask(Task):
         self._name = _('Badge One')
         self.uid = 'badge1'
         self._activity = activity
+        self._font_size = 5
 
     def get_name(self):
         return self._name
@@ -268,7 +287,8 @@ You’ve earned your first badge!" % target),
         target = self._activity.read_task_data('name').split()[0]
         graphics = Graphics(self._activity)
         graphics.add_text(_("Congratulations %s!\n\
-You’ve earned your first badge!\n\n" % target), bold=True, size='x-large')
+You’ve earned your first badge!\n\n" % target), bold=True,
+                          size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
         graphics.add_text(_('\n\nMost badges require you to complete multiple \
 tasks.\n\
@@ -284,6 +304,7 @@ class ChangeNickTask(Task):
         self._name = _('Change Nick Task')
         self.uid = 'nick1'
         self._activity = activity
+        self._font_size = 5
 
     def get_pause_time(self):
         return 1000
@@ -324,14 +345,14 @@ In this lesson we’re going to learn how to change our\n\
 nickname on the XO.\n\
 You entered your nickname on the screen shown below\n\
 when you first started the XO up. Remember?\n\n'),
-                      size='x-large')
-        graphics.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_image(path)
         graphics.add_text(_('\n\n<b>What is the nickname?</b>\n\
 The nickname is your name on the XO, and will appear\n\
 all around Sugar as well as being visible on networks.\n\n\
 Watch the animation below to see how it’s done:\n\n'),
-                      size='x-large')
-        graphics.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_image(path)
         graphics.add_text(_("\n\n<b>Step-by-step:</b>\n\
 1. Go to the home screen\n\
 2. Right click on the central icon\n\
@@ -343,7 +364,7 @@ Watch the animation below to see how it’s done:\n\n'),
 Watch the animation again if you like.\n\
 When you’re ready to try, hit the \"My Turn\"\n\
 button below to go to the home screen.\n\n"),
-                      size='x-large')
+                          size=FONT_SIZES[self._font_size])
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
         button = graphics.add_button(_('Continue'),
@@ -364,6 +385,7 @@ class RestoreNickTask(Task):
         self._name = _('Restore Nick Task')
         self.uid = 'nick2'
         self._activity = activity
+        self._font_size = 5
 
     def test(self, exercises, task_data):
         return self._activity.button_was_pressed
@@ -385,11 +407,11 @@ class RestoreNickTask(Task):
         graphics = Graphics(self._activity)
         graphics.add_text(_('Nice one!\n\n\
 You changed your nickname to %s!' % profile.get_nick_name()),
-                      size='x-large')
+                          size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
         graphics.add_text(_('\n\nYou can change it back any time you like.\n\
 Press Continue to learn about the Frame.\n\n'),
-                      size='x-large')
+                          size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -400,6 +422,7 @@ class BadgeTwoTask(Task):
         self._name = _('Badge Two')
         self.uid = 'badge2'
         self._activity = activity
+        self._font_size = 5
 
     def get_name(self):
         return self._name
@@ -421,7 +444,9 @@ You’ve earned your second badge!" % target),
         target = self._activity.read_task_data('name').split()[0]
         graphics = Graphics(self._activity)
         graphics.add_text(_("Congratulations %s!\n\
-You’ve earned your second badge!\n\n" % target), bold=True, size='x-large')
+You’ve earned your second badge!\n\n" % target),
+                          bold=True,
+                          size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
         graphics.add_text(_('\n\nMost badges require you to complete multiple \
 tasks.\n\
@@ -437,6 +462,7 @@ class AddFavoriteTask(Task):
         self._name = _('Add Favorite Task')
         self.uid = 'favorites1'
         self._activity = activity
+        self._font_size = 5
 
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
@@ -461,8 +487,8 @@ class AddFavoriteTask(Task):
                                  'Journal_main_annotated.png')
         graphics = Graphics(self._activity)
         graphics.add_text(_('Try adding a favorite to your homeview.\n\n'),
-                      size='x-large')
-        graphics.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_image(path)
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -474,6 +500,7 @@ class RemoveFavoriteTask(Task):
         self._name = _('Remove Favorite Task')
         self.uid = 'favorites2'
         self._activity = activity
+        self._font_size = 5
 
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
@@ -496,9 +523,10 @@ class RemoveFavoriteTask(Task):
                             'Help.activity', 'images',
                             'Journal_main_annotated.png')
         graphics = Graphics(self._activity)
-        graphics.add_text(_('Now try removing a favorite to your homeview.\n\n'),
-                      size='x-large')
-        graphics.add_image(path, Gdk.Screen.width() / 2, Gdk.Screen.width() / 2)
+        graphics.add_text(
+            _('Now try removing a favorite to your homeview.\n\n'),
+            size=FONT_SIZES[self._font_size])
+        graphics.add_image(path)
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -509,6 +537,7 @@ class BadgeThreeTask(Task):
         self._name = _('Badge Three')
         self.uid = 'badge3n'
         self._activity = activity
+        self._font_size = 5
 
     def get_name(self):
         return self._name
@@ -530,9 +559,11 @@ You’ve earned your third badge!" % target),
         target = self._activity.read_task_data('name').split()[0]
         graphics = Graphics(self._activity)
         graphics.add_text(_("Congratulations %s!\n\
-You’ve earned your third badge!\n\n" % target), bold=True, size='x-large')
+You’ve earned your third badge!\n\n" % target),
+                          bold=True, size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
-        graphics.add_text(_('\n\nMost badges require you to complete multiple \
+        graphics.add_text(
+            _('\n\nMost badges require you to complete multiple \
 tasks.\n\
 Press Continue to start on your next one!\n\n'))
         button = graphics.add_button(_("Continue"),
@@ -546,6 +577,7 @@ class FinishedAllTasks(Task):
         self._name = _('Finished All Tasks')
         self.uid = 'finished'
         self._activity = activity
+        self._font_size = 5
 
     def test(self, exercises, task_data):
         self._activity.completed = True
@@ -575,6 +607,7 @@ class ProgressSummary(Task):
         self.uid = 'progress%d' % progress
         self._activity = activity
         self._progress = progress
+        self._font_size = 5
 
     def get_name(self):
         return self._name
@@ -599,11 +632,11 @@ class ProgressSummary(Task):
         graphics = Graphics(self._activity)
         for i in range(len(self._SECTIONS)):
             graphics.add_text_and_icon(self._SECTIONS[i]['name'],
-                                   self._SECTIONS[i]['icon'],
-                                   size='x-large',
-                                   icon_size=style.LARGE_ICON_SIZE,
-                                   color=colors[i],
-                                   stroke=strokes[i])
+                                       self._SECTIONS[i]['icon'],
+                                       size=FONT_SIZES[self._font_size],
+                                       icon_size=style.LARGE_ICON_SIZE,
+                                       color=colors[i],
+                                       stroke=strokes[i])
         graphics.add_text('\n\n')
         button = graphics.add_button(_("Continue"),
                                      self._activity.task_button_cb)
