@@ -116,7 +116,8 @@ class IntroTask(Task):
                           justify=Gtk.Justification.CENTER)
         graphics.add_icon('one-academy', stroke=style.COLOR_BLACK.get_svg())
         graphics.add_text(_('\nAre you ready to learn?\n\n'),
-                          justify=Gtk.Justification.CENTER)
+                          justify=Gtk.Justification.CENTER,
+                          size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_("Let's go!"),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -152,12 +153,12 @@ class EnterNameTask(Task):
     def get_graphics(self):
         graphics = Graphics(self._activity)
         graphics.add_text(
-            _('See that progress bar at the bottom of your screen?\n\
-It fills up when you complete tasks.\n\
-Complete tasks to earn badges...\n\
-Earn all the badges and you’ll be XO-Certified!\n\n\n\
-Time for the first task:\n\
-Write your full name in the box below, then press Next.\n\n'),
+            _('See that progress bar at the bottom of your screen?\n'
+              'It fills up when you complete tasks.\n'
+              'Complete tasks to earn badges...\n'
+              "Earn all the badges and you’ll be XO-Certified!\n\n\n"
+              'Time for the first task:\n'
+              'Write your full name in the box below, then press Next.\n\n'),
             size=FONT_SIZES[self._font_size])
         self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
@@ -167,7 +168,6 @@ Write your full name in the box below, then press Next.\n\n'),
 
 
 class EnterEmailTask(Task):
-    # TODO: Add confirmation
 
     def __init__(self, activity):
         self._name = _('Enter Email Task')
@@ -196,12 +196,14 @@ class EnterEmailTask(Task):
         return self._name
 
     def get_graphics(self):
+        self.entries = []
         target = self._activity.read_task_data('name').split()[0]
         graphics = Graphics(self._activity)
-        graphics.add_text(_('Nice work %s!\n\
-You’ve almost filled the bar!\n\n\n\
-Here’s another tricky one:\n\
-Write your email address in the box below, then press Next\n\n' % target),
+        graphics.add_text(_('Nice work %s!\n'
+                            "You’ve almost filled the bar!\n\n\n"
+                            "Here’s another tricky one:\n"
+                            'Write your email address in the box below, '
+                            'then press Next\n\n' % target),
                           size=FONT_SIZES[self._font_size])
         self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
@@ -211,7 +213,6 @@ Write your email address in the box below, then press Next\n\n' % target),
 
 
 class ConfirmEmailTask(Task):
-    # TODO: Add confirmation
 
     def __init__(self, activity):
         self._name = _('Confirm Email Task')
@@ -246,13 +247,15 @@ class ConfirmEmailTask(Task):
         return self._name
 
     def get_graphics(self):
+        self.entries = []
         target = self._activity.read_task_data('email_address')
         graphics = Graphics(self._activity)
         self.entries.append(graphics.add_entry(text=target))
         graphics.add_text('\n\n')
-        graphics.add_text(_('Please confirm that you typed your\n\
-email address correctly by typing it again below.\n\n'),
-                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(
+            _('Please confirm that you typed your\n'
+              'email address correctly by typing it again below.\n\n'),
+            size=FONT_SIZES[self._font_size])
         self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
@@ -276,8 +279,8 @@ class BadgeOneTask(Task):
     def after_button_press(self):
         target = self._activity.read_task_data('name').split()[0]
         self._activity._activity.add_badge(
-            _("Congratulations %s!\n\
-You’ve earned your first badge!" % target),
+            _('Congratulations %s!\n'
+              "You’ve earned your first badge!" % target),
             icon='badge-intro')
 
     def test(self, exercises, task_data):
@@ -286,14 +289,16 @@ You’ve earned your first badge!" % target),
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
         graphics = Graphics(self._activity)
-        graphics.add_text(_("Congratulations %s!\n\
-You’ve earned your first badge!\n\n" % target), bold=True,
-                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(
+            _('Congratulations %s!\n'
+              "You’ve earned your first badge!\n\n" % target), bold=True,
+            size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
-        graphics.add_text(_('\n\nMost badges require you to complete multiple \
-tasks.\n\
-Press Continue to start on your next one!\n\n'))
-        button = graphics.add_button(_("Continue"),
+        graphics.add_text(
+            _('\n\nMost badges require you to complete multiple tasks.\n'
+              'Press Continue to start on your next one!\n\n'),
+            size=FONT_SIZES[self._font_size])
+        button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
 
@@ -340,31 +345,34 @@ class ChangeNickTask(Task):
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images', 'Home_fav-menu.png')
         graphics = Graphics(self._activity)
-        graphics.add_text(_('<b>Changing the Nickname</b>\n\
-In this lesson we’re going to learn how to change our\n\
-nickname on the XO.\n\
-You entered your nickname on the screen shown below\n\
-when you first started the XO up. Remember?\n\n'),
-                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(
+            _('<b>Changing the Nickname</b>\n'
+              "In this lesson we’re going to learn how to change our\n"
+              'nickname on the XO.\n'
+              'You entered your nickname on the screen shown below\n'
+              'when you first started the XO up. Remember?\n\n'),
+            size=FONT_SIZES[self._font_size])
         graphics.add_image(path)
-        graphics.add_text(_('\n\n<b>What is the nickname?</b>\n\
-The nickname is your name on the XO, and will appear\n\
-all around Sugar as well as being visible on networks.\n\n\
-Watch the animation below to see how it’s done:\n\n'),
-                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(
+            _('\n\n<b>What is the nickname?</b>\n'
+              'The nickname is your name on the XO, and will appear\n'
+              'all around Sugar as well as being visible on networks.\n\n'
+              'Watch the animation below to see how it’s done:\n\n'),
+            size=FONT_SIZES[self._font_size])
         graphics.add_image(path)
-        graphics.add_text(_("\n\n<b>Step-by-step:</b>\n\
-1. Go to the home screen\n\
-2. Right click on the central icon\n\
-3. Do other things\n\
-4. Type in a new nickname\n\
-5. Click yes to restart Sugar\n\
-6. Reopen the One Academy activity to complete\n\n\
-<b>Are you ready to try?</b>\n\
-Watch the animation again if you like.\n\
-When you’re ready to try, hit the \"My Turn\"\n\
-button below to go to the home screen.\n\n"),
-                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(
+            _('\n\n<b>Step-by-step:</b>\n'
+              '1. Go to the home screen\n'
+              '2. Right click on the central icon\n'
+              '3. Do other things\n'
+              '4. Type in a new nickname\n'
+              '5. Click yes to restart Sugar\n'
+              '6. Reopen the One Academy activity to complete\n\n'
+              '<b>Are you ready to try?</b>\n'
+              'Watch the animation again if you like.\n'
+              "When you’re ready to try, hit the \"My Turn\"\n"
+              'button below to go to the home screen.\n\n'),
+            size=FONT_SIZES[self._font_size])
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
         button = graphics.add_button(_('Continue'),
@@ -401,13 +409,15 @@ class RestoreNickTask(Task):
 
     def get_graphics(self):
         graphics = Graphics(self._activity)
-        graphics.add_text(_('Nice one!\n\n\
-You changed your nickname to %s!' % profile.get_nick_name()),
-                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(
+            _('Nice one!\n\n'
+              'You changed your nickname to %s!' % profile.get_nick_name()),
+            size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
-        graphics.add_text(_('\n\nYou can change it back any time you like.\n\
-Press Continue to learn about the Frame.\n\n'),
-                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(
+            _('\n\nYou can change it back any time you like.\n'
+              'Press Continue to learn about the Frame.\n\n'),
+            size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -429,8 +439,8 @@ class BadgeTwoTask(Task):
     def after_button_press(self):
         target = self._activity.read_task_data('name').split()[0]
         self._activity._activity.add_badge(
-            _("Congratulations %s!\n\
-You’ve earned your second badge!" % target),
+            _('Congratulations %s!\n'
+              "You’ve earned your second badge!" % target),
             icon='badge-intro')
 
     def test(self, exercises, task_data):
@@ -439,15 +449,18 @@ You’ve earned your second badge!" % target),
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
         graphics = Graphics(self._activity)
-        graphics.add_text(_("Congratulations %s!\n\
-You’ve earned your second badge!\n\n" % target),
-                          bold=True,
-                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(
+            _('Congratulations %s!\n'
+              "You’ve earned your second badge!\n\n" % target),
+            bold=True,
+            size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
-        graphics.add_text(_('\n\nMost badges require you to complete multiple \
-tasks.\n\
-Press Continue to start on your next one!\n\n'))
-        button = graphics.add_button(_("Continue"),
+        graphics.add_text(
+            _('\n\nMost badges require you to complete multiple '
+              'tasks.\n'
+              'Press Continue to start on your next one!\n\n'),
+            size=FONT_SIZES[self._font_size])
+        button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
 
@@ -544,8 +557,8 @@ class BadgeThreeTask(Task):
     def after_button_press(self):
         target = self._activity.read_task_data('name').split()[0]
         self._activity._activity.add_badge(
-            _("Congratulations %s!\n\
-You’ve earned your third badge!" % target),
+            _('Congratulations %s!\n'
+              "You’ve earned your third badge!" % target),
             icon='badge-intro')
 
     def test(self, exercises, task_data):
@@ -554,15 +567,17 @@ You’ve earned your third badge!" % target),
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
         graphics = Graphics(self._activity)
-        graphics.add_text(_("Congratulations %s!\n\
-You’ve earned your third badge!\n\n" % target),
-                          bold=True, size=FONT_SIZES[self._font_size])
+        graphics.add_text(
+            _('Congratulations %s!\n'
+              "You’ve earned your third badge!\n\n" % target),
+            bold=True, size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
         graphics.add_text(
-            _('\n\nMost badges require you to complete multiple \
-tasks.\n\
-Press Continue to start on your next one!\n\n'))
-        button = graphics.add_button(_("Continue"),
+            _('\n\nMost badges require you to complete multiple '
+              'tasks.\n'
+              'Press Continue to start on your next one!\n\n'),
+            size=FONT_SIZES[self._font_size])
+        button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
 
@@ -584,8 +599,9 @@ class FinishedAllTasks(Task):
 
     def get_graphics(self):
         graphics = Graphics(self._activity)
-        graphics.add_text(_('You are a Sugar Zenmaster.\n\n'))
-        button = graphics.add_button(_("Continue"),
+        graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
+                          size=FONT_SIZES[self._font_size])
+        button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
 
@@ -633,7 +649,7 @@ class ProgressSummary(Task):
                                        color=colors[i],
                                        stroke=strokes[i])
         graphics.add_text('\n\n')
-        button = graphics.add_button(_("Continue"),
+        button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
 
