@@ -48,6 +48,9 @@ class TrainingActivity(activity.Activity):
         self.connect('realize', self.__realize_cb)
         self.font_size = 5
 
+        if hasattr(self, 'metadata') and 'font_size' in self.metadata:
+            self.font_size = int(self.metadata['font_size'])
+
         self._setup_toolbars()
 
         self.modify_bg(Gtk.StateType.NORMAL,
@@ -67,6 +70,7 @@ class TrainingActivity(activity.Activity):
     def write_file(self, file_path):
         self._exercises.write_task_data('current_task',
                                         self._exercises.current_task)
+        self.metadata['font_size'] = str(self.font_size)
 
     def _setup_toolbars(self):
         ''' Setup the toolbars. '''
@@ -101,6 +105,7 @@ class TrainingActivity(activity.Activity):
         self._font_smaller = button_factory('resize-', view_toolbar,
                                             self._font_smaller_cb,
                                             tooltip=_('Decrease font size'))
+        self._set_font_buttons_sensitivity()
 
         self.help_button = button_factory('toolbar-help',
             toolbox.toolbar, self._help_cb, tooltip=_('help'),
@@ -123,20 +128,26 @@ class TrainingActivity(activity.Activity):
         ''' Hide the Sugar toolbars. '''
         self.fullscreen()
 
+    def _set_font_buttons_sensitivity(self):
+        if self.font_size < len(FONT_SIZES) - 1:
+            self._font_larger.set_sensitive(True)
+        else:
+            self._font_larger.set_sensitive(False)
+        if self.font_size > 0:
+            self._font_smaller.set_sensitive(True)
+        else:
+            self._font_smaller.set_sensitive(False)
+
     def _font_larger_cb(self, button):
         if self.font_size < len(FONT_SIZES) - 1:
             self.font_size += 1
-        else:
-            self._font_larger.set_sensitive(False)
-        self._font_smaller.set_sensitive(True)
+        self._set_font_buttons_sensitivity()
         self._exercises.reload_task()
 
     def _font_smaller_cb(self, button):
         if self.font_size > 0:
             self.font_size -= 1
-        else:
-            self._font_smaller.set_sensitive(False)
-        self._font_larger.set_sensitive(True)
+        self._set_font_buttons_sensitivity()
         self._exercises.reload_task()
 
     def _help_cb(self, button):
@@ -166,4 +177,3 @@ class TrainingActivity(activity.Activity):
             self.metadata['comments'] = json.dumps(comments)
         else:
             self.metadata['comments'] = json.dumps([badge])
-
