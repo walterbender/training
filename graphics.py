@@ -40,6 +40,9 @@ class Graphics(Gtk.ScrolledWindow):
         alignment.show()
 
         self._grid = Gtk.Grid()
+        self._grid.set_row_spacing(style.DEFAULT_SPACING)
+        self._grid.set_column_spacing(style.DEFAULT_SPACING)
+        self._grid.set_border_width(style.DEFAULT_SPACING * 2)
         alignment.add(self._grid)
         self._grid.show()
 

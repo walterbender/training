@@ -16,11 +16,12 @@ from gi.repository import Gdk
 from sugar3.graphics import style
 
 
-class ProgressBar(Gtk.VBox):
+class ProgressBar(Gtk.Grid):
 
     def __init__(self):
-        Gtk.VBox.__init__(self)
-        self.set_spacing(style.DEFAULT_PADDING)
+        Gtk.Grid.__init__(self)
+        self.set_row_spacing(style.DEFAULT_SPACING)
+        self.set_column_spacing(style.DEFAULT_SPACING)
         self.set_border_width(style.DEFAULT_SPACING * 2)
 
         self._progress = Gtk.ProgressBar()
@@ -28,7 +29,7 @@ class ProgressBar(Gtk.VBox):
         height = 10
         self._progress.set_size_request(width, height)
 
-        self.pack_start(self._progress, True, True, 0)
+        self.attach(self._progress, 0, 0, 1, 1)
         self._progress.show()
 
         self._label = Gtk.Label()
@@ -36,13 +37,8 @@ class ProgressBar(Gtk.VBox):
         self._label.set_property('xalign', 0.5)
         self._label.modify_fg(Gtk.StateType.NORMAL,
                               style.COLOR_BUTTON_GREY.get_gdk_color())
-        self.pack_start(self._label, True, True, 0)
+        self.attach(self._label, 0, 1, 1, 1)
         self._label.show()
-
-        alignment_box = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
-                                          xscale=0, yscale=0)
-        self.pack_start(alignment_box, True, True, 0)
-        alignment_box.show()
 
     def set_message(self, message):
         self._label.set_text(message)

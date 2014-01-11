@@ -70,9 +70,13 @@ class Exercises(Gtk.Grid):
         if self.current_task is None:
             self.current_task = 0
 
-        self._progressbar = ProgressBar()
-        self.attach(self._progressbar, 0, 0, 1, 1)
-        self._progressbar.show()
+        self._progress_bar = ProgressBar()
+        alignment = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
+                                      xscale=0, yscale=0)
+        self.attach(alignment, 0, 0, 1, 1)
+        alignment.show()
+        alignment.add(self._progress_bar)
+        self._progress_bar.show()
 
         _logger.error('LEAVING INIT %d' % self.current_task)
 
@@ -85,7 +89,7 @@ class Exercises(Gtk.Grid):
         _logger.error('INCREMENTING TASK COUNTER')
         self.write_task_data('current_task', self.current_task)
         _logger.error('WRITING CURRENT TASK %d' % (self.current_task))
-        self.update_progress()
+        self._update_progress()
         self.task_master()
 
     def get_help_info(self):
@@ -121,7 +125,7 @@ class Exercises(Gtk.Grid):
 
             self._task_button.set_sensitive(False)
             self._task_button.show()
-            self.update_progress()
+            self._update_progress()
 
             self._task_data = self.read_task_data(self._uid)
             if self._task_data is None:
@@ -157,7 +161,7 @@ class Exercises(Gtk.Grid):
 
     def task_master(self):
         _logger.error('UPDATING PROGRESS')
-        self.update_progress()
+        self._update_progress()
         _logger.error('TASK MASTER: RUNNING TASK %d' % (self.current_task))
         if self._graphics is not None:
             _logger.error('DESTROYING GRAPHICS WINDOW')
@@ -234,7 +238,7 @@ class Exercises(Gtk.Grid):
         fd.write(json_data)
         fd.close()
 
-    def update_progress(self):
+    def _update_progress(self):
         current_task = self.current_task
         section, task_index = self.get_section_index()
         task_index += 1  # Count the current task
@@ -245,13 +249,13 @@ class Exercises(Gtk.Grid):
             tasks_in_section -= 1 # Don't count badge at end of section task
         _logger.debug('section %d, task %d/%d' %
                       (section, task_index, tasks_in_section))
-        self._progressbar.set_progress(task_index / float(tasks_in_section))
+        self._progress_bar.set_progress(task_index / float(tasks_in_section))
         if task_index > tasks_in_section:  # Must be a badge task
-            self._progressbar.set_message(_('Complete'))
+            self._progress_bar.set_message(_('Complete'))
         elif task_index == 1 and tasks_in_section == 1:  # Must be a summary
-            self._progressbar.set_message(_('Progress Summary'))
+            self._progress_bar.set_message(_('Progress Summary'))
         else:
-            self._progressbar.set_message(
+            self._progress_bar.set_message(
                 _('Progress to date: %(current)d / %(total)d' %
                   {'current': task_index, 'total': tasks_in_section}))
 
