@@ -277,6 +277,8 @@ class ConfirmEmailTask(Task):
             return False
         if '@' not in entry0:  # Need better validation
             return False
+        if '.' not in entry0.split('@')[1]:
+            return False
         return True
 
     def after_button_press(self):
