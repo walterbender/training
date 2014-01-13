@@ -142,35 +142,6 @@ class IntroTask(Task):
         return graphics, button
 
 
-class HTMLTask(Task):  # TEST TASK
-    def __init__(self, activity):
-        self._name = _('HTML Task')
-        self.uid = 'htmltask'
-        self._activity = activity
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
-
-    def test(self, exercises, task_data):
-        return self._activity.button_was_pressed
-
-    def get_graphics(self):
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'introduction2.html')
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        button = graphics.add_button(_('Continue'),
-                                     self._activity.task_button_cb)
-        return graphics, button
-
-
 class EnterNameTask(Task):
 
     def __init__(self, activity):
@@ -268,7 +239,7 @@ class EnterEmailTask(Task):
         '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                             'Training.activity', 'html',
-                            'introduction3.html?name=%s' % target)
+                            'introduction3.html?NAME=%s' % target)
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)

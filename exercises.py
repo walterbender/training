@@ -46,7 +46,6 @@ class Exercises(Gtk.Grid):
         self.counter = 0
 
         self._task_list = [[IntroTask(self),
-                            # HTMLTask(self),
                             EnterNameTask(self),
                             EnterEmailTask(self),
                             ConfirmEmailTask(self),
