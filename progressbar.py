@@ -10,6 +10,8 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+import logging
+
 from gi.repository import Gtk
 from gi.repository import Gdk
 
@@ -18,30 +20,35 @@ from sugar3.graphics import style
 
 class ProgressBar(Gtk.Grid):
 
-    def __init__(self):
+    def __init__(self, buttons):
         Gtk.Grid.__init__(self)
         self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
         self.set_border_width(style.DEFAULT_SPACING * 2)
 
-        self._progress = Gtk.ProgressBar()
-        width = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
-        height = 10
-        self._progress.set_size_request(width, height)
-
-        self.attach(self._progress, 0, 0, 1, 1)
-        self._progress.show()
+        logging.error(buttons)
+        self._buttons = []
+        for i in range(len(buttons)):
+            self._buttons.append(Gtk.Button(buttons[i]['label']))
+            if 'tooltip' in buttons[i]:
+                self._buttons[-1].set_tooltip(buttons[i]['tooltip'])
+            logging.error(buttons[i]['label'])
+            self.attach(self._buttons[-1], i, 0, 1, 1)
+            self._buttons[-1].show()
+            self._buttons[-1].set_sensitive(False)
 
         self._label = Gtk.Label()
         self._label.set_line_wrap(True)
         self._label.set_property('xalign', 0.5)
         self._label.modify_fg(Gtk.StateType.NORMAL,
                               style.COLOR_BUTTON_GREY.get_gdk_color())
-        self.attach(self._label, 0, 1, 1, 1)
+        logging.error('%s %d %d %d %d' %
+                      (self._label, 0, 1, len(self._buttons), 1))
+        self.attach(self._label, 0, 1, len(self._buttons), 1)
         self._label.show()
 
     def set_message(self, message):
-        self._label.set_text(message)
+        self._label.set_label(message)
 
-    def set_progress(self, fraction):
-        self._progress.props.fraction = fraction
+    def set_progress(self, i):
+        self._buttons[i].set_sensitive(True)

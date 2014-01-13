@@ -328,7 +328,11 @@ class BadgeOneTask(Task):
         return self._activity.button_was_pressed
 
     def get_graphics(self):
-        target = self._activity.read_task_data('name').split()[0]
+        name = self._activity.read_task_data('name')
+        if name is not None:
+            target = name.split()[0]
+        else:
+            target = ''
         graphics = Graphics()
         '''
         graphics.add_text(
@@ -342,7 +346,8 @@ class BadgeOneTask(Task):
             size=FONT_SIZES[self._font_size])
         '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'introduction4.html')
+                            'Training.activity', 'html',
+                            'introduction4.html?NAME=%s' % target)
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)

@@ -65,12 +65,12 @@ class Exercises(Gtk.Grid):
         if self.current_task is None:
             self.current_task = 0
 
-        self._progress_bar = ProgressBar()
-        alignment = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
+        self._progress_bar = ProgressBar([{'label': 'init'}])
+        self._alignment = Gtk.Alignment.new(xalign=0.5, yalign=0.5,
                                       xscale=0, yscale=0)
-        self.attach(alignment, 0, 0, 1, 1)
-        alignment.show()
-        alignment.add(self._progress_bar)
+        self.attach(self._alignment, 0, 0, 1, 1)
+        self._alignment.show()
+        self._alignment.add(self._progress_bar)
         self._progress_bar.show()
 
     def task_button_cb(self, button):
@@ -105,6 +105,7 @@ class Exercises(Gtk.Grid):
                 self._activity.help_button.set_sensitive(True)
 
             self._load_graphics()
+            self._update_progress()
 
             self._task_data = self.read_task_data(self._uid)
             if self._task_data is None:
@@ -186,8 +187,6 @@ class Exercises(Gtk.Grid):
         self._task_button.set_sensitive(False)
         self._task_button.show()
 
-        self._update_progress()
-
     def get_number_of_sections(self):
         return len(self._task_list)
 
@@ -252,6 +251,20 @@ class Exercises(Gtk.Grid):
             return
         tasks_in_section = self.get_number_of_tasks_in_section(section)
 
+        # If the task index is 0, then we need to create a new progress bar
+        if task_index == 0:
+            self._progress_bar.destroy()
+            buttons = []
+            if tasks_in_section > 1:
+                for i in range(tasks_in_section - 1):
+                    buttons.append({'label': str(i + 1)})
+            self._progress_bar = ProgressBar(buttons)
+            self._alignment.add(self._progress_bar)
+            self._progress_bar.show()
+
+        if task_index < tasks_in_section - 1:
+            self._progress_bar.set_progress(task_index)
+
         # Adjust numbers:
         #    Count the current task
         #    Don't count badge at end of section task
@@ -259,15 +272,15 @@ class Exercises(Gtk.Grid):
         if tasks_in_section > 1:
             tasks_in_section -= 1
 
-        self._progress_bar.set_progress(task_index / float(tasks_in_section))
+        # self._progress_bar.set_progress(task_index / float(tasks_in_section))
         if task_index > tasks_in_section:  # Must be a badge task
             self._progress_bar.set_message(_('Complete'))
         elif task_index == 1 and tasks_in_section == 1:  # Must be a summary
             self._progress_bar.set_message(_('Progress Summary'))
         else:
-            self._progress_bar.set_message(
-                _('Progress to date: %(current)d / %(total)d' %
-                  {'current': task_index, 'total': tasks_in_section}))
+            self._progress_bar.set_message(_('Progress'))
+            #    _('Progress to date: %(current)d / %(total)d' %
+            #      {'current': task_index, 'total': tasks_in_section}))
 
         self._activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
