@@ -46,7 +46,7 @@ class TrainingActivity(activity.Activity):
 
         self.connect('realize', self.__realize_cb)
         self.font_size = 5
-        self.zoom_level = 1.0
+        self.zoom_level = 0.833
 
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])

@@ -121,6 +121,7 @@ class IntroTask(Task):
 
     def get_graphics(self):
         graphics = Graphics()
+        '''
         graphics.add_text(_('Welcome to One Academy\n\n'),
                           bold=True,
                           size=FONT_SIZES[self._font_size],
@@ -129,6 +130,13 @@ class IntroTask(Task):
         graphics.add_text(_('\nAre you ready to learn?\n\n'),
                           justify=Gtk.Justification.CENTER,
                           size=FONT_SIZES[self._font_size])
+        '''
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'introduction1.html')
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
         button = graphics.add_button(_("Let's go!"),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -153,10 +161,11 @@ class HTMLTask(Task):  # TEST TASK
 
     def get_graphics(self):
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Help.activity', 'html', 'home_view.html')
+                            'Training.activity', 'html', 'introduction2.html')
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
+
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -193,6 +202,7 @@ class EnterNameTask(Task):
     def get_graphics(self):
         self.entries = []
         graphics = Graphics()
+        '''
         graphics.add_text(
             _('See that progress bar at the bottom of your screen?\n'
               'It fills up when you complete tasks.\n'
@@ -201,8 +211,15 @@ class EnterNameTask(Task):
               'Time for the first task:\n'
               'Write your full name in the box below, then press Next.\n\n'),
             size=FONT_SIZES[self._font_size])
+        '''
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'introduction2.html')
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
         self.entries.append(graphics.add_entry())
-        graphics.add_text('\n\n')
+        # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -241,14 +258,23 @@ class EnterEmailTask(Task):
         self.entries = []
         target = self._activity.read_task_data('name').split()[0]
         graphics = Graphics()
+        '''
         graphics.add_text(_('Nice work %s!\n'
                             "You’ve almost filled the bar!\n\n\n"
                             "Here’s another tricky one:\n"
                             'Write your email address in the box below, '
                             'then press Next\n\n' % target),
                           size=FONT_SIZES[self._font_size])
+        '''
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html',
+                            'introduction3.html?name=%s' % target)
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
         self.entries.append(graphics.add_entry())
-        graphics.add_text('\n\n')
+        # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
         return graphics, button
@@ -333,6 +359,7 @@ class BadgeOneTask(Task):
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
         graphics = Graphics()
+        '''
         graphics.add_text(
             _('Congratulations %s!\n'
               "You’ve earned your first badge!\n\n" % target), bold=True,
@@ -342,6 +369,13 @@ class BadgeOneTask(Task):
             _('\n\nMost badges require you to complete multiple tasks.\n'
               'Press Continue to start on your next one!\n\n'),
             size=FONT_SIZES[self._font_size])
+        '''
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'introduction4.html')
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button

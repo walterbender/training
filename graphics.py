@@ -101,7 +101,7 @@ class Graphics(Gtk.ScrolledWindow):
         self._web_view = WebKit.WebView()
         offset = style.GRID_CELL_SIZE
         width = Gdk.Screen.width() - offset * 2
-        height = Gdk.Screen.height() - offset * 2
+        height = Gdk.Screen.height() - offset * 5
         self._web_view.set_size_request(width, height)
         self._web_view.set_full_content_zoom(True)
         self._web_view.load_uri(uri)
@@ -128,7 +128,8 @@ class Graphics(Gtk.ScrolledWindow):
         image.show()
 
     def add_button(self, button_label, callback, arg=None):
-        button = Gtk.Button(button_label)
+        button = Gtk.Button()
+        button.set_label(button_label)
         self._attach(button)
         if arg is None:
             button.connect('clicked', callback)
