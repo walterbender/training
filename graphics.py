@@ -24,7 +24,7 @@ _logger = logging.getLogger('training-activity-page')
 class Graphics(Gtk.ScrolledWindow):
     ''' An aligned grid in a scrolling window '''
 
-    def __init__(self, activity):
+    def __init__(self):
         Gtk.ScrolledWindow.__init__(self)
 
         self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -34,7 +34,7 @@ class Graphics(Gtk.ScrolledWindow):
         self.set_size_request(width, height)
 
         alignment = Gtk.Alignment.new(0.5, 0.5, 0, 0)
-        self.add(alignment)
+        self.add_with_viewport(alignment)
         alignment.show()
 
         self._grid = Gtk.Grid()
@@ -44,8 +44,8 @@ class Graphics(Gtk.ScrolledWindow):
         alignment.add(self._grid)
         self._grid.show()
 
-        self._activity = activity
         self._row = 0
+        self._web_view = None
 
     def _attach(self, widget):
         self._grid.attach(widget, 0, self._row, 1, 1)
@@ -98,15 +98,19 @@ class Graphics(Gtk.ScrolledWindow):
         icon.show()
 
     def add_uri(self, uri):
-        web_view = WebKit.WebView()
+        self._web_view = WebKit.WebView()
         offset = style.GRID_CELL_SIZE
         width = Gdk.Screen.width() - offset * 2
         height = Gdk.Screen.height() - offset * 2
-        web_view.set_size_request(width, height)
-        web_view.set_full_content_zoom(True)
-        web_view.load_uri(uri)
-        self._attach(web_view)
-        web_view.show()
+        self._web_view.set_size_request(width, height)
+        self._web_view.set_full_content_zoom(True)
+        self._web_view.load_uri(uri)
+        self._attach(self._web_view)
+        self._web_view.show()
+
+    def set_zoom_level(self, zoom_level):
+        if self._web_view is not None:
+            self._web_view.set_zoom_level(zoom_level)
 
     def add_entry(self, text=''):
         entry = Gtk.Entry()

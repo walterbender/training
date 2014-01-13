@@ -46,6 +46,7 @@ class Exercises(Gtk.Grid):
         self.counter = 0
 
         self._task_list = [[IntroTask(self),
+                            # HTMLTask(self),
                             EnterNameTask(self),
                             EnterEmailTask(self),
                             ConfirmEmailTask(self),
@@ -104,7 +105,7 @@ class Exercises(Gtk.Grid):
             else:
                 self._activity.help_button.set_sensitive(True)
 
-            self._load_task()
+            self._load_graphics()
 
             self._task_data = self.read_task_data(self._uid)
             if self._task_data is None:
@@ -140,7 +141,7 @@ class Exercises(Gtk.Grid):
     def task_master(self):
         ''' 'nough said. '''
         _logger.debug('Task Master: Running task %d' % (self.current_task))
-        self._destroy_task()
+        self._destroy_graphics()
         self._activity.button_was_pressed = False
         if self.current_task < self.get_number_of_tasks():
             section, task_index = self.get_section_index()
@@ -149,24 +150,31 @@ class Exercises(Gtk.Grid):
         else:
             self._activity.complete = True
 
-    def reload_task(self):
-        ''' When changing font size, we regenerate the task '''
-        self._destroy_task()
-        self._load_task()
+    def reload_graphics(self):
+        ''' When changing font size and zoom level, we regenerate the task
+           graphic. '''
+        self._destroy_graphics()
+        self._load_graphics()
 
-    def _destroy_task(self):
+        section, task_index = self.get_section_index()
+        self._test(self._task_list[section][task_index].test,
+                   self._task_data, self._uid)
+
+    def _destroy_graphics(self):
         ''' Destroy the graphics from the previous task '''
         if self._graphics is not None:
             self._graphics.destroy()
         if hasattr(self, 'task_button'):
             self._task_button.destroy()
 
-    def _load_task(self):
+    def _load_graphics(self):
         ''' Load the graphics for a task and define the task button '''
         section, task_index = self.get_section_index()
 
         self._task_list[section][task_index].set_font_size(
             self._activity.font_size)
+        self._task_list[section][task_index].set_zoom_level(
+            self._activity.zoom_level)
 
         self._graphics, self._task_button = \
             self._task_list[section][task_index].get_graphics()

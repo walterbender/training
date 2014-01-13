@@ -47,6 +47,7 @@ class Task():
         self.uid = None
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def set_font_size(self, size):
         if size < len(FONT_SIZES):
@@ -57,6 +58,15 @@ class Task():
 
     font_size = GObject.property(type=object, setter=set_font_size,
                                  getter=get_font_size)
+
+    def set_zoom_level(self, level):
+        self._zoom_level = level
+
+    def get_zoom_level(self):
+        return self._zoom_level
+
+    zoom_level = GObject.property(type=object, setter=set_zoom_level,
+                                 getter=get_zoom_level)
 
     def test(self, exercises, task_data):
         ''' The test to determine if task is completed '''
@@ -98,6 +108,7 @@ class IntroTask(Task):
         self.uid = 'introtask'
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def get_name(self):
         return self._name
@@ -109,7 +120,7 @@ class IntroTask(Task):
         return self._activity.button_was_pressed
 
     def get_graphics(self):
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(_('Welcome to One Academy\n\n'),
                           bold=True,
                           size=FONT_SIZES[self._font_size],
@@ -123,6 +134,34 @@ class IntroTask(Task):
         return graphics, button
 
 
+class HTMLTask(Task):  # TEST TASK
+    def __init__(self, activity):
+        self._name = _('HTML Task')
+        self.uid = 'htmltask'
+        self._activity = activity
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def get_name(self):
+        return self._name
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, exercises, task_data):
+        return self._activity.button_was_pressed
+
+    def get_graphics(self):
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Help.activity', 'html', 'home_view.html')
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+        button = graphics.add_button(_('Continue'),
+                                     self._activity.task_button_cb)
+        return graphics, button
+
+
 class EnterNameTask(Task):
 
     def __init__(self, activity):
@@ -131,6 +170,7 @@ class EnterNameTask(Task):
         self.entries = []
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def get_pause_time(self):
         return 1000
@@ -151,7 +191,8 @@ class EnterNameTask(Task):
         return self._name
 
     def get_graphics(self):
-        graphics = Graphics(self._activity)
+        self.entries = []
+        graphics = Graphics()
         graphics.add_text(
             _('See that progress bar at the bottom of your screen?\n'
               'It fills up when you complete tasks.\n'
@@ -175,6 +216,7 @@ class EnterEmailTask(Task):
         self.entries = []
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def get_pause_time(self):
         return 1000
@@ -198,7 +240,7 @@ class EnterEmailTask(Task):
     def get_graphics(self):
         self.entries = []
         target = self._activity.read_task_data('name').split()[0]
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(_('Nice work %s!\n'
                             "You’ve almost filled the bar!\n\n\n"
                             "Here’s another tricky one:\n"
@@ -220,6 +262,7 @@ class ConfirmEmailTask(Task):
         self.entries = []
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def get_pause_time(self):
         return 1000
@@ -249,7 +292,7 @@ class ConfirmEmailTask(Task):
     def get_graphics(self):
         self.entries = []
         target = self._activity.read_task_data('email_address')
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         self.entries.append(graphics.add_entry(text=target))
         graphics.add_text('\n\n')
         graphics.add_text(
@@ -269,6 +312,7 @@ class BadgeOneTask(Task):
         self.uid = 'badge1'
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def get_name(self):
         return self._name
@@ -288,7 +332,7 @@ class BadgeOneTask(Task):
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
               "You’ve earned your first badge!\n\n" % target), bold=True,
@@ -310,6 +354,7 @@ class ChangeNickTask(Task):
         self.uid = 'nick1'
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def get_pause_time(self):
         return 1000
@@ -344,7 +389,7 @@ class ChangeNickTask(Task):
 
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images', 'Home_fav-menu.png')
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(
             _('<b>Changing the Nickname</b>\n'
               "In this lesson we’re going to learn how to change our\n"
@@ -378,13 +423,6 @@ class ChangeNickTask(Task):
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
-        '''
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Help.activity', 'html',
-                            'home_view.html')
-        _logger.debug(url)
-        return make_html_graphic('file://' + url)
-        '''
 
 
 class RestoreNickTask(Task):
@@ -394,6 +432,7 @@ class RestoreNickTask(Task):
         self.uid = 'nick2'
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def test(self, exercises, task_data):
         return self._activity.button_was_pressed
@@ -408,7 +447,7 @@ class RestoreNickTask(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(
             _('Nice one!\n\n'
               'You changed your nickname to %s!' % profile.get_nick_name()),
@@ -429,6 +468,7 @@ class BadgeTwoTask(Task):
         self.uid = 'badge2'
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def get_name(self):
         return self._name
@@ -448,7 +488,7 @@ class BadgeTwoTask(Task):
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
               "You’ve earned your second badge!\n\n" % target),
@@ -472,6 +512,7 @@ class AddFavoriteTask(Task):
         self.uid = 'favorites1'
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
@@ -494,7 +535,7 @@ class AddFavoriteTask(Task):
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images',
                             'Journal_main_annotated.png')
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(_('Try adding a favorite to your homeview.\n\n'),
                           size=FONT_SIZES[self._font_size])
         graphics.add_image(path)
@@ -510,6 +551,7 @@ class RemoveFavoriteTask(Task):
         self.uid = 'favorites2'
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
@@ -531,7 +573,7 @@ class RemoveFavoriteTask(Task):
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images',
                             'Journal_main_annotated.png')
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(
             _('Now try removing a favorite to your homeview.\n\n'),
             size=FONT_SIZES[self._font_size])
@@ -547,6 +589,7 @@ class BadgeThreeTask(Task):
         self.uid = 'badge3n'
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def get_name(self):
         return self._name
@@ -566,7 +609,7 @@ class BadgeThreeTask(Task):
 
     def get_graphics(self):
         target = self._activity.read_task_data('name').split()[0]
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
               "You’ve earned your third badge!\n\n" % target),
@@ -589,6 +632,7 @@ class FinishedAllTasks(Task):
         self.uid = 'finished'
         self._activity = activity
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def test(self, exercises, task_data):
         self._activity.completed = True
@@ -598,7 +642,7 @@ class FinishedAllTasks(Task):
         return self._name
 
     def get_graphics(self):
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
                           size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
@@ -620,6 +664,7 @@ class ProgressSummary(Task):
         self._activity = activity
         self._progress = progress
         self._font_size = 5
+        self._zoom_level = 1.0
 
     def get_name(self):
         return self._name
@@ -640,7 +685,7 @@ class ProgressSummary(Task):
             else:
                 colors.append(style.COLOR_BUTTON_GREY.get_html())
                 strokes.append(style.COLOR_BUTTON_GREY.get_svg())
-        graphics = Graphics(self._activity)
+        graphics = Graphics()
         for i in range(len(self._SECTIONS)):
             graphics.add_text_and_icon(self._SECTIONS[i]['name'],
                                        self._SECTIONS[i]['icon'],

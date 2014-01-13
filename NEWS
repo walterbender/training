@@ -1,5 +1,10 @@
 NEWS
 
+1.6
+
+* Fixed problem with scrolling reported by Paul
+* Fixed problem with font scaling that disabled app reported by Paul
+
 1.5
 
 * Consolidation of code
@@ -39,3 +44,22 @@ NEWS
 1
 
 * First sketch of a training activity for Sugar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -46,6 +46,7 @@ class TrainingActivity(activity.Activity):
 
         self.connect('realize', self.__realize_cb)
         self.font_size = 5
+        self.zoom_level = 1.0
 
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
@@ -97,14 +98,16 @@ class TrainingActivity(activity.Activity):
                        self._fullscreen_cb, tooltip=_('Fullscreen'),
                        accelerator='<Alt>Return')
 
-        self._font_larger = button_factory('resize+', view_toolbar,
-                                           self._font_larger_cb,
-                                           tooltip=_('Increase font size'))
+        self._zoom_in = button_factory('resize+',
+                                       view_toolbar,
+                                       self._zoom_in_cb,
+                                       tooltip=_('Increase font size'))
 
-        self._font_smaller = button_factory('resize-', view_toolbar,
-                                            self._font_smaller_cb,
-                                            tooltip=_('Decrease font size'))
-        self._set_font_buttons_sensitivity()
+        self._zoom_out = button_factory('resize-',
+                                        view_toolbar,
+                                        self._zoom_out_cb,
+                                        tooltip=_('Decrease font size'))
+        self._set_zoom_buttons_sensitivity()
 
         self.help_button = button_factory('toolbar-help',
                                           toolbox.toolbar,
@@ -128,27 +131,29 @@ class TrainingActivity(activity.Activity):
         ''' Hide the Sugar toolbars. '''
         self.fullscreen()
 
-    def _set_font_buttons_sensitivity(self):
+    def _set_zoom_buttons_sensitivity(self):
         if self.font_size < len(FONT_SIZES) - 1:
-            self._font_larger.set_sensitive(True)
+            self._zoom_in.set_sensitive(True)
         else:
-            self._font_larger.set_sensitive(False)
+            self._zoom_in.set_sensitive(False)
         if self.font_size > 0:
-            self._font_smaller.set_sensitive(True)
+            self._zoom_out.set_sensitive(True)
         else:
-            self._font_smaller.set_sensitive(False)
+            self._zoom_out.set_sensitive(False)
 
-    def _font_larger_cb(self, button):
+    def _zoom_in_cb(self, button):
         if self.font_size < len(FONT_SIZES) - 1:
             self.font_size += 1
-        self._set_font_buttons_sensitivity()
-        self._exercises.reload_task()
+            self.zoom_level *= 1.1
+        self._set_zoom_buttons_sensitivity()
+        self._exercises.reload_graphics()
 
-    def _font_smaller_cb(self, button):
+    def _zoom_out_cb(self, button):
         if self.font_size > 0:
             self.font_size -= 1
-        self._set_font_buttons_sensitivity()
-        self._exercises.reload_task()
+            self.zoom_level /= 1.1
+        self._set_zoom_buttons_sensitivity()
+        self._exercises.reload_graphics()
 
     def _help_cb(self, button):
         title, help_file = self._exercises.get_help_info()
