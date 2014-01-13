@@ -115,7 +115,7 @@ class TrainingActivity(activity.Activity):
                                           accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)
 
-        self.progress_label = label_factory(toolbox.toolbar, '', width=200)
+        self.progress_label = label_factory(toolbox.toolbar, '', width=300)
         self.progress_label.set_use_markup(True)
 
         separator_factory(toolbox.toolbar, True, False)

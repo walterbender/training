@@ -1,5 +1,10 @@
 NEWS
 
+1.7
+
+* Add zoom for HTML content
+* Fix problem with line wrap in Overall status
+
 1.6
 
 * Fixed problem with scrolling reported by Paul
