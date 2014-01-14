@@ -168,10 +168,24 @@ class TrainingActivity(activity.Activity):
         self._exercises.reload_graphics()
 
     def _go_back_cb(self, button):
-        pass
+        section, task = self._exercises.get_section_index()
+        if section > 0:
+            section -= 1
+        _logger.debug('go back %d:%d' % (section, task))
+        uid = self._exercises.section_and_task_to_uid(section)
+        _logger.debug('new uid %s' % (uid))
+        self._exercises.current_task = self._exercises.uid_to_task_number(uid)
+        self._exercises.task_master()
 
     def _go_forward_cb(self, button):
-        pass
+        section, task = self._exercises.get_section_index()
+        if section < self._exercises.get_number_of_sections() - 1:
+            section += 1
+        _logger.debug('go forward %d:%d' % (section, task))
+        uid = self._exercises.section_and_task_to_uid(section)
+        _logger.debug('new uid %s' % (uid))
+        self._exercises.current_task = self._exercises.uid_to_task_number(uid)
+        self._exercises.task_master()
 
     def _help_cb(self, button):
         title, help_file = self._exercises.get_help_info()

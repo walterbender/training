@@ -50,16 +50,15 @@ class Exercises(Gtk.Grid):
                             EnterEmailTask(self),
                             ValidateEmailTask(self),
                             BadgeOneTask(self)],
-                           [ProgressSummary(self, 1)],
                            [ChangeNickTask(self),
                             ConfirmNickChangeTask(self),
                             BadgeTwoTask(self)],
-                           [ProgressSummary(self, 2)],
                            [AddFavoriteTask(self),
                             RemoveFavoriteTask(self),
                             BadgeThreeTask(self)],
-                           [ProgressSummary(self, 3)],
                            [FinishedAllTasks(self)]]
+
+        # [ProgressSummary(self, 3)]
 
         self.current_task = self.read_task_data('current_task')
         if self.current_task is None:
@@ -166,6 +165,19 @@ class Exercises(Gtk.Grid):
         self._activity.button_was_pressed = False
         if self.current_task < self.get_number_of_tasks():
             section, task_index = self.get_section_index()
+            if section > 0:
+                self._activity.back.set_sensitive(True)
+                if section < len(self._task_list) - 1:
+                    self._activity.forward.set_sensitive(True)
+            # Check to make sure all the requirements at met
+            requires = self._task_list[section][task_index].requires()
+            for uid in requires:
+                if not self.uid_to_task(uid, section=section).is_completed():
+                    _logger.debug(
+                        'Task %s required task %s... switching to %s' %
+                        (self._task_list[section][task_index].uid, uid, uid))
+                    self.current_task = self.uid_to_task_number(uid)
+                    break
             self.first_time = True
             self._run_task(section, task_index)
         else:
@@ -223,19 +235,47 @@ class Exercises(Gtk.Grid):
                 count += 1
         return -1, -1
 
+    def get_number_of_sections(self):
+        return len(self._task_list)
+
     def get_number_of_tasks(self):
         count = 0
         for section in self._task_list:
             count += len(section)
         return count
 
-    def uid_to_task(self, uid):
+    def section_and_task_to_uid(self, section, task_index=0):
+        if section < 0 or section > self.get_number_of_sections() - 1:
+            _logger.error('Bad section number %d' % (section))
+            return self._task_list[0][0].uid
+        elif task_index < 0 or task_index > len(self._task_list[section]) - 1:
+            _logger.error('Bad task number %d:%d' % (section, task_index))
+            return self._task_list[0][0].uid
+        else:
+            return self._task_list[section][task_index].uid
+
+    def uid_to_task_number(self, uid):
+        i = 0
         for section in self._task_list:
             for task in section:
                 if task.uid == uid:
+                    return i
+                i += 1
+        _logger.error('UID %s not found' % uid)
+        return 0
+
+    def uid_to_task(self, uid, section=None):
+        if section:
+            for task in self._task_list[section]:
+                if task.uid == uid:
                     return task
-        _logging.error('UID %s not found' % uid)
-        return None
+        else:
+            for section in self._task_list:
+                for task in section:
+                    if task.uid == uid:
+                        return task
+        _logger.error('UID %s not found' % uid)
+        return self._task_list[0][0]
 
     def read_task_data(self, uid):
         data_path = os.path.join(self._activity.get_activity_root(), 'data',
@@ -295,7 +335,7 @@ class Exercises(Gtk.Grid):
             self._progress_bar_alignment.add(self._progress_bar)
             self._progress_bar.show()
 
-        logging.debug('task_index: %d; tasks_in_section - 1: %d' %
+        _logger.debug('task_index: %d; tasks_in_section - 1: %d' %
                       (task_index, tasks_in_section - 1))
         if task_index < tasks_in_section - 1:
             for i in range(task_index + 1):
