@@ -37,7 +37,12 @@ class ProgressBar(Gtk.Grid):
         for i in range(len(buttons)):
             self._buttons.append(Gtk.Button(buttons[i]['label']))
             if 'tooltip' in buttons[i]:
-                self._buttons[-1].set_tooltip(buttons[i]['tooltip'])
+                tooltip = \
+'<span background="%s" foreground="%s" size="large"> %s </span>' \
+                    % (style.COLOR_WHITE.get_html(),
+                       style.COLOR_BLACK.get_html(),
+                       buttons[i]['tooltip'])
+                self._buttons[-1].set_tooltip_markup(tooltip)
             logging.error(buttons[i]['label'])
             self._button_grid.attach(self._buttons[-1], i, 0, 1, 1)
             self._buttons[-1].show()

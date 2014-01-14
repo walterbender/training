@@ -252,13 +252,13 @@ class Exercises(Gtk.Grid):
         # If the task index is 0, then we need to create a new progress bar
         if task_index == 0 or self._progress_bar is None:
             if self._progress_bar is not None:
-                logging.debug('destroying progress bar')
                 self._progress_bar.destroy()
             buttons = []
             if tasks_in_section > 1:
                 for i in range(tasks_in_section - 1):
-                    buttons.append({'label': str(i + 1)})
-            logging.debug('creating progress bar')
+                    buttons.append(
+                        {'label': str(i + 1),
+                         'tooltip': self._task_list[section][i].get_name()})
             self._progress_bar = ProgressBar(buttons)
             self._progress_bar_alignment.add(self._progress_bar)
             self._progress_bar.show()
