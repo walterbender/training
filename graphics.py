@@ -48,12 +48,16 @@ class Graphics(Gtk.ScrolledWindow):
         self._web_view = None
 
     def _attach(self, widget):
-        self._grid.attach(widget, 0, self._row, 1, 1)
+        self._grid.attach(widget, 0, self._row, 5, 1)
         self._row += 1
 
     def _attach_two(self, widget1, widget2):
-        self._grid.attach(widget1, 0, self._row, 1, 1)
-        self._grid.attach(widget2, 1, self._row, 1, 1)
+        self._grid.attach(widget1, 0, self._row, 2, 1)
+        self._grid.attach(widget2, 3, self._row, 2, 1)
+        self._row += 1
+
+    def _attach_center(self, widget):
+        self._grid.attach(widget, 2, self._row, 1, 1)
         self._row += 1
 
     def add_icon(self, icon_name, stroke=style.COLOR_BUTTON_GREY.get_svg(),
@@ -130,7 +134,7 @@ class Graphics(Gtk.ScrolledWindow):
     def add_button(self, button_label, callback, arg=None):
         button = Gtk.Button()
         button.set_label(button_label)
-        self._attach(button)
+        self._attach_center(button)
         if arg is None:
             button.connect('clicked', callback)
         else:
