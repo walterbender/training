@@ -98,12 +98,12 @@ class TrainingActivity(activity.Activity):
                        self._fullscreen_cb, tooltip=_('Fullscreen'),
                        accelerator='<Alt>Return')
 
-        self._zoom_in = button_factory('resize+',
+        self._zoom_in = button_factory('zoom-out',  # 'resize+',
                                        view_toolbar,
                                        self._zoom_in_cb,
                                        tooltip=_('Increase font size'))
 
-        self._zoom_out = button_factory('resize-',
+        self._zoom_out = button_factory('zoom-in',  # 'resize-',
                                         view_toolbar,
                                         self._zoom_out_cb,
                                         tooltip=_('Decrease font size'))
@@ -114,6 +114,18 @@ class TrainingActivity(activity.Activity):
                                           self._help_cb, tooltip=_('help'),
                                           accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)
+
+        self.back = button_factory('go-previous-paired',
+                                   toolbox.toolbar,
+                                   self._go_back_cb,
+                                   tooltip=_('Previous section'))
+        self.back.props.sensitive = False
+
+        self.forward = button_factory('go-next-paired',
+                                   toolbox.toolbar,
+                                   self._go_forward_cb,
+                                   tooltip=_('Next section'))
+        self.forward.props.sensitive = False
 
         self.progress_label = label_factory(toolbox.toolbar, '', width=300)
         self.progress_label.set_use_markup(True)
@@ -154,6 +166,12 @@ class TrainingActivity(activity.Activity):
             self.zoom_level /= 1.1
         self._set_zoom_buttons_sensitivity()
         self._exercises.reload_graphics()
+
+    def _go_back_cb(self, button):
+        pass
+
+    def _go_forward_cb(self, button):
+        pass
 
     def _help_cb(self, button):
         title, help_file = self._exercises.get_help_info()

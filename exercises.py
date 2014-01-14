@@ -48,11 +48,11 @@ class Exercises(Gtk.Grid):
         self._task_list = [[IntroTask(self)],
                            [EnterNameTask(self),
                             EnterEmailTask(self),
-                            ConfirmEmailTask(self),
+                            ValidateEmailTask(self),
                             BadgeOneTask(self)],
                            [ProgressSummary(self, 1)],
                            [ChangeNickTask(self),
-                            RestoreNickTask(self),
+                            ConfirmNickChangeTask(self),
                             BadgeTwoTask(self)],
                            [ProgressSummary(self, 2)],
                            [AddFavoriteTask(self),
@@ -102,19 +102,30 @@ class Exercises(Gtk.Grid):
             else:
                 self._activity.help_button.set_sensitive(True)
 
+            # In order to calculate accumulated time, we need to monitor
+            # our start time.
+            self._start_time = int(time.time() + 0.5)
+
             self._load_graphics()
             self._update_progress()
 
             self._task_data = self.read_task_data(self._uid)
             if self._task_data is None:
                 self._task_data = {}
-                self._task_data['start_time'] = int(time.time())
+                self._task_data['start_time'] = self._start_time
+                self._task_data['accumulated_time'] = 0
                 self._task_data['attempt'] = 0
+                self._task_data['completed'] = False
                 self._task_data['task'] = \
                     self._task_list[section][task_index].get_name()
                 self._task_data['data'] = \
                     self._task_list[section][task_index].get_data()
+                self._task_data['collectable'] = \
+                    self._task_list[section][task_index].is_collectable()
                 self.write_task_data(self._uid, self._task_data)
+            elif 'completed' in self._task_data and \
+                 self._task_data['completed']:
+                _logger.debug('Revisiting a completed task')
 
             self.first_time = False
 
@@ -123,15 +134,27 @@ class Exercises(Gtk.Grid):
             self._test, self._task_list[section][task_index].test,
             self._task_data, self._uid)
 
+    def _update_accumutaled_time(self, task_data):
+        end_time = int(time.time() + 0.5)
+        task_data['accumulated_time'] += end_time - self._start_time
+        self._start_time = end_time
+
     def _test(self, test, task_data, uid):
         ''' Is the task complete? '''
         if test(self, task_data):
             self._task_button.set_sensitive(True)
-            task_data = self.read_task_data(uid)
-            task_data['end_time'] = int(time.time())
+            if not 'completed' in task_data or not task_data['completed']:
+                task_data = self.read_task_data(uid)
+                task_data['end_time'] = int(time.time())
+                task_data['completed'] = True
+                self._update_accumutaled_time(task_data)
             self.write_task_data(uid, task_data)
         else:
-            self._task_data['attempt'] += 1
+            if not 'completed' in task_data or not task_data['completed']:
+                self._task_data['attempt'] += 1
+                self._update_accumutaled_time(task_data)
+            else:  # Revisting a completed task
+                pass
             self.write_task_data(uid, task_data)
             section, index = self.get_section_index()
             self._run_task(section, index)
@@ -206,6 +229,14 @@ class Exercises(Gtk.Grid):
             count += len(section)
         return count
 
+    def uid_to_task(self, uid):
+        for section in self._task_list:
+            for task in section:
+                if task.uid == uid:
+                    return task
+        _logging.error('UID %s not found' % uid)
+        return None
+
     def read_task_data(self, uid):
         data_path = os.path.join(self._activity.get_activity_root(), 'data',
                                  'training_data')
@@ -255,6 +286,7 @@ class Exercises(Gtk.Grid):
                 self._progress_bar.destroy()
             buttons = []
             if tasks_in_section > 1:
+                # TODO: add callbacks, set sensitive to completed tasks
                 for i in range(tasks_in_section - 1):
                     buttons.append(
                         {'label': str(i + 1),

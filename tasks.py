@@ -90,6 +90,15 @@ class Task():
     def get_pause_time(self):
         return 5000
 
+    def requires(self):
+        ''' Return list of tasks (uids) required prior to completing this
+            task '''
+        return []
+
+    def is_collectable(self):
+        ''' Should this task's data be collected? '''
+        return True
+
     def get_name(self):
         ''' String to present to the user to define the task '''
         raise NotImplementedError
@@ -101,11 +110,17 @@ class Task():
         ''' Graphics to present with the task '''
         return None
 
+    def is_completed(self):
+        data = self._activity.read_task_data(self.uid)
+        if 'completed' in data:
+            return data['completed']
+        return False
+
 
 class IntroTask(Task):
     def __init__(self, activity):
         self._name = _('Intro Task')
-        self.uid = 'introtask'
+        self.uid = 'intro-task'
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
@@ -146,7 +161,7 @@ class EnterNameTask(Task):
 
     def __init__(self, activity):
         self._name = _('Enter Name Task')
-        self.uid = 'nametask'
+        self.uid = 'enter-name-task'
         self.entries = []
         self._activity = activity
         self._font_size = 5
@@ -200,11 +215,14 @@ class EnterEmailTask(Task):
 
     def __init__(self, activity):
         self._name = _('Enter Email Task')
-        self.uid = 'email1'
+        self.uid = 'enter-email-task'
         self.entries = []
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
+
+    def requires(self):
+        return ['enter-name-task']
 
     def get_pause_time(self):
         return 1000
@@ -251,15 +269,18 @@ class EnterEmailTask(Task):
         return graphics, button
 
 
-class ConfirmEmailTask(Task):
+class ValidateEmailTask(Task):
 
     def __init__(self, activity):
-        self._name = _('Confirm Email Task')
-        self.uid = 'email2'
+        self._name = _('Validate Email Task')
+        self.uid = 'validate-email-task'
         self.entries = []
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
+
+    def requires(self):
+        return ['enter-email-task']
 
     def get_pause_time(self):
         return 1000
@@ -308,10 +329,16 @@ class ConfirmEmailTask(Task):
 class BadgeOneTask(Task):
     def __init__(self, activity):
         self._name = _('Badge One')
-        self.uid = 'badge1'
+        self.uid = 'badge-1'
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
+
+    def requires(self):
+        return ['enter-name-task', 'enter-email-task', 'validate-email-task']
+
+    def is_collectable(self):
+        return False
 
     def get_name(self):
         return self._name
@@ -363,7 +390,7 @@ class ChangeNickTask(Task):
 
     def __init__(self, activity):
         self._name = _('Change Nick Task')
-        self.uid = 'nick1'
+        self.uid = 'change-nick-task'
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
@@ -437,14 +464,17 @@ class ChangeNickTask(Task):
         return graphics, button
 
 
-class RestoreNickTask(Task):
+class ConfirmNickChangeTask(Task):
 
     def __init__(self, activity):
         self._name = _('Restore Nick Task')
-        self.uid = 'nick2'
+        self.uid = 'confirm-nick-change-task'
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
+
+    def requires(self):
+        return ['change-nick-task']
 
     def test(self, exercises, task_data):
         return self._activity.button_was_pressed
@@ -477,10 +507,16 @@ class RestoreNickTask(Task):
 class BadgeTwoTask(Task):
     def __init__(self, activity):
         self._name = _('Badge Two')
-        self.uid = 'badge2'
+        self.uid = 'badge-2'
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
+
+    def requires(self):
+        return ['change-nick-task', 'confirm-nick-change-task']
+
+    def is_collectable(self):
+        return False
 
     def get_name(self):
         return self._name
@@ -521,7 +557,7 @@ class AddFavoriteTask(Task):
 
     def __init__(self, activity):
         self._name = _('Add Favorite Task')
-        self.uid = 'favorites1'
+        self.uid = 'add-favorites-task'
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
@@ -560,7 +596,7 @@ class RemoveFavoriteTask(Task):
 
     def __init__(self, activity):
         self._name = _('Remove Favorite Task')
-        self.uid = 'favorites2'
+        self.uid = 'remove-favorites-task'
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
@@ -598,10 +634,16 @@ class RemoveFavoriteTask(Task):
 class BadgeThreeTask(Task):
     def __init__(self, activity):
         self._name = _('Badge Three')
-        self.uid = 'badge3n'
+        self.uid = 'badge-3'
         self._activity = activity
         self._font_size = 5
         self._zoom_level = 1.0
+
+    def requires(self):
+        return ['add-favorites-task', 'remove-favorites-task']
+
+    def is_collectable(self):
+        return False
 
     def get_name(self):
         return self._name
@@ -646,6 +688,9 @@ class FinishedAllTasks(Task):
         self._font_size = 5
         self._zoom_level = 1.0
 
+    def requires(self):
+        return []  # To Do: what tasks are actually required?
+
     def test(self, exercises, task_data):
         self._activity.completed = True
         return True
@@ -677,6 +722,9 @@ class ProgressSummary(Task):
         self._progress = progress
         self._font_size = 5
         self._zoom_level = 1.0
+
+    def is_collectable(self):
+        return False
 
     def get_name(self):
         return self._name

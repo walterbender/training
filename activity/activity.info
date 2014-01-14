@@ -3,8 +3,9 @@ name = Training
 exec = sugar-activity activity.TrainingActivity
 bundle_id = org.sugarlabs.Training
 icon = one-academy
-activity_version = 1.8
+activity_version = 1.9
 show_launcher = yes
 license = GPLv3
 single_instance = yes
-summary = a series of training exercises
+summary = a series of Sugar "How-to" exercises from One Academy
+
