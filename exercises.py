@@ -19,6 +19,7 @@ from gi.repository import Gtk
 from gi.repository import GObject
 
 from sugar3.graphics import style
+from sugar3.graphics.toolbutton import ToolButton
 
 import logging
 _logger = logging.getLogger('training-activity-exercises')
@@ -40,9 +41,9 @@ class Exercises(Gtk.Grid):
 
         self._activity = activity
         self._graphics = None
+        self._page = 0
         self._task_button = None
         self._first_time = True
-        self._grid_row_zero = None
 
         self._task_list = [[IntroTask(self)],
                            [EnterNameTask(self),
@@ -61,10 +62,27 @@ class Exercises(Gtk.Grid):
         if self.current_task is None:
             self.current_task = 0
 
+        self._graphics_grid = Gtk.Grid()
+        self._graphics_grid.set_row_spacing(style.DEFAULT_SPACING)
+        self._graphics_grid.set_column_spacing(style.DEFAULT_SPACING)
+        graphics_grid_alignment = Gtk.Alignment.new(
+            xalign=0.5, yalign=0.5, xscale=0, yscale=0)
+        graphics_grid_alignment.add(self._graphics_grid)
+        self._graphics_grid.show()
+        self.attach(graphics_grid_alignment, 0, 0, 1, 1)
+        graphics_grid_alignment.show()
+
+        self._prev_page_button = ToolButton('go-left-page')
+        self._prev_page_button.connect('clicked', self._prev_page_cb)
+        self._graphics_grid.attach(self._prev_page_button, 0, 0, 1, 1)
+        self._next_page_button = ToolButton('go-right-page')
+        self._next_page_button.connect('clicked', self._next_page_cb)
+        self._graphics_grid.attach(self._next_page_button, 2, 0, 1, 1)
+
         self._progress_bar = None
         self._progress_bar_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        self.attach(self._progress_bar_alignment, 0, 0, 1, 1)
+        self.attach(self._progress_bar_alignment, 0, 1, 1, 1)
         self._progress_bar_alignment.show()
 
     def task_button_cb(self, button):
@@ -146,6 +164,7 @@ class Exercises(Gtk.Grid):
                 self._update_accumutaled_time(task_data)
             self.write_task_data(uid, task_data)
         else:
+            self._task_button.set_sensitive(False)
             if not 'completed' in task_data or not task_data['completed']:
                 self._task_data['attempt'] += 1
                 self._update_accumutaled_time(task_data)
@@ -201,9 +220,9 @@ class Exercises(Gtk.Grid):
     def _destroy_graphics(self):
         ''' Destroy the graphics from the previous task '''
         if self._graphics is not None:
-            for graphic in self._graphics:
-                graphic.destroy()
-        if hasattr(self, 'task_button'):
+            self._graphics.destroy()
+            self._graphics = None
+        if hasattr(self, '_task_button') and self._task_button is not None:
             self._task_button.destroy()
 
     def _load_graphics(self):
@@ -217,14 +236,54 @@ class Exercises(Gtk.Grid):
 
         self._graphics, self._task_button = \
             self._task_list[section][task_index].get_graphics()
-        if self._grid_row_zero is None:
-            self.insert_row(0)
-            self._grid_row_zero = True
-        self.attach(self._graphics[0], 0, 0, 1, 1)
-        self._graphics[0].show()
+        self._graphics_grid.attach(self._graphics, 1, 0, 1, 1)
+        self._graphics.show()
 
-        self._task_button.set_sensitive(False)
-        self._task_button.show()
+        if self._task_list[section][task_index].get_page_count() > 1:
+            self._prev_page_button.show()
+            self._prev_page_button.set_sensitive(False)
+            self._next_page_button.show()
+            self._next_page_button.set_sensitive(True)
+            self._page = 0
+        else:
+            self._prev_page_button.hide()
+            self._next_page_button.hide()
+
+        if self._task_button is not None:
+            self._task_button.set_sensitive(False)
+            self._task_button.show()
+
+    def _show_page(self):
+        section, task_index = self.get_section_index()
+        if self._graphics is not None:
+            self._graphic.destroy()
+        if hasattr(self, 'task_button'):
+            self._task_button.destroy()
+        self._graphics, self._task_button = \
+            self._task_list[section][task_index].get_graphics()
+        self._graphics_grid.attach(self._graphics, 1, 0, 1, 1)
+        self._graphics.show()
+        if self._task_button is not None:
+            self._task_button.set_sensitive(False)
+            self._task_button.show()
+
+    def _prev_page_cb(self, button):
+        if self._page > 0:
+            self._page -= 1
+        if self._page == 0:
+            self._prev_page_button.set_sensitive(False)
+        self._next_page_button.set_sensitive(True)
+        self._show_page()
+
+    def _next_page_cb(self, button):
+        section, task_index = self.get_section_index()
+        count = self._task_list[section][task_index].get_page_count()
+        if self._page < count - 1:
+            self._page += 1
+        if self._page == count - 1:
+            self._next_page_button.set_sensitive(False)
+        self._prev_page_button.set_sensitive(True)
+        self._show_page()
 
     def get_number_of_sections(self):
         return len(self._task_list)

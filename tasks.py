@@ -108,7 +108,10 @@ class Task():
     def get_help_info(self):
         return (None, None)
 
-    def get_graphics(self):
+    def get_page_count(self):
+        return 1
+
+    def get_graphics(self, page=0):
         ''' Graphics to present with the task '''
         return None
 
@@ -156,7 +159,7 @@ class IntroTask(Task):
 
         button = graphics.add_button(_("Let's go!"),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class EnterNameTask(Task):
@@ -215,7 +218,7 @@ class EnterNameTask(Task):
         # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class EnterEmailTask(Task):
@@ -238,10 +241,13 @@ class EnterEmailTask(Task):
         if len(self.entries) == 0:
             _logger.error('missing entry')
             return False
-        if len(self.entries[0].get_text()) == 0:
+        entry = self.entries[0].get_text()
+        if len(entry) == 0:
             return False
-        else:
-            return True
+        realname, email_address = email.utils.parseaddr(entry)
+        if email_address == '':
+            return False
+        return True
 
     def after_button_press(self):
         _logger.debug('Writing email address: %s' % self.entries[0].get_text())
@@ -284,7 +290,7 @@ class EnterEmailTask(Task):
         # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class ValidateEmailTask(Task):
@@ -345,7 +351,7 @@ class ValidateEmailTask(Task):
         graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class BadgeOneTask(Task):
@@ -405,7 +411,7 @@ class BadgeOneTask(Task):
 
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class ChangeNickTask(Task):
@@ -483,7 +489,7 @@ class ChangeNickTask(Task):
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class ConfirmNickChangeTask(Task):
@@ -523,7 +529,7 @@ class ConfirmNickChangeTask(Task):
             size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class BadgeTwoTask(Task):
@@ -572,7 +578,7 @@ class BadgeTwoTask(Task):
             size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class AddFavoriteTask(Task):
@@ -611,7 +617,7 @@ class AddFavoriteTask(Task):
         graphics.add_image(path)
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class RemoveFavoriteTask(Task):
@@ -650,7 +656,7 @@ class RemoveFavoriteTask(Task):
         graphics.add_image(path)
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class BadgeThreeTask(Task):
@@ -698,7 +704,7 @@ class BadgeThreeTask(Task):
             size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class FinishedAllTasks(Task):
@@ -726,7 +732,7 @@ class FinishedAllTasks(Task):
                           size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
-        return [graphics], button
+        return graphics, button
 
 
 class UITest(Task):

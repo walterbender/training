@@ -1,10 +1,20 @@
 NEWS
 
+1.11
+
+* Add support for page flipping in graphics
+* Fixed zoom-in/zoom-out button swap
+* Tweak graphics to fit on page w/o scrollbars
+* Add email validation on initial email entry
+
 1.10
 
 * Enable progressbar task navigation
 * Restore data to entries when revisiting a task
 * Use Python email.utils for email address validation
+* Calculate overall progress based on number of tasks marked complete
+* Fix logic bug in prev. task button
+* Make task graphics an array in anticipation of supporting pages
 
 1.9
 
