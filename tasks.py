@@ -188,6 +188,7 @@ class EnterNameTask(Task):
 
     def get_graphics(self):
         self.entries = []
+        target = self._activity.read_task_data('name')
         graphics = Graphics()
         '''
         graphics.add_text(
@@ -205,7 +206,11 @@ class EnterNameTask(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        self.entries.append(graphics.add_entry())
+        if target is not None:
+            self.entries.append(graphics.add_entry(text=target))
+        else:
+            self.entries.append(graphics.add_entry())
+
         # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
@@ -238,6 +243,7 @@ class EnterEmailTask(Task):
             return True
 
     def after_button_press(self):
+        _logger.debug('Writing email address: %s' % self.entries[0].get_text())
         self._activity.write_task_data('email_address',
                                        self.entries[0].get_text())
 
@@ -246,24 +252,34 @@ class EnterEmailTask(Task):
 
     def get_graphics(self):
         self.entries = []
-        target = self._activity.read_task_data('name').split()[0]
+        name = self._activity.read_task_data('name')
+        if name is not None:
+            name = name.split()[0]
+        else:  # Should never happen
+            _logger.error('missing name')
+            name = ''
+        email = self._activity.read_task_data('email_address')
         graphics = Graphics()
         '''
         graphics.add_text(_('Nice work %s!\n'
                             "You’ve almost filled the bar!\n\n\n"
                             "Here’s another tricky one:\n"
                             'Write your email address in the box below, '
-                            'then press Next\n\n' % target),
+                            'then press Next\n\n' % name),
                           size=FONT_SIZES[self._font_size])
         '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                             'Training.activity', 'html',
-                            'introduction3.html?NAME=%s' % target)
+                            'introduction3.html?NAME=%s' % name)
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        self.entries.append(graphics.add_entry())
+        if email is not None:
+            self.entries.append(graphics.add_entry(text=email))
+        else:
+            self.entries.append(graphics.add_entry())
+
         # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._activity.task_button_cb)
@@ -312,9 +328,13 @@ class ValidateEmailTask(Task):
 
     def get_graphics(self):
         self.entries = []
-        target = self._activity.read_task_data('email_address')
+        email = self._activity.read_task_data('email_address')
         graphics = Graphics()
-        self.entries.append(graphics.add_entry(text=target))
+        if email is not None:
+            self.entries.append(graphics.add_entry(text=email))
+        else:  # Should never happen
+            _logger.error('missing email address')
+            self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         graphics.add_text(
             _('Please confirm that you typed your\n'
