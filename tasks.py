@@ -448,7 +448,10 @@ class ChangeNickTask(Task):
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
 
-    def get_graphics(self):
+    def get_page_count(self):
+        return 6
+
+    def get_graphics(self, page=0):
         def button_callback(widget):
             from jarabe.model import shell
             _logger.debug('My turn button clicked')
@@ -457,38 +460,47 @@ class ChangeNickTask(Task):
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images', 'Home_fav-menu.png')
         graphics = Graphics()
-        graphics.add_text(
-            _('<b>Changing the Nickname</b>\n'
-              "In this lesson we’re going to learn how to change our\n"
-              'nickname on the XO.\n'
-              'You entered your nickname on the screen shown below\n'
-              'when you first started the XO up. Remember?\n\n'),
-            size=FONT_SIZES[self._font_size])
-        graphics.add_image(path)
-        graphics.add_text(
-            _('\n\n<b>What is the nickname?</b>\n'
-              'The nickname is your name on the XO, and will appear\n'
-              'all around Sugar as well as being visible on networks.\n\n'
-              'Watch the animation below to see how it’s done:\n\n'),
-            size=FONT_SIZES[self._font_size])
-        graphics.add_image(path)
-        graphics.add_text(
-            _('\n\n<b>Step-by-step:</b>\n'
-              '1. Go to the home screen\n'
-              '2. Right click on the central icon\n'
-              '3. Do other things\n'
-              '4. Type in a new nickname\n'
-              '5. Click yes to restart Sugar\n'
-              '6. Reopen the One Academy activity to complete\n\n'
-              '<b>Are you ready to try?</b>\n'
-              'Watch the animation again if you like.\n'
-              "When you’re ready to try, hit the \"My Turn\"\n"
-              'button below to go to the home screen.\n\n'),
-            size=FONT_SIZES[self._font_size])
-        graphics.add_button(_('My turn'), button_callback)
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Continue'),
-                                     self._activity.task_button_cb)
+        button = None
+        if page == 0:
+            graphics.add_text(
+                _('<b>Changing the Nickname</b>\n'
+                  "In this lesson we’re going to learn how to change our\n"
+                  'nickname on the XO.\n'
+                  'You entered your nickname on the screen shown below\n'
+                  'when you first started the XO up. Remember?\n\n'),
+                size=FONT_SIZES[self._font_size])
+        elif page == 1:
+            graphics.add_image(path)
+        elif page == 2:
+            graphics.add_text(
+                _('\n\n<b>What is the nickname?</b>\n'
+                  'The nickname is your name on the XO, and will appear\n'
+                  'all around Sugar as well as being visible on networks.\n\n'
+                  'Watch the animation below to see how it’s done:\n\n'),
+                size=FONT_SIZES[self._font_size])
+        elif page == 3:
+            graphics.add_image(path)
+        elif page == 4:
+            graphics.add_text(
+                _('\n\n<b>Step-by-step:</b>\n'
+                  '1. Go to the home screen\n'
+                  '2. Right click on the central icon\n'
+                  '3. Do other things\n'
+                  '4. Type in a new nickname\n'
+                  '5. Click yes to restart Sugar\n'
+                  '6. Reopen the One Academy activity to complete\n\n'),
+                size=FONT_SIZES[self._font_size])
+        elif page == 5:
+            graphics.add_text(
+                _('<b>Are you ready to try?</b>\n'
+                  'Watch the animation again if you like.\n'
+                  "When you’re ready to try, hit the \"My Turn\"\n"
+                  'button below to go to the home screen.\n\n'),
+                size=FONT_SIZES[self._font_size])
+            graphics.add_button(_('My turn'), button_callback)
+            graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+            button = graphics.add_button(_('Continue'),
+                                         self._activity.task_button_cb)
         return graphics, button
 
 

@@ -256,11 +256,11 @@ class Exercises(Gtk.Grid):
     def _show_page(self):
         section, task_index = self.get_section_index()
         if self._graphics is not None:
-            self._graphic.destroy()
+            self._graphics.destroy()
         if hasattr(self, 'task_button'):
             self._task_button.destroy()
         self._graphics, self._task_button = \
-            self._task_list[section][task_index].get_graphics()
+            self._task_list[section][task_index].get_graphics(page=self._page)
         self._graphics_grid.attach(self._graphics, 1, 0, 1, 1)
         self._graphics.show()
         if self._task_button is not None:
