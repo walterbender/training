@@ -30,7 +30,7 @@ class Graphics(Gtk.ScrolledWindow):
         self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         offset = style.GRID_CELL_SIZE
         if width is None:
-            width = Gdk.Screen.width()
+            width = Gdk.Screen.width() - offset * 2
         if height is None:
             height = Gdk.Screen.height() - offset * 3
         self.set_size_request(width, height)
@@ -106,8 +106,8 @@ class Graphics(Gtk.ScrolledWindow):
     def add_uri(self, uri):
         self._web_view = WebKit.WebView()
         offset = style.GRID_CELL_SIZE
-        width = Gdk.Screen.width() - offset * 2
-        height = Gdk.Screen.height() - offset * 5
+        width = 800  # Gdk.Screen.width() - offset * 4
+        height = 480  # Gdk.Screen.height() - offset * 5
         self._web_view.set_size_request(width, height)
         self._web_view.set_full_content_zoom(True)
         self._web_view.load_uri(uri)
@@ -120,6 +120,8 @@ class Graphics(Gtk.ScrolledWindow):
 
     def add_entry(self, text=''):
         entry = Gtk.Entry()
+        offset = style.GRID_CELL_SIZE
+        entry.set_size_request(offset * 8, -1)
         entry.set_text(text)
         self._attach(entry)
         entry.show()
