@@ -100,12 +100,12 @@ class TrainingActivity(activity.Activity):
                        self._fullscreen_cb, tooltip=_('Fullscreen'),
                        accelerator='<Alt>Return')
 
-        self._zoom_in = button_factory('zoom-out',  # 'resize+',
+        self._zoom_in = button_factory('zoom-in',  # 'resize+',
                                        view_toolbar,
                                        self._zoom_in_cb,
                                        tooltip=_('Increase font size'))
 
-        self._zoom_out = button_factory('zoom-in',  # 'resize-',
+        self._zoom_out = button_factory('zoom-out',  # 'resize-',
                                         view_toolbar,
                                         self._zoom_out_cb,
                                         tooltip=_('Decrease font size'))
