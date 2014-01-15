@@ -35,15 +35,14 @@ class Exercises(Gtk.Grid):
         self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
 
+        self.button_was_pressed = True
+        self.current_task = None
+
         self._activity = activity
         self._graphics = None
         self._task_button = None
-        self.button_was_pressed = True
-        self.current_task = None
-        self.first_time = True
-        self.grid_row_zero = None
-        self._current_section = None
-        self.counter = 0
+        self._first_time = True
+        self._grid_row_zero = None
 
         self._task_list = [[IntroTask(self)],
                            [EnterNameTask(self),
@@ -90,7 +89,7 @@ class Exercises(Gtk.Grid):
         '''To run a task, we need graphics to display, a test to call that
             returns True or False, and perhaps some data '''
 
-        if self.first_time:
+        if self._first_time:
             self._uid = self._task_list[section][task_index].uid
             title, help_file = \
                 self._task_list[section][task_index].get_help_info()
@@ -124,7 +123,7 @@ class Exercises(Gtk.Grid):
                  self._task_data['completed']:
                 _logger.debug('Revisiting a completed task')
 
-            self.first_time = False
+            self._first_time = False
 
         GObject.timeout_add(
             self._task_list[section][task_index].get_pause_time(),
@@ -171,7 +170,7 @@ class Exercises(Gtk.Grid):
             if not self._check_requirements(section, task_index):
                 # Switching to a required task
                 section, task_index = self.get_section_index()
-            self.first_time = True
+            self._first_time = True
             self._run_task(section, task_index)
         else:
             self._activity.complete = True
@@ -202,7 +201,8 @@ class Exercises(Gtk.Grid):
     def _destroy_graphics(self):
         ''' Destroy the graphics from the previous task '''
         if self._graphics is not None:
-            self._graphics.destroy()
+            for graphic in self._graphics:
+                graphic.destroy()
         if hasattr(self, 'task_button'):
             self._task_button.destroy()
 
@@ -217,11 +217,11 @@ class Exercises(Gtk.Grid):
 
         self._graphics, self._task_button = \
             self._task_list[section][task_index].get_graphics()
-        if self.grid_row_zero is None:
+        if self._grid_row_zero is None:
             self.insert_row(0)
-            self.grid_row_zero = True
-        self.attach(self._graphics, 0, 0, 1, 1)
-        self._graphics.show()
+            self._grid_row_zero = True
+        self.attach(self._graphics[0], 0, 0, 1, 1)
+        self._graphics[0].show()
 
         self._task_button.set_sensitive(False)
         self._task_button.show()
