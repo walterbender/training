@@ -313,9 +313,15 @@ class ValidateEmailTask(Task):
             return False
         if entry0 != entry1:
             return False
-        if '@' not in entry0:  # Need better validation
+        if '@' not in entry0:
             return False
-        if '.' not in entry0.split('@')[1]:
+        server = entry0.split('@')[1]
+        if '.' not in server:
+            return False
+        dotpos = server.index('.')
+        if dotpos == 0:
+            return False
+        if dotpos == len(server) - 1:
             return False
         return True
 
