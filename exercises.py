@@ -168,18 +168,26 @@ class Exercises(Gtk.Grid):
                 if section < len(self._task_list) - 1:
                     self._activity.forward.set_sensitive(True)
             # Check to make sure all the requirements at met
-            requires = self._task_list[section][task_index].requires()
-            for uid in requires:
-                if not self.uid_to_task(uid, section=section).is_completed():
-                    _logger.debug(
-                        'Task %s required task %s... switching to %s' %
-                        (self._task_list[section][task_index].uid, uid, uid))
-                    self.current_task = self.uid_to_task_number(uid)
-                    break
+            if not self._check_requirements(section, task_index):
+                # Switching to a required task
+                section, task_index = self.get_section_index()
             self.first_time = True
             self._run_task(section, task_index)
         else:
             self._activity.complete = True
+
+    def _check_requirements(self, section, task_index, switch_task=True):
+        ''' Check to make sure all the requirements at met '''
+        requires = self._task_list[section][task_index].requires()
+        for uid in requires:
+            if not self.uid_to_task(uid, section=section).is_completed():
+                if switch_task:
+                    _logger.debug(
+                        'Task %s required task %s... switching to %s' %
+                        (self._task_list[section][task_index].uid, uid, uid))
+                    self.current_task = self.uid_to_task_number(uid)
+                return False
+        return True
 
     def reload_graphics(self):
         ''' When changing font size and zoom level, we regenerate the task
@@ -326,6 +334,55 @@ class Exercises(Gtk.Grid):
         fd.write(json_data)
         fd.close()
 
+    def _prev_task_button_cb(self, button):
+        section, task_index = self.get_section_index()
+        if task_index == 0:
+            return
+        task = task_index - 1
+        while(task > 0):
+            if self._check_requirements(section, task, switch_task=False):
+                self.current_task -= (task_index - task)
+                break
+            task -= 1
+        section, task_index = self.get_section_index()
+        _logger.debug('running task %d:%d from prev task button' %
+                      (section, task_index))
+        self.task_master()
+
+    def _next_task_button_cb(self, button):
+        section, task_index = self.get_section_index()
+        tasks_in_section = self.get_number_of_tasks_in_section(section)
+        if task_index > tasks_in_section - 1:
+            return
+        task = task_index + 1
+        while(task < tasks_in_section - 1):
+            if self._check_requirements(section, task, switch_task=False):
+                self.current_task += (task - task_index)
+                break
+            task += 1
+        section, task_index = self.get_section_index()
+        _logger.debug('running task %d:%d from next task button' %
+                      (section, task_index))
+        self.task_master()
+
+    def _look_for_next_task(self):
+        section, task_index = self.get_section_index()
+        tasks_in_section = self.get_number_of_tasks_in_section(section)
+        if task_index > tasks_in_section - 1:
+            return False
+        task = task_index + 1
+        while(task < tasks_in_section - 1):
+            if self._check_requirements(section, task, switch_task=False):
+                return True
+            task += 1
+        return False
+
+    def _progress_button_cb(self, button, i):
+        section, task_index = self.get_section_index()
+        _logger.debug('running task %d:%d from progess button' % (section, i))
+        self.current_task += (i - task_index)
+        self.task_master()
+
     def _update_progress(self):
         section, task_index = self.get_section_index()
         if section < 0:  # We haven't started yet
@@ -338,20 +395,44 @@ class Exercises(Gtk.Grid):
                 self._progress_bar.destroy()
             buttons = []
             if tasks_in_section > 1:
-                # TODO: add callbacks, set sensitive to completed tasks
                 for i in range(tasks_in_section - 1):
                     buttons.append(
                         {'label': str(i + 1),
                          'tooltip': self._task_list[section][i].get_name()})
-            self._progress_bar = ProgressBar(buttons)
+            self._progress_bar = ProgressBar(buttons,
+                                             self._prev_task_button_cb,
+                                             self._next_task_button_cb,
+                                             self._progress_button_cb)
             self._progress_bar_alignment.add(self._progress_bar)
             self._progress_bar.show()
 
-        _logger.debug('task_index: %d; tasks_in_section - 1: %d' %
-                      (task_index, tasks_in_section - 1))
-        if task_index < tasks_in_section - 1:
-            for i in range(task_index + 1):
-                self._progress_bar.set_progress(i)
+        if tasks_in_section == 1:
+            self._progress_bar.hide_prev_next_task_buttons()
+        else:
+            self._progress_bar.show_prev_next_task_buttons()
+
+        # Set button sensitivity True for completed tasks and current task
+        _logger.debug('task_index: %d; tasks_in_section: %d' %
+                      (task_index, tasks_in_section))
+        if task_index < tasks_in_section:
+            for task in range(tasks_in_section - 1):
+                if self._task_list[section][task].is_completed():
+                    self._progress_bar.set_button_sensitive(task, True)
+                else:
+                    self._progress_bar.set_button_sensitive(task, False)
+            # Current task (last task in section has no button)
+            if task_index < tasks_in_section - 1:
+                self._progress_bar.set_button_sensitive(task_index, True)
+
+        if task_index > 0:
+            self._progress_bar.prev_task_button.set_sensitive(True)
+        else:
+            self._progress_bar.prev_task_button.set_sensitive(False)
+
+        if self._look_for_next_task():
+            self._progress_bar.next_task_button.set_sensitive(True)
+        else:
+            self._progress_bar.next_task_button.set_sensitive(False)
 
         # Adjust numbers:
         #    Count the current task
