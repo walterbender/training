@@ -29,6 +29,7 @@ from jarabe.view.viewhelp import ViewHelp
 from toolbar_utils import separator_factory, label_factory, button_factory
 from exercises import Exercises
 from tasks import FONT_SIZES
+from checkprogress import CheckProgress
 
 import logging
 _logger = logging.getLogger('training-activity')
@@ -47,6 +48,7 @@ class TrainingActivity(activity.Activity):
         self.connect('realize', self.__realize_cb)
         self.font_size = 5
         self.zoom_level = 0.833
+        self._check_progress = None
 
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
@@ -115,6 +117,11 @@ class TrainingActivity(activity.Activity):
                                           accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)
 
+        progress = button_factory('check-progress',
+                                  toolbox.toolbar,
+                                  self._check_progress_cb,
+                                  tooltip=_('Check progress'))
+
         self.back = button_factory('go-previous-paired',
                                    toolbox.toolbar,
                                    self._go_back_cb,
@@ -166,6 +173,14 @@ class TrainingActivity(activity.Activity):
             self.zoom_level /= 1.1
         self._set_zoom_buttons_sensitivity()
         self._exercises.reload_graphics()
+
+    def resume(self):
+        if self._check_progess is not None:
+            self._check_progress.set_keep_above(True)
+
+    def _check_progress_cb(self, button):
+        self._check_progress = CheckProgress(self._exercises)
+        self._check_progress.show()
 
     def _go_back_cb(self, button):
         section, task = self._exercises.get_section_index()

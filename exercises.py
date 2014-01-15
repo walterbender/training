@@ -58,8 +58,6 @@ class Exercises(Gtk.Grid):
                             BadgeThreeTask(self)],
                            [FinishedAllTasks(self)]]
 
-        # [ProgressSummary(self, 3)]
-
         self.current_task = self.read_task_data('current_task')
         if self.current_task is None:
             self.current_task = 0

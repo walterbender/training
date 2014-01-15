@@ -12,9 +12,10 @@
 
 import os
 import json
+from gettext import gettext as _
+
 from gi.repository import Gtk
 from gi.repository import GObject
-from gettext import gettext as _
 
 import logging
 _logger = logging.getLogger('training-activity-tasks')
@@ -702,58 +703,6 @@ class FinishedAllTasks(Task):
         graphics = Graphics()
         graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
                           size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Continue'),
-                                     self._activity.task_button_cb)
-        return graphics, button
-
-
-class ProgressSummary(Task):
-    _SECTIONS = [{'name': _('Welcome to One Academy'),
-                  'icon': 'badge-intro'},
-                 {'name': _('Getting to Know the XO'),
-                  'icon': 'badge-intro'},
-                 {'name': _('More sections listed here'),
-                  'icon': 'badge-intro'}]
-
-    def __init__(self, activity, progress):
-        self._name = _('Progress Summary')
-        self.uid = 'progress%d' % progress
-        self._activity = activity
-        self._progress = progress
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def is_collectable(self):
-        return False
-
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
-
-    def test(self, exercises, task_data):
-        return self._activity.button_was_pressed
-
-    def get_graphics(self):
-        colors = []
-        strokes = []
-        for i in range(len(self._SECTIONS)):
-            if i < self._progress:
-                colors.append(style.COLOR_BLACK.get_html())
-                strokes.append(style.COLOR_BLACK.get_svg())
-            else:
-                colors.append(style.COLOR_BUTTON_GREY.get_html())
-                strokes.append(style.COLOR_BUTTON_GREY.get_svg())
-        graphics = Graphics()
-        for i in range(len(self._SECTIONS)):
-            graphics.add_text_and_icon(self._SECTIONS[i]['name'],
-                                       self._SECTIONS[i]['icon'],
-                                       size=FONT_SIZES[self._font_size],
-                                       icon_size=style.LARGE_ICON_SIZE,
-                                       color=colors[i],
-                                       stroke=strokes[i])
-        graphics.add_text('\n\n')
         button = graphics.add_button(_('Continue'),
                                      self._activity.task_button_cb)
         return graphics, button
