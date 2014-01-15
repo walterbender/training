@@ -297,6 +297,14 @@ class Exercises(Gtk.Grid):
         _logger.error('UID %s not found' % uid)
         return self._task_list[0][0]
 
+    def _get_number_of_completed_tasks(self):
+        count = 0
+        for section in self._task_list:
+            for task in section:
+                if task.is_completed():
+                    count += 1
+        return count
+
     def read_task_data(self, uid):
         data_path = os.path.join(self._activity.get_activity_root(), 'data',
                                  'training_data')
@@ -441,14 +449,17 @@ class Exercises(Gtk.Grid):
         if tasks_in_section > 1:
             tasks_in_section -= 1
 
+        '''
         if task_index > tasks_in_section:  # Must be a badge task
             self._progress_bar.set_message(_('Complete'))
         elif task_index == 1 and tasks_in_section == 1:  # Must be a summary
             if section > 0:
                 self._progress_bar.set_message(_('Progress Summary'))
+        '''
 
         self._activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
-             _('Overall: %d%%' % (int((self.current_task * 100.)
-                                      / self.get_number_of_tasks())))))
+             _('Overall: %d%%' % (int(
+                 (self._get_number_of_completed_tasks() * 100.)
+                 / self.get_number_of_tasks())))))
