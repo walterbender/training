@@ -338,12 +338,12 @@ class Exercises(Gtk.Grid):
         section, task_index = self.get_section_index()
         if task_index == 0:
             return
-        task = task_index - 1
+        task = task_index
         while(task > 0):
+            task -= 1
             if self._check_requirements(section, task, switch_task=False):
                 self.current_task -= (task_index - task)
                 break
-            task -= 1
         section, task_index = self.get_section_index()
         _logger.debug('running task %d:%d from prev task button' %
                       (section, task_index))
