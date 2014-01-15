@@ -49,7 +49,7 @@ class CheckProgress(Gtk.Window):
 
         grid = Gtk.Grid()
         toolbox = self.build_toolbar()
-        graphics = ProgressSummary(exercises, 1).get_graphics()
+        graphics = ProgressSummary(exercises).get_graphics()
 
         grid.attach(toolbox, 0, 1, 1, 1)
         toolbox.show()
@@ -97,20 +97,18 @@ class ProgressSummary():
                  {'name': _('More sections listed here'),
                   'icon': 'badge-intro'}]
 
-    # TODO: actually calculate progress
-    def __init__(self, activity, progress):
+    def __init__(self, activity):
         self._name = _('Progress Summary')
-        self.uid = 'progress-%d' % progress
         self._activity = activity
-        self._progress = progress
         self._font_size = 5
         self._zoom_level = 1.0
+        self._progress = self._activity.get_completed_sections()
 
     def get_graphics(self):
         colors = []
         strokes = []
         for i in range(len(self._SECTIONS)):
-            if i < self._progress:
+            if i in self._progress:
                 colors.append(style.COLOR_BLACK.get_html())
                 strokes.append(style.COLOR_BLACK.get_svg())
             else:

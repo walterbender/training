@@ -113,7 +113,7 @@ class Task():
 
     def is_completed(self):
         data = self._activity.read_task_data(self.uid)
-        if 'completed' in data:
+        if data is not None and 'completed' in data:
             return data['completed']
         return False
 

@@ -236,6 +236,20 @@ class Exercises(Gtk.Grid):
     def get_number_of_sections(self):
         return len(self._task_list)
 
+    def get_completed_sections(self):
+        progress = []
+        for s, section in enumerate(self._task_list):
+            section_completed = True
+            for task in section:
+                if not task.is_completed():
+                    section_completed = False
+                else:
+                    _logger.debug('Task %s is completed' % task.uid)
+            if section_completed:
+                _logger.debug('Section %d is completed' % s)
+                progress.append(s)
+        return progress
+
     def get_number_of_tasks(self):
         count = 0
         for section in self._task_list:
