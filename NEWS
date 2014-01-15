@@ -1,5 +1,11 @@
 NEWS
 
+1.10
+
+* Enable progressbar task navigation
+* Restore data to entries when revisiting a task
+* Use Python email.utils for email address validation
+
 1.9
 
 * Add tooltips to progress bar buttons

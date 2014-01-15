@@ -11,6 +11,7 @@
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 import os
+import email.utils
 import json
 from gettext import gettext as _
 
@@ -313,15 +314,9 @@ class ValidateEmailTask(Task):
             return False
         if entry0 != entry1:
             return False
-        if '@' not in entry0:
-            return False
-        server = entry0.split('@')[1]
-        if '.' not in server:
-            return False
-        dotpos = server.index('.')
-        if dotpos == 0:
-            return False
-        if dotpos == len(server) - 1:
+
+        realname, email_address = email.utils.parseaddr(entry0)
+        if email_address == '':
             return False
         return True
 
