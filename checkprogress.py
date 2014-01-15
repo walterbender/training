@@ -37,7 +37,6 @@ class CheckProgress(Gtk.Window):
         Gtk.Window.__init__(self)
 
         self.set_destroy_with_parent(True)
-        # TODO: why doesn't this work?
         self.set_size_request(int(Gdk.Screen.width() / 1.5),
                               int(Gdk.Screen.height() / 1.5))
         self.set_decorated(False)
@@ -63,8 +62,11 @@ class CheckProgress(Gtk.Window):
     def build_toolbar(self):
         toolbox = ToolbarBox()
 
-        label = Gtk.Label('\t' + _('Progress'))
-        label.modify_fg(Gtk.StateType.NORMAL, Gdk.color_parse('white'))
+        label = Gtk.Label()
+        label.set_use_markup(True)
+        label.set_markup(
+            '<span foreground="%s" size="x-large">%s</span>' %
+            (style.COLOR_WHITE.get_html(), _('Progress Summary')))
 
         item = Gtk.ToolItem()
         item.add(label)
@@ -114,7 +116,9 @@ class ProgressSummary():
             else:
                 colors.append(style.COLOR_BUTTON_GREY.get_html())
                 strokes.append(style.COLOR_BUTTON_GREY.get_svg())
-        graphics = Graphics()
+        graphics = Graphics(
+            width=int(Gdk.Screen.width() / 1.5),
+            height=int(Gdk.Screen.height() / 1.5 - style.GRID_CELL_SIZE))
         for i in range(len(self._SECTIONS)):
             graphics.add_text_and_icon(self._SECTIONS[i]['name'],
                                        self._SECTIONS[i]['icon'],

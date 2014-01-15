@@ -4,6 +4,9 @@ NEWS
 
 * Add tooltips to progress bar buttons
 * Make Next button more narrow
+* Add buttons to jump around sections
+* Add button to check summary of progress
+* Refactor data output to include accumulated time, completed, and collectible
 
 1.8
 

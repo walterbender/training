@@ -24,13 +24,15 @@ _logger = logging.getLogger('training-activity-page')
 class Graphics(Gtk.ScrolledWindow):
     ''' An aligned grid in a scrolling window '''
 
-    def __init__(self):
+    def __init__(self, width=None, height=None):
         Gtk.ScrolledWindow.__init__(self)
 
         self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         offset = style.GRID_CELL_SIZE
-        width = Gdk.Screen.width()
-        height = Gdk.Screen.height() - offset * 3
+        if width is None:
+            width = Gdk.Screen.width()
+        if height is None:
+            height = Gdk.Screen.height() - offset * 3
         self.set_size_request(width, height)
 
         alignment = Gtk.Alignment.new(0.5, 0.5, 0, 0)
