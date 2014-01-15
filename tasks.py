@@ -458,7 +458,8 @@ class ChangeNickTask(Task):
             shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
 
         path = os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Help.activity', 'images', 'Home_fav-menu.png')
+                            'Training.activity', 'images',
+                            'home-view-menu.png')
         graphics = Graphics()
         button = None
         if page == 0:
