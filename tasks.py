@@ -85,7 +85,7 @@ class Task():
     zoom_level = GObject.property(type=object, setter=set_zoom_level,
                                  getter=get_zoom_level)
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         ''' The test to determine if task is completed '''
         raise NotImplementedError
 
@@ -159,7 +159,7 @@ class Intro1Task(Task):
     def get_pause_time(self):
         return 1000
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
@@ -187,7 +187,7 @@ class Intro2Task(Task):
     def get_pause_time(self):
         return 1000
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         if len(self.entries) == 0:
             _logger.error('missing entry')
             return False
@@ -237,7 +237,7 @@ class Intro3Task(Task):
     def get_pause_time(self):
         return 1000
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         if len(self.entries) == 0:
             _logger.error('missing entry')
             return False
@@ -299,7 +299,7 @@ class ValidateEmailTask(Task):
     def get_pause_time(self):
         return 1000
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         if len(self.entries) < 2:
             _logger.error('missing entry')
             return False
@@ -372,7 +372,7 @@ class BadgeOneTask(Task):
               "You’ve earned your first badge!" % target),
             icon='badge-intro')
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
@@ -406,7 +406,7 @@ class ChangeNickTask(Task):
     def get_pause_time(self):
         return 1000
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         if task_data['attempt'] == 0:
             _logger.debug('first attempt: saving nick value as %s' %
                           profile.get_nick_name())
@@ -503,7 +503,7 @@ class NickChange1Task(Task):
     def get_pause_time(self):
         return 1000
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
@@ -536,7 +536,7 @@ class NickChange2Task(Task):
     def get_pause_time(self):
         return 1000
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
@@ -570,7 +570,7 @@ class NickChange3Task(Task):
     def get_pause_time(self):
         return 1000
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
@@ -601,7 +601,7 @@ class NickChange4Task(Task):
     def get_pause_time(self):
         return 1000
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         if task_data['attempt'] == 0:
             _logger.debug('first attempt: saving nick value as %s' %
                           get_nick())
@@ -645,7 +645,7 @@ class NickChange5Task(Task):
     def requires(self):
         return ['nick-change-task-4']
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_pause_time(self):
@@ -681,7 +681,7 @@ class WriteSave1Task(Task):
     def is_collectable(self):
         return False
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_pause_time(self):
@@ -716,7 +716,7 @@ class WriteSave2Task(Task):
     def is_collectable(self):
         return False
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_pause_time(self):
@@ -752,7 +752,7 @@ class WriteSave3Task(Task):
         return False
 
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_pause_time(self):
@@ -784,7 +784,7 @@ class WriteSave4Task(Task):
         self._font_size = 5
         self._zoom_level = 1.0
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         paths = get_rtf()
         for path in paths:
             # Check to see if there is a picture in the file
@@ -834,7 +834,7 @@ class WriteSave5Task(Task):
     def requires(self):
         return ['write-save-task-4']
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_pause_time(self):
@@ -885,7 +885,7 @@ class BadgeTwoTask(Task):
               "You’ve earned your second badge!" % target),
             icon='badge-intro')
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
@@ -916,7 +916,7 @@ class AddFavoriteTask(Task):
         self._font_size = 5
         self._zoom_level = 1.0
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         if task_data['attempt'] == 0:
             favorites_list = get_favorites()
             self._task_master.write_task_data('favorites', len(favorites_list))
@@ -955,7 +955,7 @@ class RemoveFavoriteTask(Task):
         self._font_size = 5
         self._zoom_level = 1.0
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         if task_data['attempt'] == 0:
             favorites_list = get_favorites()
             self._task_master.write_task_data('favorites', len(favorites_list))
@@ -1013,7 +1013,7 @@ class BadgeThreeTask(Task):
               "You’ve earned your third badge!" % target),
             icon='badge-intro')
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
@@ -1047,7 +1047,7 @@ class FinishedAllTasks(Task):
         return ['enter-name-task', 'enter-email-task', 'validate-email-task',
                 'nick-change-task-4', 'write-save-task-4']
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         self._task_master.completed = True
         return True
 
@@ -1070,7 +1070,7 @@ class UITest(Task):
         self.uid = 'uitest'
         self._task_master = task_master
 
-    def test(self, exercises, task_data):
+    def test(self, task_data):
         return self._uitester()
 
     def _uitester(self):

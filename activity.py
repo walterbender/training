@@ -27,7 +27,7 @@ from sugar3.graphics import style
 from jarabe.view.viewhelp import ViewHelp
 
 from toolbar_utils import separator_factory, label_factory, button_factory
-from exercises import Exercises
+from taskmaster import TaskMaster
 from tasks import FONT_SIZES
 from checkprogress import CheckProgress
 
@@ -46,7 +46,6 @@ class TrainingActivity(activity.Activity):
             _logger.error(str(e))
 
         self.connect('realize', self.__realize_cb)
-        # self.connect("notify::active", self.__notify_active_cb)
 
         self.font_size = 5
         self.zoom_level = 0.833
@@ -60,20 +59,20 @@ class TrainingActivity(activity.Activity):
         self.modify_bg(Gtk.StateType.NORMAL,
                        style.COLOR_WHITE.get_gdk_color())
 
-        self._exercises = Exercises(self)
+        self._task_master = TaskMaster(self)
 
         center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-        center_in_panel.add(self._exercises)
-        self._exercises.show()
+        center_in_panel.add(self._task_master)
+        self._task_master.show()
         self.set_canvas(center_in_panel)
         center_in_panel.show()
 
         self.completed = False
-        self._exercises.task_master()
+        self._task_master.task_master()
 
     def write_file(self, file_path):
-        self._exercises.write_task_data('current_task',
-                                        self._exercises.current_task)
+        self._task_master.write_task_data('current_task',
+                                        self._task_master.current_task)
         self.metadata['font_size'] = str(self.font_size)
 
     def _setup_toolbars(self):
@@ -81,7 +80,7 @@ class TrainingActivity(activity.Activity):
         self.max_participants = 1  # No sharing
 
         toolbox = ToolbarBox()
-        # Activity toolbar
+
         activity_button = ActivityToolbarButton(self)
         toolbox.toolbar.insert(activity_button, 0)
         activity_button.show()
@@ -167,41 +166,43 @@ class TrainingActivity(activity.Activity):
             self.font_size += 1
             self.zoom_level *= 1.1
         self._set_zoom_buttons_sensitivity()
-        self._exercises.reload_graphics()
+        self._task_master.reload_graphics()
 
     def _zoom_out_cb(self, button):
         if self.font_size > 0:
             self.font_size -= 1
             self.zoom_level /= 1.1
         self._set_zoom_buttons_sensitivity()
-        self._exercises.reload_graphics()
+        self._task_master.reload_graphics()
 
     def _check_progress_cb(self, button):
-        self.check_progress = CheckProgress(self._exercises)
-        self._exercises.load_progress_summary(self.check_progress)
+        self.check_progress = CheckProgress(self._task_master)
+        self._task_master.load_progress_summary(self.check_progress)
 
     def _go_back_cb(self, button):
-        section, task = self._exercises.get_section_index()
+        section, task = self._task_master.get_section_index()
         if section > 0:
             section -= 1
         _logger.debug('go back %d:%d' % (section, task))
-        uid = self._exercises.section_and_task_to_uid(section)
+        uid = self._task_master.section_and_task_to_uid(section)
         _logger.debug('new uid %s' % (uid))
-        self._exercises.current_task = self._exercises.uid_to_task_number(uid)
-        self._exercises.task_master()
+        self._task_master.current_task = \
+            self._task_master.uid_to_task_number(uid)
+        self._task_master.task_master()
 
     def _go_forward_cb(self, button):
-        section, task = self._exercises.get_section_index()
-        if section < self._exercises.get_number_of_sections() - 1:
+        section, task = self._task_master.get_section_index()
+        if section < self._task_master.get_number_of_sections() - 1:
             section += 1
         _logger.debug('go forward %d:%d' % (section, task))
-        uid = self._exercises.section_and_task_to_uid(section)
+        uid = self._task_master.section_and_task_to_uid(section)
         _logger.debug('new uid %s' % (uid))
-        self._exercises.current_task = self._exercises.uid_to_task_number(uid)
-        self._exercises.task_master()
+        self._task_master.current_task = \
+            self._task_master.uid_to_task_number(uid)
+        self._task_master.task_master()
 
     def _help_cb(self, button):
-        title, help_file = self._exercises.get_help_info()
+        title, help_file = self._task_master.get_help_info()
         _logger.debug('%s: %s' % (title, help_file))
         if not hasattr(self, 'window_xid'):
             self.window_xid = self.get_window().get_xid()

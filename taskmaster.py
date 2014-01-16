@@ -22,14 +22,14 @@ from sugar3.graphics import style
 from sugar3.graphics.toolbutton import ToolButton
 
 import logging
-_logger = logging.getLogger('training-activity-exercises')
+_logger = logging.getLogger('training-activity-taskmaster')
 
 from tasks import get_task_list
 from tasks import *
 from progressbar import ProgressBar
 
 
-class Exercises(Gtk.Grid):
+class TaskMaster(Gtk.Grid):
 
     def __init__(self, activity):
         ''' Initialize the task list '''
@@ -146,7 +146,7 @@ class Exercises(Gtk.Grid):
 
     def _test(self, test, task_data, uid):
         ''' Is the task complete? '''
-        if test(self, task_data):
+        if test(task_data):
             if self._task_button is not None:
                 self._task_button.set_sensitive(True)
             if not 'completed' in task_data or not task_data['completed']:
@@ -278,7 +278,7 @@ class Exercises(Gtk.Grid):
         self._graphics_grid.attach(self._graphics, 1, 0, 1, 1)
         self._graphics.show()
         if self._task_button is not None:
-            self._task_button.set_sensitive(test(self, self._task_data))
+            self._task_button.set_sensitive(test(self._task_data))
             self._task_button.show()
 
     def _prev_page_cb(self, button):
