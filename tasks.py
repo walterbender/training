@@ -44,10 +44,12 @@ def get_task_list(task_master):
              NickChange2Task(task_master),
              NickChange3Task(task_master),
              NickChange4Task(task_master),
+             NickChange5Task(task_master),
              WriteSave1Task(task_master),
              WriteSave2Task(task_master),
              WriteSave3Task(task_master),
              WriteSave4Task(task_master),
+             WriteSave5Task(task_master),
              BadgeTwoTask(task_master)],
             # [AddFavoriteTask(task_master),
             #  RemoveFavoriteTask(task_master),
@@ -571,6 +573,40 @@ class NickChange3Task(Task):
     def get_name(self):
         return self._name
 
+    def is_collectable(self):
+        return False
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, exercises, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self):
+        graphics = Graphics()
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'nickchange3.html')
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class NickChange4Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Nick Change Step Four')
+        self.uid = 'nick-change-task-4'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def get_name(self):
+        return self._name
+
     def get_pause_time(self):
         return 1000
 
@@ -596,7 +632,7 @@ class NickChange3Task(Task):
 
         graphics = Graphics()
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'nickchange3.html')
+                            'Training.activity', 'html', 'nickchange4.html')
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
@@ -606,11 +642,11 @@ class NickChange3Task(Task):
         return graphics, button
 
 
-class NickChange4Task(Task):
+class NickChange5Task(Task):
 
     def __init__(self, task_master):
-        self._name = _('Nick Change Step Four')
-        self.uid = 'nick-change-task-4'
+        self._name = _('Nick Change Step Five')
+        self.uid = 'nick-change-task-5'
         self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
@@ -619,7 +655,7 @@ class NickChange4Task(Task):
         return False
 
     def requires(self):
-        return ['nick-change-task-3']
+        return ['nick-change-task-4']
 
     def test(self, exercises, task_data):
         return self._task_master.button_was_pressed
@@ -636,7 +672,7 @@ class NickChange4Task(Task):
     def get_graphics(self):
         graphics = Graphics()
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'nickchange4.html')
+                            'Training.activity', 'html', 'nickchange5.html')
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         button = graphics.add_button(_('Continue'),
@@ -723,6 +759,41 @@ class WriteSave3Task(Task):
         self._font_size = 5
         self._zoom_level = 1.0
 
+    def is_collectable(self):
+        return False
+
+    def test(self, exercises, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_pause_time(self):
+        return 1000
+
+    def get_name(self):
+        return self._name
+
+    def get_help_info(self):
+        return ('My Settings', 'my_settings.html')
+
+    def get_graphics(self):
+        graphics = Graphics()
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'writesave3.html')
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+        button = graphics.add_button(_('Continue'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class WriteSave4Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Write Save Step Four')
+        self.uid = 'write-save-task-4'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
     def test(self, exercises, task_data):
         # TODO: look for RTF file in Journal
         return self._task_master.button_was_pressed
@@ -745,7 +816,7 @@ class WriteSave3Task(Task):
 
         graphics = Graphics()
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'writesave3.html')
+                            'Training.activity', 'html', 'writesave4.html')
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
@@ -755,11 +826,11 @@ class WriteSave3Task(Task):
         return graphics, button
 
 
-class WriteSave4Task(Task):
+class WriteSave5Task(Task):
 
     def __init__(self, task_master):
-        self._name = _('Write Save Step Four')
-        self.uid = 'write-save-task-4'
+        self._name = _('Write Save Step Five')
+        self.uid = 'write-save-task-5'
         self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
@@ -768,7 +839,7 @@ class WriteSave4Task(Task):
         return False
 
     def requires(self):
-        return ['write-save-task-3']
+        return ['write-save-task-4']
 
     def test(self, exercises, task_data):
         return self._task_master.button_was_pressed
@@ -785,7 +856,7 @@ class WriteSave4Task(Task):
     def get_graphics(self):
         graphics = Graphics()
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'writesave4.html')
+                            'Training.activity', 'html', 'writesave5.html')
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         button = graphics.add_button(_('Continue'),
@@ -803,7 +874,7 @@ class BadgeTwoTask(Task):
         self._zoom_level = 1.0
 
     def requires(self):
-        return ['nick-change-task-3', 'write-save-task-3']
+        return ['nick-change-task-4', 'write-save-task-4']
 
     def is_collectable(self):
         return False
@@ -982,7 +1053,7 @@ class FinishedAllTasks(Task):
 
     def requires(self):
         return ['enter-name-task', 'enter-email-task', 'validate-email-task',
-                'nick-change-task-3', 'write-save-task-3']
+                'nick-change-task-4', 'write-save-task-4']
 
     def test(self, exercises, task_data):
         self._task_master.completed = True

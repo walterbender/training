@@ -6,7 +6,7 @@
 	font-weight: normal;
 	color: #000000;
 	text-align: center;
-	height: 800px;
+	height: auto;
 	width: 800px;
 	margin-right: auto;
 	margin-left: auto;
@@ -24,7 +24,7 @@
 	font-weight: normal;
 	color: #000000;
 	text-align: left;
-	height: 800px;
+	height: auto;
 	width: 800px;
 	margin-right: auto;
 	margin-left: auto;
