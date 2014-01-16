@@ -34,12 +34,12 @@ _logger = logging.getLogger('training-activity-check-progress')
 
 class CheckProgress(Gtk.Grid):
 
-    def __init__(self, exercises):
+    def __init__(self, task_master):
         Gtk.Grid.__init__(self)
-        self._exercises = exercises
+        self._task_master = task_master
 
         toolbox = self.build_toolbar()
-        graphics = ProgressSummary(self._exercises).get_graphics()
+        graphics = ProgressSummary(self._task_master).get_graphics()
 
         self.attach(toolbox, 0, 1, 1, 1)
         toolbox.show()
@@ -47,7 +47,7 @@ class CheckProgress(Gtk.Grid):
         graphics.show()
 
     def _close_cb(self, button):
-        self._exercises.destroy_summary()
+        self._task_master.destroy_summary()
 
     def build_toolbar(self):
         toolbox = ToolbarBox()
@@ -87,12 +87,18 @@ class ProgressSummary():
                  {'name': _('More sections listed here'),
                   'icon': 'badge-intro'}]
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Progress Summary')
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
-        self._progress = self._activity.get_completed_sections()
+        self._progress = self._task_master.get_completed_sections()
+
+    def _section_button_cb(self, button, section):
+        uid = self._task_master.section_and_task_to_uid(section)
+        self._task_master.current_task = \
+            self._task_master.uid_to_task_number(uid)
+        self._task_master.destroy_summary()  # i.e., self.destroy()
 
     def get_graphics(self):
         colors = []
@@ -108,10 +114,13 @@ class ProgressSummary():
             width=int(Gdk.Screen.width() / 1.5),
             height=int(Gdk.Screen.height() / 1.5 - style.GRID_CELL_SIZE))
         for i in range(len(self._SECTIONS)):
-            graphics.add_text_and_icon(self._SECTIONS[i]['name'],
-                                       self._SECTIONS[i]['icon'],
-                                       size=FONT_SIZES[self._font_size],
-                                       icon_size=style.LARGE_ICON_SIZE,
-                                       color=colors[i],
-                                       stroke=strokes[i])
+            button = graphics.add_text_icon_and_button(
+                self._SECTIONS[i]['name'],
+                self._SECTIONS[i]['icon'],
+                button_label='go',
+                size=FONT_SIZES[self._font_size],
+                icon_size=style.LARGE_ICON_SIZE,
+                color=colors[i],
+                stroke=strokes[i])
+            button.connect('clicked', self._section_button_cb, i)
         return graphics

@@ -58,6 +58,12 @@ class Graphics(Gtk.ScrolledWindow):
         self._grid.attach(widget2, 3, self._row, 2, 1)
         self._row += 1
 
+    def _attach_three(self, widget1, widget2, widget3):
+        self._grid.attach(widget1, 0, self._row, 2, 1)
+        self._grid.attach(widget2, 3, self._row, 2, 1)
+        self._grid.attach(widget3, 5, self._row, 1, 1)
+        self._row += 1
+
     def _attach_center(self, widget):
         self._grid.attach(widget, 2, self._row, 1, 1)
         self._row += 1
@@ -103,9 +109,37 @@ class Graphics(Gtk.ScrolledWindow):
         label.show()
         icon.show()
 
+    def add_text_icon_and_button(self, text, icon_name,
+                                 button_label='go',
+                                 size='large', bold=False,
+                                 color=style.COLOR_BLACK.get_html(),
+                                 justify=Gtk.Justification.LEFT,
+                                 stroke=style.COLOR_BUTTON_GREY.get_svg(),
+                                 fill=style.COLOR_TRANSPARENT.get_svg(),
+                                 icon_size=style.XLARGE_ICON_SIZE):
+        label = Gtk.Label()
+        label.set_use_markup(True)
+        label.set_justify(justify)
+        if bold:
+            text = '<b>' + text + '</b>'
+        span = '<span foreground="%s" size="%s">' % (color, size)
+        label.set_markup(span + text + '</span>')
+
+        icon = Icon(pixel_size=icon_size, icon_name=icon_name,
+                    stroke_color=stroke, fill_color=fill)
+
+        button = Gtk.Button()
+        button.set_label(button_label)
+
+        self._attach_three(label, icon, button)
+        label.show()
+        icon.show()
+        button.show()
+        return button
+
     def add_uri(self, uri, height=480):
         self._web_view = WebKit.WebView()
-        offset = style.GRID_CELL_SIZE
+        # offset = style.GRID_CELL_SIZE
         width = 800  # Gdk.Screen.width() - offset * 4
         # height = 480  # Gdk.Screen.height() - offset * 5
         self._web_view.set_size_request(width, height)

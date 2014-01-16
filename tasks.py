@@ -15,14 +15,10 @@ import email.utils
 import re
 from gettext import gettext as _
 
-from gi.repository import Gtk
-from gi.repository import Gdk
 from gi.repository import GObject
 
 import logging
 _logger = logging.getLogger('training-activity-tasks')
-
-from sugar3.graphics import style
 
 from graphics import Graphics
 from testutils import (get_nick, get_favorites, get_rtf, get_uitree_root,
@@ -83,7 +79,7 @@ class Task():
         return self._zoom_level
 
     zoom_level = GObject.property(type=object, setter=set_zoom_level,
-                                 getter=get_zoom_level)
+                                  getter=get_zoom_level)
 
     def test(self, task_data):
         ''' The test to determine if task is completed '''
@@ -163,8 +159,9 @@ class Intro1Task(Task):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'introduction1.html')
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'introduction1.html')
+
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
@@ -205,9 +202,8 @@ class Intro2Task(Task):
     def get_graphics(self):
         self.entries = []
         target = self._task_master.read_task_data('name')
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html',
-                            'introduction2.html')
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'introduction2.html')
 
         graphics = Graphics()
         graphics.add_uri('file://' + url)
@@ -254,7 +250,7 @@ class Intro3Task(Task):
     def after_button_press(self):
         _logger.debug('Writing email address: %s' % self.entries[0].get_text())
         self._task_master.write_task_data('email_address',
-                                       self.entries[0].get_text())
+                                          self.entries[0].get_text())
 
     def get_name(self):
         return self._name
@@ -268,9 +264,9 @@ class Intro3Task(Task):
             _logger.error('missing name')
             name = ''
         email = self._task_master.read_task_data('email_address')
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html',
-                            'introduction3.html?NAME=%s' % name)
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'introduction3.html?NAME=%s' % name)
+
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
@@ -318,7 +314,7 @@ class ValidateEmailTask(Task):
 
     def after_button_press(self):
         self._task_master.write_task_data('email_address',
-                                       self.entries[1].get_text())
+                                          self.entries[1].get_text())
 
     def get_name(self):
         return self._name
@@ -381,9 +377,9 @@ class BadgeOneTask(Task):
             target = name.split()[0]
         else:
             target = ''
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html',
-                            'introduction4.html?NAME=%s' % target)
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'introduction4.html?NAME=%s' % target)
+
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
@@ -479,11 +475,12 @@ class ChangeNickTask(Task):
                   'button below to go to the home screen.\n\n'),
                 size=FONT_SIZES[self._font_size])
             graphics.add_button(_('My turn'), button_callback)
-            graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+            graphics.add_text(_('\n\nWhen you are done, you may continue.\n'))
             button = graphics.add_button(_('Continue'),
                                          self._task_master.task_button_cb)
         return graphics, button
 """
+
 
 class NickChange1Task(Task):
 
@@ -507,8 +504,9 @@ class NickChange1Task(Task):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'nickchange1.html')
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'nickchange1.html')
+
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
@@ -541,8 +539,9 @@ class NickChange2Task(Task):
 
     def get_graphics(self):
         graphics = Graphics()
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'nickchange2.html')
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'nickchange2.html')
+
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
@@ -575,8 +574,9 @@ class NickChange3Task(Task):
 
     def get_graphics(self):
         graphics = Graphics()
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'nickchange3.html')
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'nickchange3.html')
+
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
@@ -617,10 +617,10 @@ class NickChange4Task(Task):
             _logger.debug('My turn button clicked')
             shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
 
-        offset = style.GRID_CELL_SIZE
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'nickchange4.html')
+
         graphics = Graphics()
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'nickchange4.html')
         graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
@@ -658,10 +658,10 @@ class NickChange5Task(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'nickchange5.html?NAME=%s' % get_nick())
+
         graphics = Graphics()
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html',
-                            'nickchange5.html?NAME=%s' % get_nick())
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         button = graphics.add_button(_('Continue'),
@@ -694,9 +694,10 @@ class WriteSave1Task(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'writesave1.html')
+
         graphics = Graphics()
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'writesave1.html')
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         button = graphics.add_button(_('Next'),
@@ -729,9 +730,10 @@ class WriteSave2Task(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'writesave2.html')
+
         graphics = Graphics()
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'writesave2.html')
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         button = graphics.add_button(_('Continue'),
@@ -751,7 +753,6 @@ class WriteSave3Task(Task):
     def is_collectable(self):
         return False
 
-
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
@@ -765,9 +766,10 @@ class WriteSave3Task(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'writesave3.html')
+
         graphics = Graphics()
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'writesave3.html')
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         button = graphics.add_button(_('Continue'),
@@ -807,9 +809,10 @@ class WriteSave4Task(Task):
             from jarabe.model import shell
             shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
 
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'writesave4.html')
+
         graphics = Graphics()
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'writesave4.html')
         graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
@@ -847,9 +850,10 @@ class WriteSave5Task(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'writesave5.html')
+
         graphics = Graphics()
-        url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'writesave5.html')
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         button = graphics.add_button(_('Continue'),

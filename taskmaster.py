@@ -112,7 +112,6 @@ class TaskMaster(Gtk.Grid):
             self._start_time = int(time.time() + 0.5)
 
             self._load_graphics()
-            self._update_progress()
 
             self._task_data = self.read_task_data(self._uid)
             if self._task_data is None:
@@ -267,6 +266,8 @@ class TaskMaster(Gtk.Grid):
             self._task_button.set_sensitive(False)
             self._task_button.show()
 
+        self._update_progress()
+
     def _show_page(self):
         section, task_index = self.get_section_index()
         if self._graphics is not None:
@@ -299,6 +300,9 @@ class TaskMaster(Gtk.Grid):
         self._prev_page_button.set_sensitive(True)
         self._show_page()
 
+    def get_bundle_path(self):
+        return self.activity.bundle_path
+
     def get_number_of_sections(self):
         return len(self._task_list)
 
@@ -313,9 +317,6 @@ class TaskMaster(Gtk.Grid):
                     return section_index, task_index
                 count += 1
         return -1, -1
-
-    def get_number_of_sections(self):
-        return len(self._task_list)
 
     def get_completed_sections(self):
         progress = []

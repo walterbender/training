@@ -50,6 +50,7 @@ class TrainingActivity(activity.Activity):
         self.font_size = 5
         self.zoom_level = 0.833
         self.check_progress = None
+        self.bundle_path = activity.get_bundle_path()
 
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
@@ -72,7 +73,7 @@ class TrainingActivity(activity.Activity):
 
     def write_file(self, file_path):
         self._task_master.write_task_data('current_task',
-                                        self._task_master.current_task)
+                                          self._task_master.current_task)
         self.metadata['font_size'] = str(self.font_size)
 
     def _setup_toolbars(self):
@@ -118,22 +119,24 @@ class TrainingActivity(activity.Activity):
                                           accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)
 
-        progress = button_factory('check-progress',
-                                  toolbox.toolbar,
-                                  self._check_progress_cb,
-                                  tooltip=_('Check progress'))
+        button_factory('check-progress',
+                       toolbox.toolbar,
+                       self._check_progress_cb,
+                       tooltip=_('Check progress'))
 
         self.back = button_factory('go-previous-paired',
                                    toolbox.toolbar,
                                    self._go_back_cb,
                                    tooltip=_('Previous section'))
         self.back.props.sensitive = False
+        self.back.hide()
 
         self.forward = button_factory('go-next-paired',
-                                   toolbox.toolbar,
-                                   self._go_forward_cb,
-                                   tooltip=_('Next section'))
+                                      toolbox.toolbar,
+                                      self._go_forward_cb,
+                                      tooltip=_('Next section'))
         self.forward.props.sensitive = False
+        self.forward.hide()
 
         self.progress_label = label_factory(toolbox.toolbar, '', width=300)
         self.progress_label.set_use_markup(True)
