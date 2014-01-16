@@ -17,6 +17,7 @@ import json
 from gettext import gettext as _
 
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GObject
 
 import logging
@@ -630,10 +631,11 @@ class NickChange4Task(Task):
             _logger.debug('My turn button clicked')
             shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
 
+        offset = style.GRID_CELL_SIZE
         graphics = Graphics()
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                             'Training.activity', 'html', 'nickchange4.html')
-        graphics.add_uri('file://' + url)
+        graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
@@ -817,7 +819,7 @@ class WriteSave4Task(Task):
         graphics = Graphics()
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                             'Training.activity', 'html', 'writesave4.html')
-        graphics.add_uri('file://' + url)
+        graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
