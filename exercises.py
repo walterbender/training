@@ -24,6 +24,7 @@ from sugar3.graphics.toolbutton import ToolButton
 import logging
 _logger = logging.getLogger('training-activity-exercises')
 
+from tasks import get_task_list
 from tasks import *
 from progressbar import ProgressBar
 
@@ -38,25 +39,14 @@ class Exercises(Gtk.Grid):
 
         self.button_was_pressed = True
         self.current_task = None
+        self.activity = activity
 
-        self._activity = activity
         self._graphics = None
         self._page = 0
         self._task_button = None
         self._first_time = True
 
-        self._task_list = [[IntroTask(self)],
-                           [EnterNameTask(self),
-                            EnterEmailTask(self),
-                            ValidateEmailTask(self),
-                            BadgeOneTask(self)],
-                           [ChangeNickTask(self),
-                            ConfirmNickChangeTask(self),
-                            BadgeTwoTask(self)],
-                           [AddFavoriteTask(self),
-                            RemoveFavoriteTask(self),
-                            BadgeThreeTask(self)],
-                           [FinishedAllTasks(self)]]
+        self._task_list = get_task_list(self)
 
         self.current_task = self.read_task_data('current_task')
         if self.current_task is None:
@@ -112,9 +102,9 @@ class Exercises(Gtk.Grid):
             title, help_file = \
                 self._task_list[section][task_index].get_help_info()
             if title is None or help_file is None:
-                self._activity.help_button.set_sensitive(False)
+                self.activity.help_button.set_sensitive(False)
             else:
-                self._activity.help_button.set_sensitive(True)
+                self.activity.help_button.set_sensitive(True)
 
             # In order to calculate accumulated time, we need to monitor
             # our start time.
@@ -156,7 +146,8 @@ class Exercises(Gtk.Grid):
     def _test(self, test, task_data, uid):
         ''' Is the task complete? '''
         if test(self, task_data):
-            self._task_button.set_sensitive(True)
+            if self._task_button is not None:
+                self._task_button.set_sensitive(True)
             if not 'completed' in task_data or not task_data['completed']:
                 task_data = self.read_task_data(uid)
                 task_data['end_time'] = int(time.time())
@@ -164,7 +155,8 @@ class Exercises(Gtk.Grid):
                 self._update_accumutaled_time(task_data)
             self.write_task_data(uid, task_data)
         else:
-            self._task_button.set_sensitive(False)
+            if self._task_button is not None:
+                self._task_button.set_sensitive(False)
             if not 'completed' in task_data or not task_data['completed']:
                 self._task_data['attempt'] += 1
                 self._update_accumutaled_time(task_data)
@@ -178,13 +170,13 @@ class Exercises(Gtk.Grid):
         ''' 'nough said. '''
         _logger.debug('Task Master: Running task %d' % (self.current_task))
         self._destroy_graphics()
-        self._activity.button_was_pressed = False
+        self.activity.button_was_pressed = False
         if self.current_task < self.get_number_of_tasks():
             section, task_index = self.get_section_index()
             if section > 0:
-                self._activity.back.set_sensitive(True)
+                self.activity.back.set_sensitive(True)
                 if section < len(self._task_list) - 1:
-                    self._activity.forward.set_sensitive(True)
+                    self.activity.forward.set_sensitive(True)
             # Check to make sure all the requirements at met
             if not self._check_requirements(section, task_index):
                 # Switching to a required task
@@ -192,7 +184,7 @@ class Exercises(Gtk.Grid):
             self._first_time = True
             self._run_task(section, task_index)
         else:
-            self._activity.complete = True
+            self.activity.complete = True
 
     def _check_requirements(self, section, task_index, switch_task=True):
         ''' Check to make sure all the requirements at met '''
@@ -230,9 +222,9 @@ class Exercises(Gtk.Grid):
         section, task_index = self.get_section_index()
 
         self._task_list[section][task_index].set_font_size(
-            self._activity.font_size)
+            self.activity.font_size)
         self._task_list[section][task_index].set_zoom_level(
-            self._activity.zoom_level)
+            self.activity.zoom_level)
 
         self._graphics, self._task_button = \
             self._task_list[section][task_index].get_graphics()
@@ -264,7 +256,7 @@ class Exercises(Gtk.Grid):
         self._graphics_grid.attach(self._graphics, 1, 0, 1, 1)
         self._graphics.show()
         if self._task_button is not None:
-            self._task_button.set_sensitive(False)
+            self._task_button.set_sensitive(test(self, self._task_data))
             self._task_button.show()
 
     def _prev_page_cb(self, button):
@@ -365,7 +357,7 @@ class Exercises(Gtk.Grid):
         return count
 
     def read_task_data(self, uid):
-        data_path = os.path.join(self._activity.get_activity_root(), 'data',
+        data_path = os.path.join(self.activity.get_activity_root(), 'data',
                                  'training_data')
         uid_data = None
         if os.path.exists(data_path):
@@ -383,7 +375,7 @@ class Exercises(Gtk.Grid):
         return uid_data
 
     def write_task_data(self, uid, uid_data):
-        data_path = os.path.join(self._activity.get_activity_root(), 'data',
+        data_path = os.path.join(self.activity.get_activity_root(), 'data',
                                  'training_data')
         data = {}
         if os.path.exists(data_path):
@@ -516,7 +508,7 @@ class Exercises(Gtk.Grid):
                 self._progress_bar.set_message(_('Progress Summary'))
         '''
 
-        self._activity.progress_label.set_markup(
+        self.activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
              _('Overall: %d%%' % (int(

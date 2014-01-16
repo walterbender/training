@@ -33,6 +33,21 @@ FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
               'xx-large']
 
 
+def get_task_list(task_master):
+    return [[IntroTask(task_master)],
+            [EnterNameTask(task_master),
+             EnterEmailTask(task_master),
+             ValidateEmailTask(task_master),
+             BadgeOneTask(task_master)],
+            [ChangeNickTask(task_master),
+             ConfirmNickChangeTask(task_master),
+             BadgeTwoTask(task_master)],
+            [AddFavoriteTask(task_master),
+             RemoveFavoriteTask(task_master),
+             BadgeThreeTask(task_master)],
+            [FinishedAllTasks(task_master)]]
+
+
 def get_favorites():
     favorites_path = env.get_profile_path('favorite_activities')
     if os.path.exists(favorites_path):
@@ -44,10 +59,10 @@ def get_favorites():
 class Task():
     ''' Generate class for defining tasks '''
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = 'Generic Task'
         self.uid = None
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -116,17 +131,17 @@ class Task():
         return None
 
     def is_completed(self):
-        data = self._activity.read_task_data(self.uid)
+        data = self._task_master.read_task_data(self.uid)
         if data is not None and 'completed' in data:
             return data['completed']
         return False
 
 
 class IntroTask(Task):
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Intro Task')
         self.uid = 'intro-task'
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -137,7 +152,7 @@ class IntroTask(Task):
         return 1000
 
     def test(self, exercises, task_data):
-        return self._activity.button_was_pressed
+        return self._task_master.button_was_pressed
 
     def get_graphics(self):
         graphics = Graphics()
@@ -158,17 +173,17 @@ class IntroTask(Task):
         graphics.set_zoom_level(self._zoom_level)
 
         button = graphics.add_button(_("Let's go!"),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class EnterNameTask(Task):
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Enter Name Task')
         self.uid = 'enter-name-task'
         self.entries = []
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -185,14 +200,14 @@ class EnterNameTask(Task):
             return True
 
     def after_button_press(self):
-        self._activity.write_task_data('name', self.entries[0].get_text())
+        self._task_master.write_task_data('name', self.entries[0].get_text())
 
     def get_name(self):
         return self._name
 
     def get_graphics(self):
         self.entries = []
-        target = self._activity.read_task_data('name')
+        target = self._task_master.read_task_data('name')
         graphics = Graphics()
         '''
         graphics.add_text(
@@ -205,7 +220,8 @@ class EnterNameTask(Task):
             size=FONT_SIZES[self._font_size])
         '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'introduction2.html')
+                            'Training.activity', 'html',
+                            'introduction2.html')
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
@@ -217,17 +233,17 @@ class EnterNameTask(Task):
 
         # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class EnterEmailTask(Task):
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Enter Email Task')
         self.uid = 'enter-email-task'
         self.entries = []
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -251,7 +267,7 @@ class EnterEmailTask(Task):
 
     def after_button_press(self):
         _logger.debug('Writing email address: %s' % self.entries[0].get_text())
-        self._activity.write_task_data('email_address',
+        self._task_master.write_task_data('email_address',
                                        self.entries[0].get_text())
 
     def get_name(self):
@@ -259,13 +275,13 @@ class EnterEmailTask(Task):
 
     def get_graphics(self):
         self.entries = []
-        name = self._activity.read_task_data('name')
+        name = self._task_master.read_task_data('name')
         if name is not None:
             name = name.split()[0]
         else:  # Should never happen
             _logger.error('missing name')
             name = ''
-        email = self._activity.read_task_data('email_address')
+        email = self._task_master.read_task_data('email_address')
         graphics = Graphics()
         '''
         graphics.add_text(_('Nice work %s!\n'
@@ -289,17 +305,17 @@ class EnterEmailTask(Task):
 
         # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class ValidateEmailTask(Task):
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Validate Email Task')
         self.uid = 'validate-email-task'
         self.entries = []
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -327,7 +343,7 @@ class ValidateEmailTask(Task):
         return True
 
     def after_button_press(self):
-        self._activity.write_task_data('email_address',
+        self._task_master.write_task_data('email_address',
                                        self.entries[1].get_text())
 
     def get_name(self):
@@ -335,7 +351,7 @@ class ValidateEmailTask(Task):
 
     def get_graphics(self):
         self.entries = []
-        email = self._activity.read_task_data('email_address')
+        email = self._task_master.read_task_data('email_address')
         graphics = Graphics()
         if email is not None:
             self.entries.append(graphics.add_entry(text=email))
@@ -350,15 +366,15 @@ class ValidateEmailTask(Task):
         self.entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class BadgeOneTask(Task):
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Badge One')
         self.uid = 'badge-1'
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -375,17 +391,17 @@ class BadgeOneTask(Task):
         return 1000
 
     def after_button_press(self):
-        target = self._activity.read_task_data('name').split()[0]
-        self._activity._activity.add_badge(
+        target = self._task_master.read_task_data('name').split()[0]
+        self._task_master.activity.add_badge(
             _('Congratulations %s!\n'
               "You’ve earned your first badge!" % target),
             icon='badge-intro')
 
     def test(self, exercises, task_data):
-        return self._activity.button_was_pressed
+        return self._task_master.button_was_pressed
 
     def get_graphics(self):
-        name = self._activity.read_task_data('name')
+        name = self._task_master.read_task_data('name')
         if name is not None:
             target = name.split()[0]
         else:
@@ -410,16 +426,16 @@ class BadgeOneTask(Task):
         graphics.set_zoom_level(self._zoom_level)
 
         button = graphics.add_button(_('Continue'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class ChangeNickTask(Task):
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Change Nick Task')
         self.uid = 'change-nick-task'
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -430,17 +446,17 @@ class ChangeNickTask(Task):
         if task_data['attempt'] == 0:
             _logger.debug('first attempt: saving nick value as %s' %
                           profile.get_nick_name())
-            self._activity.write_task_data('nick', profile.get_nick_name())
+            self._task_master.write_task_data('nick', profile.get_nick_name())
             return False
         else:
-            target = self._activity.read_task_data('nick')
+            target = self._task_master.read_task_data('nick')
             _logger.debug('%d attempt: comparing %s to %s' %
                           (task_data['attempt'], profile.get_nick_name(),
                            target))
             return not profile.get_nick_name() == target
 
     def after_button_press(self):
-        _logger.error('how to jump to home view?')
+        return
 
     def get_name(self):
         return self._name
@@ -489,7 +505,7 @@ class ChangeNickTask(Task):
                   '3. Do other things\n'
                   '4. Type in a new nickname\n'
                   '5. Click yes to restart Sugar\n'
-                  '6. Reopen the One Academy activity to complete\n\n'),
+                  '6. Reopen the One Academy task_master to complete\n\n'),
                 size=FONT_SIZES[self._font_size])
         elif page == 5:
             graphics.add_text(
@@ -501,16 +517,16 @@ class ChangeNickTask(Task):
             graphics.add_button(_('My turn'), button_callback)
             graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
             button = graphics.add_button(_('Continue'),
-                                         self._activity.task_button_cb)
+                                         self._task_master.task_button_cb)
         return graphics, button
 
 
 class ConfirmNickChangeTask(Task):
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Restore Nick Task')
         self.uid = 'confirm-nick-change-task'
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -518,7 +534,7 @@ class ConfirmNickChangeTask(Task):
         return ['change-nick-task']
 
     def test(self, exercises, task_data):
-        return self._activity.button_was_pressed
+        return self._task_master.button_was_pressed
 
     def get_pause_time(self):
         return 1000
@@ -541,15 +557,15 @@ class ConfirmNickChangeTask(Task):
               'Press Continue to learn about the Frame.\n\n'),
             size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class BadgeTwoTask(Task):
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Badge Two')
         self.uid = 'badge-2'
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -566,17 +582,17 @@ class BadgeTwoTask(Task):
         return 1000
 
     def after_button_press(self):
-        target = self._activity.read_task_data('name').split()[0]
-        self._activity._activity.add_badge(
+        target = self._task_master.read_task_data('name').split()[0]
+        self._task_master.activity.add_badge(
             _('Congratulations %s!\n'
               "You’ve earned your second badge!" % target),
             icon='badge-intro')
 
     def test(self, exercises, task_data):
-        return self._activity.button_was_pressed
+        return self._task_master.button_was_pressed
 
     def get_graphics(self):
-        target = self._activity.read_task_data('name').split()[0]
+        target = self._task_master.read_task_data('name').split()[0]
         graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
@@ -590,16 +606,16 @@ class BadgeTwoTask(Task):
               'Press Continue to start on your next one!\n\n'),
             size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class AddFavoriteTask(Task):
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Add Favorite Task')
         self.uid = 'add-favorites-task'
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -607,11 +623,11 @@ class AddFavoriteTask(Task):
         if task_data['attempt'] == 0:
             _logger.debug('first attempt: saving favorites list')
             favorites_list = get_favorites()
-            self._activity.write_task_data('favorites', len(favorites_list))
+            self._task_master.write_task_data('favorites', len(favorites_list))
             return False
         else:
             favorites_count = len(get_favorites())
-            saved_favorites_count = self._activity.read_task_data('favorites')
+            saved_favorites_count = self._task_master.read_task_data('favorites')
             return favorites_count > saved_favorites_count
 
     def get_name(self):
@@ -629,27 +645,27 @@ class AddFavoriteTask(Task):
                           size=FONT_SIZES[self._font_size])
         graphics.add_image(path)
         button = graphics.add_button(_('Next'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class RemoveFavoriteTask(Task):
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Remove Favorite Task')
         self.uid = 'remove-favorites-task'
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
             favorites_list = get_favorites()
-            self._activity.write_task_data('favorites', len(favorites_list))
+            self._task_master.write_task_data('favorites', len(favorites_list))
             return False
         else:
             favorites_count = len(get_favorites())
-            saved_favorites_count = self._activity.read_task_data('favorites')
+            saved_favorites_count = self._task_master.read_task_data('favorites')
             return favorites_count < saved_favorites_count
 
     def get_name(self):
@@ -668,15 +684,15 @@ class RemoveFavoriteTask(Task):
             size=FONT_SIZES[self._font_size])
         graphics.add_image(path)
         button = graphics.add_button(_('Next'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class BadgeThreeTask(Task):
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Badge Three')
         self.uid = 'badge-3'
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -693,17 +709,17 @@ class BadgeThreeTask(Task):
         return 1000
 
     def after_button_press(self):
-        target = self._activity.read_task_data('name').split()[0]
-        self._activity._activity.add_badge(
+        target = self._task_master.read_task_data('name').split()[0]
+        self._task_master.activity.add_badge(
             _('Congratulations %s!\n'
               "You’ve earned your third badge!" % target),
             icon='badge-intro')
 
     def test(self, exercises, task_data):
-        return self._activity.button_was_pressed
+        return self._task_master.button_was_pressed
 
     def get_graphics(self):
-        target = self._activity.read_task_data('name').split()[0]
+        target = self._task_master.read_task_data('name').split()[0]
         graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
@@ -716,16 +732,16 @@ class BadgeThreeTask(Task):
               'Press Continue to start on your next one!\n\n'),
             size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class FinishedAllTasks(Task):
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('Finished All Tasks')
         self.uid = 'finished'
-        self._activity = activity
+        self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
@@ -733,7 +749,7 @@ class FinishedAllTasks(Task):
         return []  # To Do: what tasks are actually required?
 
     def test(self, exercises, task_data):
-        self._activity.completed = True
+        self._task_master.completed = True
         return True
 
     def get_name(self):
@@ -744,16 +760,16 @@ class FinishedAllTasks(Task):
         graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
                           size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Continue'),
-                                     self._activity.task_button_cb)
+                                     self._task_master.task_button_cb)
         return graphics, button
 
 
 class UITest(Task):
 
-    def __init__(self, activity):
+    def __init__(self, task_master):
         self._name = _('UI Test Task')
         self.uid = 'uitest'
-        self._activity = activity
+        self._task_master = task_master
 
     def test(self, exercises, task_data):
         return self._uitester()
