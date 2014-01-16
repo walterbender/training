@@ -176,31 +176,9 @@ class TrainingActivity(activity.Activity):
         self._set_zoom_buttons_sensitivity()
         self._exercises.reload_graphics()
 
-    """
-    def __notify_active_cb(self, widget, event):
-        ''' Sugar notify us that the activity is becoming active or
-        inactive. Remove . '''
-        if self.props.active:
-            _logger.debug('returning to foreground')
-        else:
-            _logger.debug('going to background')
-        if hasattr(self, 'check_progress') and self.check_progess is not None:
-            self.check_progress.destroy()
-
-    def can_close(self):
-        ''' Override activity class can_close inorder to notify plugins '''
-        if hasattr(self, 'check_progress') and self.check_progess is not None:
-            self.check_progress.destroy()
-        return True
-
-    def resume(self):
-        if self._check_progess is not None:
-            self.check_progress.set_keep_above(True)
-    """
-
     def _check_progress_cb(self, button):
         self.check_progress = CheckProgress(self._exercises)
-        self.check_progress.show()
+        self._exercises.load_progress_summary(self.check_progress)
 
     def _go_back_cb(self, button):
         section, task = self._exercises.get_section_index()

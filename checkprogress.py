@@ -32,32 +32,22 @@ import logging
 _logger = logging.getLogger('training-activity-check-progress')
 
 
-class CheckProgress(Gtk.Window):
+class CheckProgress(Gtk.Grid):
+
     def __init__(self, exercises):
-        Gtk.Window.__init__(self)
+        Gtk.Grid.__init__(self)
+        self._exercises = exercises
 
-        self.set_destroy_with_parent(True)
-        self.set_size_request(int(Gdk.Screen.width() / 1.5),
-                              int(Gdk.Screen.height() / 1.5))
-        self.set_decorated(False)
-        self.set_skip_pager_hint(True)
-        self.set_skip_taskbar_hint(True)
-        self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
-        self.set_resizable(False)
-        self.set_modal(True)
-        self.modify_bg(Gtk.StateType.NORMAL, Gdk.color_parse('white'))
-
-        grid = Gtk.Grid()
         toolbox = self.build_toolbar()
-        graphics = ProgressSummary(exercises).get_graphics()
+        graphics = ProgressSummary(self._exercises).get_graphics()
 
-        grid.attach(toolbox, 0, 1, 1, 1)
+        self.attach(toolbox, 0, 1, 1, 1)
         toolbox.show()
-        grid.attach(graphics, 0, 2, 1, 1)
+        self.attach(graphics, 0, 2, 1, 1)
         graphics.show()
 
-        self.add(grid)
-        grid.show()
+    def _close_cb(self, button):
+        self._exercises.destroy_summary()
 
     def build_toolbar(self):
         toolbox = ToolbarBox()
@@ -73,7 +63,7 @@ class CheckProgress(Gtk.Window):
         label.show()
 
         close = ToolButton('entry-cancel')
-        close.connect('clicked', lambda x: self.destroy())
+        close.connect('clicked', self._close_cb)
 
         separator = Gtk.SeparatorToolItem()
         separator.props.draw = False

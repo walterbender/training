@@ -4,6 +4,8 @@ NEWS
 
 * Fix bug with page/test interactions
 * Moved all task-specific data to tasks.py
+* Moved check progress to grid instead of separate window
+* Added new tasks for change nick and write save
 
 1.11
 

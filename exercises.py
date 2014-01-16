@@ -42,6 +42,7 @@ class Exercises(Gtk.Grid):
         self.activity = activity
 
         self._graphics = None
+        self._summary = None
         self._page = 0
         self._task_button = None
         self._first_time = True
@@ -168,6 +169,9 @@ class Exercises(Gtk.Grid):
 
     def task_master(self):
         ''' 'nough said. '''
+        if self._summary is not None:
+            _logging.debug('Cannot run tasks while summary is displayed')
+            return
         _logger.debug('Task Master: Running task %d' % (self.current_task))
         self._destroy_graphics()
         self.activity.button_was_pressed = False
@@ -199,12 +203,30 @@ class Exercises(Gtk.Grid):
                 return False
         return True
 
+    def load_progress_summary(self, summary):
+        self._destroy_graphics()
+        self._progress_bar.hide()
+        if hasattr(self, '_summary') and self._summary is not None:
+            self._summary.destroy()
+        self._summary = summary
+        self._graphics_grid.attach(self._summary, 1, 0, 1, 1)
+        summary.show()
+
+    def destroy_summary(self):
+        if hasattr(self, '_summary') and self._summary is not None:
+            self._summary.destroy()
+        self._summary = None
+        self.reload_graphics()
+
     def reload_graphics(self):
         ''' When changing font size and zoom level, we regenerate the task
            graphic. '''
+        if self._summary is not None:
+            _logging.debug('Cannot run tasks while summary is displayed')
+            return
         self._destroy_graphics()
         self._load_graphics()
-
+        self._progress_bar.show()
         section, task_index = self.get_section_index()
         self._test(self._task_list[section][task_index].test,
                    self._task_data, self._uid)

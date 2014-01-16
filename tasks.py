@@ -13,7 +13,6 @@
 import os
 import email.utils
 import re
-import json
 from gettext import gettext as _
 
 from gi.repository import Gtk
@@ -23,12 +22,11 @@ from gi.repository import GObject
 import logging
 _logger = logging.getLogger('training-activity-tasks')
 
-from sugar3 import env
-from sugar3 import profile
 from sugar3.graphics import style
-from sugar3.test import uitree
 
 from graphics import Graphics
+from testutils import (get_nick, get_favorites, get_rtf, get_uitree_root,
+                       find_string)
 
 
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
@@ -56,14 +54,6 @@ def get_task_list(task_master):
             #  RemoveFavoriteTask(task_master),
             #  BadgeThreeTask(task_master)],
             [FinishedAllTasks(task_master)]]
-
-
-def get_favorites():
-    favorites_path = env.get_profile_path('favorite_activities')
-    if os.path.exists(favorites_path):
-        favorites_data = json.load(open(favorites_path))
-        favorites_list = favorites_data['favorites']
-    return favorites_list
 
 
 class Task():
@@ -614,15 +604,11 @@ class NickChange4Task(Task):
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
             _logger.debug('first attempt: saving nick value as %s' %
-                          profile.get_nick_name())
-            self._task_master.write_task_data('nick', profile.get_nick_name())
+                          get_nick())
+            self._task_master.write_task_data('nick', get_nick())
             return False
         else:
-            target = self._task_master.read_task_data('nick')
-            _logger.debug('%d attempt: comparing %s to %s' %
-                          (task_data['attempt'], profile.get_nick_name(),
-                           target))
-            return not profile.get_nick_name() == target
+            return not get_nick() == self._task_master.read_task_data('nick')
 
     def get_graphics(self):
 
@@ -764,6 +750,7 @@ class WriteSave3Task(Task):
     def is_collectable(self):
         return False
 
+
     def test(self, exercises, task_data):
         return self._task_master.button_was_pressed
 
@@ -797,8 +784,12 @@ class WriteSave4Task(Task):
         self._zoom_level = 1.0
 
     def test(self, exercises, task_data):
-        # TODO: look for RTF file in Journal
-        return self._task_master.button_was_pressed
+        paths = get_rtf()
+        for path in paths:
+            # Check to see if there is a picture in the file
+            if find_string(path, '\\pict'):
+                return True
+        return False
 
     def get_pause_time(self):
         return 1000
@@ -813,7 +804,6 @@ class WriteSave4Task(Task):
 
         def button_callback(widget):
             from jarabe.model import shell
-            _logger.debug('My turn button clicked')
             shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
 
         graphics = Graphics()
@@ -927,7 +917,6 @@ class AddFavoriteTask(Task):
 
     def test(self, exercises, task_data):
         if task_data['attempt'] == 0:
-            _logger.debug('first attempt: saving favorites list')
             favorites_list = get_favorites()
             self._task_master.write_task_data('favorites', len(favorites_list))
             return False
@@ -1085,8 +1074,9 @@ class UITest(Task):
 
     def _uitester(self):
         _logger.debug('uitree')
-        _logger.debug(uitree.get_root())
-        for node in uitree.get_root().get_children():
+        uitree_root = get_uitree_root()
+        _logger.debug(uitree_root)
+        for node in uitree_root.get_children():
             _logger.debug('%s (%s)' % (node.name, node.role_name))
             for node1 in node.get_children():
                 _logger.debug('> %s (%s)' % (node1.name, node1.role_name))

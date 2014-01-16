@@ -87,19 +87,22 @@ class ProgressBar(Gtk.Grid):
         self.attach(self._next_grid, 3, 0, 1, 1)
         self._next_grid.show()
 
+        '''
         self._label = Gtk.Label()
         self._label.set_line_wrap(True)
         self._label.set_property('xalign', 0.5)
         self._label.modify_fg(Gtk.StateType.NORMAL,
                               style.COLOR_BUTTON_GREY.get_gdk_color())
-        # self.attach(self._label, 0, 1, 5, 1)
+        self.attach(self._label, 0, 1, 5, 1)
         self._label.show()
+        '''
 
     def set_message(self, message):
-        self._label.set_label(message)
+        # self._label.set_label(message)
+        pass
 
     def set_button_sensitive(self, i, flag=True):
-        _logger.debug('setting button %d to %r' % (i, flag))
+        # _logger.debug('setting button %d to %r' % (i, flag))
         if i < len(self._progress_buttons):
             self._progress_buttons[i].set_sensitive(flag)
 
