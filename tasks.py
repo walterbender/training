@@ -660,7 +660,8 @@ class NickChange5Task(Task):
     def get_graphics(self):
         graphics = Graphics()
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'html', 'nickchange5.html')
+                            'Training.activity', 'html',
+                            'nickchange5.html?NAME=%s' % get_nick())
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         button = graphics.add_button(_('Continue'),
