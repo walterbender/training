@@ -46,9 +46,11 @@ class TrainingActivity(activity.Activity):
             _logger.error(str(e))
 
         self.connect('realize', self.__realize_cb)
+        # self.connect("notify::active", self.__notify_active_cb)
+
         self.font_size = 5
         self.zoom_level = 0.833
-        self._check_progress = None
+        self.check_progress = None
 
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
@@ -174,13 +176,31 @@ class TrainingActivity(activity.Activity):
         self._set_zoom_buttons_sensitivity()
         self._exercises.reload_graphics()
 
+    """
+    def __notify_active_cb(self, widget, event):
+        ''' Sugar notify us that the activity is becoming active or
+        inactive. Remove . '''
+        if self.props.active:
+            _logger.debug('returning to foreground')
+        else:
+            _logger.debug('going to background')
+        if hasattr(self, 'check_progress') and self.check_progess is not None:
+            self.check_progress.destroy()
+
+    def can_close(self):
+        ''' Override activity class can_close inorder to notify plugins '''
+        if hasattr(self, 'check_progress') and self.check_progess is not None:
+            self.check_progress.destroy()
+        return True
+
     def resume(self):
         if self._check_progess is not None:
-            self._check_progress.set_keep_above(True)
+            self.check_progress.set_keep_above(True)
+    """
 
     def _check_progress_cb(self, button):
-        self._check_progress = CheckProgress(self._exercises)
-        self._check_progress.show()
+        self.check_progress = CheckProgress(self._exercises)
+        self.check_progress.show()
 
     def _go_back_cb(self, button):
         section, task = self._exercises.get_section_index()

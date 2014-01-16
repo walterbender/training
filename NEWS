@@ -1,5 +1,10 @@
 NEWS
 
+1.12
+
+* Fix bug with page/test interactions
+* Moved all task-specific data to tasks.py
+
 1.11
 
 * Add support for page flipping in graphics

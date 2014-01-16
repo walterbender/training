@@ -12,6 +12,7 @@
 
 import os
 import email.utils
+import re
 import json
 from gettext import gettext as _
 
@@ -34,17 +35,23 @@ FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
 
 
 def get_task_list(task_master):
-    return [[IntroTask(task_master)],
-            [EnterNameTask(task_master),
-             EnterEmailTask(task_master),
+    return [[Intro1Task(task_master),
+             Intro2Task(task_master),
+             Intro3Task(task_master),
              ValidateEmailTask(task_master),
              BadgeOneTask(task_master)],
-            [ChangeNickTask(task_master),
-             ConfirmNickChangeTask(task_master),
+            [NickChange1Task(task_master),
+             NickChange2Task(task_master),
+             NickChange3Task(task_master),
+             NickChange4Task(task_master),
+             WriteSave1Task(task_master),
+             WriteSave2Task(task_master),
+             WriteSave3Task(task_master),
+             WriteSave4Task(task_master),
              BadgeTwoTask(task_master)],
-            [AddFavoriteTask(task_master),
-             RemoveFavoriteTask(task_master),
-             BadgeThreeTask(task_master)],
+            # [AddFavoriteTask(task_master),
+            #  RemoveFavoriteTask(task_master),
+            #  BadgeThreeTask(task_master)],
             [FinishedAllTasks(task_master)]]
 
 
@@ -90,6 +97,7 @@ class Task():
         raise NotImplementedError
 
     def after_button_press(self):
+        ''' Anything special to do after the task is completed? '''
         return
 
     def get_success(self):
@@ -105,6 +113,7 @@ class Task():
         return None
 
     def get_pause_time(self):
+        ''' How long should we pause between testing? '''
         return 5000
 
     def requires(self):
@@ -121,7 +130,8 @@ class Task():
         raise NotImplementedError
 
     def get_help_info(self):
-        return (None, None)
+        ''' Is there help associated with this task? '''
+        return (None, None)  # title, url (from Help.activity)
 
     def get_page_count(self):
         return 1
@@ -131,22 +141,27 @@ class Task():
         return None
 
     def is_completed(self):
+        ''' Has this task been marked as complete? '''
         data = self._task_master.read_task_data(self.uid)
         if data is not None and 'completed' in data:
             return data['completed']
         return False
 
 
-class IntroTask(Task):
+class Intro1Task(Task):
+
     def __init__(self, task_master):
-        self._name = _('Intro Task')
-        self.uid = 'intro-task'
+        self._name = _('Intro One')
+        self.uid = 'intro-task-1'
         self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
     def get_name(self):
         return self._name
+
+    def is_collectable(self):
+        return False
 
     def get_pause_time(self):
         return 1000
@@ -155,17 +170,6 @@ class IntroTask(Task):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
-        graphics = Graphics()
-        '''
-        graphics.add_text(_('Welcome to One Academy\n\n'),
-                          bold=True,
-                          size=FONT_SIZES[self._font_size],
-                          justify=Gtk.Justification.CENTER)
-        graphics.add_icon('one-academy', stroke=style.COLOR_BLACK.get_svg())
-        graphics.add_text(_('\nAre you ready to learn?\n\n'),
-                          justify=Gtk.Justification.CENTER,
-                          size=FONT_SIZES[self._font_size])
-        '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                             'Training.activity', 'html', 'introduction1.html')
         graphics = Graphics()
@@ -177,10 +181,10 @@ class IntroTask(Task):
         return graphics, button
 
 
-class EnterNameTask(Task):
+class Intro2Task(Task):
 
     def __init__(self, task_master):
-        self._name = _('Enter Name Task')
+        self._name = _('Enter Name')
         self.uid = 'enter-name-task'
         self.entries = []
         self._task_master = task_master
@@ -208,39 +212,26 @@ class EnterNameTask(Task):
     def get_graphics(self):
         self.entries = []
         target = self._task_master.read_task_data('name')
-        graphics = Graphics()
-        '''
-        graphics.add_text(
-            _('See that progress bar at the bottom of your screen?\n'
-              'It fills up when you complete tasks.\n'
-              'Complete tasks to earn badges...\n'
-              "Earn all the badges and you’ll be XO-Certified!\n\n\n"
-              'Time for the first task:\n'
-              'Write your full name in the box below, then press Next.\n\n'),
-            size=FONT_SIZES[self._font_size])
-        '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                             'Training.activity', 'html',
                             'introduction2.html')
+
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-
         if target is not None:
             self.entries.append(graphics.add_entry(text=target))
         else:
             self.entries.append(graphics.add_entry())
-
-        # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
 
-class EnterEmailTask(Task):
+class Intro3Task(Task):
 
     def __init__(self, task_master):
-        self._name = _('Enter Email Task')
+        self._name = _('Enter Email')
         self.uid = 'enter-email-task'
         self.entries = []
         self._task_master = task_master
@@ -263,6 +254,8 @@ class EnterEmailTask(Task):
         realname, email_address = email.utils.parseaddr(entry)
         if email_address == '':
             return False
+        if not re.match(r'[^@]+@[^@]+\.[^@]+', email_address):
+            return False
         return True
 
     def after_button_press(self):
@@ -282,28 +275,16 @@ class EnterEmailTask(Task):
             _logger.error('missing name')
             name = ''
         email = self._task_master.read_task_data('email_address')
-        graphics = Graphics()
-        '''
-        graphics.add_text(_('Nice work %s!\n'
-                            "You’ve almost filled the bar!\n\n\n"
-                            "Here’s another tricky one:\n"
-                            'Write your email address in the box below, '
-                            'then press Next\n\n' % name),
-                          size=FONT_SIZES[self._font_size])
-        '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                             'Training.activity', 'html',
                             'introduction3.html?NAME=%s' % name)
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-
         if email is not None:
             self.entries.append(graphics.add_entry(text=email))
         else:
             self.entries.append(graphics.add_entry())
-
-        # graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
@@ -312,7 +293,7 @@ class EnterEmailTask(Task):
 class ValidateEmailTask(Task):
 
     def __init__(self, task_master):
-        self._name = _('Validate Email Task')
+        self._name = _('Validate Email')
         self.uid = 'validate-email-task'
         self.entries = []
         self._task_master = task_master
@@ -331,14 +312,14 @@ class ValidateEmailTask(Task):
             return False
         entry0 = self.entries[0].get_text()
         entry1 = self.entries[1].get_text()
-
         if len(entry0) == 0 or len(entry1) == 0:
             return False
         if entry0 != entry1:
             return False
-
         realname, email_address = email.utils.parseaddr(entry0)
         if email_address == '':
+            return False
+        if not re.match(r'[^@]+@[^@]+\.[^@]+', email_address):
             return False
         return True
 
@@ -371,9 +352,10 @@ class ValidateEmailTask(Task):
 
 
 class BadgeOneTask(Task):
+
     def __init__(self, task_master):
         self._name = _('Badge One')
-        self.uid = 'badge-1'
+        self.uid = 'badge-one'
         self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
@@ -406,18 +388,6 @@ class BadgeOneTask(Task):
             target = name.split()[0]
         else:
             target = ''
-        graphics = Graphics()
-        '''
-        graphics.add_text(
-            _('Congratulations %s!\n'
-              "You’ve earned your first badge!\n\n" % target), bold=True,
-            size=FONT_SIZES[self._font_size])
-        graphics.add_icon('badge-intro')
-        graphics.add_text(
-            _('\n\nMost badges require you to complete multiple tasks.\n'
-              'Press Continue to start on your next one!\n\n'),
-            size=FONT_SIZES[self._font_size])
-        '''
         url =  os.path.join(os.path.expanduser('~'), 'Activities',
                             'Training.activity', 'html',
                             'introduction4.html?NAME=%s' % target)
@@ -430,6 +400,7 @@ class BadgeOneTask(Task):
         return graphics, button
 
 
+"""
 class ChangeNickTask(Task):
 
     def __init__(self, task_master):
@@ -519,19 +490,136 @@ class ChangeNickTask(Task):
             button = graphics.add_button(_('Continue'),
                                          self._task_master.task_button_cb)
         return graphics, button
+"""
 
-
-class ConfirmNickChangeTask(Task):
+class NickChange1Task(Task):
 
     def __init__(self, task_master):
-        self._name = _('Restore Nick Task')
-        self.uid = 'confirm-nick-change-task'
+        self._name = _('Nick Change Step One')
+        self.uid = 'nick-change-task-1'
         self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
+    def is_collectable(self):
+        return False
+
+    def get_name(self):
+        return self._name
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, exercises, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self):
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'nickchange1.html')
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class NickChange2Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Nick Change Step Two')
+        self.uid = 'nick-change-task-2'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def get_name(self):
+        return self._name
+
+    def is_collectable(self):
+        return False
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, exercises, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self):
+        graphics = Graphics()
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'nickchange2.html')
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class NickChange3Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Nick Change Step Three')
+        self.uid = 'nick-change-task-3'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def get_name(self):
+        return self._name
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, exercises, task_data):
+        if task_data['attempt'] == 0:
+            _logger.debug('first attempt: saving nick value as %s' %
+                          profile.get_nick_name())
+            self._task_master.write_task_data('nick', profile.get_nick_name())
+            return False
+        else:
+            target = self._task_master.read_task_data('nick')
+            _logger.debug('%d attempt: comparing %s to %s' %
+                          (task_data['attempt'], profile.get_nick_name(),
+                           target))
+            return not profile.get_nick_name() == target
+
+    def get_graphics(self):
+
+        def button_callback(widget):
+            from jarabe.model import shell
+            _logger.debug('My turn button clicked')
+            shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+
+        graphics = Graphics()
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'nickchange3.html')
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+        graphics.add_button(_('My turn'), button_callback)
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Continue'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class NickChange4Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Nick Change Step Four')
+        self.uid = 'nick-change-task-4'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def is_collectable(self):
+        return False
+
     def requires(self):
-        return ['change-nick-task']
+        return ['nick-change-task-3']
 
     def test(self, exercises, task_data):
         return self._task_master.button_was_pressed
@@ -547,30 +635,175 @@ class ConfirmNickChangeTask(Task):
 
     def get_graphics(self):
         graphics = Graphics()
-        graphics.add_text(
-            _('Nice one!\n\n'
-              'You changed your nickname to %s!' % profile.get_nick_name()),
-            size=FONT_SIZES[self._font_size])
-        graphics.add_icon('badge-intro')
-        graphics.add_text(
-            _('\n\nYou can change it back any time you like.\n'
-              'Press Continue to learn about the Frame.\n\n'),
-            size=FONT_SIZES[self._font_size])
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'nickchange4.html')
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+        button = graphics.add_button(_('Continue'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class WriteSave1Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Write Save Step One')
+        self.uid = 'write-save-task-1'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def is_collectable(self):
+        return False
+
+    def test(self, exercises, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_pause_time(self):
+        return 1000
+
+    def get_name(self):
+        return self._name
+
+    def get_help_info(self):
+        return ('My Settings', 'my_settings.html')
+
+    def get_graphics(self):
+        graphics = Graphics()
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'writesave1.html')
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class WriteSave2Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Write Save Step Two')
+        self.uid = 'write-save-task-2'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def is_collectable(self):
+        return False
+
+    def test(self, exercises, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_pause_time(self):
+        return 1000
+
+    def get_name(self):
+        return self._name
+
+    def get_help_info(self):
+        return ('My Settings', 'my_settings.html')
+
+    def get_graphics(self):
+        graphics = Graphics()
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'writesave2.html')
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+        button = graphics.add_button(_('Continue'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class WriteSave3Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Write Save Step Three')
+        self.uid = 'write-save-task-3'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def test(self, exercises, task_data):
+        # TODO: look for RTF file in Journal
+        return self._task_master.button_was_pressed
+
+    def get_pause_time(self):
+        return 1000
+
+    def get_name(self):
+        return self._name
+
+    def get_help_info(self):
+        return ('My Settings', 'my_settings.html')
+
+    def get_graphics(self):
+
+        def button_callback(widget):
+            from jarabe.model import shell
+            _logger.debug('My turn button clicked')
+            shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+
+        graphics = Graphics()
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'writesave3.html')
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+        graphics.add_button(_('My turn'), button_callback)
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class WriteSave4Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Write Save Step Four')
+        self.uid = 'write-save-task-4'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def is_collectable(self):
+        return False
+
+    def requires(self):
+        return ['write-save-task-3']
+
+    def test(self, exercises, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_pause_time(self):
+        return 1000
+
+    def get_name(self):
+        return self._name
+
+    def get_help_info(self):
+        return ('My Settings', 'my_settings.html')
+
+    def get_graphics(self):
+        graphics = Graphics()
+        url =  os.path.join(os.path.expanduser('~'), 'Activities',
+                            'Training.activity', 'html', 'writesave4.html')
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
         button = graphics.add_button(_('Continue'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
 
 class BadgeTwoTask(Task):
+
     def __init__(self, task_master):
         self._name = _('Badge Two')
-        self.uid = 'badge-2'
+        self.uid = 'badge-two'
         self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
 
     def requires(self):
-        return ['change-nick-task', 'confirm-nick-change-task']
+        return ['nick-change-task-3', 'write-save-task-3']
 
     def is_collectable(self):
         return False
@@ -627,7 +860,8 @@ class AddFavoriteTask(Task):
             return False
         else:
             favorites_count = len(get_favorites())
-            saved_favorites_count = self._task_master.read_task_data('favorites')
+            saved_favorites_count = \
+                self._task_master.read_task_data('favorites')
             return favorites_count > saved_favorites_count
 
     def get_name(self):
@@ -665,7 +899,8 @@ class RemoveFavoriteTask(Task):
             return False
         else:
             favorites_count = len(get_favorites())
-            saved_favorites_count = self._task_master.read_task_data('favorites')
+            saved_favorites_count = \
+                self._task_master.read_task_data('favorites')
             return favorites_count < saved_favorites_count
 
     def get_name(self):
@@ -746,7 +981,8 @@ class FinishedAllTasks(Task):
         self._zoom_level = 1.0
 
     def requires(self):
-        return []  # To Do: what tasks are actually required?
+        return ['enter-name-task', 'enter-email-task', 'validate-email-task',
+                'nick-change-task-3', 'write-save-task-3']
 
     def test(self, exercises, task_data):
         self._task_master.completed = True

@@ -6,8 +6,8 @@
 	font-weight: normal;
 	color: #000000;
 	text-align: center;
-	height: auto;
-	width: 600px;
+	height: 800px;
+	width: 800px;
 	margin-right: auto;
 	margin-left: auto;
 }
@@ -24,8 +24,11 @@
 	font-weight: normal;
 	color: #000000;
 	text-align: left;
-	height: auto;
+	height: 800px;
 	width: 800px;
 	margin-right: auto;
 	margin-left: auto;
 }
+   
+
+ 
