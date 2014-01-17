@@ -5,6 +5,8 @@ NEWS
 * Added jump-to-section to summary page
 * Move section definitions to tasks.py
 * Added Speak Task
+* Overall progress based on achievements, not pages viewed
+* Using Next rather than Continue
 
 1.12
 

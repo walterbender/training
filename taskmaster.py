@@ -48,6 +48,7 @@ class TaskMaster(Gtk.Grid):
         self._first_time = True
 
         self._task_list = get_task_list(self)
+        self._assign_required()
 
         self.current_task = self.read_task_data('current_task')
         if self.current_task is None:
@@ -75,6 +76,29 @@ class TaskMaster(Gtk.Grid):
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
         self.attach(self._progress_bar_alignment, 0, 1, 1, 1)
         self._progress_bar_alignment.show()
+
+    def task_master(self):
+        ''' 'nough said. '''
+        if self._summary is not None:
+            _logging.debug('Cannot run tasks while summary is displayed')
+            return
+        _logger.debug('Task Master: Running task %d' % (self.current_task))
+        self._destroy_graphics()
+        self.activity.button_was_pressed = False
+        if self.current_task < self._get_number_of_tasks():
+            section, task_index = self.get_section_index()
+            if section > 0:
+                self.activity.back.set_sensitive(True)
+                if section < len(self._task_list) - 1:
+                    self.activity.forward.set_sensitive(True)
+            # Check to make sure all the requirements at met
+            if not self._check_requirements(section, task_index):
+                # Switching to a required task
+                section, task_index = self.get_section_index()
+            self._first_time = True
+            self._run_task(section, task_index)
+        else:
+            self.activity.complete = True
 
     def task_button_cb(self, button):
         ''' The button at the bottom of the page for each task: used to
@@ -166,34 +190,29 @@ class TaskMaster(Gtk.Grid):
             section, index = self.get_section_index()
             self._run_task(section, index)
 
-    def task_master(self):
-        ''' 'nough said. '''
-        if self._summary is not None:
-            _logging.debug('Cannot run tasks while summary is displayed')
-            return
-        _logger.debug('Task Master: Running task %d' % (self.current_task))
-        self._destroy_graphics()
-        self.activity.button_was_pressed = False
-        if self.current_task < self.get_number_of_tasks():
-            section, task_index = self.get_section_index()
-            if section > 0:
-                self.activity.back.set_sensitive(True)
-                if section < len(self._task_list) - 1:
-                    self.activity.forward.set_sensitive(True)
-            # Check to make sure all the requirements at met
-            if not self._check_requirements(section, task_index):
-                # Switching to a required task
-                section, task_index = self.get_section_index()
-            self._first_time = True
-            self._run_task(section, task_index)
-        else:
-            self.activity.complete = True
+    def _assign_required(self):
+        ''' Add collectable tasks in each section to badge task. '''
+        all_requirements = []
+        for section in self._task_list:
+            section_requirements = []
+            for task in section:
+                if task.is_collectable():
+                    section_requirements.append(task.uid)
+                    all_requirements.append(task.uid)
+            last = len(section) - 1
+            if section[last].uid[0:5] == 'badge':
+                _logger.debug('setting requirements for %s to %r' %
+                              (section[last].uid, section_requirements))
+                section[last].set_requires(section_requirements)
+        self._task_list[-1][-1].set_requires(all_requirements)
+        _logger.debug('setting requirements for %s to %r' %
+                      (self._task_list[-1][-1].uid, all_requirements))
 
     def _check_requirements(self, section, task_index, switch_task=True):
         ''' Check to make sure all the requirements at met '''
-        requires = self._task_list[section][task_index].requires()
+        requires = self._task_list[section][task_index].get_requires()
         for uid in requires:
-            if not self.uid_to_task(uid, section=section).is_completed():
+            if not self._uid_to_task(uid, section=section).is_completed():
                 if switch_task:
                     _logger.debug(
                         'Task %s required task %s... switching to %s' %
@@ -309,22 +328,6 @@ class TaskMaster(Gtk.Grid):
     def get_number_of_sections(self):
         return len(self._task_list)
 
-    def get_number_of_tasks_in_section(self, section_index):
-        return len(self._task_list[section_index])
-
-    def get_number_of_collectables_in_section(self, section_index):
-        count = 0
-        for task in self._task_list[section_index]:
-            if task.is_collectable():
-                count += 1
-        return count
-
-    def get_number_of_collectables(self):
-        count = 0
-        for section_index in range(len(self._task_list)):
-            count += self.get_number_of_collectables_in_section(section_index)
-        return count
-
     def get_section_index(self):
         count = 0
         for section_index, section in enumerate(self._task_list):
@@ -341,18 +344,9 @@ class TaskMaster(Gtk.Grid):
             for task in section:
                 if task.is_collectable() and not task.is_completed():
                     section_completed = False
-                else:
-                    _logger.debug('Task %s is completed' % task.uid)
             if section_completed:
-                _logger.debug('Section %d is completed' % s)
                 progress.append(s)
         return progress
-
-    def get_number_of_tasks(self):
-        count = 0
-        for section in self._task_list:
-            count += len(section)
-        return count
 
     def section_and_task_to_uid(self, section, task_index=0):
         if section < 0 or section > self.get_number_of_sections() - 1:
@@ -374,7 +368,29 @@ class TaskMaster(Gtk.Grid):
         _logger.error('UID %s not found' % uid)
         return 0
 
-    def uid_to_task(self, uid, section=None):
+    def _get_number_of_tasks_in_section(self, section_index):
+        return len(self._task_list[section_index])
+
+    def _get_number_of_collectables_in_section(self, section_index):
+        count = 0
+        for task in self._task_list[section_index]:
+            if task.is_collectable():
+                count += 1
+        return count
+
+    def _get_number_of_collectables(self):
+        count = 0
+        for section_index in range(len(self._task_list)):
+            count += self._get_number_of_collectables_in_section(section_index)
+        return count
+
+    def _get_number_of_tasks(self):
+        count = 0
+        for section in self._task_list:
+            count += len(section)
+        return count
+
+    def _uid_to_task(self, uid, section=None):
         if section:
             for task in self._task_list[section]:
                 if task.uid == uid:
@@ -457,7 +473,7 @@ class TaskMaster(Gtk.Grid):
 
     def _next_task_button_cb(self, button):
         section, task_index = self.get_section_index()
-        tasks_in_section = self.get_number_of_tasks_in_section(section)
+        tasks_in_section = self._get_number_of_tasks_in_section(section)
         if task_index > tasks_in_section - 1:
             return
         task = task_index + 1
@@ -473,7 +489,7 @@ class TaskMaster(Gtk.Grid):
 
     def _look_for_next_task(self):
         section, task_index = self.get_section_index()
-        tasks_in_section = self.get_number_of_tasks_in_section(section)
+        tasks_in_section = self._get_number_of_tasks_in_section(section)
         if task_index > tasks_in_section - 1:
             return False
         task = task_index + 1
@@ -493,7 +509,7 @@ class TaskMaster(Gtk.Grid):
         section, task_index = self.get_section_index()
         if section < 0:  # We haven't started yet
             return
-        tasks_in_section = self.get_number_of_tasks_in_section(section)
+        tasks_in_section = self._get_number_of_tasks_in_section(section)
 
         # If the task index is 0, then we need to create a new progress bar
         if task_index == 0 or self._progress_bar is None:
@@ -540,24 +556,9 @@ class TaskMaster(Gtk.Grid):
         else:
             self._progress_bar.next_task_button.set_sensitive(False)
 
-        # Adjust numbers:
-        #    Count the current task
-        #    Don't count badge at end of section task
-        task_index += 1
-        if tasks_in_section > 1:
-            tasks_in_section -= 1
-
-        '''
-        if task_index > tasks_in_section:  # Must be a badge task
-            self._progress_bar.set_message(_('Complete'))
-        elif task_index == 1 and tasks_in_section == 1:  # Must be a summary
-            if section > 0:
-                self._progress_bar.set_message(_('Progress Summary'))
-        '''
-
         self.activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
              _('Overall: %d%%' % (int(
                  (self._get_number_of_completed_collectables() * 100.)
-                 / self.get_number_of_collectables())))))
+                 / self._get_number_of_collectables())))))

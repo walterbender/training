@@ -40,8 +40,8 @@ SECTIONS = [{'name': _('Welcome to One Academy'),
 
 def get_task_list(task_master):
     return [[Intro1Task(task_master),
-             Intro2Task(task_master),
-             Intro3Task(task_master),
+             EnterNameTask(task_master),
+             EnterEmailTask(task_master),
              ValidateEmailTask(task_master),
              BadgeOneTask(task_master)],
             [NickChange1Task(task_master),
@@ -75,6 +75,8 @@ class Task():
         self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
+        self._pause_between_tests = 1000
+        self._requires = []
 
     def set_font_size(self, size):
         if size < len(FONT_SIZES):
@@ -117,20 +119,26 @@ class Task():
 
     def get_pause_time(self):
         ''' How long should we pause between testing? '''
-        return 5000
+        return self._pause_between_tests
 
-    def requires(self):
+    def set_requires(self, requires):
+        self._requires = requires[:]
+
+    def get_requires(self):
         ''' Return list of tasks (uids) required prior to completing this
             task '''
         return []
 
+    requires = GObject.property(type=object, setter=set_requires,
+                                getter=get_requires)
+
     def is_collectable(self):
         ''' Should this task's data be collected? '''
-        return True
+        return False
 
     def get_name(self):
         ''' String to present to the user to define the task '''
-        raise NotImplementedError
+        return self._name
 
     def get_help_info(self):
         ''' Is there help associated with this task? '''
@@ -154,20 +162,9 @@ class Task():
 class Intro1Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Intro One')
         self.uid = 'intro-task-1'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def get_name(self):
-        return self._name
-
-    def is_collectable(self):
-        return False
-
-    def get_pause_time(self):
-        return 1000
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -185,36 +182,31 @@ class Intro1Task(Task):
         return graphics, button
 
 
-class Intro2Task(Task):
+class EnterNameTask(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Enter Name')
         self.uid = 'enter-name-task'
-        self.entries = []
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
+        self._entries = []
 
-    def get_pause_time(self):
-        return 1000
+    def is_collectable(self):
+        return True
 
     def test(self, task_data):
-        if len(self.entries) == 0:
+        if len(self._entries) == 0:
             _logger.error('missing entry')
             return False
-        if len(self.entries[0].get_text()) == 0:
+        if len(self._entries[0].get_text()) == 0:
             return False
         else:
             return True
 
     def after_button_press(self):
-        self._task_master.write_task_data('name', self.entries[0].get_text())
-
-    def get_name(self):
-        return self._name
+        self._task_master.write_task_data('name', self._entries[0].get_text())
 
     def get_graphics(self):
-        self.entries = []
+        self._entries = []
         target = self._task_master.read_task_data('name')
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'introduction2.html')
@@ -223,38 +215,30 @@ class Intro2Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         if target is not None:
-            self.entries.append(graphics.add_entry(text=target))
+            self._entries.append(graphics.add_entry(text=target))
         else:
-            self.entries.append(graphics.add_entry())
+            self._entries.append(graphics.add_entry())
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
 
-class Intro3Task(Task):
+class EnterEmailTask(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Enter Email')
         self.uid = 'enter-email-task'
-        self.entries = []
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
+        self._entries = []
 
-    def is_collectable(self):
-        return False
-
-    def requires(self):
+    def get_requires(self):
         return ['enter-name-task']
 
-    def get_pause_time(self):
-        return 1000
-
     def test(self, task_data):
-        if len(self.entries) == 0:
+        if len(self._entries) == 0:
             _logger.error('missing entry')
             return False
-        entry = self.entries[0].get_text()
+        entry = self._entries[0].get_text()
         if len(entry) == 0:
             return False
         realname, email_address = email.utils.parseaddr(entry)
@@ -265,15 +249,13 @@ class Intro3Task(Task):
         return True
 
     def after_button_press(self):
-        _logger.debug('Writing email address: %s' % self.entries[0].get_text())
+        _logger.debug('Writing email address: %s' %
+                      self._entries[0].get_text())
         self._task_master.write_task_data('email_address',
-                                          self.entries[0].get_text())
-
-    def get_name(self):
-        return self._name
+                                          self._entries[0].get_text())
 
     def get_graphics(self):
-        self.entries = []
+        self._entries = []
         name = self._task_master.read_task_data('name')
         if name is not None:
             name = name.split()[0]
@@ -288,9 +270,9 @@ class Intro3Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         if email is not None:
-            self.entries.append(graphics.add_entry(text=email))
+            self._entries.append(graphics.add_entry(text=email))
         else:
-            self.entries.append(graphics.add_entry())
+            self._entries.append(graphics.add_entry())
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
@@ -299,25 +281,23 @@ class Intro3Task(Task):
 class ValidateEmailTask(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Validate Email')
         self.uid = 'validate-email-task'
-        self.entries = []
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
+        self._entries = []
 
-    def requires(self):
+    def is_collectable(self):
+        return True
+
+    def get_requires(self):
         return ['enter-email-task']
 
-    def get_pause_time(self):
-        return 1000
-
     def test(self, task_data):
-        if len(self.entries) < 2:
+        if len(self._entries) < 2:
             _logger.error('missing entry')
             return False
-        entry0 = self.entries[0].get_text()
-        entry1 = self.entries[1].get_text()
+        entry0 = self._entries[0].get_text()
+        entry1 = self._entries[1].get_text()
         if len(entry0) == 0 or len(entry1) == 0:
             return False
         if entry0 != entry1:
@@ -331,26 +311,23 @@ class ValidateEmailTask(Task):
 
     def after_button_press(self):
         self._task_master.write_task_data('email_address',
-                                          self.entries[1].get_text())
-
-    def get_name(self):
-        return self._name
+                                          self._entries[1].get_text())
 
     def get_graphics(self):
-        self.entries = []
+        self._entries = []
         email = self._task_master.read_task_data('email_address')
         graphics = Graphics()
         if email is not None:
-            self.entries.append(graphics.add_entry(text=email))
+            self._entries.append(graphics.add_entry(text=email))
         else:  # Should never happen
             _logger.error('missing email address')
-            self.entries.append(graphics.add_entry())
+            self._entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         graphics.add_text(
             _('Please confirm that you typed your\n'
               'email address correctly by typing it again below.\n\n'),
             size=FONT_SIZES[self._font_size])
-        self.entries.append(graphics.add_entry())
+        self._entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
@@ -360,23 +337,9 @@ class ValidateEmailTask(Task):
 class BadgeOneTask(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Badge One')
         self.uid = 'badge-one'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def requires(self):
-        return ['enter-name-task', 'enter-email-task', 'validate-email-task']
-
-    def is_collectable(self):
-        return False
-
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
 
     def after_button_press(self):
         target = self._task_master.read_task_data('name').split()[0]
@@ -406,116 +369,12 @@ class BadgeOneTask(Task):
         return graphics, button
 
 
-"""
-class ChangeNickTask(Task):
-
-    def __init__(self, task_master):
-        self._name = _('Change Nick Task')
-        self.uid = 'change-nick-task'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def get_pause_time(self):
-        return 1000
-
-    def test(self, task_data):
-        if task_data['attempt'] == 0:
-            _logger.debug('first attempt: saving nick value as %s' %
-                          profile.get_nick_name())
-            self._task_master.write_task_data('nick', profile.get_nick_name())
-            return False
-        else:
-            target = self._task_master.read_task_data('nick')
-            _logger.debug('%d attempt: comparing %s to %s' %
-                          (task_data['attempt'], profile.get_nick_name(),
-                           target))
-            return not profile.get_nick_name() == target
-
-    def after_button_press(self):
-        return
-
-    def get_name(self):
-        return self._name
-
-    def get_help_info(self):
-        return ('My Settings', 'my_settings.html')
-
-    def get_page_count(self):
-        return 6
-
-    def get_graphics(self, page=0):
-        def button_callback(widget):
-            from jarabe.model import shell
-            _logger.debug('My turn button clicked')
-            shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
-
-        path = os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Training.activity', 'images',
-                            'home-view-menu.png')
-        graphics = Graphics()
-        button = None
-        if page == 0:
-            graphics.add_text(
-                _('<b>Changing the Nickname</b>\n'
-                  "In this lesson we’re going to learn how to change our\n"
-                  'nickname on the XO.\n'
-                  'You entered your nickname on the screen shown below\n'
-                  'when you first started the XO up. Remember?\n\n'),
-                size=FONT_SIZES[self._font_size])
-        elif page == 1:
-            graphics.add_image(path)
-        elif page == 2:
-            graphics.add_text(
-                _('\n\n<b>What is the nickname?</b>\n'
-                  'The nickname is your name on the XO, and will appear\n'
-                  'all around Sugar as well as being visible on networks.\n\n'
-                  'Watch the animation below to see how it’s done:\n\n'),
-                size=FONT_SIZES[self._font_size])
-        elif page == 3:
-            graphics.add_image(path)
-        elif page == 4:
-            graphics.add_text(
-                _('\n\n<b>Step-by-step:</b>\n'
-                  '1. Go to the home screen\n'
-                  '2. Right click on the central icon\n'
-                  '3. Do other things\n'
-                  '4. Type in a new nickname\n'
-                  '5. Click yes to restart Sugar\n'
-                  '6. Reopen the One Academy task_master to complete\n\n'),
-                size=FONT_SIZES[self._font_size])
-        elif page == 5:
-            graphics.add_text(
-                _('<b>Are you ready to try?</b>\n'
-                  'Watch the animation again if you like.\n'
-                  "When you’re ready to try, hit the \"My Turn\"\n"
-                  'button below to go to the home screen.\n\n'),
-                size=FONT_SIZES[self._font_size])
-            graphics.add_button(_('My turn'), button_callback)
-            graphics.add_text(_('\n\nWhen you are done, you may continue.\n'))
-            button = graphics.add_button(_('Next'),
-                                         self._task_master.task_button_cb)
-        return graphics, button
-"""
-
-
 class NickChange1Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Nick Change Step One')
         self.uid = 'nick-change-task-1'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def is_collectable(self):
-        return False
-
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -536,20 +395,9 @@ class NickChange1Task(Task):
 class NickChange2Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Nick Change Step Two')
         self.uid = 'nick-change-task-2'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def get_name(self):
-        return self._name
-
-    def is_collectable(self):
-        return False
-
-    def get_pause_time(self):
-        return 1000
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -571,20 +419,9 @@ class NickChange2Task(Task):
 class NickChange3Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Nick Change Step Three')
         self.uid = 'nick-change-task-3'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def get_name(self):
-        return self._name
-
-    def is_collectable(self):
-        return False
-
-    def get_pause_time(self):
-        return 1000
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -606,17 +443,12 @@ class NickChange3Task(Task):
 class NickChange4Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Nick Change Step Four')
         self.uid = 'nick-change-task-4'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
 
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
+    def is_collectable(self):
+        return True
 
     def test(self, task_data):
         if task_data['attempt'] == 0:
@@ -650,26 +482,15 @@ class NickChange4Task(Task):
 class NickChange5Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Nick Change Step Five')
         self.uid = 'nick-change-task-5'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
 
-    def is_collectable(self):
-        return False
-
-    def requires(self):
+    def get_requires(self):
         return ['nick-change-task-4']
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
-
-    def get_pause_time(self):
-        return 1000
-
-    def get_name(self):
-        return self._name
 
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
@@ -689,23 +510,12 @@ class NickChange5Task(Task):
 class WriteSave1Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Write Save Step One')
         self.uid = 'write-save-task-1'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def is_collectable(self):
-        return False
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
-
-    def get_pause_time(self):
-        return 1000
-
-    def get_name(self):
-        return self._name
 
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
@@ -725,23 +535,12 @@ class WriteSave1Task(Task):
 class WriteSave2Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Write Save Step Two')
         self.uid = 'write-save-task-2'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def is_collectable(self):
-        return False
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
-
-    def get_pause_time(self):
-        return 1000
-
-    def get_name(self):
-        return self._name
 
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
@@ -761,23 +560,12 @@ class WriteSave2Task(Task):
 class WriteSave3Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Write Save Step Three')
         self.uid = 'write-save-task-3'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def is_collectable(self):
-        return False
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
-
-    def get_pause_time(self):
-        return 1000
-
-    def get_name(self):
-        return self._name
 
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
@@ -797,11 +585,12 @@ class WriteSave3Task(Task):
 class WriteSave4Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Write Save Step Four')
         self.uid = 'write-save-task-4'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
+
+    def is_collectable(self):
+        return True
 
     def test(self, task_data):
         paths = get_rtf()
@@ -810,12 +599,6 @@ class WriteSave4Task(Task):
             if find_string(path, '\\pict'):
                 return True
         return False
-
-    def get_pause_time(self):
-        return 1000
-
-    def get_name(self):
-        return self._name
 
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
@@ -842,26 +625,15 @@ class WriteSave4Task(Task):
 class WriteSave5Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Write Save Step Five')
         self.uid = 'write-save-task-5'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
 
-    def is_collectable(self):
-        return False
-
-    def requires(self):
+    def get_requires(self):
         return ['write-save-task-4']
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
-
-    def get_pause_time(self):
-        return 1000
-
-    def get_name(self):
-        return self._name
 
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
@@ -881,23 +653,9 @@ class WriteSave5Task(Task):
 class BadgeTwoTask(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Badge Two')
         self.uid = 'badge-two'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def requires(self):
-        return ['nick-change-task-4', 'write-save-task-4']
-
-    def is_collectable(self):
-        return False
-
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
 
     def after_button_press(self):
         target = self._task_master.read_task_data('name').split()[0]
@@ -931,20 +689,9 @@ class BadgeTwoTask(Task):
 class Speak1Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Speak Step One')
         self.uid = 'speak-task-1'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def is_collectable(self):
-        return False
-
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -965,20 +712,9 @@ class Speak1Task(Task):
 class Speak2Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Speak Step Two')
         self.uid = 'speak-task-2'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def get_name(self):
-        return self._name
-
-    def is_collectable(self):
-        return False
-
-    def get_pause_time(self):
-        return 1000
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -1000,20 +736,9 @@ class Speak2Task(Task):
 class Speak3Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Speak Step Three')
         self.uid = 'speak-task-3'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def get_name(self):
-        return self._name
-
-    def is_collectable(self):
-        return False
-
-    def get_pause_time(self):
-        return 1000
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -1035,17 +760,12 @@ class Speak3Task(Task):
 class Speak4Task(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Speak Step Four')
         self.uid = 'speak-task-4'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
 
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
+    def is_collectable(self):
+        return True
 
     def test(self, task_data):
         return len(get_activity('vu.lux.olpc.Speak')) > 0
@@ -1072,23 +792,9 @@ class Speak4Task(Task):
 
 class BadgeThreeTask(Task):
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Badge Three')
         self.uid = 'badge-3'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def requires(self):
-        return ['speak-task-4']
-
-    def is_collectable(self):
-        return False
-
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
 
     def after_button_press(self):
         target = self._task_master.read_task_data('name').split()[0]
@@ -1121,11 +827,12 @@ class BadgeThreeTask(Task):
 class AddFavoriteTask(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Add Favorite Task')
         self.uid = 'add-favorites-task'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
+
+    def is_collectable(self):
+        return True
 
     def test(self, task_data):
         if task_data['attempt'] == 0:
@@ -1137,9 +844,6 @@ class AddFavoriteTask(Task):
             saved_favorites_count = \
                 self._task_master.read_task_data('favorites')
             return favorites_count > saved_favorites_count
-
-    def get_name(self):
-        return self._name
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
@@ -1160,11 +864,12 @@ class AddFavoriteTask(Task):
 class RemoveFavoriteTask(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Remove Favorite Task')
         self.uid = 'remove-favorites-task'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
+
+    def is_collectable(self):
+        return True
 
     def test(self, task_data):
         if task_data['attempt'] == 0:
@@ -1176,9 +881,6 @@ class RemoveFavoriteTask(Task):
             saved_favorites_count = \
                 self._task_master.read_task_data('favorites')
             return favorites_count < saved_favorites_count
-
-    def get_name(self):
-        return self._name
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
@@ -1199,23 +901,9 @@ class RemoveFavoriteTask(Task):
 
 class BadgeFourTask(Task):
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Badge Four')
         self.uid = 'badge-4'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def requires(self):
-        return ['add-favorites-task', 'remove-favorites-task']
-
-    def is_collectable(self):
-        return False
-
-    def get_name(self):
-        return self._name
-
-    def get_pause_time(self):
-        return 1000
 
     def after_button_press(self):
         target = self._task_master.read_task_data('name').split()[0]
@@ -1248,25 +936,13 @@ class BadgeFourTask(Task):
 class FinishedAllTasks(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('Finished All Tasks')
         self.uid = 'finished'
-        self._task_master = task_master
-        self._font_size = 5
-        self._zoom_level = 1.0
-
-    def requires(self):
-        return ['enter-name-task', 'enter-email-task', 'validate-email-task',
-                'nick-change-task-4', 'write-save-task-4']
-
-    def is_collectable(self):
-        return False
 
     def test(self, task_data):
         self._task_master.completed = True
         return True
-
-    def get_name(self):
-        return self._name
 
     def get_graphics(self):
         graphics = Graphics()
@@ -1280,9 +956,9 @@ class FinishedAllTasks(Task):
 class UITest(Task):
 
     def __init__(self, task_master):
+        Task.__init__(self, task_master)
         self._name = _('UI Test Task')
         self.uid = 'uitest'
-        self._task_master = task_master
 
     def test(self, task_data):
         return self._uitester()
