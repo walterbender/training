@@ -2,6 +2,7 @@ NEWS
 
 1.14
 
+* Fix bug when nick contains spaces (%20)
 * Auto-calculate requirements for badges
 * General cleanup/consolidation of code
 
