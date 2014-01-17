@@ -1,5 +1,10 @@
 NEWS
 
+1.14
+
+* Auto-calculate requirements for badges
+* General cleanup/consolidation of code
+
 1.13
 
 * Added jump-to-section to summary page
