@@ -128,10 +128,22 @@ class Graphics(Gtk.ScrolledWindow):
         icon = Icon(pixel_size=icon_size, icon_name=icon_name,
                     stroke_color=stroke, fill_color=fill)
 
+        # TODO: must be a better way
+        filler1 = Gtk.Label(' ')
+        filler1.show()
         button = Gtk.Button()
         button.set_label(button_label)
+        filler2 = Gtk.Label(' ')
+        filler2.show()
+        grid = Gtk.Grid()
+        grid.set_row_spacing(style.DEFAULT_SPACING)
+        grid.set_column_spacing(style.DEFAULT_SPACING)
+        grid.attach(filler1, 0, 0, 1, 1)
+        grid.attach(button, 0, 1, 1, 1)
+        grid.attach(filler2, 0, 2, 1, 1)
+        grid.show()
 
-        self._attach_three(label, icon, button)
+        self._attach_three(label, icon, grid)
         label.show()
         icon.show()
         button.show()
