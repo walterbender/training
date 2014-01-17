@@ -28,6 +28,15 @@ from testutils import (get_nick, get_favorites, get_rtf, get_uitree_root,
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
               'xx-large']
 
+SECTIONS = [{'name': _('Welcome to One Academy'),
+             'icon': 'badge-intro'},
+            {'name': _('Getting to Know the XO'),
+             'icon': 'badge-intro'},
+            {'name': _('Getting to Know the XO (Part 2)'),
+             'icon': 'badge-intro'},
+            {'name': _('More sections listed here'),
+             'icon': 'badge-intro'}]
+
 
 def get_task_list(task_master):
     return [[Intro1Task(task_master),

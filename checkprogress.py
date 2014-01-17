@@ -26,7 +26,7 @@ from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics import style
 
 from graphics import Graphics
-from tasks import FONT_SIZES
+from tasks import FONT_SIZES, SECTIONS
 
 import logging
 _logger = logging.getLogger('training-activity-check-progress')
@@ -80,12 +80,6 @@ class CheckProgress(Gtk.Grid):
 
 
 class ProgressSummary():
-    _SECTIONS = [{'name': _('Welcome to One Academy'),
-                  'icon': 'badge-intro'},
-                 {'name': _('Getting to Know the XO'),
-                  'icon': 'badge-intro'},
-                 {'name': _('More sections listed here'),
-                  'icon': 'badge-intro'}]
 
     def __init__(self, task_master):
         self._name = _('Progress Summary')
@@ -103,7 +97,7 @@ class ProgressSummary():
     def get_graphics(self):
         colors = []
         strokes = []
-        for i in range(len(self._SECTIONS)):
+        for i in range(len(SECTIONS)):
             if i in self._progress:
                 colors.append(style.COLOR_BLACK.get_html())
                 strokes.append(style.COLOR_BLACK.get_svg())
@@ -113,10 +107,10 @@ class ProgressSummary():
         graphics = Graphics(
             width=int(Gdk.Screen.width() / 1.5),
             height=int(Gdk.Screen.height() / 1.5 - style.GRID_CELL_SIZE))
-        for i in range(len(self._SECTIONS)):
+        for i in range(len(SECTIONS)):
             button = graphics.add_text_icon_and_button(
-                self._SECTIONS[i]['name'],
-                self._SECTIONS[i]['icon'],
+                SECTIONS[i]['name'],
+                SECTIONS[i]['icon'],
                 button_label='go',
                 size=FONT_SIZES[self._font_size],
                 icon_size=style.LARGE_ICON_SIZE,
