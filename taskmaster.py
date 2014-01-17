@@ -66,10 +66,10 @@ class TaskMaster(Gtk.Grid):
 
         self._prev_page_button = ToolButton('go-left-page')
         self._prev_page_button.connect('clicked', self._prev_page_cb)
-        self._graphics_grid.attach(self._prev_page_button, 0, 0, 1, 1)
+        self._graphics_grid.attach(self._prev_page_button, 0, 7, 1, 1)
         self._next_page_button = ToolButton('go-right-page')
         self._next_page_button.connect('clicked', self._next_page_cb)
-        self._graphics_grid.attach(self._next_page_button, 2, 0, 1, 1)
+        self._graphics_grid.attach(self._next_page_button, 2, 7, 1, 1)
 
         self._progress_bar = None
         self._progress_bar_alignment = Gtk.Alignment.new(
@@ -225,10 +225,12 @@ class TaskMaster(Gtk.Grid):
         ''' Interrupt the flow of tasks by showing progress summary '''
         self._destroy_graphics()
         self._progress_bar.hide()
+        self._prev_page_button.hide()
+        self._next_page_button.hide()
         if hasattr(self, '_summary') and self._summary is not None:
             self._summary.destroy()
         self._summary = summary
-        self._graphics_grid.attach(self._summary, 1, 0, 1, 1)
+        self._graphics_grid.attach(self._summary, 1, 0, 1, 15)
         summary.show()
 
     def destroy_summary(self):
@@ -270,7 +272,7 @@ class TaskMaster(Gtk.Grid):
 
         self._graphics, self._task_button = \
             self._task_list[section][task_index].get_graphics()
-        self._graphics_grid.attach(self._graphics, 1, 0, 1, 1)
+        self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
         self._graphics.show()
 
         if self._task_list[section][task_index].get_page_count() > 1:
@@ -298,7 +300,7 @@ class TaskMaster(Gtk.Grid):
             self._task_button.destroy()
         self._graphics, self._task_button = \
             self._task_list[section][task_index].get_graphics(page=self._page)
-        self._graphics_grid.attach(self._graphics, 1, 0, 1, 1)
+        self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
         self._graphics.show()
         if self._task_button is not None:
             self._task_button.set_sensitive(test(self._task_data))
