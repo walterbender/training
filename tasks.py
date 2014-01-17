@@ -401,7 +401,7 @@ class BadgeOneTask(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -493,7 +493,7 @@ class ChangeNickTask(Task):
                 size=FONT_SIZES[self._font_size])
             graphics.add_button(_('My turn'), button_callback)
             graphics.add_text(_('\n\nWhen you are done, you may continue.\n'))
-            button = graphics.add_button(_('Continue'),
+            button = graphics.add_button(_('Next'),
                                          self._task_master.task_button_cb)
         return graphics, button
 """
@@ -642,7 +642,7 @@ class NickChange4Task(Task):
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -681,7 +681,7 @@ class NickChange5Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -753,7 +753,7 @@ class WriteSave2Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -789,7 +789,7 @@ class WriteSave3Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -873,7 +873,7 @@ class WriteSave5Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -921,9 +921,9 @@ class BadgeTwoTask(Task):
         graphics.add_text(
             _('\n\nMost badges require you to complete multiple '
               'tasks.\n'
-              'Press Continue to start on your next one!\n\n'),
+              'Press Next to start on your next one!\n\n'),
             size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -1065,7 +1065,7 @@ class Speak4Task(Task):
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -1111,9 +1111,9 @@ class BadgeThreeTask(Task):
         graphics.add_text(
             _('\n\nMost badges require you to complete multiple '
               'tasks.\n'
-              'Press Continue to start on your next one!\n\n'),
+              'Press Next to start on your next one!\n\n'),
             size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -1238,9 +1238,9 @@ class BadgeFourTask(Task):
         graphics.add_text(
             _('\n\nMost badges require you to complete multiple '
               'tasks.\n'
-              'Press Continue to start on your next one!\n\n'),
+              'Press Next to start on your next one!\n\n'),
             size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
@@ -1272,7 +1272,7 @@ class FinishedAllTasks(Task):
         graphics = Graphics()
         graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
                           size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Continue'),
+        button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
 
