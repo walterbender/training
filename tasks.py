@@ -77,6 +77,7 @@ class Task():
         self._zoom_level = 1.0
         self._pause_between_tests = 1000
         self._requires = []
+        self._page_count = 1
 
     def set_font_size(self, size):
         if size < len(FONT_SIZES):
@@ -145,7 +146,7 @@ class Task():
         return (None, None)  # title, url (from Help.activity)
 
     def get_page_count(self):
-        return 1
+        return self._page_count
 
     def get_graphics(self, page=0):
         ''' Graphics to present with the task '''
@@ -169,7 +170,7 @@ class Intro1Task(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'introduction1.html')
 
@@ -205,7 +206,7 @@ class EnterNameTask(Task):
     def after_button_press(self):
         self._task_master.write_task_data('name', self._entries[0].get_text())
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         self._entries = []
         target = self._task_master.read_task_data('name')
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
@@ -254,7 +255,7 @@ class EnterEmailTask(Task):
         self._task_master.write_task_data('email_address',
                                           self._entries[0].get_text())
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         self._entries = []
         name = self._task_master.read_task_data('name')
         if name is not None:
@@ -313,7 +314,7 @@ class ValidateEmailTask(Task):
         self._task_master.write_task_data('email_address',
                                           self._entries[1].get_text())
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         self._entries = []
         email = self._task_master.read_task_data('email_address')
         graphics = Graphics()
@@ -351,7 +352,7 @@ class BadgeOneTask(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         name = self._task_master.read_task_data('name')
         if name is not None:
             target = name.split()[0]
@@ -379,7 +380,7 @@ class NickChange1Task(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'nickchange1.html')
 
@@ -402,7 +403,7 @@ class NickChange2Task(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         graphics = Graphics()
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'nickchange2.html')
@@ -426,7 +427,7 @@ class NickChange3Task(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         graphics = Graphics()
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'nickchange3.html')
@@ -459,7 +460,7 @@ class NickChange4Task(Task):
         else:
             return not get_nick() == self._task_master.read_task_data('nick')
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
 
         def button_callback(widget):
             from jarabe.model import shell
@@ -495,7 +496,7 @@ class NickChange5Task(Task):
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'nickchange5.html?NAME=%s' % get_nick())
 
@@ -520,7 +521,7 @@ class WriteSave1Task(Task):
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'writesave1.html')
 
@@ -545,7 +546,7 @@ class WriteSave2Task(Task):
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'writesave2.html')
 
@@ -570,7 +571,7 @@ class WriteSave3Task(Task):
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'writesave3.html')
 
@@ -603,7 +604,7 @@ class WriteSave4Task(Task):
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
 
         def button_callback(widget):
             from jarabe.model import shell
@@ -638,7 +639,7 @@ class WriteSave5Task(Task):
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'writesave5.html')
 
@@ -667,7 +668,7 @@ class BadgeTwoTask(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         target = self._task_master.read_task_data('name').split()[0]
         graphics = Graphics()
         graphics.add_text(
@@ -696,7 +697,7 @@ class Speak1Task(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'speak1.html')
 
@@ -719,7 +720,7 @@ class Speak2Task(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         graphics = Graphics()
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'speak2.html')
@@ -743,7 +744,7 @@ class Speak3Task(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         graphics = Graphics()
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'speak3.html')
@@ -770,7 +771,7 @@ class Speak4Task(Task):
     def test(self, task_data):
         return len(get_activity('vu.lux.olpc.Speak')) > 0
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
 
         def button_callback(widget):
             from jarabe.model import shell
@@ -806,7 +807,7 @@ class BadgeThreeTask(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         target = self._task_master.read_task_data('name').split()[0]
         graphics = Graphics()
         graphics.add_text(
@@ -848,7 +849,7 @@ class AddFavoriteTask(Task):
     def get_help_info(self):
         return ('Home', 'home_view.html')
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images',
                             'Journal_main_annotated.png')
@@ -885,7 +886,7 @@ class RemoveFavoriteTask(Task):
     def get_help_info(self):
         return ('Home', 'home_view.html')
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         path = os.path.join(os.path.expanduser('~'), 'Activities',
                             'Help.activity', 'images',
                             'Journal_main_annotated.png')
@@ -915,7 +916,7 @@ class BadgeFourTask(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         target = self._task_master.read_task_data('name').split()[0]
         graphics = Graphics()
         graphics.add_text(
@@ -944,7 +945,7 @@ class FinishedAllTasks(Task):
         self._task_master.completed = True
         return True
 
-    def get_graphics(self):
+    def get_graphics(self, page=0):
         graphics = Graphics()
         graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
                           size=FONT_SIZES[self._font_size])
