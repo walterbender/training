@@ -2,7 +2,9 @@ NEWS
 
 1.13
 
-* Add jump to section from summary page
+* Added jump-to-section to summary page
+* Move section definitions to tasks.py
+* Added Speak Task
 
 1.12
 

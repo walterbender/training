@@ -203,6 +203,7 @@ class TaskMaster(Gtk.Grid):
         return True
 
     def load_progress_summary(self, summary):
+        ''' Interrupt the flow of tasks by showing progress summary '''
         self._destroy_graphics()
         self._progress_bar.hide()
         if hasattr(self, '_summary') and self._summary is not None:
@@ -212,6 +213,7 @@ class TaskMaster(Gtk.Grid):
         summary.show()
 
     def destroy_summary(self):
+        ''' Back to tasks '''
         if hasattr(self, '_summary') and self._summary is not None:
             self._summary.destroy()
         self._summary = None
@@ -269,6 +271,7 @@ class TaskMaster(Gtk.Grid):
         self._update_progress()
 
     def _show_page(self):
+        ''' Some tasks have multiple pages '''
         section, task_index = self.get_section_index()
         if self._graphics is not None:
             self._graphics.destroy()
@@ -309,6 +312,19 @@ class TaskMaster(Gtk.Grid):
     def get_number_of_tasks_in_section(self, section_index):
         return len(self._task_list[section_index])
 
+    def get_number_of_collectables_in_section(self, section_index):
+        count = 0
+        for task in self._task_list[section_index]:
+            if task.is_collectable():
+                count += 1
+        return count
+
+    def get_number_of_collectables(self):
+        count = 0
+        for section_index in range(len(self._task_list)):
+            count += self.get_number_of_collectables_in_section(section_index)
+        return count
+
     def get_section_index(self):
         count = 0
         for section_index, section in enumerate(self._task_list):
@@ -323,7 +339,7 @@ class TaskMaster(Gtk.Grid):
         for s, section in enumerate(self._task_list):
             section_completed = True
             for task in section:
-                if not task.is_completed():
+                if task.is_collectable() and not task.is_completed():
                     section_completed = False
                 else:
                     _logger.debug('Task %s is completed' % task.uid)
@@ -376,6 +392,14 @@ class TaskMaster(Gtk.Grid):
         for section in self._task_list:
             for task in section:
                 if task.is_completed():
+                    count += 1
+        return count
+
+    def _get_number_of_completed_collectables(self):
+        count = 0
+        for section in self._task_list:
+            for task in section:
+                if task.is_collectable() and task.is_completed():
                     count += 1
         return count
 
@@ -535,5 +559,5 @@ class TaskMaster(Gtk.Grid):
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
              _('Overall: %d%%' % (int(
-                 (self._get_number_of_completed_tasks() * 100.)
-                 / self.get_number_of_tasks())))))
+                 (self._get_number_of_completed_collectables() * 100.)
+                 / self.get_number_of_collectables())))))

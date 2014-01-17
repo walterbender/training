@@ -241,6 +241,9 @@ class Intro3Task(Task):
         self._font_size = 5
         self._zoom_level = 1.0
 
+    def is_collectable(self):
+        return False
+
     def requires(self):
         return ['enter-name-task']
 
@@ -1254,6 +1257,9 @@ class FinishedAllTasks(Task):
     def requires(self):
         return ['enter-name-task', 'enter-email-task', 'validate-email-task',
                 'nick-change-task-4', 'write-save-task-4']
+
+    def is_collectable(self):
+        return False
 
     def test(self, task_data):
         self._task_master.completed = True
