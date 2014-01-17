@@ -59,10 +59,10 @@ class Graphics(Gtk.ScrolledWindow):
         self._row += 1
 
     def _attach_three(self, widget1, widget2, widget3):
-        self._grid.attach(widget1, 0, self._row, 2, 1)
-        self._grid.attach(widget2, 3, self._row, 2, 1)
-        self._grid.attach(widget3, 5, self._row, 1, 1)
-        self._row += 1
+        self._grid.attach(widget1, 0, self._row, 2, 3)
+        self._grid.attach(widget2, 3, self._row, 2, 3)
+        self._grid.attach(widget3, 5, self._row + 1, 1, 1)
+        self._row += 3
 
     def _attach_center(self, widget):
         self._grid.attach(widget, 2, self._row, 1, 1)
@@ -128,22 +128,10 @@ class Graphics(Gtk.ScrolledWindow):
         icon = Icon(pixel_size=icon_size, icon_name=icon_name,
                     stroke_color=stroke, fill_color=fill)
 
-        # TODO: must be a better way
-        filler1 = Gtk.Label(' ')
-        filler1.show()
         button = Gtk.Button()
         button.set_label(button_label)
-        filler2 = Gtk.Label(' ')
-        filler2.show()
-        grid = Gtk.Grid()
-        grid.set_row_spacing(style.DEFAULT_SPACING)
-        grid.set_column_spacing(style.DEFAULT_SPACING)
-        grid.attach(filler1, 0, 0, 1, 1)
-        grid.attach(button, 0, 1, 1, 1)
-        grid.attach(filler2, 0, 2, 1, 1)
-        grid.show()
 
-        self._attach_three(label, icon, grid)
+        self._attach_three(label, icon, button)
         label.show()
         icon.show()
         button.show()
