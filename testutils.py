@@ -17,6 +17,7 @@ from sugar3.test import uitree
 from sugar3 import env
 from sugar3.datastore import datastore
 from sugar3 import profile
+from sugar3.graphics.objectchooser import FILTER_TYPE_ACTIVITY
 
 import logging
 _logger = logging.getLogger('training-activity-testutils')
@@ -32,6 +33,11 @@ def get_favorites():
         favorites_data = json.load(open(favorites_path))
         favorites_list = favorites_data['favorites']
     return favorites_list
+
+
+def get_activity(activity):
+    dsobjects, nobjects = datastore.find({'activity': [activity]})
+    return dsobjects
 
 
 def get_audio(self):

@@ -22,7 +22,7 @@ _logger = logging.getLogger('training-activity-tasks')
 
 from graphics import Graphics
 from testutils import (get_nick, get_favorites, get_rtf, get_uitree_root,
-                       find_string)
+                       get_activity, find_string)
 
 
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
@@ -46,9 +46,14 @@ def get_task_list(task_master):
              WriteSave4Task(task_master),
              WriteSave5Task(task_master),
              BadgeTwoTask(task_master)],
+            [Speak1Task(task_master),
+             Speak2Task(task_master),
+             Speak3Task(task_master),
+             Speak4Task(task_master),
+             BadgeThreeTask(task_master)],
             # [AddFavoriteTask(task_master),
             #  RemoveFavoriteTask(task_master),
-            #  BadgeThreeTask(task_master)],
+            #  BadgeFourTask(task_master)],
             [FinishedAllTasks(task_master)]]
 
 
@@ -911,6 +916,196 @@ class BadgeTwoTask(Task):
         return graphics, button
 
 
+class Speak1Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Speak Step One')
+        self.uid = 'speak-task-1'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def is_collectable(self):
+        return False
+
+    def get_name(self):
+        return self._name
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'speak1.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Speak2Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Speak Step Two')
+        self.uid = 'speak-task-2'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def get_name(self):
+        return self._name
+
+    def is_collectable(self):
+        return False
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self):
+        graphics = Graphics()
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'speak2.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Speak3Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Speak Step Three')
+        self.uid = 'speak-task-3'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def get_name(self):
+        return self._name
+
+    def is_collectable(self):
+        return False
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self):
+        graphics = Graphics()
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'speak3.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Speak4Task(Task):
+
+    def __init__(self, task_master):
+        self._name = _('Speak Step Four')
+        self.uid = 'speak-task-4'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def get_name(self):
+        return self._name
+
+    def get_pause_time(self):
+        return 1000
+
+    def test(self, task_data):
+        return len(get_activity('vu.lux.olpc.Speak')) > 0
+
+    def get_graphics(self):
+
+        def button_callback(widget):
+            from jarabe.model import shell
+            _logger.debug('My turn button clicked')
+            shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'speak4.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url, height=300)
+        graphics.set_zoom_level(self._zoom_level)
+        graphics.add_button(_('My turn'), button_callback)
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Continue'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class BadgeThreeTask(Task):
+    def __init__(self, task_master):
+        self._name = _('Badge Three')
+        self.uid = 'badge-3'
+        self._task_master = task_master
+        self._font_size = 5
+        self._zoom_level = 1.0
+
+    def requires(self):
+        return ['speak-task-4']
+
+    def is_collectable(self):
+        return False
+
+    def get_name(self):
+        return self._name
+
+    def get_pause_time(self):
+        return 1000
+
+    def after_button_press(self):
+        target = self._task_master.read_task_data('name').split()[0]
+        self._task_master.activity.add_badge(
+            _('Congratulations %s!\n'
+              "You’ve earned your third badge!" % target),
+            icon='badge-intro')
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self):
+        target = self._task_master.read_task_data('name').split()[0]
+        graphics = Graphics()
+        graphics.add_text(
+            _('Congratulations %s!\n'
+              "You’ve earned your third badge!\n\n" % target),
+            bold=True, size=FONT_SIZES[self._font_size])
+        graphics.add_icon('badge-intro')
+        graphics.add_text(
+            _('\n\nMost badges require you to complete multiple '
+              'tasks.\n'
+              'Press Continue to start on your next one!\n\n'),
+            size=FONT_SIZES[self._font_size])
+        button = graphics.add_button(_('Continue'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
 class AddFavoriteTask(Task):
 
     def __init__(self, task_master):
@@ -990,10 +1185,10 @@ class RemoveFavoriteTask(Task):
         return graphics, button
 
 
-class BadgeThreeTask(Task):
+class BadgeFourTask(Task):
     def __init__(self, task_master):
-        self._name = _('Badge Three')
-        self.uid = 'badge-3'
+        self._name = _('Badge Four')
+        self.uid = 'badge-4'
         self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
@@ -1014,7 +1209,7 @@ class BadgeThreeTask(Task):
         target = self._task_master.read_task_data('name').split()[0]
         self._task_master.activity.add_badge(
             _('Congratulations %s!\n'
-              "You’ve earned your third badge!" % target),
+              "You’ve earned your fourth badge!" % target),
             icon='badge-intro')
 
     def test(self, task_data):
@@ -1025,7 +1220,7 @@ class BadgeThreeTask(Task):
         graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
-              "You’ve earned your third badge!\n\n" % target),
+              "You’ve earned your fourth badge!\n\n" % target),
             bold=True, size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
         graphics.add_text(
