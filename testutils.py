@@ -19,8 +19,66 @@ from sugar3.datastore import datastore
 from sugar3 import profile
 from sugar3.graphics.objectchooser import FILTER_TYPE_ACTIVITY
 
+from jarabe.model import shell
+
 import logging
 _logger = logging.getLogger('training-activity-testutils')
+
+
+def is_expanded(toolbar_button):
+    return toolbar_button.is_expanded()
+
+
+def is_fullscreen(activity):
+    return activity._is_fullscreen
+
+
+def get_description(activity):
+    if 'description' in activity.metadata:
+        return activity.metadata['description']
+    else:
+        return ''
+
+
+def is_activity_open(bundle_name):
+    return bundle_name == shell.get_model().get_activity_name() and \
+        is_activity_view()
+
+
+def is_journal_open():
+    return shell.get_model().is_journal() and is_activity_view()
+
+
+def is_activity_view():
+    return shell.get_model().props.zoom_level == \
+        shell.ShellModel.ZOOM_ACTIVITY
+
+
+def is_home_view():
+    return shell.get_model().props.zoom_level == shell.ShellModel.ZOOM_HOME
+
+
+def is_neighborhood_view():
+    return shell.get_model().props.zoom_level == shell.ShellModel.ZOOM_MESH
+
+
+def goto_activity_view():
+    shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_ACTIVITY)
+
+
+def goto_home_view():
+    shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+
+
+def goto_neighborhood_view():
+    shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_MESH)
+
+
+def get_number_of_launchs(activity):
+    if 'launch-times' in activity.metadata:
+        return len(activity.metadata['launch-times'].split(','))
+    else:
+        return 0
 
 
 def get_nick():

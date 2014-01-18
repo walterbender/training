@@ -22,7 +22,7 @@ _logger = logging.getLogger('training-activity-tasks')
 
 from graphics import Graphics
 from testutils import (get_nick, get_favorites, get_rtf, get_uitree_root,
-                       get_activity, find_string)
+                       get_activity, find_string, goto_home_view)
 
 
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
@@ -476,9 +476,7 @@ class NickChange4Task(Task):
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            from jarabe.model import shell
-            _logger.debug('My turn button clicked')
-            shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+            goto_home_view()
 
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'nickchange4.html')
@@ -626,8 +624,7 @@ class WriteSave4Task(Task):
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            from jarabe.model import shell
-            shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+            goto_home_view()
 
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'writesave4.html')
@@ -796,9 +793,7 @@ class Speak4Task(Task):
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            from jarabe.model import shell
-            _logger.debug('My turn button clicked')
-            shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+            goto_home_view()
 
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'speak4.html')
