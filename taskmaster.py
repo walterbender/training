@@ -87,6 +87,12 @@ class TaskMaster(Gtk.Grid):
         self.activity.button_was_pressed = False
         if self.current_task < self._get_number_of_tasks():
             section, task_index = self.get_section_index()
+            # Do we skip this task?
+            if self._task_list[section][task_index].is_completed() and \
+               self._task_list[section][task_index].skip_if_completed():
+                _logger.debug('skipping task %d' % task_index)
+                self.current_task += 1  # Assume there is a next task
+                task_index += 1
             if section > 0:
                 self.activity.back.set_sensitive(True)
                 if section < len(self._task_list) - 1:
@@ -142,7 +148,6 @@ class TaskMaster(Gtk.Grid):
                 self._task_data = {}
                 self._task_data['start_time'] = self._start_time
                 self._task_data['accumulated_time'] = 0
-                self._task_data['attempt'] = 0
                 self._task_data['completed'] = False
                 self._task_data['task'] = \
                     self._task_list[section][task_index].get_name()
@@ -182,7 +187,6 @@ class TaskMaster(Gtk.Grid):
             if self._task_button is not None:
                 self._task_button.set_sensitive(False)
             if not 'completed' in task_data or not task_data['completed']:
-                self._task_data['attempt'] += 1
                 self._update_accumutaled_time(task_data)
             else:  # Revisting a completed task
                 pass

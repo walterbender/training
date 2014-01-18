@@ -118,6 +118,10 @@ class Task():
         ''' Any data needed for the test '''
         return None
 
+    def skip_if_completed(self):
+        ''' Should we skip this task if it is already complete? '''
+        return False
+
     def get_pause_time(self):
         ''' How long should we pause between testing? '''
         return self._pause_between_tests
@@ -451,14 +455,18 @@ class NickChange4Task(Task):
     def is_collectable(self):
         return True
 
+    def skip_if_completed(self):
+        return True
+
     def test(self, task_data):
-        if task_data['attempt'] == 0:
-            _logger.debug('first attempt: saving nick value as %s' %
-                          get_nick())
+        if task_data['data'] is None:
+            _logger.debug('saving nick value as %s' % get_nick())
             self._task_master.write_task_data('nick', get_nick())
+            task_data['data'] = get_nick()
+            self._task_master.write_task_data(self._name, task_data)
             return False
         else:
-            return not get_nick() == self._task_master.read_task_data('nick')
+            return not get_nick() == task_data['data']
 
     def get_graphics(self, page=0):
 
@@ -591,6 +599,9 @@ class WriteSave4Task(Task):
         self.uid = 'write-save-task-4'
 
     def is_collectable(self):
+        return True
+
+    def skip_if_completed(self):
         return True
 
     def test(self, task_data):
@@ -768,6 +779,9 @@ class Speak4Task(Task):
     def is_collectable(self):
         return True
 
+    def skip_if_completed(self):
+        return True
+
     def test(self, task_data):
         return len(get_activity('vu.lux.olpc.Speak')) > 0
 
@@ -836,15 +850,13 @@ class AddFavoriteTask(Task):
         return True
 
     def test(self, task_data):
-        if task_data['attempt'] == 0:
+        if task_data['data'] is None:
             favorites_list = get_favorites()
-            self._task_master.write_task_data('favorites', len(favorites_list))
+            task_data['data'] = len(favorites_list)
+            self._task_master.write_task_data(self._name, task_data)
             return False
         else:
-            favorites_count = len(get_favorites())
-            saved_favorites_count = \
-                self._task_master.read_task_data('favorites')
-            return favorites_count > saved_favorites_count
+            return len(get_favorites()) > task_data['data']
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
@@ -873,15 +885,13 @@ class RemoveFavoriteTask(Task):
         return True
 
     def test(self, task_data):
-        if task_data['attempt'] == 0:
+        if task_data['data'] is None:
             favorites_list = get_favorites()
-            self._task_master.write_task_data('favorites', len(favorites_list))
+            task_data['data'] = len(favorites_list)
+            self._task_master.write_task_data(self._name, task_data)
             return False
         else:
-            favorites_count = len(get_favorites())
-            saved_favorites_count = \
-                self._task_master.read_task_data('favorites')
-            return favorites_count < saved_favorites_count
+            return len(get_favorites()) < task_data['data']
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
