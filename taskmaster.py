@@ -46,6 +46,7 @@ class TaskMaster(Gtk.Grid):
         self._page = 0
         self._task_button = None
         self._first_time = True
+        self._accumulated_time = 0
 
         self._task_list = get_task_list(self)
         self._assign_required()
@@ -139,14 +140,15 @@ class TaskMaster(Gtk.Grid):
 
             # In order to calculate accumulated time, we need to monitor
             # our start time.
-            self._start_time = int(time.time() + 0.5)
+            self._start_time = time.time()
+            self._accumulated_time = 0
 
             self._load_graphics()
 
             self._task_data = self.read_task_data(self._uid)
             if self._task_data is None:
                 self._task_data = {}
-                self._task_data['start_time'] = self._start_time
+                self._task_data['start_time'] = int(self._start_time + 0.5)
                 self._task_data['accumulated_time'] = 0
                 self._task_data['completed'] = False
                 self._task_data['task'] = \
@@ -168,8 +170,9 @@ class TaskMaster(Gtk.Grid):
             self._task_data, self._uid)
 
     def _update_accumutaled_time(self, task_data):
-        end_time = int(time.time() + 0.5)
-        task_data['accumulated_time'] += end_time - self._start_time
+        end_time = time.time()
+        self._accumulated_time += end_time - self._start_time
+        task_data['accumulated_time'] += int(self._accumulated_time + 0.5)
         self._start_time = end_time
 
     def _test(self, test, task_data, uid):
@@ -179,7 +182,7 @@ class TaskMaster(Gtk.Grid):
                 self._task_button.set_sensitive(True)
             if not 'completed' in task_data or not task_data['completed']:
                 task_data = self.read_task_data(uid)
-                task_data['end_time'] = int(time.time())
+                task_data['end_time'] = int(time.time() + 0.5)
                 task_data['completed'] = True
                 self._update_accumutaled_time(task_data)
             self.write_task_data(uid, task_data)
@@ -188,8 +191,6 @@ class TaskMaster(Gtk.Grid):
                 self._task_button.set_sensitive(False)
             if not 'completed' in task_data or not task_data['completed']:
                 self._update_accumutaled_time(task_data)
-            else:  # Revisting a completed task
-                pass
             self.write_task_data(uid, task_data)
             section, index = self.get_section_index()
             self._run_task(section, index)

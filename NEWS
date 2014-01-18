@@ -1,5 +1,10 @@
 NEWS
 
+1.16
+
+* More accurate accumulated time calculation
+* Save new nick in change nick task
+
 1.15
 
 * Some tasks should not be revisited if already completed.

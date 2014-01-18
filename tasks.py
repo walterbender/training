@@ -463,10 +463,15 @@ class NickChange4Task(Task):
             _logger.debug('saving nick value as %s' % get_nick())
             self._task_master.write_task_data('nick', get_nick())
             task_data['data'] = get_nick()
-            self._task_master.write_task_data(self._name, task_data)
+            self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            return not get_nick() == task_data['data']
+            if not get_nick() == task_data['data']:
+                task_data['new_nick'] = get_nick()
+                self._task_master.write_task_data(self.uid, task_data)
+                return True
+            else:
+                return False
 
     def get_graphics(self, page=0):
 
@@ -505,8 +510,11 @@ class NickChange5Task(Task):
         return ('My Settings', 'my_settings.html')
 
     def get_graphics(self, page=0):
+        nick_task_data = self._task_master.read_task_data(
+            self.get_requires()[0])
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'nickchange5.html?NAME=%s' % get_nick())
+                           'nickchange5.html?NAME=%s' %
+                           nick_task_data['new_nick'])
 
         graphics = Graphics()
         graphics.add_uri('file://' + url)
