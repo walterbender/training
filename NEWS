@@ -1,5 +1,11 @@
 NEWS
 
+1.15
+
+* Some tasks should not be revisited if already completed.
+* Eliminate 'attempts' as it is misleading
+* Use icon for 'go' button on summary page
+
 1.14
 
 * Fix bug when nick contains spaces (%20)
