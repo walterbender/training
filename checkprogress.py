@@ -111,7 +111,8 @@ class ProgressSummary():
             button = graphics.add_text_icon_and_button(
                 SECTIONS[i]['name'],
                 SECTIONS[i]['icon'],
-                button_label='go',
+                # button_label='go',
+                button_icon='go-right-page',
                 size=FONT_SIZES[self._font_size],
                 icon_size=style.LARGE_ICON_SIZE,
                 color=colors[i],

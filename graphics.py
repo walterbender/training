@@ -16,6 +16,7 @@ from gi.repository import WebKit
 
 from sugar3.graphics import style
 from sugar3.graphics.icon import Icon
+from sugar3.graphics.toolbutton import ToolButton
 
 import logging
 _logger = logging.getLogger('training-activity-page')
@@ -110,7 +111,8 @@ class Graphics(Gtk.ScrolledWindow):
         icon.show()
 
     def add_text_icon_and_button(self, text, icon_name,
-                                 button_label='go',
+                                 button_icon=None,
+                                 button_label=None,
                                  size='large', bold=False,
                                  color=style.COLOR_BLACK.get_html(),
                                  justify=Gtk.Justification.LEFT,
@@ -128,9 +130,11 @@ class Graphics(Gtk.ScrolledWindow):
         icon = Icon(pixel_size=icon_size, icon_name=icon_name,
                     stroke_color=stroke, fill_color=fill)
 
-        button = Gtk.Button()
-        button.set_label(button_label)
-
+        if button_icon is not None:
+            button = ToolButton(button_icon)
+        else:
+            button = Gtk.Button()
+            button.set_label(button_label)
         self._attach_three(label, icon, button)
         label.show()
         icon.show()
