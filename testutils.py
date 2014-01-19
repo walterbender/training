@@ -74,7 +74,7 @@ def goto_neighborhood_view():
     shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_MESH)
 
 
-def get_number_of_launchs(activity):
+def get_number_of_launches(activity):
     if 'launch-times' in activity.metadata:
         return len(activity.metadata['launch-times'].split(','))
     else:

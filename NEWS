@@ -2,14 +2,15 @@ NEWS
 
 1.16
 
-* More accurate accumulated time calculation
-* Save new nick in change nick task
+* Wrote test utilities for various Sugar and activity states
 
 1.15
 
 * Some tasks should not be revisited if already completed.
 * Eliminate 'attempts' as it is misleading
 * Use icon for 'go' button on summary page
+* More accurate accumulated time calculation
+* Save new nick in change nick task
 
 1.14
 

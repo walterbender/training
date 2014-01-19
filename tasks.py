@@ -22,13 +22,17 @@ _logger = logging.getLogger('training-activity-tasks')
 
 from graphics import Graphics
 from testutils import (get_nick, get_favorites, get_rtf, get_uitree_root,
-                       get_activity, find_string, goto_home_view)
+                       get_activity, find_string, goto_home_view,
+                       get_number_of_launches, is_expanded, is_fullscreen,
+                       get_description)
 
 
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
               'xx-large']
 
 SECTIONS = [{'name': _('Welcome to One Academy'),
+             'icon': 'badge-intro'},
+            {'name': _('Getting to Know the Toolbar'),
              'icon': 'badge-intro'},
             {'name': _('Getting to Know the XO'),
              'icon': 'badge-intro'},
@@ -44,6 +48,15 @@ def get_task_list(task_master):
              EnterEmailTask(task_master),
              ValidateEmailTask(task_master),
              BadgeOneTask(task_master)],
+            [Toolbars1Task(task_master),
+             Toolbars2Task(task_master),
+             Toolbars3Task(task_master),
+             Toolbars4Task(task_master),
+             Toolbars5Task(task_master),
+             Toolbars6Task(task_master),
+             Toolbars7Task(task_master),
+             Toolbars8Task(task_master),
+             BadgeTwoTask(task_master)],
             [NickChange1Task(task_master),
              NickChange2Task(task_master),
              NickChange3Task(task_master),
@@ -54,15 +67,15 @@ def get_task_list(task_master):
              WriteSave3Task(task_master),
              WriteSave4Task(task_master),
              WriteSave5Task(task_master),
-             BadgeTwoTask(task_master)],
+             BadgeThreeTask(task_master)],
             [Speak1Task(task_master),
              Speak2Task(task_master),
              Speak3Task(task_master),
              Speak4Task(task_master),
-             BadgeThreeTask(task_master)],
+             BadgeFourTask(task_master)],
             # [AddFavoriteTask(task_master),
             #  RemoveFavoriteTask(task_master),
-            #  BadgeFourTask(task_master)],
+            #  BadgeFiveTask(task_master)],
             [FinishedAllTasks(task_master)]]
 
 
@@ -374,6 +387,272 @@ class BadgeOneTask(Task):
         return graphics, button
 
 
+class Toolbars1Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Toolbars Stop')
+        self.uid = 'toolbars-task-1'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            task_data['data'] = \
+                get_number_of_launches(self._task_master.activity)
+            self._task_master.write_task_data(self._name, task_data)
+            return False
+        else:
+            _logger.debug(get_number_of_launches(self._task_master.activity))
+            return get_number_of_launches(self._task_master.activity) > \
+                task_data['data']
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'toolbars1.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Toolbars2Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Show View Toolbar')
+        self.uid = 'toolbars-task-2'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        return is_expanded(self._task_master.activity.view_toolbar_button)
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'toolbars2.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Toolbars3Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Hide View Toolbar')
+        self.uid = 'toolbars-task-3'
+
+    def is_collectable(self):
+        return True
+
+    def get_requires(self):
+        return ['toolbars-task-2']
+
+    def test(self, task_data):
+        return not is_expanded(self._task_master.activity.view_toolbar_button)
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'toolbars3.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Toolbars4Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Enter Fullscreen')
+        self.uid = 'toolbars-task-4'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        return is_fullscreen(self._task_master.activity)
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'toolbars4.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Toolbars5Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Exit Fullscreen')
+        self.uid = 'toolbars-task-5'
+
+    def is_collectable(self):
+        return True
+
+    def get_requires(self):
+        return ['toolbars-task-4']
+
+    def test(self, task_data):
+        return not is_fullscreen(self._task_master.activity)
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'toolbars5.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Toolbars6Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Activity Toolbar')
+        self.uid = 'toolbars-task-6'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        return is_expanded(self._task_master.activity.activity_button)
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'toolbars6.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Toolbars7Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Description Box')
+        self.uid = 'toolbars-task-7'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        return len(get_description(self._task_master.activity)) > 0
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'toolbars7.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Toolbars8Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Description Summary')
+        self.uid = 'toolbars-task-8'
+
+    def get_requires(self):
+        return ['toolbars-task-7']
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'toolbars8.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class BadgeTwoTask(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Badge Two')
+        self.uid = 'badge-two'
+
+    def after_button_press(self):
+        name = self._task_master.read_task_data('name')
+        if name is None:
+            target = ' '
+        else:
+            target = name.split()[0]
+        self._task_master.activity.add_badge(
+            _('Congratulations %s!\n'
+              "You’ve earned your second badge!" % target),
+            icon='badge-intro')
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self, page=0):
+        name = self._task_master.read_task_data('name')
+        if name is None:
+            target = ' '
+        else:
+            target = name.split()[0]
+        graphics = Graphics()
+        graphics.add_text(
+            _('Congratulations %s!\n'
+              "You’ve earned your second badge!\n\n" % target),
+            bold=True,
+            size=FONT_SIZES[self._font_size])
+        graphics.add_icon('badge-intro')
+        graphics.add_text(
+            _('\n\nMost badges require you to complete multiple '
+              'tasks.\n'
+              'Press Next to start on your next one!\n\n'),
+            size=FONT_SIZES[self._font_size])
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
 class NickChange1Task(Task):
 
     def __init__(self, task_master):
@@ -667,31 +946,37 @@ class WriteSave5Task(Task):
         return graphics, button
 
 
-class BadgeTwoTask(Task):
-
+class BadgeThreeTask(Task):
     def __init__(self, task_master):
         Task.__init__(self, task_master)
-        self._name = _('Badge Two')
-        self.uid = 'badge-two'
+        self._name = _('Badge Three')
+        self.uid = 'badge-3'
 
     def after_button_press(self):
-        target = self._task_master.read_task_data('name').split()[0]
+        name = self._task_master.read_task_data('name')
+        if name is None:
+            target = ' '
+        else:
+            target = name.split()[0]
         self._task_master.activity.add_badge(
             _('Congratulations %s!\n'
-              "You’ve earned your second badge!" % target),
+              "You’ve earned your third badge!" % target),
             icon='badge-intro')
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self, page=0):
-        target = self._task_master.read_task_data('name').split()[0]
+        name = self._task_master.read_task_data('name')
+        if name is None:
+            target = ' '
+        else:
+            target = name.split()[0]
         graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
-              "You’ve earned your second badge!\n\n" % target),
-            bold=True,
-            size=FONT_SIZES[self._font_size])
+              "You’ve earned your third badge!\n\n" % target),
+            bold=True, size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
         graphics.add_text(
             _('\n\nMost badges require you to complete multiple '
@@ -808,28 +1093,36 @@ class Speak4Task(Task):
         return graphics, button
 
 
-class BadgeThreeTask(Task):
+class BadgeFourTask(Task):
     def __init__(self, task_master):
         Task.__init__(self, task_master)
-        self._name = _('Badge Three')
-        self.uid = 'badge-3'
+        self._name = _('Badge Four')
+        self.uid = 'badge-4'
 
     def after_button_press(self):
-        target = self._task_master.read_task_data('name').split()[0]
+        name = self._task_master.read_task_data('name')
+        if name is None:
+            target = ' '
+        else:
+            target = name.split()[0]
         self._task_master.activity.add_badge(
             _('Congratulations %s!\n'
-              "You’ve earned your third badge!" % target),
+              "You’ve earned your fourth badge!" % target),
             icon='badge-intro')
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self, page=0):
-        target = self._task_master.read_task_data('name').split()[0]
+        name = self._task_master.read_task_data('name')
+        if name is None:
+            target = ' '
+        else:
+            target = name.split()[0]
         graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
-              "You’ve earned your third badge!\n\n" % target),
+              "You’ve earned your fourth badge!\n\n" % target),
             bold=True, size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
         graphics.add_text(
@@ -913,14 +1206,18 @@ class RemoveFavoriteTask(Task):
         return graphics, button
 
 
-class BadgeFourTask(Task):
+class BadgeFiveTask(Task):
     def __init__(self, task_master):
         Task.__init__(self, task_master)
-        self._name = _('Badge Four')
-        self.uid = 'badge-4'
+        self._name = _('Badge Five')
+        self.uid = 'badge-5'
 
     def after_button_press(self):
-        target = self._task_master.read_task_data('name').split()[0]
+        name = self._task_master.read_task_data('name')
+        if name is None:
+            target = ' '
+        else:
+            target = name.split()[0]
         self._task_master.activity.add_badge(
             _('Congratulations %s!\n'
               "You’ve earned your fourth badge!" % target),
@@ -930,11 +1227,15 @@ class BadgeFourTask(Task):
         return self._task_master.button_was_pressed
 
     def get_graphics(self, page=0):
-        target = self._task_master.read_task_data('name').split()[0]
+        name = self._task_master.read_task_data('name')
+        if name is None:
+            target = ' '
+        else:
+            target = name.split()[0]
         graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
-              "You’ve earned your fourth badge!\n\n" % target),
+              "You’ve earned your fifth badge!\n\n" % target),
             bold=True, size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
         graphics.add_text(

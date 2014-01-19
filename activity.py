@@ -82,21 +82,21 @@ class TrainingActivity(activity.Activity):
 
         toolbox = ToolbarBox()
 
-        activity_button = ActivityToolbarButton(self)
-        toolbox.toolbar.insert(activity_button, 0)
-        activity_button.show()
+        self.activity_button = ActivityToolbarButton(self)
+        toolbox.toolbar.insert(self.activity_button, 0)
+        self.activity_button.show()
 
         self.set_toolbar_box(toolbox)
         toolbox.show()
         self.toolbar = toolbox.toolbar
 
         view_toolbar = Gtk.Toolbar()
-        view_toolbar_button = ToolbarButton(
+        self.view_toolbar_button = ToolbarButton(
             page=view_toolbar,
             icon_name='toolbar-view')
-        toolbox.toolbar.insert(view_toolbar_button, 1)
+        toolbox.toolbar.insert(self.view_toolbar_button, 1)
         view_toolbar.show()
-        view_toolbar_button.show()
+        self.view_toolbar_button.show()
 
         button_factory('view-fullscreen', view_toolbar,
                        self._fullscreen_cb, tooltip=_('Fullscreen'),
