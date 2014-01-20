@@ -1,5 +1,12 @@
 NEWS
 
+1.17
+
+* Added keypress event handling
+* Added tablet_mode test
+* Added gamekey test
+* Added uinode test 
+
 1.16
 
 * Wrote series of toolbar tasks

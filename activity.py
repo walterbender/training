@@ -10,12 +10,14 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-from gi.repository import Gtk
 import dbus
 import os
 from shutil import copy
 import json
 from gettext import gettext as _
+
+from gi.repository import Gtk
+from gi.repository import Gdk
 
 from sugar3.activity import activity
 from sugar3.graphics.toolbarbox import ToolbarBox
@@ -67,6 +69,12 @@ class TrainingActivity(activity.Activity):
         self._task_master.show()
         self.set_canvas(center_in_panel)
         center_in_panel.show()
+
+        self._task_master.set_events(Gdk.EventMask.KEY_PRESS_MASK)
+        self._task_master.connect('key_press_event',
+                                  self._task_master.keypress_cb)
+        self._task_master.set_can_focus(True)
+        self._task_master.grab_focus()
 
         self.completed = False
         self._task_master.task_master()

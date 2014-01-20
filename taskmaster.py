@@ -16,6 +16,7 @@ import time
 from gettext import gettext as _
 
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GObject
 
 from sugar3.graphics import style
@@ -40,6 +41,7 @@ class TaskMaster(Gtk.Grid):
         self.button_was_pressed = True
         self.current_task = None
         self.activity = activity
+        self.keyname = None
 
         self._graphics = None
         self._summary = None
@@ -77,6 +79,9 @@ class TaskMaster(Gtk.Grid):
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
         self.attach(self._progress_bar_alignment, 0, 1, 1, 1)
         self._progress_bar_alignment.show()
+
+    def keypress_cb(self, widget, event):
+        self.keyname = Gdk.keyval_name(event.keyval)
 
     def task_master(self):
         ''' 'nough said. '''

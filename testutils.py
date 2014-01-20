@@ -12,6 +12,7 @@
 
 import os
 import json
+import subprocess
 
 from sugar3.test import uitree
 from sugar3 import env
@@ -25,6 +26,28 @@ import logging
 _logger = logging.getLogger('training-activity-testutils')
 
 
+def is_game_key(keyname):
+    if keyname in ['KP_Up', 'KP_Down', 'KP_Left', 'KP_Right',
+                   'KP_Page_Down', 'KP_Page_Up', 'KP_End', 'KP_Home']:
+        return True
+    else:
+        return False
+
+
+def is_tablet_mode():
+    if not os.path.exists('/dev/input/event4'):
+        return False
+    try:
+        output = subprocess.call(
+            ['evtest', '--query', '/dev/input/event4', 'EV_SW',
+             'SW_TABLET_MODE'])
+    except (OSError, subprocess.CalledProcessError):
+        return False
+    if str(output) == '10':
+        return True
+    return False
+
+
 def is_expanded(toolbar_button):
     return toolbar_button.is_expanded()
 
@@ -36,6 +59,13 @@ def is_fullscreen(activity):
 def get_description(activity):
     if 'description' in activity.metadata:
         return activity.metadata['description']
+    else:
+        return ''
+
+
+def get_title(activity):
+    if 'title' in activity.metadata:
+        return activity.metadata['title']
     else:
         return ''
 
@@ -124,8 +154,33 @@ def get_rtf():
     return paths
 
 
-def get_uitree_root():
-    return uitree.get_root()
+def get_uitree_node(name):
+    uiroot = uitree.get_root()
+    for node in uiroot.get_children():
+        if name in [node.name, node.role_name]:
+            return True
+        for node1 in node.get_children():
+            if name in [node1.name, node1.role_name]:
+                return True
+            for node2 in node1.get_children():
+                if name in [node2.name, node2.role_name]:
+                    return True
+                for node3 in node2.get_children():
+                    if name in [node3.name, node3.role_name]:
+                        return True
+                    for node4 in node3.get_children():
+                        if name in [node4.name, node4.role_name]:
+                            return True
+                        for node5 in node4.get_children():
+                            if name in [node5.name, node5.role_name]:
+                                return True
+                            for node6 in node5.get_children():
+                                if name in [node6.name, node6.role_name]:
+                                    return True
+                                for node7 in node6.get_children():
+                                    if name in [node7.name, node7.role_name]:
+                                        return True
+        return False
 
 
 def find_string(path, string):

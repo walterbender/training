@@ -21,7 +21,7 @@ import logging
 _logger = logging.getLogger('training-activity-tasks')
 
 from graphics import Graphics
-from testutils import (get_nick, get_favorites, get_rtf, get_uitree_root,
+from testutils import (get_nick, get_favorites, get_rtf, get_uitree_node,
                        get_activity, find_string, goto_home_view,
                        get_number_of_launches, is_expanded, is_fullscreen,
                        get_description)
@@ -60,6 +60,7 @@ def get_task_list(task_master):
             [NickChange1Task(task_master),
              NickChange2Task(task_master),
              NickChange3Task(task_master),
+             # UITest(task_master),
              NickChange4Task(task_master),
              NickChange5Task(task_master),
              WriteSave1Task(task_master),
@@ -1276,17 +1277,19 @@ class UITest(Task):
         self.uid = 'uitest'
 
     def test(self, task_data):
-        return self._uitester()
+        nick = get_nick()
+        return get_uitree_node(nick)
 
-    def _uitester(self):
-        _logger.debug('uitree')
-        uitree_root = get_uitree_root()
-        _logger.debug(uitree_root)
-        for node in uitree_root.get_children():
-            _logger.debug('%s (%s)' % (node.name, node.role_name))
-            for node1 in node.get_children():
-                _logger.debug('> %s (%s)' % (node1.name, node1.role_name))
-                for node2 in node1.get_children():
-                    _logger.debug('> > %s (%s)' %
-                                  (node2.name, node2.role_name))
-        return True
+    def get_graphics(self, page=0):
+
+        def button_callback(widget):
+            goto_home_view()
+
+        graphics = Graphics()
+        graphics.add_text(_('Open the menu under the central XO\n\n'),
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_button(_('My turn'), button_callback)
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
