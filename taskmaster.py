@@ -25,8 +25,7 @@ from sugar3.graphics.toolbutton import ToolButton
 import logging
 _logger = logging.getLogger('training-activity-taskmaster')
 
-from tasks import get_task_list
-from tasks import *
+import tasks
 from progressbar import ProgressBar
 
 
@@ -50,7 +49,7 @@ class TaskMaster(Gtk.Grid):
         self._first_time = True
         self._accumulated_time = 0
 
-        self._task_list = get_task_list(self)
+        self._task_list = tasks.get_task_list(self)
         self._assign_required()
 
         self.current_task = self.read_task_data('current_task')
