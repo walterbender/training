@@ -24,8 +24,9 @@ from graphics import Graphics
 from testutils import (get_nick, get_favorites, get_rtf, get_uitree_node,
                        get_activity, find_string, goto_home_view,
                        get_number_of_launches, is_expanded, is_fullscreen,
-                       get_description)
-
+                       get_description, get_volume_paths, get_sound_level,
+                       get_number_of_starred, is_tablet_mode, get_safe_text,
+                       get_battery_level, get_colors)
 
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
               'xx-large']
@@ -44,6 +45,7 @@ SECTIONS = [{'name': _('Welcome to One Academy'),
 
 def get_task_list(task_master):
     return [[Intro1Task(task_master),
+             Test(task_master),
              EnterNameTask(task_master),
              EnterEmailTask(task_master),
              ValidateEmailTask(task_master),
@@ -60,7 +62,6 @@ def get_task_list(task_master):
             [NickChange1Task(task_master),
              NickChange2Task(task_master),
              NickChange3Task(task_master),
-             # UITest(task_master),
              NickChange4Task(task_master),
              NickChange5Task(task_master),
              WriteSave1Task(task_master),
@@ -283,7 +284,7 @@ class EnterEmailTask(Task):
             name = ''
         email = self._task_master.read_task_data('email_address')
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'introduction3.html?NAME=%s' % name)
+                           'introduction3.html?NAME=%s' % get_safe_text(name))
 
         graphics = Graphics()
         graphics.add_uri('file://' + url)
@@ -1269,7 +1270,7 @@ class FinishedAllTasks(Task):
         return graphics, button
 
 
-class UITest(Task):
+class Test(Task):
 
     def __init__(self, task_master):
         Task.__init__(self, task_master)
@@ -1277,8 +1278,14 @@ class UITest(Task):
         self.uid = 'uitest'
 
     def test(self, task_data):
-        nick = get_nick()
-        return get_uitree_node(nick)
+        # nick = get_nick()
+        # return get_uitree_node(nick)
+        _logger.error(get_volume_paths())
+        _logger.error(get_number_of_starred())
+        _logger.error(get_sound_level())
+        _logger.error(is_tablet_mode())
+        _logger.error(get_battery_level())
+        return True
 
     def get_graphics(self, page=0):
 
@@ -1290,6 +1297,9 @@ class UITest(Task):
                           size=FONT_SIZES[self._font_size])
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        graphics.add_radio_buttons(['battery-000', 'battery-020', 'battery-040',
+                                    'battery-060', 'battery-080', 'battery-100'],
+                                   colors=get_colors())
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button

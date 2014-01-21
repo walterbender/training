@@ -17,6 +17,7 @@ from gi.repository import WebKit
 from sugar3.graphics import style
 from sugar3.graphics.icon import Icon
 from sugar3.graphics.toolbutton import ToolButton
+from sugar3.graphics.radiotoolbutton import RadioToolButton
 
 import logging
 _logger = logging.getLogger('training-activity-page')
@@ -183,3 +184,28 @@ class Graphics(Gtk.ScrolledWindow):
             button.connect('clicked', callback, arg)
         button.show()
         return button
+
+    def add_radio_buttons(self, button_icons, colors=None):
+        alignment = Gtk.Alignment.new(0.5, 0.5, 0, 0)
+        grid = Gtk.Grid()
+        grid.set_row_spacing(style.DEFAULT_SPACING)
+        grid.set_column_spacing(style.DEFAULT_SPACING)
+        grid.set_border_width(style.DEFAULT_SPACING * 2)
+        buttons = []
+        for i, icon in enumerate(button_icons):
+            if i == 0:
+                group = None
+            else:
+                group = buttons[0]
+            buttons.append(RadioToolButton(group=group))
+            buttons[i].set_icon_name(icon)
+            if colors is not None:
+                buttons[i].set_xo_color(colors)
+            grid.attach(buttons[i], i, 0, 1, 1)
+            buttons[i].show()
+        alignment.add(grid)
+        grid.show()
+        self._attach(alignment)
+        alignment.show()
+
+        return buttons

@@ -13,17 +13,105 @@
 import os
 import json
 import subprocess
+import dbus
+
+from gi.repository import Gio
+from gi.repository import GLib
+from gi.repository import GConf
+from gi.repository import GObject
 
 from sugar3.test import uitree
 from sugar3 import env
 from sugar3.datastore import datastore
 from sugar3 import profile
 from sugar3.graphics.objectchooser import FILTER_TYPE_ACTIVITY
+from sugar3.graphics.xocolor import XoColor
 
 from jarabe.model import shell
+from jarabe.model import sound
 
 import logging
 _logger = logging.getLogger('training-activity-testutils')
+
+_STATUS_CHARGING = 0
+_STATUS_DISCHARGING = 1
+_STATUS_FULLY_CHARGED = 2
+_STATUS_NOT_PRESENT = 3
+
+_UP_DEVICE_IFACE = 'org.freedesktop.UPower.Device'
+
+_UP_TYPE_BATTERY = 2
+
+_UP_STATE_UNKNOWN = 0
+_UP_STATE_CHARGING = 1
+_UP_STATE_DISCHARGING = 2
+_UP_STATE_EMPTY = 3
+_UP_STATE_FULL = 4
+_UP_STATE_CHARGE_PENDING = 5
+_UP_STATE_DISCHARGE_PENDING = 6
+
+_WARN_MIN_PERCENTAGE = 15
+
+volume_monitor = None
+battery_model = None
+
+
+def get_safe_text(text):
+    return GLib.markup_escape_text(text)
+
+
+def get_battery_level():
+    global battery_model
+    if battery_model is None:
+        bus = dbus.Bus(dbus.Bus.TYPE_SYSTEM)
+        up_proxy = bus.get_object('org.freedesktop.UPower',
+                                  '/org/freedesktop/UPower')
+        upower = dbus.Interface(up_proxy, 'org.freedesktop.UPower')
+
+        for device_path in upower.EnumerateDevices():
+            device = bus.get_object('org.freedesktop.UPower', device_path)
+            device_prop_iface = dbus.Interface(device, dbus.PROPERTIES_IFACE)
+            device_type = device_prop_iface.Get(_UP_DEVICE_IFACE, 'Type')
+            if device_type == _UP_TYPE_BATTERY:
+                battery_model = DeviceModel(device)
+
+    return battery_model.props.level
+
+
+def get_sound_level():
+    return sound.get_volume()
+
+
+def get_volume_names():
+    global volume_monitor
+    if volume_monitor is None:
+        volume_monitor = Gio.VolumeMonitor.get()
+
+    names = []
+    for mount in volume_monitor.get_mounts():
+        names.append(mount.get_name())
+
+    return names
+
+
+def get_volume_paths():
+    global volume_monitor
+    if volume_monitor is None:
+        volume_monitor = Gio.VolumeMonitor.get()
+
+    paths = []
+    for mount in volume_monitor.get_mounts():
+        paths.append(mount.get_root().get_path())
+
+    return paths
+
+
+def get_number_of_mounted_volumes():
+    global volume_monitor
+    if volume_monitor is None:
+        volume_monitor = Gio.VolumeMonitor.get()
+
+    return len(volume_monitor.get_mounts())
 
 
 def is_game_key(keyname):
@@ -54,6 +142,16 @@ def is_expanded(toolbar_button):
 
 def is_fullscreen(activity):
     return activity._is_fullscreen
+
+
+def get_starred():
+    dsobjects, nobjects = datastore.find({'keep': '1'})
+    return dsobjects
+
+
+def get_number_of_starred():
+    dsobjects, nobjects = datastore.find({'keep': '1'})
+    return nobjects
 
 
 def get_description(activity):
@@ -97,7 +195,11 @@ def goto_activity_view():
 
 
 def goto_home_view():
-    shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+    shell_model = shell.get_model()
+    _logger.debug('before zoom level %s' % str(shell_model.zoom_level))
+    shell_model.set_zoom_level(shell.ShellModel.ZOOM_MESH)
+    shell_model.set_zoom_level(shell.ShellModel.ZOOM_HOME)
+    _logger.debug('after zoom level %s' % str(shell_model.zoom_level))
 
 
 def goto_neighborhood_view():
@@ -109,6 +211,11 @@ def get_number_of_launches(activity):
         return len(activity.metadata['launch-times'].split(','))
     else:
         return 0
+
+
+def get_colors():
+    client = GConf.Client.get_default()
+    return XoColor(client.get_string('/desktop/sugar/user/color'))
 
 
 def get_nick():
@@ -155,7 +262,9 @@ def get_rtf():
 
 
 def get_uitree_node(name):
+    return True
     uiroot = uitree.get_root()
+    # print uiroot.dump()
     for node in uiroot.get_children():
         if name in [node.name, node.role_name]:
             return True
@@ -176,6 +285,7 @@ def get_uitree_node(name):
                                 return True
                             for node6 in node5.get_children():
                                 if name in [node6.name, node6.role_name]:
+                                    # help(node6)
                                     return True
                                 for node7 in node6.get_children():
                                     if name in [node7.name, node7.role_name]:
@@ -193,3 +303,81 @@ def find_string(path, string):
         if string in line:
             return True
     return False
+
+
+class DeviceModel(GObject.GObject):
+    __gproperties__ = {
+        'level': (int, None, None, 0, 100, 0, GObject.PARAM_READABLE),
+        'time-remaining': (int, None, None, 0, GLib.MAXINT32, 0,
+                           GObject.PARAM_READABLE),  # unit: seconds
+        'charging': (bool, None, None, False, GObject.PARAM_READABLE),
+        'discharging': (bool, None, None, False, GObject.PARAM_READABLE),
+        'present': (bool, None, None, False, GObject.PARAM_READABLE),
+    }
+
+    __gsignals__ = {
+        'updated': (GObject.SignalFlags.RUN_FIRST, None, ([])),
+    }
+
+    def __init__(self, battery):
+        GObject.GObject.__init__(self)
+        self._battery = battery
+        self._battery_props_iface = dbus.Interface(self._battery,
+                                                   dbus.PROPERTIES_IFACE)
+        self._battery.connect_to_signal('Changed',
+                                        self.__battery_properties_changed_cb,
+                                        dbus_interface=_UP_DEVICE_IFACE)
+        self._fetch_properties_from_upower()
+
+    def _fetch_properties_from_upower(self):
+        """Get current values from UPower."""
+        # pylint: disable=W0201
+        try:
+            dbus_props = self._battery_props_iface.GetAll(_UP_DEVICE_IFACE)
+        except dbus.DBusException:
+            logging.error('Cannot access battery properties')
+            dbus_props = {}
+
+        self._level = dbus_props.get('Percentage', 0)
+        self._state = dbus_props.get('State', _UP_STATE_UNKNOWN)
+        self._present = dbus_props.get('IsPresent', False)
+        self._time_to_empty = dbus_props.get('TimeToEmpty', 0)
+        self._time_to_full = dbus_props.get('TimeToFull', 0)
+
+    def do_get_property(self, pspec):
+        """Return current value of given GObject property."""
+        if pspec.name == 'level':
+            return self._level
+        if pspec.name == 'charging':
+            return self._state == _UP_STATE_CHARGING
+        if pspec.name == 'discharging':
+            return self._state == _UP_STATE_DISCHARGING
+        if pspec.name == 'present':
+            return self._present
+        if pspec.name == 'time-remaining':
+            if self._state == _UP_STATE_CHARGING:
+                return self._time_to_full
+            if self._state == _UP_STATE_DISCHARGING:
+                return self._time_to_empty
+            return 0
+
+    def get_type(self):
+        return 'battery'
+
+    def __battery_properties_changed_cb(self):
+        old_level = self._level
+        old_state = self._state
+        old_present = self._present
+        old_time = self.props.time_remaining
+        self._fetch_properties_from_upower()
+        if self._level != old_level:
+            self.notify('level')
+        if self._state != old_state:
+            self.notify('charging')
+            self.notify('discharging')
+        if self._present != old_present:
+            self.notify('present')
+        if self.props.time_remaining != old_time:
+            self.notify('time-remaining')
+
+        self.emit('updated')

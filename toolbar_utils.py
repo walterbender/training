@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2011, Walter Bender
-# Port To GTK3:
-# Ignacio Rodriguez <ignaciorodriguez@sugarlabs.org>
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
@@ -65,7 +64,7 @@ def entry_factory(default_string, toolbar, tooltip=None, max=3):
 
 def button_factory(icon_name, toolbar, callback, cb_arg=None, tooltip=None,
                    accelerator=None):
-    '''Factory for making tooplbar buttons'''
+    '''Factory for making toolbar buttons'''
     button = ToolButton(icon_name)
     if tooltip is not None:
         button.set_tooltip(tooltip)
@@ -84,11 +83,11 @@ def button_factory(icon_name, toolbar, callback, cb_arg=None, tooltip=None,
     return button
 
 
-def radio_factory(name, toolbar, callback, cb_arg=None, tooltip=None,
+def radio_factory(button_name, toolbar, callback, cb_arg=None, tooltip=None,
                   group=None):
     ''' Add a radio button to a toolbar '''
     button = RadioToolButton(group=group)
-    button.set_icon_name(name)
+    button.set_icon_name(button_name)
     if callback is not None:
         if cb_arg is None:
             button.connect('clicked', callback)
@@ -106,7 +105,7 @@ def radio_factory(name, toolbar, callback, cb_arg=None, tooltip=None,
 
 def label_factory(toolbar, label_text, width=None):
     ''' Factory for adding a label to a toolbar '''
-    label = Gtk.Label(label_text)
+    label = Gtk.Label(label=label_text)
     label.set_line_wrap(True)
     if width is not None:
         label.set_size_request(width, -1)  # doesn't work on XOs
