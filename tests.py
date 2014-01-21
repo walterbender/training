@@ -28,7 +28,6 @@ from sugar3.graphics.objectchooser import FILTER_TYPE_ACTIVITY
 from sugar3.graphics.xocolor import XoColor
 
 from jarabe.model import shell
-from jarabe.model import sound
 
 import logging
 _logger = logging.getLogger('training-activity-testutils')
@@ -79,7 +78,8 @@ def get_battery_level():
 
 
 def get_sound_level():
-    return sound.get_volume()
+    client = GConf.Client.get_default()
+    return client.get_int('/desktop/sugar/sound/volume')
 
 
 def get_volume_names():
@@ -149,7 +149,7 @@ def get_starred():
     return dsobjects
 
 
-def get_number_of_starred():
+def get_starred_count():
     dsobjects, nobjects = datastore.find({'keep': '1'})
     return nobjects
 
@@ -194,6 +194,11 @@ def goto_activity_view():
     shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_ACTIVITY)
 
 
+def goto_journal():
+    # TODO: FIX ME
+    shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+
+
 def goto_home_view():
     shell_model = shell.get_model()
     _logger.debug('before zoom level %s' % str(shell_model.zoom_level))
@@ -206,7 +211,7 @@ def goto_neighborhood_view():
     shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_MESH)
 
 
-def get_number_of_launches(activity):
+def get_launch_count(activity):
     if 'launch-times' in activity.metadata:
         return len(activity.metadata['launch-times'].split(','))
     else:

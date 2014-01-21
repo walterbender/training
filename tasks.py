@@ -21,12 +21,7 @@ import logging
 _logger = logging.getLogger('training-activity-tasks')
 
 from graphics import Graphics
-from testutils import (get_nick, get_favorites, get_rtf, get_uitree_node,
-                       get_activity, find_string, goto_home_view,
-                       get_number_of_launches, is_expanded, is_fullscreen,
-                       get_description, get_volume_paths, get_sound_level,
-                       get_number_of_starred, is_tablet_mode, get_safe_text,
-                       get_battery_level, get_colors)
+import tests
 
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
               'xx-large']
@@ -45,7 +40,6 @@ SECTIONS = [{'name': _('Welcome to One Academy'),
 
 def get_task_list(task_master):
     return [[Intro1Task(task_master),
-             Test(task_master),
              EnterNameTask(task_master),
              EnterEmailTask(task_master),
              ValidateEmailTask(task_master),
@@ -75,9 +69,17 @@ def get_task_list(task_master):
              Speak3Task(task_master),
              Speak4Task(task_master),
              BadgeFourTask(task_master)],
-            # [AddFavoriteTask(task_master),
-            #  RemoveFavoriteTask(task_master),
-            #  BadgeFiveTask(task_master)],
+            [BatteryTask(task_master),
+             SoundTask(task_master),
+             Tablet1Task(task_master),
+             GameKeyTask(task_master),
+             Tablet2Task(task_master),
+             Journal1Task(task_master),
+             AddStarredTask(task_master),
+             RemoveStarredTask(task_master),
+             AddFavoriteTask(task_master),
+             RemoveFavoriteTask(task_master),
+             BadgeFiveTask(task_master)],
             [FinishedAllTasks(task_master)]]
 
 
@@ -284,7 +286,7 @@ class EnterEmailTask(Task):
             name = ''
         email = self._task_master.read_task_data('email_address')
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'introduction3.html?NAME=%s' % get_safe_text(name))
+                           'introduction3.html?NAME=%s' % tests.get_safe_text(name))
 
         graphics = Graphics()
         graphics.add_uri('file://' + url)
@@ -402,12 +404,12 @@ class Toolbars1Task(Task):
     def test(self, task_data):
         if task_data['data'] is None:
             task_data['data'] = \
-                get_number_of_launches(self._task_master.activity)
-            self._task_master.write_task_data(self._name, task_data)
+                tests.get_launch_count(self._task_master.activity)
+            self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            _logger.debug(get_number_of_launches(self._task_master.activity))
-            return get_number_of_launches(self._task_master.activity) > \
+            _logger.debug(tests.get_launch_count(self._task_master.activity))
+            return tests.get_launch_count(self._task_master.activity) > \
                 task_data['data']
 
     def get_graphics(self, page=0):
@@ -434,7 +436,7 @@ class Toolbars2Task(Task):
         return True
 
     def test(self, task_data):
-        return is_expanded(self._task_master.activity.view_toolbar_button)
+        return tests.is_expanded(self._task_master.activity.view_toolbar_button)
 
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
@@ -463,7 +465,7 @@ class Toolbars3Task(Task):
         return ['toolbars-task-2']
 
     def test(self, task_data):
-        return not is_expanded(self._task_master.activity.view_toolbar_button)
+        return not tests.is_expanded(self._task_master.activity.view_toolbar_button)
 
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
@@ -489,7 +491,7 @@ class Toolbars4Task(Task):
         return True
 
     def test(self, task_data):
-        return is_fullscreen(self._task_master.activity)
+        return tests.is_fullscreen(self._task_master.activity)
 
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
@@ -518,7 +520,7 @@ class Toolbars5Task(Task):
         return ['toolbars-task-4']
 
     def test(self, task_data):
-        return not is_fullscreen(self._task_master.activity)
+        return not tests.is_fullscreen(self._task_master.activity)
 
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
@@ -544,7 +546,7 @@ class Toolbars6Task(Task):
         return True
 
     def test(self, task_data):
-        return is_expanded(self._task_master.activity.activity_button)
+        return tests.is_expanded(self._task_master.activity.activity_button)
 
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
@@ -570,7 +572,7 @@ class Toolbars7Task(Task):
         return True
 
     def test(self, task_data):
-        return len(get_description(self._task_master.activity)) > 0
+        return len(tests.get_description(self._task_master.activity)) > 0
 
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
@@ -741,14 +743,14 @@ class NickChange4Task(Task):
 
     def test(self, task_data):
         if task_data['data'] is None:
-            _logger.debug('saving nick value as %s' % get_nick())
-            self._task_master.write_task_data('nick', get_nick())
-            task_data['data'] = get_nick()
+            _logger.debug('saving nick value as %s' % tests.get_nick())
+            self._task_master.write_task_data('nick', tests.get_nick())
+            task_data['data'] = tests.get_nick()
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            if not get_nick() == task_data['data']:
-                task_data['new_nick'] = get_nick()
+            if not tests.get_nick() == task_data['data']:
+                task_data['new_nick'] = tests.get_nick()
                 self._task_master.write_task_data(self.uid, task_data)
                 return True
             else:
@@ -757,7 +759,7 @@ class NickChange4Task(Task):
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            goto_home_view()
+            tests.goto_home_view()
 
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'nickchange4.html')
@@ -892,10 +894,10 @@ class WriteSave4Task(Task):
         return True
 
     def test(self, task_data):
-        paths = get_rtf()
+        paths = tests.get_rtf()
         for path in paths:
             # Check to see if there is a picture in the file
-            if find_string(path, '\\pict'):
+            if tests.find_string(path, '\\pict'):
                 return True
         return False
 
@@ -905,7 +907,7 @@ class WriteSave4Task(Task):
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            goto_home_view()
+            tests.goto_home_view()
 
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'writesave4.html')
@@ -1075,12 +1077,12 @@ class Speak4Task(Task):
         return True
 
     def test(self, task_data):
-        return len(get_activity('vu.lux.olpc.Speak')) > 0
+        return len(tests.get_activity('vu.lux.olpc.Speak')) > 0
 
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            goto_home_view()
+            tests.goto_home_view()
 
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'speak4.html')
@@ -1149,12 +1151,12 @@ class AddFavoriteTask(Task):
 
     def test(self, task_data):
         if task_data['data'] is None:
-            favorites_list = get_favorites()
+            favorites_list = tests.get_favorites()
             task_data['data'] = len(favorites_list)
-            self._task_master.write_task_data(self._name, task_data)
+            self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            return len(get_favorites()) > task_data['data']
+            return len(tests.get_favorites()) > task_data['data']
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
@@ -1179,17 +1181,20 @@ class RemoveFavoriteTask(Task):
         self._name = _('Remove Favorite Task')
         self.uid = 'remove-favorites-task'
 
+    def get_requires(self):
+        return ['add-favorites-task']
+
     def is_collectable(self):
         return True
 
     def test(self, task_data):
         if task_data['data'] is None:
-            favorites_list = get_favorites()
+            favorites_list = tests.get_favorites()
             task_data['data'] = len(favorites_list)
-            self._task_master.write_task_data(self._name, task_data)
+            self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            return len(get_favorites()) < task_data['data']
+            return len(tests.get_favorites()) < task_data['data']
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
@@ -1203,6 +1208,106 @@ class RemoveFavoriteTask(Task):
             _('Now try removing a favorite to your homeview.\n\n'),
             size=FONT_SIZES[self._font_size])
         graphics.add_image(path)
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Journal1Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Introducing the Journal')
+        self.uid = 'jouranl-task-1'
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'journal1.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class AddStarredTask(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Add Starred Task')
+        self.uid = 'add-starred-task'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            task_data['data'] = tests.get_starred_count()
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            return tests.get_starred_count() > task_data['data']
+
+    def get_help_info(self):
+        return ('Home', 'home_view.html')
+
+    def get_graphics(self, page=0):
+
+        def button_callback(widget):
+            tests.goto_journal()
+
+        graphics = Graphics()
+        graphics.add_text(
+            _('Try adding a star from an item in your journal.\n\n'),
+            size=FONT_SIZES[self._font_size])
+        graphics.add_button(_('My turn'), button_callback)
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class RemoveStarredTask(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Remove Starred Task')
+        self.uid = 'remove-starred-task'
+
+    def get_requires(self):
+        return ['add-starred-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            task_data['data'] = tests.get_starred_count()
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            return tests.get_starred_count() < task_data['data']
+
+    def get_help_info(self):
+        return ('Home', 'home_view.html')
+
+    def get_graphics(self, page=0):
+
+        def button_callback(widget):
+            tests.goto_journal()
+
+        graphics = Graphics()
+        graphics.add_text(
+            _('Now try removing a star from an item in your journal.\n\n'),
+            size=FONT_SIZES[self._font_size])
+        graphics.add_button(_('My turn'), button_callback)
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
@@ -1270,36 +1375,165 @@ class FinishedAllTasks(Task):
         return graphics, button
 
 
-class Test(Task):
+class BatteryTask(Task):
 
     def __init__(self, task_master):
         Task.__init__(self, task_master)
-        self._name = _('UI Test Task')
-        self.uid = 'uitest'
+        self._name = _('Battery Task')
+        self.uid = 'battery-task'
+        self._battery_level = None
+
+    def is_collectable(self):
+        return True
 
     def test(self, task_data):
-        # nick = get_nick()
-        # return get_uitree_node(nick)
-        _logger.error(get_volume_paths())
-        _logger.error(get_number_of_starred())
-        _logger.error(get_sound_level())
-        _logger.error(is_tablet_mode())
-        _logger.error(get_battery_level())
-        return True
+        if self._battery_level is None:
+            return False
+        level = tests.get_battery_level()
+        if abs(level - self._battery_level) <= 10:
+            return True
+        else:
+            return False
+
+    def _battery_button_callback(self, widget, i):
+        self._battery_level = i * 20
 
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            goto_home_view()
+            tests.goto_home_view()
 
         graphics = Graphics()
-        graphics.add_text(_('Open the menu under the central XO\n\n'),
+        graphics.add_text(_('Check the battery levels and then click\n'
+                            'on the matching battery indicator.\n\n'),
                           size=FONT_SIZES[self._font_size])
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        graphics.add_radio_buttons(['battery-000', 'battery-020', 'battery-040',
-                                    'battery-060', 'battery-080', 'battery-100'],
-                                   colors=get_colors())
+        buttons = graphics.add_radio_buttons(['battery-000', 'battery-020',
+                                              'battery-040', 'battery-060',
+                                              'battery-080', 'battery-100'],
+                                             colors=tests.get_colors())
+        for i, button in enumerate(buttons):
+            button.connect('clicked', self._battery_button_callback, i)
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class SoundTask(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Sound Task')
+        self.uid = 'sound-task'
+        self._battery_level = None
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            task_data['data'] = tests.get_sound_level()
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            return not tests.get_sound_level() == task_data['data']
+
+    def get_graphics(self, page=0):
+
+        def button_callback(widget):
+            tests.goto_home_view()
+
+        graphics = Graphics()
+        graphics.add_text(_('Check the sound level and then use\n'
+                            'the slider to adjust it.\n\n'),
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_button(_('My turn'), button_callback)
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class GameKeyTask(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Game Key Task')
+        self.uid = 'game-task'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            self._task_master.grab_focus()
+            self._task_master.keyname = None
+            task_data['data'] = ' '
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            if tests.is_game_key(self._task_master.keyname):
+                task_data['data'] = self._task_master.keyname
+                self._task_master.write_task_data(self.uid, task_data)
+                return True
+            else:
+                return False
+
+    def get_graphics(self, page=0):
+
+        graphics = Graphics()
+        graphics.add_text(_('Click on a Game Key'))
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Tablet1Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Tablet Task 1')
+        self.uid = 'tablet-task-1'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        return tests.is_tablet_mode()
+
+    def get_graphics(self, page=0):
+
+        graphics = Graphics()
+        graphics.add_text(_('Switch to Tablet Mode'))
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Tablet2Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Tablet Task 2')
+        self.uid = 'tablet-task-2'
+
+    def is_collectable(self):
+        return True
+
+    def get_requires(self):
+        return ['tablet-task-1']
+
+    def test(self, task_data):
+        return not tests.is_tablet_mode()
+
+    def get_graphics(self, page=0):
+
+        graphics = Graphics()
+        graphics.add_text(_('Switch to back to Laptop Mode'))
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
