@@ -6,6 +6,9 @@ NEWS
 * Added tablet_mode test
 * Added gamekey test
 * Added uinode test 
+* Added battery test
+* Added Journal starred entry test
+* Added mounted-volume test
 
 1.16
 
