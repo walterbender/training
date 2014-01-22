@@ -32,64 +32,10 @@ class ProgressBar(Gtk.Grid):
                  prev_task_button_cb, next_task_button_cb, progress_button_cb):
         Gtk.Grid.__init__(self)
 
-        self.set_row_spacing(0)  # style.DEFAULT_SPACING)
+        self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
         self.set_border_width(0) # style.DEFAULT_SPACING * 2)
         self.set_column_homogeneous(True)
-
-        # FIX ME
-        rgba = Gdk.RGBA()
-        rgba.red, rgba.green, rgba.blue, rgba.alpha = \
-            style.COLOR_PANEL_GREY.get_rgba()
-        self.override_background_color(Gtk.StateFlags.NORMAL, rgba)
-        self.modify_bg(Gtk.StateFlags.NORMAL,
-                       style.COLOR_PANEL_GREY.get_gdk_color())
-
-        # FIX ME
-        '''
-        separator = Gtk.SeparatorToolItem()
-        separator.props.draw = True
-        separator.set_expand(True)
-        self.attach(separator, 0, 0, 5, 1)
-        separator.show()
-        '''
-
-        self._prev_grid = Gtk.Grid()
-        self._prev_grid.set_row_spacing(0)  # style.DEFAULT_SPACING)
-        self._prev_grid.set_column_spacing(style.DEFAULT_SPACING)
-        self._prev_grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
-        self._prev_grid.set_size_request(-1, _HEIGHT)
-
-        self._progress_button_grid = Gtk.Grid()
-        self._progress_button_grid.set_row_spacing(0) # style.DEFAULT_SPACING)
-        self._progress_button_grid.set_column_spacing(style.DEFAULT_SPACING)
-        self._progress_button_grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
-        self._progress_button_grid.set_size_request(-1, _HEIGHT)
-
-        self._next_grid = Gtk.Grid()
-        self._next_grid.set_row_spacing(0) # style.DEFAULT_SPACING)
-        self._next_grid.set_column_spacing(style.DEFAULT_SPACING)
-        self._next_grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
-        self._next_grid.set_size_request(-1, _HEIGHT)
-
-        alignment2 = Gtk.Alignment.new(
-            xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        self._progress_buttons = []
-        for i, button_data in enumerate(progress_button_data):
-            self._progress_buttons.append(Gtk.Button(button_data['label']))
-            if 'tooltip' in button_data:
-                tooltip = \
-'<span background="%s" foreground="%s" size="%s"> %s </span>' \
-                    % (_WHITE, _BLACK, _SIZE, button_data['tooltip'])
-                self._progress_buttons[i].connect(
-                    'clicked', progress_button_cb, i)
-                self._progress_buttons[i].set_tooltip_markup(tooltip)
-            self._progress_button_grid.attach(
-                self._progress_buttons[i], i, 0, 1, 1)
-            self._progress_buttons[i].show()
-            self._progress_buttons[-1].set_sensitive(False)
-        alignment2.add(self._progress_button_grid)
-        self._progress_button_grid.show()
 
         alignment1 = Gtk.Alignment.new(
             xalign=1.0, yalign=0.5, xscale=0, yscale=0)
@@ -102,39 +48,94 @@ class ProgressBar(Gtk.Grid):
         alignment1.add(self._section_label)
         self._section_label.show()
 
+        alignment2 = Gtk.Alignment.new(
+            xalign=1.0, yalign=0.5, xscale=0, yscale=0)
         self.prev_task_button = Gtk.Button('<')
         self.prev_task_button.connect('clicked', prev_task_button_cb)
-        self._prev_grid.attach(self.prev_task_button, 0, 0, 1, 1)
+        grid = Gtk.Grid()
+        grid.set_row_spacing(0)  # style.DEFAULT_SPACING)
+        grid.set_column_spacing(style.DEFAULT_SPACING)
+        grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
+        grid.set_size_request(-1, _HEIGHT)
+        grid.attach(self.prev_task_button, 0, 0, 1, 1)
         self.prev_task_button.show()
         self.prev_task_button.set_sensitive(False)
-
-        self.next_task_button = Gtk.Button('>')
-        self.next_task_button.connect('clicked', next_task_button_cb)
-        self._next_grid.attach(self.next_task_button, 0, 0, 1, 1)
-        self.next_task_button.show()
-        self.next_task_button.set_sensitive(False)
+        alignment2.add(grid)
+        grid.show()
 
         alignment3 = Gtk.Alignment.new(
+            xalign=0.5, yalign=0.5, xscale=0, yscale=0)
+        grid = Gtk.Grid()
+        grid.set_row_spacing(0) # style.DEFAULT_SPACING)
+        grid.set_column_spacing(style.DEFAULT_SPACING)
+        grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
+        grid.set_size_request(-1, _HEIGHT)
+        self._progress_buttons = []
+        for i, button_data in enumerate(progress_button_data):
+            self._progress_buttons.append(Gtk.Button(button_data['label']))
+            if 'tooltip' in button_data:
+                tooltip = \
+'<span background="%s" foreground="%s" size="%s"> %s </span>' \
+                    % (_WHITE, _BLACK, _SIZE, button_data['tooltip'])
+                self._progress_buttons[i].connect(
+                    'clicked', progress_button_cb, i)
+                self._progress_buttons[i].set_tooltip_markup(tooltip)
+            grid.attach(
+                self._progress_buttons[i], i, 0, 1, 1)
+            self._progress_buttons[i].show()
+            self._progress_buttons[-1].set_sensitive(False)
+        alignment3.add(grid)
+        grid.show()
+
+        alignment4 = Gtk.Alignment.new(
+            xalign=0, yalign=0.5, xscale=0, yscale=0)
+        self.next_task_button = Gtk.Button('>')
+        self.next_task_button.connect('clicked', next_task_button_cb)
+        grid = Gtk.Grid()
+        grid.set_row_spacing(0)  # style.DEFAULT_SPACING)
+        grid.set_column_spacing(style.DEFAULT_SPACING)
+        grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
+        grid.set_size_request(-1, _HEIGHT)
+        grid.attach(self.next_task_button, 0, 0, 1, 1)
+        self.next_task_button.show()
+        self.next_task_button.set_sensitive(False)
+        alignment4.add(grid)
+        grid.show()
+
+        alignment5 = Gtk.Alignment.new(
             xalign=0, yalign=0.5, xscale=0, yscale=0)
         self._name_label = Gtk.Label()
         self._name_label.set_use_markup(True)
         self._name_label.set_justify(Gtk.Justification.RIGHT)
         span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
         self._name_label.set_markup(span + name + '</span>')
-        alignment3.add(self._name_label)
+        alignment5.add(self._name_label)
         self._name_label.show()
 
         n = len(progress_button_data)
-        self.attach(alignment1, 0, 1, 9, 1)
+        c = 0
+        self.attach(alignment1, c, 1, 9, 1)
         alignment1.show()
-        self.attach(self._prev_grid, 10, 1, 1, 1)
-        self._prev_grid.show()
-        self.attach(alignment2, 11, 1, n + 1, 1)
+        c += 9
+        self.attach(alignment2, c, 1, 2, 1)
         alignment2.show()
-        self.attach(self._next_grid, 12 + n, 1, 1, 1)
-        self._next_grid.show()
-        self.attach(alignment3, 13 + n, 1, 9, 1)
+        c += 2
+        self.attach(alignment3, c, 1, n, 1)
         alignment3.show()
+        c += n
+        self.attach(alignment4, c, 1, 2, 1)
+        alignment4.show()
+        c += 2
+        self.attach(alignment5, c, 1, 9, 1)
+        alignment5.show()
+        c += 9
+
+        box = Gtk.EventBox()
+        box.modify_bg(Gtk.StateFlags.NORMAL,
+                      style.COLOR_BLACK.get_gdk_color())
+        box.set_size_request(800, 2)
+        self.attach(box, 0, 0, c, 1)
+        box.show()
 
     def set_button_sensitive(self, i, flag=True):
         if i < len(self._progress_buttons):
