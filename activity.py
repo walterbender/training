@@ -26,7 +26,11 @@ from sugar3.graphics.toolbarbox import ToolbarButton
 from sugar3.activity.widgets import StopButton
 from sugar3.graphics import style
 
-from jarabe.view.viewhelp import ViewHelp
+try:
+    from jarabe.view.viewhelp import ViewHelp
+    _HELP_AVAILABLE = True
+except:
+    _HELP_AVAILABLE = False
 
 from toolbar_utils import separator_factory, label_factory, button_factory
 from taskmaster import TaskMaster
@@ -126,6 +130,8 @@ class TrainingActivity(activity.Activity):
                                           self._help_cb, tooltip=_('help'),
                                           accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)
+        if not _HELP_AVAILABLE:
+            self.help_button.hide()
 
         button_factory('check-progress',
                        toolbox.toolbar,

@@ -56,15 +56,21 @@ class Graphics(Gtk.ScrolledWindow):
         self._row += 1
 
     def _attach_two(self, widget1, widget2):
-        self._grid.attach(widget1, 0, self._row, 2, 1)
+        alignment = Gtk.Alignment.new(0, 0.5, 0, 0)
+        alignment.add(widget1)
+        self._grid.attach(alignment, 0, self._row, 2, 1)
+        alignment.show()
         self._grid.attach(widget2, 3, self._row, 2, 1)
         self._row += 1
 
     def _attach_three(self, widget1, widget2, widget3):
-        self._grid.attach(widget1, 0, self._row, 2, 3)
-        self._grid.attach(widget2, 3, self._row, 2, 3)
-        self._grid.attach(widget3, 5, self._row + 1, 1, 1)
-        self._row += 3
+        alignment = Gtk.Alignment.new(0, 0.5, 0, 0)
+        alignment.add(widget1)
+        self._grid.attach(alignment, 0, self._row, 3, 1)
+        alignment.show()
+        self._grid.attach(widget2, 3, self._row, 1, 1)
+        self._grid.attach(widget3, 4, self._row, 1, 1)
+        self._row += 1
 
     def _attach_center(self, widget):
         self._grid.attach(widget, 2, self._row, 1, 1)

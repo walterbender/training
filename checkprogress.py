@@ -105,8 +105,9 @@ class ProgressSummary():
                 colors.append(style.COLOR_BUTTON_GREY.get_html())
                 strokes.append(style.COLOR_BUTTON_GREY.get_svg())
         graphics = Graphics(
-            width=int(Gdk.Screen.width() / 1.5),
-            height=int(Gdk.Screen.height() / 1.5 - style.GRID_CELL_SIZE))
+            # width=int(Gdk.Screen.width() / 1.5),
+            # height=int(Gdk.Screen.height() / 1.5 - style.GRID_CELL_SIZE)
+        )
         for i in range(len(SECTIONS)):
             button = graphics.add_text_icon_and_button(
                 SECTIONS[i]['name'],
@@ -114,7 +115,7 @@ class ProgressSummary():
                 # button_label='go',
                 button_icon='go-right-page',
                 size=FONT_SIZES[self._font_size],
-                icon_size=style.LARGE_ICON_SIZE,
+                icon_size=style.STANDARD_ICON_SIZE,
                 color=colors[i],
                 stroke=strokes[i])
             button.connect('clicked', self._section_button_cb, i)

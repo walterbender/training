@@ -9,6 +9,8 @@ NEWS
 * Added battery test
 * Added Journal starred entry test
 * Added mounted-volume test
+* Added new sections (with stubs for networking and final task)
+* Run even when help is not available
 
 1.16
 
