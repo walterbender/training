@@ -25,7 +25,7 @@ from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics.toolbarbox import ToolbarButton
-from sugar3.graphics.alert import NotifyAlert
+from sugar3.graphics.alert import ConfirmationAlert
 from sugar3.graphics import style
 
 try:
@@ -291,7 +291,7 @@ class TrainingActivity(activity.Activity):
                 _logger.error('Could not copy %s to %s, %s' %
                               (training_path), webservice_path, e)
 
-            alert = NotifyAlert(10)
+            alert = ConfirmationAlert()
             alert.props.title = _('Restart required')
             alert.props.msg = _('We needed to install some software on your '
                                 'system.\nSugar must be restarted before '
@@ -302,3 +302,5 @@ class TrainingActivity(activity.Activity):
 
     def _remove_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
+        if response_id is Gtk.ResponseType.OK:
+            self.close()
