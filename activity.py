@@ -14,16 +14,18 @@ import dbus
 import os
 from shutil import copy
 import json
+import subprocess
 from gettext import gettext as _
 
 from gi.repository import Gtk
 from gi.repository import Gdk
 
 from sugar3.activity import activity
-from sugar3.graphics.toolbarbox import ToolbarBox
-from sugar3.activity.widgets import ActivityToolbarButton
-from sugar3.graphics.toolbarbox import ToolbarButton
 from sugar3.activity.widgets import StopButton
+from sugar3.activity.widgets import ActivityToolbarButton
+from sugar3.graphics.toolbarbox import ToolbarBox
+from sugar3.graphics.toolbarbox import ToolbarButton
+from sugar3.graphics.alert import NotifyAlert
 from sugar3.graphics import style
 
 try:
@@ -53,6 +55,8 @@ class TrainingActivity(activity.Activity):
 
         self.connect('realize', self.__realize_cb)
 
+        self._load_extension()
+
         self.font_size = 5
         self.zoom_level = 0.833
         self.check_progress = None
@@ -63,8 +67,7 @@ class TrainingActivity(activity.Activity):
 
         self._setup_toolbars()
 
-        self.modify_bg(Gtk.StateType.NORMAL,
-                       style.COLOR_WHITE.get_gdk_color())
+        self.modify_bg(Gtk.StateType.NORMAL, style.COLOR_WHITE.get_gdk_color())
 
         self._task_master = TaskMaster(self)
 
@@ -234,10 +237,9 @@ class TrainingActivity(activity.Activity):
             'message': msg
         }
         icon_path = os.path.join(activity.get_bundle_path(),
-                                 'icons',
-                                 (icon + '.svg'))
+                                 'icons', (icon + '.svg'))
         sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')
-        copy(icon_path, sugar_icons)
+        subprocess.check(['copy', icon_path, sugar_icons])
 
         if 'comments' in self.metadata:
             comments = json.loads(self.metadata['comments'])
@@ -245,3 +247,23 @@ class TrainingActivity(activity.Activity):
             self.metadata['comments'] = json.dumps(comments)
         else:
             self.metadata['comments'] = json.dumps([badge])
+
+    def _load_extension(self):
+        extension_path = os.path.join(os.path.expanduser('~'), '.sugar',
+                                      'default', 'extensions', 'webservice')
+        if not os.path.exists(os.path.join(extension_path, 'training')):
+            _logger.error('Training webservice not found. Installing...')
+            subprocess.check(['cp', '-r', os.path.join(get_bundle_path(),
+                                                       'training'),
+                              extension_path])
+
+            alert = NotifyAlert(10)
+            alert.props.title = _('Restart required')
+            alert.props.msg = _('We needed to install some software on your '
+                                'system. Sugar must be restarted before '
+                                'training can commence.')
+            alert.connect('response', self._remove_alert_cb)
+            self.add_alert(alert)
+
+    def _remove_alert_cb(self, alert, response_id):
+        self.remove_alert(alert)

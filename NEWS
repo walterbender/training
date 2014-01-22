@@ -1,5 +1,9 @@
 NEWS
 
+1.18
+
+* Use training service for shell interface (with Martin Abente)
+
 1.17
 
 * Added keypress event handling

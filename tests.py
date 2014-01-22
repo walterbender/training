@@ -53,6 +53,7 @@ _WARN_MIN_PERCENTAGE = 15
 
 volume_monitor = None
 battery_model = None
+proxy = None
 
 
 def get_safe_text(text):
@@ -169,46 +170,133 @@ def get_title(activity):
 
 
 def is_activity_open(bundle_name):
-    return bundle_name == shell.get_model().get_activity_name() and \
-        is_activity_view()
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        return \
+            dbus.Interface(proxy, 'org.sugarlabs.Shell').GetActivityName() == \
+            bundle_name and is_activity_view()
+    except Exception, e:
+        _logger.error('ERROR setting zoom level %s' % e)
+        return False
 
 
 def is_journal_open():
-    return shell.get_model().is_journal() and is_activity_view()
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        return dbus.Interface(proxy, 'org.sugarlabs.Shell').IsJournal() and \
+            is_activity_view()
+    except Exception, e:
+        _logger.error('ERROR setting zoom level %s' % e)
+        return False
 
 
 def is_activity_view():
-    return shell.get_model().props.zoom_level == \
-        shell.ShellModel.ZOOM_ACTIVITY
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        zoom_level = \
+            dbus.Interface(proxy, 'org.sugarlabs.Shell').GetZoomLevel()
+    except Exception, e:
+        _logger.error('ERROR setting zoom level %s' % e)
+        return False
+
+    return zoom_level == shell.ShellModel.ZOOM_ACTIVITY
 
 
 def is_home_view():
-    return shell.get_model().props.zoom_level == shell.ShellModel.ZOOM_HOME
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        zoom_level = \
+            dbus.Interface(proxy, 'org.sugarlabs.Shell').GetZoomLevel()
+    except Exception, e:
+        _logger.error('ERROR setting zoom level %s' % e)
+        return False
+
+    return zoom_level == shell.ShellModel.ZOOM_HOME
 
 
 def is_neighborhood_view():
-    return shell.get_model().props.zoom_level == shell.ShellModel.ZOOM_MESH
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        zoom_level = \
+            dbus.Interface(proxy, 'org.sugarlabs.Shell').GetZoomLevel()
+    except Exception, e:
+        _logger.error('ERROR setting zoom level %s' % e)
+        return False
+
+    return zoom_level == shell.ShellModel.ZOOM_MESH
 
 
 def goto_activity_view():
-    shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_ACTIVITY)
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+            shell.ShellModel.ZOOM_ACTIVITY)
+    except Exception, e:
+        _logger.error('ERROR setting zoom level %s' % e)
 
 
 def goto_journal():
     # TODO: FIX ME
-    shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_HOME)
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+            shell.ShellModel.ZOOM_ACTIVITY)
+    except Exception, e:
+        _logger.error('ERROR setting zoom level %s' % e)
 
 
 def goto_home_view():
-    shell_model = shell.get_model()
-    _logger.debug('before zoom level %s' % str(shell_model.zoom_level))
-    shell_model.set_zoom_level(shell.ShellModel.ZOOM_MESH)
-    shell_model.set_zoom_level(shell.ShellModel.ZOOM_HOME)
-    _logger.debug('after zoom level %s' % str(shell_model.zoom_level))
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+            shell.ShellModel.ZOOM_HOME)
+    except Exception, e:
+        _logger.error('ERROR setting zoom level %s' % e)
 
 
 def goto_neighborhood_view():
-    shell.get_model().set_zoom_level(shell.ShellModel.ZOOM_MESH)
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+            shell.ShellModel.ZOOM_MESH)
+    except Exception, e:
+        _logger.error('ERROR setting zoom level %s' % e)
 
 
 def get_launch_count(activity):
