@@ -55,12 +55,12 @@ class TrainingActivity(activity.Activity):
 
         self.connect('realize', self.__realize_cb)
 
-        self._load_extension()
-
         self.font_size = 5
         self.zoom_level = 0.833
         self.check_progress = None
         self.bundle_path = activity.get_bundle_path()
+
+        self._load_extension()
 
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
@@ -236,8 +236,7 @@ class TrainingActivity(activity.Activity):
             'from': name,
             'message': msg
         }
-        icon_path = os.path.join(activity.get_bundle_path(),
-                                 'icons', (icon + '.svg'))
+        icon_path = os.path.join(self.bundle_path(), 'icons', (icon + '.svg'))
         sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')
         try:
             subprocess.call(['cp', icon_path, sugar_icons])
@@ -253,24 +252,41 @@ class TrainingActivity(activity.Activity):
             self.metadata['comments'] = json.dumps([badge])
 
     def _load_extension(self):
-        extension_path = os.path.join(os.path.expanduser('~'), '.sugar',
-                                      'default', 'extensions', 'webservice')
-        if not os.path.exists(os.path.join(extension_path, 'training')):
+        extensions_path = os.path.join(os.path.expanduser('~'), '.sugar',
+                                      'default', 'extensions')
+        webservice_path = os.path.join(extensions_path, 'webservice')
+        training_path = os.path.join(self.bundle_path, 'training')
+        init_path = os.path.join(self.bundle_path, 'training', '__init__.py')
+
+        if not os.path.exists(extensions_path):
+            try:
+                subprocess.call(['mkdir', extensions_path])
+            except OSError, e:
+                _logger.error('Could not mkdir %s, %s' % (extensions_path, e))
+        if not os.path.exists(webservice_path):
+            try:
+                subprocess.call(['mkdir', webservice_path])
+            except OSError, e:
+                _logger.error('Could not mkdir %s, %s' % (webservice_path, e))
+            try:
+                subprocess.call(['cp', init_path, webservice_path])
+            except OSError, e:
+                _logger.error('Could not cp %s to %s, %s' %
+                              (init_path, webservice_path, e))
+        if not os.path.exists(os.path.join(webservice_path, 'training')):
             _logger.error('Training webservice not found. Installing...')
             try:
-                subprocess.call(['cp', '-r', os.path.join(get_bundle_path(),
-                                                          'training'),
-                                 extension_path])
+                subprocess.call(['cp', '-r', training_path, webservice_path])
             except OSError, e:
                 _logger.error('Could not copy %s to %s, %s' %
-                              (os.path.join(get_bundle_path(), 'training'),
-                               extension_path, e))
+                              (training_path), webservice_path, e)
 
             alert = NotifyAlert(10)
             alert.props.title = _('Restart required')
             alert.props.msg = _('We needed to install some software on your '
-                                'system. Sugar must be restarted before '
+                                'system.\nSugar must be restarted before '
                                 'training can commence.')
+
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
 
