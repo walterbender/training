@@ -17,14 +17,19 @@ from gi.repository import Gtk
 
 from sugar3.graphics import style
 
+from tasks import SECTIONS
+
+_HEIGHT = 15
+_BLACK = style.COLOR_BLACK.get_html()
+_WHITE = style.COLOR_WHITE.get_html()
+_SIZE = 'large'
+
 
 class ProgressBar(Gtk.Grid):
 
-    def __init__(self, progress_button_data, prev_task_button_cb,
-                 next_task_button_cb, progress_button_cb):
+    def __init__(self, name, section, progress_button_data,
+                 prev_task_button_cb, next_task_button_cb, progress_button_cb):
         Gtk.Grid.__init__(self)
-
-        height = 15
 
         self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
@@ -34,29 +39,27 @@ class ProgressBar(Gtk.Grid):
         self._prev_grid.set_row_spacing(style.DEFAULT_SPACING)
         self._prev_grid.set_column_spacing(style.DEFAULT_SPACING)
         self._prev_grid.set_border_width(style.DEFAULT_SPACING * 2)
-        self._prev_grid.set_size_request(-1, height)
+        self._prev_grid.set_size_request(-1, _HEIGHT)
 
         self._progress_button_grid = Gtk.Grid()
         self._progress_button_grid.set_row_spacing(style.DEFAULT_SPACING)
         self._progress_button_grid.set_column_spacing(style.DEFAULT_SPACING)
         self._progress_button_grid.set_border_width(style.DEFAULT_SPACING * 2)
-        self._progress_button_grid.set_size_request(-1, height)
+        self._progress_button_grid.set_size_request(-1, _HEIGHT)
 
         self._next_grid = Gtk.Grid()
         self._next_grid.set_row_spacing(style.DEFAULT_SPACING)
         self._next_grid.set_column_spacing(style.DEFAULT_SPACING)
         self._next_grid.set_border_width(style.DEFAULT_SPACING * 2)
-        self._next_grid.set_size_request(-1, height)
+        self._next_grid.set_size_request(-1, _HEIGHT)
 
         self._progress_buttons = []
         for i, button_data in enumerate(progress_button_data):
             self._progress_buttons.append(Gtk.Button(button_data['label']))
             if 'tooltip' in button_data:
                 tooltip = \
-'<span background="%s" foreground="%s" size="large"> %s </span>' \
-                    % (style.COLOR_WHITE.get_html(),
-                       style.COLOR_BLACK.get_html(),
-                       button_data['tooltip'])
+'<span background="%s" foreground="%s" size="%s"> %s </span>' \
+                    % (_WHITE, _BLACK, _SIZE, button_data['tooltip'])
                 self._progress_buttons[i].connect(
                     'clicked', progress_button_cb, i)
                 self._progress_buttons[i].set_tooltip_markup(tooltip)
@@ -64,6 +67,15 @@ class ProgressBar(Gtk.Grid):
                 self._progress_buttons[i], i, 0, 1, 1)
             self._progress_buttons[i].show()
             self._progress_buttons[-1].set_sensitive(False)
+
+        self._name_label = Gtk.Label()
+        self._name_label.set_size_request(200, _HEIGHT)
+        self._name_label.set_use_markup(True)
+        self._name_label.set_justify(Gtk.Justification.RIGHT)
+        span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
+        self._name_label.set_markup(span + name + '</span>')
+        self.attach(self._name_label, 0, 0, 1, 1)
+        self._name_label.show()
 
         self.prev_task_button = Gtk.Button('<')
         self.prev_task_button.connect('clicked', prev_task_button_cb)
@@ -83,6 +95,16 @@ class ProgressBar(Gtk.Grid):
         self.next_task_button.set_sensitive(False)
         self.attach(self._next_grid, 3, 0, 1, 1)
         self._next_grid.show()
+
+        self._section_label = Gtk.Label()
+        self._section_label.set_size_request(200, _HEIGHT)
+        self._section_label.set_use_markup(True)
+        self._section_label.set_justify(Gtk.Justification.LEFT)
+        span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
+        self._section_label.set_markup(
+            span + SECTIONS[section]['name'] + '</span>')
+        self.attach(self._section_label, 4, 0, 1, 1)
+        self._section_label.show()
 
     def set_button_sensitive(self, i, flag=True):
         # _logger.debug('setting button %d to %r' % (i, flag))

@@ -27,7 +27,7 @@ _logger = logging.getLogger('training-activity-taskmaster')
 
 import tasks
 from progressbar import ProgressBar
-
+from tests import get_nick
 
 class TaskMaster(Gtk.Grid):
 
@@ -532,7 +532,9 @@ class TaskMaster(Gtk.Grid):
                     buttons.append(
                         {'label': str(i + 1),
                          'tooltip': self._task_list[section][i].get_name()})
-            self._progress_bar = ProgressBar(buttons,
+            self._progress_bar = ProgressBar(get_nick(),
+                                             section,
+                                             buttons,
                                              self._prev_task_button_cb,
                                              self._next_task_button_cb,
                                              self._progress_button_cb)
