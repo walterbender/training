@@ -26,15 +26,25 @@ import tests
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
               'xx-large']
 
-SECTIONS = [{'name': _('Welcome to One Academy'),
+SECTIONS = [{'name': _('1. Welcome to One Academy'),
              'icon': 'badge-intro'},
-            {'name': _('Getting to Know the Toolbar'),
+            {'name': _('2. Getting to Know the Toolbar'),
              'icon': 'badge-intro'},
-            {'name': _('Getting to Know the XO'),
+            {'name': _('3. Getting Connected'),
              'icon': 'badge-intro'},
-            {'name': _('Getting to Know the XO (Part 2)'),
+            {'name': _('4. Getting to Know Sugar Activities'),
              'icon': 'badge-intro'},
-            {'name': _('More sections listed here'),
+            {'name': _('5. Getting to Know the Journal'),
+             'icon': 'badge-intro'},
+            {'name': _('6. Getting to Know the Frame'),
+             'icon': 'badge-intro'},
+            {'name': _('7. Getting to Know the Views'),
+             'icon': 'badge-intro'},
+            {'name': _('8. Getting to Know Settings'),
+             'icon': 'badge-intro'},
+            {'name': _('9. Getting to Know the XO'),
+             'icon': 'badge-intro'},
+            {'name': _('Wrap Up'),
              'icon': 'badge-intro'}]
 
 
@@ -43,7 +53,7 @@ def get_task_list(task_master):
              EnterNameTask(task_master),
              EnterEmailTask(task_master),
              ValidateEmailTask(task_master),
-             BadgeOneTask(task_master)],
+             BadgeIntroTask(task_master)],
             [Toolbars1Task(task_master),
              Toolbars2Task(task_master),
              Toolbars3Task(task_master),
@@ -52,35 +62,41 @@ def get_task_list(task_master):
              Toolbars6Task(task_master),
              Toolbars7Task(task_master),
              Toolbars8Task(task_master),
-             BadgeTwoTask(task_master)],
-            [NickChange1Task(task_master),
-             NickChange2Task(task_master),
-             NickChange3Task(task_master),
-             NickChange4Task(task_master),
-             NickChange5Task(task_master),
+             BadgeToolbarTask(task_master)],
+            [Network1Task(task_master),
+             BadgeNetworkTask(task_master)],
+            [Speak1Task(task_master),
+             Speak2Task(task_master),
+             Speak3Task(task_master),
+             Speak4Task(task_master),
              WriteSave1Task(task_master),
              WriteSave2Task(task_master),
              WriteSave3Task(task_master),
              WriteSave4Task(task_master),
              WriteSave5Task(task_master),
-             BadgeThreeTask(task_master)],
-            [Speak1Task(task_master),
-             Speak2Task(task_master),
-             Speak3Task(task_master),
-             Speak4Task(task_master),
-             BadgeFourTask(task_master)],
-            [BatteryTask(task_master),
-             SoundTask(task_master),
-             Tablet1Task(task_master),
-             GameKeyTask(task_master),
-             Tablet2Task(task_master),
-             Journal1Task(task_master),
+             BadgeActivitiesTask(task_master)],
+            [Journal1Task(task_master),
              AddStarredTask(task_master),
              RemoveStarredTask(task_master),
-             AddFavoriteTask(task_master),
+             BadgeJournalTask(task_master)],
+            [BatteryTask(task_master),
+             SoundTask(task_master),
+             BadgeFrameTask(task_master)],
+            [AddFavoriteTask(task_master),
              RemoveFavoriteTask(task_master),
-             BadgeFiveTask(task_master)],
-            [FinishedAllTasks(task_master)]]
+             BadgeViewsTask(task_master)],
+            [NickChange1Task(task_master),
+             NickChange2Task(task_master),
+             NickChange3Task(task_master),
+             NickChange4Task(task_master),
+             NickChange5Task(task_master),
+             BadgeSettingsTask(task_master)],
+            [Tablet1Task(task_master),
+             GameKeyTask(task_master),
+             Tablet2Task(task_master),
+             BadgeXOTask(task_master)],
+            [Finished1Task(task_master),
+             FinishedAllTasks(task_master)]]
 
 
 class Task():
@@ -286,7 +302,8 @@ class EnterEmailTask(Task):
             name = ''
         email = self._task_master.read_task_data('email_address')
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'introduction3.html?NAME=%s' % tests.get_safe_text(name))
+                           'introduction3.html?NAME=%s' %
+                           tests.get_safe_text(name))
 
         graphics = Graphics()
         graphics.add_uri('file://' + url)
@@ -351,41 +368,6 @@ class ValidateEmailTask(Task):
             size=FONT_SIZES[self._font_size])
         self._entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
-
-
-class BadgeOneTask(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Badge One')
-        self.uid = 'badge-one'
-
-    def after_button_press(self):
-        target = self._task_master.read_task_data('name').split()[0]
-        self._task_master.activity.add_badge(
-            _('Congratulations %s!\n'
-              "You’ve earned your first badge!" % target),
-            icon='badge-intro')
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        name = self._task_master.read_task_data('name')
-        if name is not None:
-            target = name.split()[0]
-        else:
-            target = ''
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'introduction4.html?NAME=%s' % target)
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
@@ -608,50 +590,6 @@ class Toolbars8Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
-
-
-class BadgeTwoTask(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Badge Two')
-        self.uid = 'badge-two'
-
-    def after_button_press(self):
-        name = self._task_master.read_task_data('name')
-        if name is None:
-            target = ' '
-        else:
-            target = name.split()[0]
-        self._task_master.activity.add_badge(
-            _('Congratulations %s!\n'
-              "You’ve earned your second badge!" % target),
-            icon='badge-intro')
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        name = self._task_master.read_task_data('name')
-        if name is None:
-            target = ' '
-        else:
-            target = name.split()[0]
-        graphics = Graphics()
-        graphics.add_text(
-            _('Congratulations %s!\n'
-              "You’ve earned your second badge!\n\n" % target),
-            bold=True,
-            size=FONT_SIZES[self._font_size])
-        graphics.add_icon('badge-intro')
-        graphics.add_text(
-            _('\n\nMost badges require you to complete multiple '
-              'tasks.\n'
-              'Press Next to start on your next one!\n\n'),
-            size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
@@ -950,48 +888,6 @@ class WriteSave5Task(Task):
         return graphics, button
 
 
-class BadgeThreeTask(Task):
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Badge Three')
-        self.uid = 'badge-3'
-
-    def after_button_press(self):
-        name = self._task_master.read_task_data('name')
-        if name is None:
-            target = ' '
-        else:
-            target = name.split()[0]
-        self._task_master.activity.add_badge(
-            _('Congratulations %s!\n'
-              "You’ve earned your third badge!" % target),
-            icon='badge-intro')
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        name = self._task_master.read_task_data('name')
-        if name is None:
-            target = ' '
-        else:
-            target = name.split()[0]
-        graphics = Graphics()
-        graphics.add_text(
-            _('Congratulations %s!\n'
-              "You’ve earned your third badge!\n\n" % target),
-            bold=True, size=FONT_SIZES[self._font_size])
-        graphics.add_icon('badge-intro')
-        graphics.add_text(
-            _('\n\nMost badges require you to complete multiple '
-              'tasks.\n'
-              'Press Next to start on your next one!\n\n'),
-            size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
-
-
 class Speak1Task(Task):
 
     def __init__(self, task_master):
@@ -1092,48 +988,6 @@ class Speak4Task(Task):
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
-
-
-class BadgeFourTask(Task):
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Badge Four')
-        self.uid = 'badge-4'
-
-    def after_button_press(self):
-        name = self._task_master.read_task_data('name')
-        if name is None:
-            target = ' '
-        else:
-            target = name.split()[0]
-        self._task_master.activity.add_badge(
-            _('Congratulations %s!\n'
-              "You’ve earned your fourth badge!" % target),
-            icon='badge-intro')
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        name = self._task_master.read_task_data('name')
-        if name is None:
-            target = ' '
-        else:
-            target = name.split()[0]
-        graphics = Graphics()
-        graphics.add_text(
-            _('Congratulations %s!\n'
-              "You’ve earned your fourth badge!\n\n" % target),
-            bold=True, size=FONT_SIZES[self._font_size])
-        graphics.add_icon('badge-intro')
-        graphics.add_text(
-            _('\n\nMost badges require you to complete multiple '
-              'tasks.\n'
-              'Press Next to start on your next one!\n\n'),
-            size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
@@ -1313,68 +1167,6 @@ class RemoveStarredTask(Task):
         return graphics, button
 
 
-class BadgeFiveTask(Task):
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Badge Five')
-        self.uid = 'badge-5'
-
-    def after_button_press(self):
-        name = self._task_master.read_task_data('name')
-        if name is None:
-            target = ' '
-        else:
-            target = name.split()[0]
-        self._task_master.activity.add_badge(
-            _('Congratulations %s!\n'
-              "You’ve earned your fourth badge!" % target),
-            icon='badge-intro')
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        name = self._task_master.read_task_data('name')
-        if name is None:
-            target = ' '
-        else:
-            target = name.split()[0]
-        graphics = Graphics()
-        graphics.add_text(
-            _('Congratulations %s!\n'
-              "You’ve earned your fifth badge!\n\n" % target),
-            bold=True, size=FONT_SIZES[self._font_size])
-        graphics.add_icon('badge-intro')
-        graphics.add_text(
-            _('\n\nMost badges require you to complete multiple '
-              'tasks.\n'
-              'Press Next to start on your next one!\n\n'),
-            size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
-
-
-class FinishedAllTasks(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Finished All Tasks')
-        self.uid = 'finished'
-
-    def test(self, task_data):
-        self._task_master.completed = True
-        return True
-
-    def get_graphics(self, page=0):
-        graphics = Graphics()
-        graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
-
-
 class BatteryTask(Task):
 
     def __init__(self, task_master):
@@ -1534,6 +1326,222 @@ class Tablet2Task(Task):
         graphics = Graphics()
         graphics.add_text(_('Switch to back to Laptop Mode'))
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Network1Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Network 1')
+        self.uid = 'network-task-1'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            task_data['data'] = \
+                tests.get_launch_count(self._task_master.activity)
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            _logger.debug(tests.get_launch_count(self._task_master.activity))
+            return tests.get_launch_count(self._task_master.activity) > \
+                task_data['data']
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'network1.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class Finished1Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Fill out a form 1')
+        self.uid = 'finished-task-1'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            task_data['data'] = \
+                tests.get_launch_count(self._task_master.activity)
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            _logger.debug(tests.get_launch_count(self._task_master.activity))
+            return tests.get_launch_count(self._task_master.activity) > \
+                task_data['data']
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'finished1.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class BadgeTask(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Badge Task')
+        self.uid = 'badge-task'
+
+    def after_button_press(self):
+        target = self._task_master.read_task_data('name').split()[0]
+        self._task_master.activity.add_badge(
+            _('Congratulations %s!\n'
+              "You’ve earned another badge!" % target),
+            icon='badge-intro')
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+        name = self._task_master.read_task_data('name')
+        if name is None:
+            target = ' '
+        else:
+            target = name.split()[0]
+        graphics = Graphics()
+        graphics.add_text(
+            _('Congratulations %s!\n'
+              "You’ve earned another badge!\n\n" % target),
+            bold=True,
+            size=FONT_SIZES[self._font_size])
+        graphics.add_icon('badge-intro')
+        graphics.add_text(
+            _('\n\nMost badges require you to complete multiple '
+              'tasks.\n'
+              'Press Next to start on your next one!\n\n'),
+            size=FONT_SIZES[self._font_size])
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class BadgeIntroTask(BadgeTask):
+
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge Intro')
+        self.uid = 'badge-intro'
+
+    def after_button_press(self):
+        target = self._task_master.read_task_data('name').split()[0]
+        self._task_master.activity.add_badge(
+            _('Congratulations %s!\n'
+              "You’ve earned your first badge!" % target),
+            icon='badge-intro')
+
+    def get_graphics(self, page=0):
+        name = self._task_master.read_task_data('name')
+        if name is not None:
+            target = name.split()[0]
+        else:
+            target = ''
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'introduction4.html?NAME=%s' % target)
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        button = graphics.add_button(_('Next'),
+                                     self._task_master.task_button_cb)
+        return graphics, button
+
+
+class BadgeToolbarTask(BadgeTask):
+
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge Toolbar')
+        self.uid = 'badge-toolbar'
+
+
+class BadgeNetworkTask(BadgeTask):
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge Network')
+        self.uid = 'badge-network'
+
+
+class BadgeActivitiesTask(BadgeTask):
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge Activities')
+        self.uid = 'badge-activities'
+
+
+class BadgeJournalTask(BadgeTask):
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge Journal')
+        self.uid = 'badge-journal'
+
+
+class BadgeFrameTask(BadgeTask):
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge Frame')
+        self.uid = 'badge-frame'
+
+
+class BadgeViewsTask(BadgeTask):
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge View')
+        self.uid = 'badge-view'
+
+
+class BadgeSettingsTask(BadgeTask):
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge Settings')
+        self.uid = 'badge-settings'
+
+
+class BadgeXOTask(BadgeTask):
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge XO')
+        self.uid = 'badge-xo'
+
+
+class FinishedAllTasks(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Finished All Tasks')
+        self.uid = 'finished'
+
+    def test(self, task_data):
+        self._task_master.completed = True
+        return True
+
+    def get_graphics(self, page=0):
+        graphics = Graphics()
+        graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
+                          size=FONT_SIZES[self._font_size])
         button = graphics.add_button(_('Next'),
                                      self._task_master.task_button_cb)
         return graphics, button
