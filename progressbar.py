@@ -23,7 +23,7 @@ from tasks import SECTIONS
 _HEIGHT = 15
 _BLACK = style.COLOR_BLACK.get_html()
 _WHITE = style.COLOR_WHITE.get_html()
-_SIZE = 'large'
+_SIZE = 'small'
 
 
 class ProgressBar(Gtk.Grid):
@@ -114,9 +114,9 @@ class ProgressBar(Gtk.Grid):
 
         n = len(progress_button_data)
         c = 0
-        self.attach(alignment1, c, 1, 9, 1)
+        self.attach(alignment1, c, 1, 7, 1)
         alignment1.show()
-        c += 9
+        c += 7
         self.attach(alignment2, c, 1, 2, 1)
         alignment2.show()
         c += 2
@@ -126,14 +126,14 @@ class ProgressBar(Gtk.Grid):
         self.attach(alignment4, c, 1, 2, 1)
         alignment4.show()
         c += 2
-        self.attach(alignment5, c, 1, 9, 1)
+        self.attach(alignment5, c, 1, 7, 1)
         alignment5.show()
-        c += 9
+        c += 7
 
         box = Gtk.EventBox()
         box.modify_bg(Gtk.StateFlags.NORMAL,
                       style.COLOR_BLACK.get_gdk_color())
-        box.set_size_request(800, 2)
+        box.set_size_request(-1, 2)
         self.attach(box, 0, 0, c, 1)
         box.show()
 

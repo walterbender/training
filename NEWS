@@ -5,6 +5,7 @@ NEWS
 * Use training service for shell interface (with Martin Abente)
 * Auto-install training service
 * Add name, section name to progress bar
+* Add rule to progress bar
 
 1.17
 

@@ -36,6 +36,7 @@ class TaskMaster(Gtk.Grid):
         Gtk.Grid.__init__(self)
         self.set_row_spacing(0) # style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
+        self.set_row_homogeneous(True)
 
         self.button_was_pressed = True
         self.current_task = None
@@ -64,7 +65,7 @@ class TaskMaster(Gtk.Grid):
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
         graphics_grid_alignment.add(self._graphics_grid)
         self._graphics_grid.show()
-        self.attach(graphics_grid_alignment, 0, 0, 1, 1)
+        self.attach(graphics_grid_alignment, 0, 0, 1, 12)
         graphics_grid_alignment.show()
 
         self._prev_page_button = ToolButton('go-left-page')
@@ -77,7 +78,7 @@ class TaskMaster(Gtk.Grid):
         self._progress_bar = None
         self._progress_bar_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        self.attach(self._progress_bar_alignment, 0, 1, 1, 1)
+        self.attach(self._progress_bar_alignment, 0, 13, 1, 1)
         self._progress_bar_alignment.show()
 
     def keypress_cb(self, widget, event):
