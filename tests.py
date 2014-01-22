@@ -115,9 +115,32 @@ def get_number_of_mounted_volumes():
     return len(volume_monitor.get_mounts())
 
 
-# FIX ME
+def _get_dmi(node):
+    ''' The desktop management interface should be a reliable source
+    for product and version information. '''
+    path = os.path.join('/sys/class/dmi/id', node)
+    try:
+        return open(path).readline().strip()
+    except:
+        return None
+
+
 def is_XO():
-    return True
+    version = _get_dmi('product_version')
+    if version is None:
+        hwinfo_path = '/bin/olpc-hwinfo'
+        if os.path.exists(hwinfo_path) and os.access(hwinfo_path, os.X_OK):
+            model = check_output([hwinfo_path, 'model'], 'unknown hardware')
+            version = model.strip()
+    if version in ['1', '1.5', '1.75', '4']:
+        return True
+    else:
+        # Some systems (e.g. ARM) don't have dmi info
+        if os.path.exists('/sys/devices/platform/lis3lv02d/position'):
+            return True
+        elif os.path.exists('/etc/olpc-release'):
+            return True
+    return False
 
 
 def is_game_key(keyname):
