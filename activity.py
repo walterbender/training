@@ -239,7 +239,11 @@ class TrainingActivity(activity.Activity):
         icon_path = os.path.join(activity.get_bundle_path(),
                                  'icons', (icon + '.svg'))
         sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')
-        subprocess.check(['copy', icon_path, sugar_icons])
+        try:
+            subprocess.call(['cp', icon_path, sugar_icons])
+        except OSError, e:
+            _logger.error('Could not copy %s to %s, %s' %
+                          (icon_path, sugar_icons, e))
 
         if 'comments' in self.metadata:
             comments = json.loads(self.metadata['comments'])
@@ -253,9 +257,14 @@ class TrainingActivity(activity.Activity):
                                       'default', 'extensions', 'webservice')
         if not os.path.exists(os.path.join(extension_path, 'training')):
             _logger.error('Training webservice not found. Installing...')
-            subprocess.check(['cp', '-r', os.path.join(get_bundle_path(),
-                                                       'training'),
-                              extension_path])
+            try:
+                subprocess.call(['cp', '-r', os.path.join(get_bundle_path(),
+                                                          'training'),
+                                 extension_path])
+            except OSError, e:
+                _logger.error('Could not copy %s to %s, %s' %
+                              (os.path.join(get_bundle_path(), 'training'),
+                               extension_path, e))
 
             alert = NotifyAlert(10)
             alert.props.title = _('Restart required')
