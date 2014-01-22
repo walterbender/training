@@ -42,6 +42,7 @@ class TaskMaster(Gtk.Grid):
         self.activity = activity
         self.keyname = None
 
+        self._name = None
         self._graphics = None
         self._summary = None
         self._page = 0
@@ -532,9 +533,13 @@ class TaskMaster(Gtk.Grid):
                     buttons.append(
                         {'label': str(i + 1),
                          'tooltip': self._task_list[section][i].get_name()})
-            self._progress_bar = ProgressBar(get_nick(),
-                                             section,
-                                             buttons,
+            if self._name is None:
+                self._name = self.read_task_data('name')
+            if self._name is None:
+                name = get_nick()
+            else:
+                name = self._name
+            self._progress_bar = ProgressBar(name, section, buttons,
                                              self._prev_task_button_cb,
                                              self._next_task_button_cb,
                                              self._progress_button_cb)

@@ -14,6 +14,7 @@ import logging
 _logger = logging.getLogger('training-activity-progressbar')
 
 from gi.repository import Gtk
+from gi.repository import Gdk
 
 from sugar3.graphics import style
 
@@ -22,7 +23,7 @@ from tasks import SECTIONS
 _HEIGHT = 15
 _BLACK = style.COLOR_BLACK.get_html()
 _WHITE = style.COLOR_WHITE.get_html()
-_SIZE = 'medium'
+_SIZE = 'large'
 
 
 class ProgressBar(Gtk.Grid):
@@ -34,13 +35,24 @@ class ProgressBar(Gtk.Grid):
         self.set_row_spacing(0)  # style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
         self.set_border_width(0) # style.DEFAULT_SPACING * 2)
+        self.set_column_homogeneous(True)
 
         # FIX ME
+        rgba = Gdk.RGBA()
+        rgba.red, rgba.green, rgba.blue, rgba.alpha = \
+            style.COLOR_PANEL_GREY.get_rgba()
+        self.override_background_color(Gtk.StateFlags.NORMAL, rgba)
+        self.modify_bg(Gtk.StateFlags.NORMAL,
+                       style.COLOR_PANEL_GREY.get_gdk_color())
+
+        # FIX ME
+        '''
         separator = Gtk.SeparatorToolItem()
         separator.props.draw = True
         separator.set_expand(True)
         self.attach(separator, 0, 0, 5, 1)
         separator.show()
+        '''
 
         self._prev_grid = Gtk.Grid()
         self._prev_grid.set_row_spacing(0)  # style.DEFAULT_SPACING)
@@ -60,6 +72,8 @@ class ProgressBar(Gtk.Grid):
         self._next_grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
         self._next_grid.set_size_request(-1, _HEIGHT)
 
+        alignment2 = Gtk.Alignment.new(
+            xalign=0.5, yalign=0.5, xscale=0, yscale=0)
         self._progress_buttons = []
         for i, button_data in enumerate(progress_button_data):
             self._progress_buttons.append(Gtk.Button(button_data['label']))
@@ -74,15 +88,18 @@ class ProgressBar(Gtk.Grid):
                 self._progress_buttons[i], i, 0, 1, 1)
             self._progress_buttons[i].show()
             self._progress_buttons[-1].set_sensitive(False)
+        alignment2.add(self._progress_button_grid)
+        self._progress_button_grid.show()
 
+        alignment1 = Gtk.Alignment.new(
+            xalign=1.0, yalign=0.5, xscale=0, yscale=0)
         self._section_label = Gtk.Label()
-        self._section_label.set_size_request(250, _HEIGHT)
         self._section_label.set_use_markup(True)
         self._section_label.set_justify(Gtk.Justification.LEFT)
         span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
         self._section_label.set_markup(
             span + SECTIONS[section]['name'] + '</span>')
-        self.attach(self._section_label, 0, 1, 1, 1)
+        alignment1.add(self._section_label)
         self._section_label.show()
 
         self.prev_task_button = Gtk.Button('<')
@@ -90,31 +107,36 @@ class ProgressBar(Gtk.Grid):
         self._prev_grid.attach(self.prev_task_button, 0, 0, 1, 1)
         self.prev_task_button.show()
         self.prev_task_button.set_sensitive(False)
-        self.attach(self._prev_grid, 1, 1, 1, 1)
-        self._prev_grid.show()
-
-        self.attach(self._progress_button_grid, 2, 1, 1, 1)
-        self._progress_button_grid.show()
 
         self.next_task_button = Gtk.Button('>')
         self.next_task_button.connect('clicked', next_task_button_cb)
         self._next_grid.attach(self.next_task_button, 0, 0, 1, 1)
         self.next_task_button.show()
         self.next_task_button.set_sensitive(False)
-        self.attach(self._next_grid, 3, 1, 1, 1)
-        self._next_grid.show()
 
+        alignment3 = Gtk.Alignment.new(
+            xalign=0, yalign=0.5, xscale=0, yscale=0)
         self._name_label = Gtk.Label()
-        self._name_label.set_size_request(250, _HEIGHT)
         self._name_label.set_use_markup(True)
         self._name_label.set_justify(Gtk.Justification.RIGHT)
         span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
         self._name_label.set_markup(span + name + '</span>')
-        self.attach(self._name_label, 4, 1, 1, 1)
+        alignment3.add(self._name_label)
         self._name_label.show()
 
+        n = len(progress_button_data)
+        self.attach(alignment1, 0, 1, 9, 1)
+        alignment1.show()
+        self.attach(self._prev_grid, 10, 1, 1, 1)
+        self._prev_grid.show()
+        self.attach(alignment2, 11, 1, n + 1, 1)
+        alignment2.show()
+        self.attach(self._next_grid, 12 + n, 1, 1, 1)
+        self._next_grid.show()
+        self.attach(alignment3, 13 + n, 1, 9, 1)
+        alignment3.show()
+
     def set_button_sensitive(self, i, flag=True):
-        # _logger.debug('setting button %d to %r' % (i, flag))
         if i < len(self._progress_buttons):
             self._progress_buttons[i].set_sensitive(flag)
 
