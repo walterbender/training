@@ -38,6 +38,7 @@ from toolbar_utils import separator_factory, label_factory, button_factory
 from taskmaster import TaskMaster
 from graphics import FONT_SIZES
 from checkprogress import CheckProgress
+from tests import get_nick
 
 import logging
 _logger = logging.getLogger('training-activity')
@@ -90,6 +91,15 @@ class TrainingActivity(activity.Activity):
         self._task_master.write_task_data('current_task',
                                           self._task_master.current_task)
         self.metadata['font_size'] = str(self.font_size)
+
+    def update_activity_title(self):
+        name = self._task_master.read_task_data('name')
+        if name is not None:
+            bundle_name = activity.get_bundle_name()
+            if self.metadata['title'] != _('%s %s Activity') % (name,
+                                                                bundle_name):
+                self.metadata['title'] = _('%s %s Activity') % (name,
+                                                                bundle_name)
 
     def _setup_toolbars(self):
         ''' Setup the toolbars. '''

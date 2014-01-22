@@ -248,6 +248,7 @@ class EnterNameTask(Task):
 
     def after_button_press(self):
         self._task_master.write_task_data('name', self._entries[0].get_text())
+        self._task_master.activity.update_activity_title()
 
     def get_graphics(self, page=0):
         self._entries = []
