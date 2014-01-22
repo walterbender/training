@@ -115,6 +115,11 @@ def get_number_of_mounted_volumes():
     return len(volume_monitor.get_mounts())
 
 
+# FIX ME
+def is_XO():
+    return True
+
+
 def is_game_key(keyname):
     if keyname in ['KP_Up', 'KP_Down', 'KP_Left', 'KP_Right',
                    'KP_Page_Down', 'KP_Page_Up', 'KP_End', 'KP_Home']:

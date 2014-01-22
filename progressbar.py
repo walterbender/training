@@ -22,7 +22,7 @@ from tasks import SECTIONS
 _HEIGHT = 15
 _BLACK = style.COLOR_BLACK.get_html()
 _WHITE = style.COLOR_WHITE.get_html()
-_SIZE = 'large'
+_SIZE = 'medium'
 
 
 class ProgressBar(Gtk.Grid):
@@ -31,26 +31,33 @@ class ProgressBar(Gtk.Grid):
                  prev_task_button_cb, next_task_button_cb, progress_button_cb):
         Gtk.Grid.__init__(self)
 
-        self.set_row_spacing(style.DEFAULT_SPACING)
+        self.set_row_spacing(0)  # style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
-        self.set_border_width(style.DEFAULT_SPACING * 2)
+        self.set_border_width(0) # style.DEFAULT_SPACING * 2)
+
+        # FIX ME
+        separator = Gtk.SeparatorToolItem()
+        separator.props.draw = True
+        separator.set_expand(True)
+        self.attach(separator, 0, 0, 5, 1)
+        separator.show()
 
         self._prev_grid = Gtk.Grid()
-        self._prev_grid.set_row_spacing(style.DEFAULT_SPACING)
+        self._prev_grid.set_row_spacing(0)  # style.DEFAULT_SPACING)
         self._prev_grid.set_column_spacing(style.DEFAULT_SPACING)
-        self._prev_grid.set_border_width(style.DEFAULT_SPACING * 2)
+        self._prev_grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
         self._prev_grid.set_size_request(-1, _HEIGHT)
 
         self._progress_button_grid = Gtk.Grid()
-        self._progress_button_grid.set_row_spacing(style.DEFAULT_SPACING)
+        self._progress_button_grid.set_row_spacing(0) # style.DEFAULT_SPACING)
         self._progress_button_grid.set_column_spacing(style.DEFAULT_SPACING)
-        self._progress_button_grid.set_border_width(style.DEFAULT_SPACING * 2)
+        self._progress_button_grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
         self._progress_button_grid.set_size_request(-1, _HEIGHT)
 
         self._next_grid = Gtk.Grid()
-        self._next_grid.set_row_spacing(style.DEFAULT_SPACING)
+        self._next_grid.set_row_spacing(0) # style.DEFAULT_SPACING)
         self._next_grid.set_column_spacing(style.DEFAULT_SPACING)
-        self._next_grid.set_border_width(style.DEFAULT_SPACING * 2)
+        self._next_grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
         self._next_grid.set_size_request(-1, _HEIGHT)
 
         self._progress_buttons = []
@@ -68,24 +75,25 @@ class ProgressBar(Gtk.Grid):
             self._progress_buttons[i].show()
             self._progress_buttons[-1].set_sensitive(False)
 
-        self._name_label = Gtk.Label()
-        self._name_label.set_size_request(200, _HEIGHT)
-        self._name_label.set_use_markup(True)
-        self._name_label.set_justify(Gtk.Justification.RIGHT)
+        self._section_label = Gtk.Label()
+        self._section_label.set_size_request(250, _HEIGHT)
+        self._section_label.set_use_markup(True)
+        self._section_label.set_justify(Gtk.Justification.LEFT)
         span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
-        self._name_label.set_markup(span + name + '</span>')
-        self.attach(self._name_label, 0, 0, 1, 1)
-        self._name_label.show()
+        self._section_label.set_markup(
+            span + SECTIONS[section]['name'] + '</span>')
+        self.attach(self._section_label, 0, 1, 1, 1)
+        self._section_label.show()
 
         self.prev_task_button = Gtk.Button('<')
         self.prev_task_button.connect('clicked', prev_task_button_cb)
         self._prev_grid.attach(self.prev_task_button, 0, 0, 1, 1)
         self.prev_task_button.show()
         self.prev_task_button.set_sensitive(False)
-        self.attach(self._prev_grid, 1, 0, 1, 1)
+        self.attach(self._prev_grid, 1, 1, 1, 1)
         self._prev_grid.show()
 
-        self.attach(self._progress_button_grid, 2, 0, 1, 1)
+        self.attach(self._progress_button_grid, 2, 1, 1, 1)
         self._progress_button_grid.show()
 
         self.next_task_button = Gtk.Button('>')
@@ -93,18 +101,17 @@ class ProgressBar(Gtk.Grid):
         self._next_grid.attach(self.next_task_button, 0, 0, 1, 1)
         self.next_task_button.show()
         self.next_task_button.set_sensitive(False)
-        self.attach(self._next_grid, 3, 0, 1, 1)
+        self.attach(self._next_grid, 3, 1, 1, 1)
         self._next_grid.show()
 
-        self._section_label = Gtk.Label()
-        self._section_label.set_size_request(200, _HEIGHT)
-        self._section_label.set_use_markup(True)
-        self._section_label.set_justify(Gtk.Justification.LEFT)
+        self._name_label = Gtk.Label()
+        self._name_label.set_size_request(250, _HEIGHT)
+        self._name_label.set_use_markup(True)
+        self._name_label.set_justify(Gtk.Justification.RIGHT)
         span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
-        self._section_label.set_markup(
-            span + SECTIONS[section]['name'] + '</span>')
-        self.attach(self._section_label, 4, 0, 1, 1)
-        self._section_label.show()
+        self._name_label.set_markup(span + name + '</span>')
+        self.attach(self._name_label, 4, 1, 1, 1)
+        self._name_label.show()
 
     def set_button_sensitive(self, i, flag=True):
         # _logger.debug('setting button %d to %r' % (i, flag))

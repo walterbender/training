@@ -25,8 +25,8 @@ from sugar3.graphics.toolbutton import ToolButton
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics import style
 
-from graphics import Graphics
-from tasks import FONT_SIZES, SECTIONS
+from graphics import Graphics, FONT_SIZES
+from tasks import SECTIONS
 
 import logging
 _logger = logging.getLogger('training-activity-check-progress')
@@ -36,6 +36,9 @@ class CheckProgress(Gtk.Grid):
 
     def __init__(self, task_master):
         Gtk.Grid.__init__(self)
+        self.set_row_spacing(0)  # style.DEFAULT_SPACING)
+        self.set_column_spacing(style.DEFAULT_SPACING)
+
         self._task_master = task_master
 
         toolbox = self.build_toolbar()

@@ -20,11 +20,8 @@ from gi.repository import GObject
 import logging
 _logger = logging.getLogger('training-activity-tasks')
 
-from graphics import Graphics
+from graphics import Graphics, FONT_SIZES
 import tests
-
-FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
-              'xx-large']
 
 SECTIONS = [{'name': _('Welcome to One Academy'),
              'icon': 'badge-intro'},
@@ -1309,6 +1306,9 @@ class GameKeyTask(Task):
         return True
 
     def test(self, task_data):
+        if not tests.is_XO():
+            _logger.error('Skipping %s on non-XO hardware' % self._name)
+            return True
         if task_data['data'] is None:
             self._task_master.grab_focus()
             self._task_master.keyname = None
@@ -1344,6 +1344,9 @@ class Tablet1Task(Task):
         return True
 
     def test(self, task_data):
+        if not tests.is_XO():
+            _logger.error('Skipping %s on non-XO hardware' % self._name)
+            return True
         return tests.is_tablet_mode()
 
     def get_graphics(self, page=0):
@@ -1370,6 +1373,9 @@ class Tablet2Task(Task):
         return ['tablet-task-1']
 
     def test(self, task_data):
+        if not tests.is_XO():
+            _logger.error('Skipping %s on non-XO hardware' % self._name)
+            return True
         return not tests.is_tablet_mode()
 
     def get_graphics(self, page=0):

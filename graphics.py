@@ -22,6 +22,9 @@ from sugar3.graphics.radiotoolbutton import RadioToolButton
 import logging
 _logger = logging.getLogger('training-activity-page')
 
+FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
+              'xx-large']
+
 
 class Graphics(Gtk.ScrolledWindow):
     ''' An aligned grid in a scrolling window '''
@@ -148,7 +151,7 @@ class Graphics(Gtk.ScrolledWindow):
         button.show()
         return button
 
-    def add_uri(self, uri, height=480):
+    def add_uri(self, uri, height=520):  # 480):
         self._web_view = WebKit.WebView()
         # offset = style.GRID_CELL_SIZE
         width = 800  # Gdk.Screen.width() - offset * 4

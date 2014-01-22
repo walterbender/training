@@ -34,7 +34,7 @@ class TaskMaster(Gtk.Grid):
     def __init__(self, activity):
         ''' Initialize the task list '''
         Gtk.Grid.__init__(self)
-        self.set_row_spacing(style.DEFAULT_SPACING)
+        self.set_row_spacing(0) # style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
 
         self.button_was_pressed = True

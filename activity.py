@@ -36,7 +36,7 @@ except:
 
 from toolbar_utils import separator_factory, label_factory, button_factory
 from taskmaster import TaskMaster
-from tasks import FONT_SIZES
+from graphics import FONT_SIZES
 from checkprogress import CheckProgress
 
 import logging
