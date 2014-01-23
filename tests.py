@@ -288,17 +288,35 @@ def goto_activity_view():
 
 
 def goto_journal():
-    # TODO: FIX ME
+    ''' Actually go to the journal '''
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
         proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
-
     try:
-        dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
-            shell.ShellModel.ZOOM_ACTIVITY)
+        if dbus.Interface(proxy, 'org.sugarlabs.Shell').OpenJournal():
+            dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+                shell.ShellModel.ZOOM_ACTIVITY)
+        else:
+            _logger.error('Could not find journal to open???')
     except Exception, e:
-        _logger.error('ERROR setting zoom level %s' % e)
+        _logger.error('ERROR calling open journal: %s' % e)
+
+
+def set_journal_active():
+    ''' Just set the Journal as the active activity in the Home View '''
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+    try:
+        if dbus.Interface(proxy, 'org.sugarlabs.Shell').OpenJournal():
+            dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+                shell.ShellModel.ZOOM_HOME)
+        else:
+            _logger.error('Could not find journal to open???')
+    except Exception, e:
+        _logger.error('ERROR calling open journal: %s' % e)
 
 
 def goto_home_view():

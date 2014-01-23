@@ -21,6 +21,7 @@ from gi.repository import Gtk
 
 from jarabe.model import shell
 from jarabe.model import bundleregistry
+from jarabe.journal import journalactivity
 
 
 _DBUS_SERVICE = 'org.sugarlabs.Shell'
@@ -39,6 +40,7 @@ class ShellService(dbus.service.Object):
         dbus.service.Object.__init__(self, bus_name, _DBUS_PATH)
 
         self._shell_model = shell.get_model()
+        self._journal = journalactivity.get_journal()
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='i', out_signature='')
@@ -63,11 +65,29 @@ class ShellService(dbus.service.Object):
     def IsJournal(self):
         """Is the current activity the Journal?
         """
-        return self._shell_model.is_journal()
+        active_activity = self._shell_model.get_active_activity()
+        return active_activity.is_journal()
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='', out_signature='s')
     def GetActivityName(self):
-        """Is the current activity the Journal?
+        """Get bundle name of the current activity
         """
-        return self._shell_model.get_activity_name()
+        active_activity = self._shell_model.get_active_activity()
+        return active_activity.get_activity_name()
+
+    @dbus.service.method(_DBUS_SHELL_IFACE,
+                         in_signature='', out_signature='b')
+    def OpenJournal(self):
+        """Open the journal
+        """
+        starting_activity = activity = self._shell_model.get_active_activity()
+        while not activity.is_journal():
+            activity = self._shell_model.get_next_activity(current=activity)
+            if activity == starting_activity:
+                return False
+            if activity.is_journal():
+                break
+        journalactivity.get_journal().show_journal()
+        activity.set_active(True)
+        return True
