@@ -1,11 +1,18 @@
 NEWS
 
+1.19
+
+* Fix typo in badge code
+* Add missing Journal html file
+* Move next button to its own grid row
+
 1.18
 
 * Use training service for shell interface (with Martin Abente)
 * Auto-install training service
 * Add name, section name to progress bar
 * Add rule to progress bar
+* Use name in activity title
 
 1.17
 
