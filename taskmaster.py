@@ -34,9 +34,8 @@ class TaskMaster(Gtk.Grid):
     def __init__(self, activity):
         ''' Initialize the task list '''
         Gtk.Grid.__init__(self)
-        self.set_row_spacing(0) # style.DEFAULT_SPACING)
+        self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
-        self.set_row_homogeneous(True)
 
         self.button_was_pressed = True
         self.current_task = None
@@ -61,11 +60,12 @@ class TaskMaster(Gtk.Grid):
         self._graphics_grid = Gtk.Grid()
         self._graphics_grid.set_row_spacing(style.DEFAULT_SPACING)
         self._graphics_grid.set_column_spacing(style.DEFAULT_SPACING)
+
         graphics_grid_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
         graphics_grid_alignment.add(self._graphics_grid)
         self._graphics_grid.show()
-        self.attach(graphics_grid_alignment, 0, 0, 1, 12)
+        self.attach(graphics_grid_alignment, 0, 0, 1, 1)
         graphics_grid_alignment.show()
 
         self._prev_page_button = ToolButton('go-left-page')
@@ -75,10 +75,19 @@ class TaskMaster(Gtk.Grid):
         self._next_page_button.connect('clicked', self._next_page_cb)
         self._graphics_grid.attach(self._next_page_button, 2, 7, 1, 1)
 
+        self._task_button_alignment = Gtk.Alignment.new(
+            xalign=0.5, yalign=0.5, xscale=0, yscale=0)
+        self._task_button = Gtk.Button(_('Next'))
+        self._task_button.connect('clicked', self._task_button_cb)
+        self._task_button_alignment.add(self._task_button)
+        self._task_button.show()
+        self.attach(self._task_button_alignment, 0, 1, 1, 1)
+        self._task_button_alignment.show()
+
         self._progress_bar = None
         self._progress_bar_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        self.attach(self._progress_bar_alignment, 0, 13, 1, 1)
+        self.attach(self._progress_bar_alignment, 0, 2, 1, 1)
         self._progress_bar_alignment.show()
 
     def keypress_cb(self, widget, event):
@@ -113,7 +122,7 @@ class TaskMaster(Gtk.Grid):
         else:
             self.activity.complete = True
 
-    def task_button_cb(self, button):
+    def _task_button_cb(self, button):
         ''' The button at the bottom of the page for each task: used to
             advance to the next task. '''
         self.button_was_pressed = True
@@ -270,7 +279,7 @@ class TaskMaster(Gtk.Grid):
             self._graphics.destroy()
             self._graphics = None
         if hasattr(self, '_task_button') and self._task_button is not None:
-            self._task_button.destroy()
+            self._task_button.hide()
 
     def _load_graphics(self):
         ''' Load the graphics for a task and define the task button '''
@@ -281,8 +290,9 @@ class TaskMaster(Gtk.Grid):
         self._task_list[section][task_index].set_zoom_level(
             self.activity.zoom_level)
 
-        self._graphics, self._task_button = \
+        self._graphics, label = \
             self._task_list[section][task_index].get_graphics()
+
         self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
         self._graphics.show()
 
@@ -297,6 +307,7 @@ class TaskMaster(Gtk.Grid):
             self._next_page_button.hide()
 
         if self._task_button is not None:
+            self._task_button.set_label(label)
             self._task_button.set_sensitive(False)
             self._task_button.show()
 

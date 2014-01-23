@@ -193,7 +193,7 @@ class Task():
 
     def get_graphics(self, page=0):
         ''' Graphics to present with the task '''
-        return None
+        return None, _('Next')
 
     def is_completed(self):
         ''' Has this task been marked as complete? '''
@@ -221,9 +221,7 @@ class Intro1Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_("Let's go!"),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _("Let's go!")
 
 
 class EnterNameTask(Task):
@@ -257,15 +255,14 @@ class EnterNameTask(Task):
                            'introduction2.html')
 
         graphics = Graphics()
-        graphics.add_uri('file://' + url)
+        graphics.add_uri('file://' + url, height=400)
         graphics.set_zoom_level(self._zoom_level)
         if target is not None:
             self._entries.append(graphics.add_entry(text=target))
         else:
             self._entries.append(graphics.add_entry())
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class EnterSchoolNameTask(Task):
@@ -305,9 +302,8 @@ class EnterSchoolNameTask(Task):
             self._entries.append(graphics.add_entry(text=target))
         else:
             self._entries.append(graphics.add_entry())
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class EnterEmailTask(Task):
@@ -361,9 +357,8 @@ class EnterEmailTask(Task):
             self._entries.append(graphics.add_entry(text=email))
         else:
             self._entries.append(graphics.add_entry())
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class ValidateEmailTask(Task):
@@ -417,9 +412,8 @@ class ValidateEmailTask(Task):
             size=FONT_SIZES[self._font_size])
         self._entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class Toolbars1Task(Task):
@@ -451,9 +445,7 @@ class Toolbars1Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Toolbars2Task(Task):
@@ -477,9 +469,7 @@ class Toolbars2Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Toolbars3Task(Task):
@@ -496,7 +486,8 @@ class Toolbars3Task(Task):
         return ['toolbars-task-2']
 
     def test(self, task_data):
-        return not tests.is_expanded(self._task_master.activity.view_toolbar_button)
+        return not tests.is_expanded(
+            self._task_master.activity.view_toolbar_button)
 
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
@@ -506,9 +497,7 @@ class Toolbars3Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Toolbars4Task(Task):
@@ -532,9 +521,7 @@ class Toolbars4Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Toolbars5Task(Task):
@@ -561,9 +548,7 @@ class Toolbars5Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Toolbars6Task(Task):
@@ -587,9 +572,7 @@ class Toolbars6Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Toolbars7Task(Task):
@@ -613,9 +596,7 @@ class Toolbars7Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Toolbars8Task(Task):
@@ -639,9 +620,7 @@ class Toolbars8Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class NickChange1Task(Task):
@@ -662,9 +641,7 @@ class NickChange1Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class NickChange2Task(Task):
@@ -686,9 +663,7 @@ class NickChange2Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class NickChange3Task(Task):
@@ -710,9 +685,7 @@ class NickChange3Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class NickChange4Task(Task):
@@ -756,9 +729,8 @@ class NickChange4Task(Task):
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class NickChange5Task(Task):
@@ -787,9 +759,8 @@ class NickChange5Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class WriteSave1Task(Task):
@@ -812,9 +783,8 @@ class WriteSave1Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class WriteSave2Task(Task):
@@ -837,9 +807,8 @@ class WriteSave2Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class WriteSave3Task(Task):
@@ -862,9 +831,8 @@ class WriteSave3Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class WriteSave4Task(Task):
@@ -904,9 +872,8 @@ class WriteSave4Task(Task):
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class WriteSave5Task(Task):
@@ -932,9 +899,8 @@ class WriteSave5Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class Speak1Task(Task):
@@ -955,9 +921,7 @@ class Speak1Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Speak2Task(Task):
@@ -979,9 +943,7 @@ class Speak2Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Speak3Task(Task):
@@ -1003,9 +965,7 @@ class Speak3Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Speak4Task(Task):
@@ -1037,9 +997,8 @@ class Speak4Task(Task):
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class AddFavoriteTask(Task):
@@ -1072,9 +1031,8 @@ class AddFavoriteTask(Task):
         graphics.add_text(_('Try adding a favorite to your homeview.\n\n'),
                           size=FONT_SIZES[self._font_size])
         graphics.add_image(path)
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class RemoveFavoriteTask(Task):
@@ -1111,9 +1069,8 @@ class RemoveFavoriteTask(Task):
             _('Now try removing a favorite to your homeview.\n\n'),
             size=FONT_SIZES[self._font_size])
         graphics.add_image(path)
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class Journal1Task(Task):
@@ -1134,9 +1091,7 @@ class Journal1Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class AddStarredTask(Task):
@@ -1163,7 +1118,7 @@ class AddStarredTask(Task):
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            tests.goto_journal()
+            tests.goto_home_view()
 
         graphics = Graphics()
         graphics.add_text(
@@ -1171,9 +1126,8 @@ class AddStarredTask(Task):
             size=FONT_SIZES[self._font_size])
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class RemoveStarredTask(Task):
@@ -1203,7 +1157,7 @@ class RemoveStarredTask(Task):
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            tests.goto_journal()
+            tests.goto_home_view()
 
         graphics = Graphics()
         graphics.add_text(
@@ -1211,9 +1165,8 @@ class RemoveStarredTask(Task):
             size=FONT_SIZES[self._font_size])
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class BatteryTask(Task):
@@ -1256,9 +1209,8 @@ class BatteryTask(Task):
                                              colors=tests.get_colors())
         for i, button in enumerate(buttons):
             button.connect('clicked', self._battery_button_callback, i)
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class SoundTask(Task):
@@ -1291,9 +1243,8 @@ class SoundTask(Task):
                           size=FONT_SIZES[self._font_size])
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class GameKeyTask(Task):
@@ -1329,9 +1280,8 @@ class GameKeyTask(Task):
         graphics = Graphics()
         graphics.add_text(_('Click on a Game Key'))
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class Tablet1Task(Task):
@@ -1355,9 +1305,8 @@ class Tablet1Task(Task):
         graphics = Graphics()
         graphics.add_text(_('Switch to Tablet Mode'))
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class Tablet2Task(Task):
@@ -1384,9 +1333,8 @@ class Tablet2Task(Task):
         graphics = Graphics()
         graphics.add_text(_('Switch to back to Laptop Mode'))
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class Network1Task(Task):
@@ -1410,9 +1358,7 @@ class Network1Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class Finished1Task(Task):
@@ -1444,9 +1390,7 @@ class Finished1Task(Task):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class BadgeTask(Task):
@@ -1481,13 +1425,11 @@ class BadgeTask(Task):
             size=FONT_SIZES[self._font_size])
         graphics.add_icon('badge-intro')
         graphics.add_text(
-            _('\n\nMost badges require you to complete multiple '
-              'tasks.\n'
-              'Press Next to start on your next one!\n\n'),
+            _('\n\nMost badges require you to complete multiple tasks.\n\n'
+              'Click on Next to go to your next one!'),
             size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
 
 
 class BadgeIntroTask(BadgeTask):
@@ -1517,9 +1459,7 @@ class BadgeIntroTask(BadgeTask):
         graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
 
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+        return graphics, _('Next')
 
 
 class BadgeToolbarTask(BadgeTask):
@@ -1607,6 +1547,5 @@ class FinishedAllTasks(Task):
         graphics = Graphics()
         graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
                           size=FONT_SIZES[self._font_size])
-        button = graphics.add_button(_('Next'),
-                                     self._task_master.task_button_cb)
-        return graphics, button
+
+        return graphics, _('Next')
