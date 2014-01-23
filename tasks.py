@@ -727,6 +727,7 @@ class NickChange4Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
+        graphics.add_button(None, button_callback, button_icon='home')
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
@@ -752,9 +753,12 @@ class NickChange5Task(Task):
     def get_graphics(self, page=0):
         nick_task_data = self._task_master.read_task_data(
             self.get_requires()[0])
+        if 'new_nick' in nick_task_data:
+            new_nick = nick_task_data['new_nick']
+        else:
+            new_nick = ''
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'nickchange5.html?NAME=%s' %
-                           nick_task_data['new_nick'])
+                           'nickchange5.html?NAME=%s' % new_nick)
 
         graphics = Graphics()
         graphics.add_uri('file://' + url)
@@ -870,6 +874,7 @@ class WriteSave4Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
+        graphics.add_button(None, button_callback, button_icon='home')
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
@@ -995,6 +1000,7 @@ class Speak4Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
+        graphics.add_button(None, button_callback, button_icon='home')
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
@@ -1078,7 +1084,7 @@ class Journal1Task(Task):
     def __init__(self, task_master):
         Task.__init__(self, task_master)
         self._name = _('Introducing the Journal')
-        self.uid = 'jouranl-task-1'
+        self.uid = 'journal-task-1'
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -1118,12 +1124,14 @@ class AddStarredTask(Task):
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            tests.goto_home_view()
+            tests.goto_journal()
 
         graphics = Graphics()
         graphics.add_text(
             _('Try adding a star from an item in your journal.\n\n'),
             size=FONT_SIZES[self._font_size])
+        graphics.add_button(None, button_callback,
+                            button_icon='activity-journal')
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
@@ -1157,12 +1165,14 @@ class RemoveStarredTask(Task):
     def get_graphics(self, page=0):
 
         def button_callback(widget):
-            tests.goto_home_view()
+            tests.goto_journal()
 
         graphics = Graphics()
         graphics.add_text(
             _('Now try removing a star from an item in your journal.\n\n'),
             size=FONT_SIZES[self._font_size])
+        graphics.add_button(None, button_callback,
+                            button_icon='activity-journal')
         graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 

@@ -5,6 +5,7 @@ NEWS
 * Fix typo in badge code
 * Add missing Journal html file
 * Move next button to its own grid row
+* Fixed goto journal code
 
 1.18
 

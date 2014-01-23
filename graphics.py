@@ -183,14 +183,18 @@ class Graphics(Gtk.ScrolledWindow):
         self._attach(image)
         image.show()
 
-    def add_button(self, button_label, callback, arg=None):
-        button = Gtk.Button()
-        button.set_label(button_label)
-        self._attach_center(button)
-        if arg is None:
-            button.connect('clicked', callback)
+    def add_button(self, button_label, callback, arg=None, button_icon=None):
+        if button_icon is not None:
+            button = ToolButton(button_icon)
         else:
-            button.connect('clicked', callback, arg)
+            button = Gtk.Button()
+            button.set_label(button_label)
+        self._attach_center(button)
+        if callback is not None:
+            if arg is None:
+                button.connect('clicked', callback)
+            else:
+                button.connect('clicked', callback, arg)
         button.show()
         return button
 
