@@ -85,7 +85,9 @@ def get_task_list(task_master):
             [BatteryTask(task_master),
              SoundTask(task_master),
              BadgeFrameTask(task_master)],
-            [AddFavoriteTask(task_master),
+            [Views1Task(task_master),
+             Views2Task(task_master),
+             AddFavoriteTask(task_master),
              RemoveFavoriteTask(task_master),
              BadgeViewsTask(task_master)],
             [NickChange1Task(task_master),
@@ -1098,6 +1100,61 @@ class Journal1Task(Task):
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'journal1.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        return graphics, _('Next')
+
+
+class Views1Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Introducing the Views')
+        self.uid = 'views-task-1'
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'views1.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        return graphics, _('Next')
+
+
+class Views2Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Exploring the Views')
+        self.uid = 'views-task-2'
+        self._views = []
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if tests.is_activity_view():
+            if 'activity' not in self._views:
+                self._views.append('activity')
+        elif tests.is_home_view():
+            if 'home' not in self._views:
+                self._views.append('home')
+        elif tests.is_neighborhood_view():
+            if 'neighborhood' not in self._views:
+                self._views.append('neighborhood')
+        return len(self._views) > 2
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'views2.html')
 
         graphics = Graphics()
         graphics.add_uri('file://' + url)

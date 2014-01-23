@@ -58,7 +58,7 @@ class ShellService(dbus.service.Object):
     def GetZoomLevel(self):
         """Get Zoom Level of Sugar Shell
         """
-        return self._shell_model.get_zoom_level()
+        return self._shell_model._get_zoom_level()
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='', out_signature='b')
