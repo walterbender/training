@@ -98,6 +98,8 @@ def get_task_list(task_master):
              BadgeMoreActivitiesTask(task_master)],
             [BadgeCollaborationTask(task_master)],
             [Tablet1Task(task_master),
+             Rotate1Task(task_master),
+             Rotate2Task(task_master),
              GameKeyTask(task_master),
              Tablet2Task(task_master),
              BadgeXOTask(task_master)],
@@ -202,6 +204,14 @@ class Task():
             return data['completed']
         return False
 
+    def _get_user_name(self):
+        ''' Get user's name. '''
+        name = self._task_master.read_task_data('name')
+        if name is not None:
+            return name
+        else:
+            return ''
+
 
 class Intro1Task(Task):
 
@@ -250,7 +260,7 @@ class EnterNameTask(Task):
 
     def get_graphics(self, page=0):
         self._entries = []
-        target = self._task_master.read_task_data('name')
+        target = self._get_user_name()
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'introduction2.html')
 
@@ -339,12 +349,7 @@ class EnterEmailTask(Task):
 
     def get_graphics(self, page=0):
         self._entries = []
-        name = self._task_master.read_task_data('name')
-        if name is not None:
-            name = name.split()[0]
-        else:  # Should never happen
-            _logger.error('missing name')
-            name = ''
+        name = self._get_user_name().split()[0]
         email = self._task_master.read_task_data('email_address')
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'introduction3.html?NAME=%s' %
@@ -705,11 +710,12 @@ class NickChange4Task(Task):
         if task_data['data'] is None:
             _logger.debug('saving nick value as %s' % tests.get_nick())
             self._task_master.write_task_data('nick', tests.get_nick())
-            task_data['data'] = tests.get_nick()
+            task_data['data'] = [tests.get_nick(), tests.get_colors()]
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            if not tests.get_nick() == task_data['data']:
+            # data[0] is nick; data[1] are colors
+            if not tests.get_nick() == task_data['data'][0]:
                 task_data['new_nick'] = tests.get_nick()
                 self._task_master.write_task_data(self.uid, task_data)
                 return True
@@ -1288,8 +1294,10 @@ class GameKeyTask(Task):
     def get_graphics(self, page=0):
 
         graphics = Graphics()
-        graphics.add_text(_('Click on a Game Key'))
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        graphics.add_text(_('Click on a Game Key'),
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
+                          size=FONT_SIZES[self._font_size])
 
         return graphics, _('Next')
 
@@ -1313,9 +1321,10 @@ class Tablet1Task(Task):
     def get_graphics(self, page=0):
 
         graphics = Graphics()
-        graphics.add_text(_('Switch to Tablet Mode'))
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-
+        graphics.add_text(_('Switch to Tablet Mode'),
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
+                          size=FONT_SIZES[self._font_size])
         return graphics, _('Next')
 
 
@@ -1341,8 +1350,72 @@ class Tablet2Task(Task):
     def get_graphics(self, page=0):
 
         graphics = Graphics()
-        graphics.add_text(_('Switch to back to Laptop Mode'))
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+        graphics.add_text(_('Switch to back to Laptop Mode'),
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
+                          size=FONT_SIZES[self._font_size])
+
+        return graphics, _('Next')
+
+
+class Rotate1Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Rotate Task 1')
+        self.uid = 'rotate-task-1'
+
+    def is_collectable(self):
+        return True
+
+    def get_requires(self):
+        return ['tablet-task-1']
+
+    def test(self, task_data):
+        if not tests.is_XO():
+            _logger.error('Skipping %s on non-XO hardware' % self._name)
+            return True
+        return not tests.is_landscape()
+
+    def get_graphics(self, page=0):
+
+        graphics = Graphics()
+        graphics.add_text(_('Hit the rotate button to switch to '
+                            'Portrait mode.'),
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
+                          size=FONT_SIZES[self._font_size])
+
+        return graphics, _('Next')
+
+
+class Rotate2Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Rotate Task 2')
+        self.uid = 'rotate-task-2'
+
+    def is_collectable(self):
+        return True
+
+    def get_requires(self):
+        return ['tablet-task-1']
+
+    def test(self, task_data):
+        if tests.is_XO():
+            _logger.error('Skipping %s on non-XO hardware' % self._name)
+            return True
+        return tests.is_landscape()
+
+    def get_graphics(self, page=0):
+
+        graphics = Graphics()
+        graphics.add_text(_('Hit the rotate button to switch to '
+                            'Landscape mode.'),
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
+                          size=FONT_SIZES[self._font_size])
 
         return graphics, _('Next')
 
@@ -1411,22 +1484,21 @@ class BadgeTask(Task):
         self.uid = 'badge-task'
 
     def after_button_press(self):
-        target = self._task_master.read_task_data('name').split()[0]
-        self._task_master.activity.add_badge(
-            _('Congratulations %s!\n'
-              "You’ve earned another badge!" % target),
-            icon='badge-intro')
+        task_data = self._task_master.read_task_data(self.uid)
+        if not 'badge' in task_data:
+            task_data['badge'] = True
+            target = self._get_user_name().split()[0]
+            self._task_master.activity.add_badge(
+                _('Congratulations %s!\n'
+                  "You’ve earned another badge!" % target),
+                icon='badge-intro')
+            self._task_master.write_task_data(self.uid, task_data)
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self, page=0):
-        target = self._task_master.read_task_data('name')
-        if target is not None:
-            name = target.split()[0]
-        else:
-            name = ''
-
+        target = self._get_user_name().split()[0]
         graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
@@ -1450,18 +1522,18 @@ class BadgeIntroTask(BadgeTask):
         self.uid = 'badge-intro'
 
     def after_button_press(self):
-        target = self._task_master.read_task_data('name').split()[0]
-        self._task_master.activity.add_badge(
-            _('Congratulations %s!\n'
-              "You’ve earned your first badge!" % target),
-            icon='badge-intro')
+        task_data = self._task_master.read_task_data(self.uid)
+        if not 'badge' in task_data:
+            task_data['badge'] = True
+            target = self._task_master.read_task_data('name').split()[0]
+            self._task_master.activity.add_badge(
+                _('Congratulations %s!\n'
+                  "You’ve earned your first badge!" % target),
+                icon='badge-intro')
+            self._task_master.write_task_data(self.uid, task_data)
 
     def get_graphics(self, page=0):
-        name = self._task_master.read_task_data('name')
-        if name is not None:
-            target = name.split()[0]
-        else:
-            target = ''
+        target = self._get_user_name().split()[0]
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'introduction4.html?NAME=%s' % target)
 
@@ -1558,4 +1630,4 @@ class FinishedAllTasks(Task):
         graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
                           size=FONT_SIZES[self._font_size])
 
-        return graphics, _('Next')
+        return graphics, _('Done')

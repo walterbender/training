@@ -2,6 +2,9 @@ NEWS
 
 1.19
 
+* Fixed font size issue with XO tests
+* Added rotate tests
+* Don't assign badges more than once
 * Fixed typo in badge code
 * Added missing Journal html file
 * Moved Next button to its own grid row

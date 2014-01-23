@@ -16,6 +16,7 @@ import subprocess
 import dbus
 
 from gi.repository import Gio
+from gi.repository import Gdk
 from gi.repository import GLib
 from gi.repository import GConf
 from gi.repository import GObject
@@ -54,6 +55,10 @@ _WARN_MIN_PERCENTAGE = 15
 volume_monitor = None
 battery_model = None
 proxy = None
+
+
+def is_landscape():
+    return Gdk.Screen.width() > Gdk.Screen.height()
 
 
 def get_safe_text(text):
