@@ -53,7 +53,8 @@ def get_task_list(task_master):
     return [[Intro1Task(task_master),
              EnterNameTask(task_master),
              BadgeIntroTask(task_master)],
-            [Toolbars1Task(task_master),
+            [Toolbars0Task(task_master),
+             Toolbars1Task(task_master),
              Toolbars2Task(task_master),
              Toolbars3Task(task_master),
              Toolbars4Task(task_master),
@@ -156,6 +157,14 @@ class Task():
     def get_retry(self):
         ''' String to present to the user when task is not completed '''
         return _('Keep trying')
+
+    def get_refresh(self):
+        ''' Does the task need a refresh button for its graphics? '''
+        return False
+
+    def get_my_turn(self):
+        ''' Does the task need a my turn button to goto home view? '''
+        return False
 
     def get_data(self):
         ''' Any data needed for the test '''
@@ -419,6 +428,30 @@ class ValidateEmailTask(Task):
             size=FONT_SIZES[self._font_size])
         self._entries.append(graphics.add_entry())
         graphics.add_text('\n\n')
+
+        return graphics, _('Next')
+
+
+class Toolbars0Task(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Toolbars test')
+        self.uid = 'toolbars-task-0'
+
+    def get_refresh(self):
+        return True
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           'toolbars0.html')
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
 
         return graphics, _('Next')
 
@@ -724,10 +757,10 @@ class NickChange4Task(Task):
             else:
                 return False
 
-    def get_graphics(self, page=0):
+    def get_my_turn(self):
+        return True
 
-        def button_callback(widget):
-            tests.goto_home_view()
+    def get_graphics(self, page=0):
 
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'nickchange4.html')
@@ -736,7 +769,6 @@ class NickChange4Task(Task):
         graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(None, button_callback, button_icon='home')
-        graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
         return graphics, _('Next')
@@ -871,11 +903,10 @@ class WriteSave4Task(Task):
     def get_help_info(self):
         return ('My Settings', 'my_settings.html')
 
+    def get_my_turn(self):
+        return True
+
     def get_graphics(self, page=0):
-
-        def button_callback(widget):
-            tests.goto_home_view()
-
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'writesave4.html')
 
@@ -883,7 +914,6 @@ class WriteSave4Task(Task):
         graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(None, button_callback, button_icon='home')
-        graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
         return graphics, _('Next')
@@ -997,19 +1027,20 @@ class Speak4Task(Task):
     def test(self, task_data):
         return len(tests.get_activity('vu.lux.olpc.Speak')) > 0
 
+    def get_my_turn(self):
+        return True
+
     def get_graphics(self, page=0):
-
-        def button_callback(widget):
-            tests.goto_home_view()
-
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'speak4.html')
+
+        def button_callback(button):
+            tests.goto_home_view()
 
         graphics = Graphics()
         graphics.add_uri('file://' + url, height=300)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(None, button_callback, button_icon='home')
-        graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
         return graphics, _('Next')
@@ -1184,9 +1215,12 @@ class AddStarredTask(Task):
     def get_help_info(self):
         return ('Home', 'home_view.html')
 
+    def get_my_turn(self):
+        return True
+
     def get_graphics(self, page=0):
 
-        def button_callback(widget):
+        def button_callback(button):
             tests.goto_journal()
 
         graphics = Graphics()
@@ -1195,7 +1229,6 @@ class AddStarredTask(Task):
             size=FONT_SIZES[self._font_size])
         graphics.add_button(None, button_callback,
                             button_icon='activity-journal')
-        graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
         return graphics, _('Next')
@@ -1225,9 +1258,12 @@ class RemoveStarredTask(Task):
     def get_help_info(self):
         return ('Home', 'home_view.html')
 
+    def get_my_turn(self):
+        return True
+
     def get_graphics(self, page=0):
 
-        def button_callback(widget):
+        def button_callback(button):
             tests.goto_journal()
 
         graphics = Graphics()
@@ -1236,7 +1272,6 @@ class RemoveStarredTask(Task):
             size=FONT_SIZES[self._font_size])
         graphics.add_button(None, button_callback,
                             button_icon='activity-journal')
-        graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
         return graphics, _('Next')
@@ -1265,16 +1300,14 @@ class BatteryTask(Task):
     def _battery_button_callback(self, widget, i):
         self._battery_level = i * 20
 
+    def get_my_turn(self):
+        return True
+
     def get_graphics(self, page=0):
-
-        def button_callback(widget):
-            tests.goto_home_view()
-
         graphics = Graphics()
         graphics.add_text(_('Check the battery levels and then click\n'
                             'on the matching battery indicator.\n\n'),
                           size=FONT_SIZES[self._font_size])
-        graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
         buttons = graphics.add_radio_buttons(['battery-000', 'battery-020',
                                               'battery-040', 'battery-060',
@@ -1305,16 +1338,14 @@ class SoundTask(Task):
         else:
             return not tests.get_sound_level() == task_data['data']
 
+    def get_my_turn(self):
+        return True
+
     def get_graphics(self, page=0):
-
-        def button_callback(widget):
-            tests.goto_home_view()
-
         graphics = Graphics()
         graphics.add_text(_('Check the sound level and then use\n'
                             'the slider to adjust it.\n\n'),
                           size=FONT_SIZES[self._font_size])
-        graphics.add_button(_('My turn'), button_callback)
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
         return graphics, _('Next')
@@ -1544,10 +1575,10 @@ class BadgeTask(Task):
         task_data = self._task_master.read_task_data(self.uid)
         if not 'badge' in task_data:
             task_data['badge'] = True
-            target = self._get_user_name().split()[0]
+            name = self._get_user_name().split()[0]
             self._task_master.activity.add_badge(
                 _('Congratulations %s!\n'
-                  "You’ve earned another badge!" % target),
+                  "You’ve earned another badge!" % name),
                 icon='badge-intro')
             self._task_master.write_task_data(self.uid, task_data)
 
@@ -1555,7 +1586,7 @@ class BadgeTask(Task):
         return self._task_master.button_was_pressed
 
     def get_graphics(self, page=0):
-        target = self._get_user_name().split()[0]
+        name = self._get_user_name().split()[0]
         graphics = Graphics()
         graphics.add_text(
             _('Congratulations %s!\n'
@@ -1582,17 +1613,17 @@ class BadgeIntroTask(BadgeTask):
         task_data = self._task_master.read_task_data(self.uid)
         if not 'badge' in task_data:
             task_data['badge'] = True
-            target = self._task_master.read_task_data('name').split()[0]
+            name = self._task_master.read_task_data('name').split()[0]
             self._task_master.activity.add_badge(
                 _('Congratulations %s!\n'
-                  "You’ve earned your first badge!" % target),
+                  "You’ve earned your first badge!" % name),
                 icon='badge-intro')
             self._task_master.write_task_data(self.uid, task_data)
 
     def get_graphics(self, page=0):
-        target = self._get_user_name().split()[0]
+        name = self._get_user_name().split()[0]
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'introduction4.html?NAME=%s' % target)
+                           'introduction4.html?NAME=%s' % name)
 
         graphics = Graphics()
         graphics.add_uri('file://' + url)

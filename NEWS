@@ -1,7 +1,14 @@
 NEWS
 
+1.20
+
+* My turn button
+* Refresh button
+* Adjust page scaling
+
 1.19
 
+* Rough draft of Views tasks
 * Fixed font size issue with XO tests
 * Added rotate tests
 * Don't assign badges more than once

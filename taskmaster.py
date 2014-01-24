@@ -27,7 +27,7 @@ _logger = logging.getLogger('training-activity-taskmaster')
 
 import tasks
 from progressbar import ProgressBar
-from tests import get_nick
+from tests import get_nick, goto_home_view
 
 class TaskMaster(Gtk.Grid):
 
@@ -77,10 +77,37 @@ class TaskMaster(Gtk.Grid):
 
         self._task_button_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
+        grid = Gtk.Grid()
+        grid.set_row_spacing(style.DEFAULT_SPACING)
+        grid.set_column_spacing(style.DEFAULT_SPACING)
+        grid.set_column_homogeneous(True)
+
+        self._refresh_button = Gtk.Button(_('Refresh Page'))
+        self._refresh_button.connect('clicked', self._refresh_button_cb)
+        left = Gtk.Alignment.new(xalign=0, yalign=0.5, xscale=0, yscale=0)
+        left.add(self._refresh_button)
+        self._refresh_button.hide()
+        grid.attach(left, 0, 0, 1, 1)
+        left.show()
+
         self._task_button = Gtk.Button(_('Next'))
         self._task_button.connect('clicked', self._task_button_cb)
-        self._task_button_alignment.add(self._task_button)
+        mid = Gtk.Alignment.new(xalign=0.5, yalign=0.5, xscale=0, yscale=0)
+        mid.add(self._task_button)
         self._task_button.show()
+        grid.attach(mid, 1, 0, 1, 1)
+        mid.show()
+
+        self._my_turn_button = Gtk.Button(_('My Turn'))
+        self._my_turn_button.connect('clicked', self._my_turn_button_cb)
+        right = Gtk.Alignment.new(xalign=1.0, yalign=0.5, xscale=0, yscale=0)
+        right.add(self._my_turn_button)
+        self._my_turn_button.hide()
+        grid.attach(right, 2, 0, 1, 1)
+        right.show()
+
+        self._task_button_alignment.add(grid)
+        grid.show()
         self.attach(self._task_button_alignment, 0, 1, 1, 1)
         self._task_button_alignment.show()
 
@@ -131,6 +158,20 @@ class TaskMaster(Gtk.Grid):
         self.current_task += 1
         self.write_task_data('current_task', self.current_task)
         self.task_master()
+
+    def _my_turn_button_cb(self, button):
+        ''' Take me to the Home Page. '''
+        goto_home_view()
+
+    def _refresh_button_cb(self, button):
+        ''' Refresh the current page's graphics '''
+        section, task_index = self.get_section_index()
+        self._graphics.destroy()
+        self._graphics, label = \
+            self._task_list[section][task_index].get_graphics()
+
+        self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
+        self._graphics.show()
 
     def get_help_info(self):
         ''' Uses help from the Help activity '''
@@ -310,6 +351,16 @@ class TaskMaster(Gtk.Grid):
             self._task_button.set_label(label)
             self._task_button.set_sensitive(False)
             self._task_button.show()
+
+        if self._task_list[section][task_index].get_refresh():
+            self._refresh_button.show()
+        else:
+            self._refresh_button.hide()
+
+        if self._task_list[section][task_index].get_my_turn():
+            self._my_turn_button.show()
+        else:
+            self._my_turn_button.hide()
 
         self._update_progress()
 

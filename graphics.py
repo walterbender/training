@@ -151,11 +151,12 @@ class Graphics(Gtk.ScrolledWindow):
         button.show()
         return button
 
-    def add_uri(self, uri, height=560):
+    def add_uri(self, uri, height=700):
         self._web_view = WebKit.WebView()
         # offset = style.GRID_CELL_SIZE
         width = 800  # Gdk.Screen.width() - offset * 4
         # height = 480  # Gdk.Screen.height() - offset * 5
+        height = int(height * Gdk.Screen.height() / 900.)
         self._web_view.set_size_request(width, height)
         self._web_view.set_full_content_zoom(True)
         self._web_view.load_uri(uri)
