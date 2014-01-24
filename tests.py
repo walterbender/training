@@ -135,7 +135,7 @@ def is_XO():
     if version is None:
         hwinfo_path = '/bin/olpc-hwinfo'
         if os.path.exists(hwinfo_path) and os.access(hwinfo_path, os.X_OK):
-            model = check_output([hwinfo_path, 'model'], 'unknown hardware')
+            model = subprocess.check_output([hwinfo_path, 'model'])
             version = model.strip()
     if version in ['1', '1.5', '1.75', '4']:
         return True

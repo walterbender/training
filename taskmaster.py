@@ -318,7 +318,7 @@ class TaskMaster(Gtk.Grid):
         ''' Destroy the graphics from the previous task '''
         if self._graphics is not None:
             self._graphics.destroy()
-            self._graphics = None
+            # self._graphics = None
         if hasattr(self, '_task_button') and self._task_button is not None:
             self._task_button.hide()
 

@@ -1,5 +1,12 @@
 NEWS
 
+1.21
+
+* Fixed regressions in Nick Task
+* Fixed bug in hardware detection that broke XO tasks
+* Added more refresh buttons to videos
+* Fixed regressions to homeview buttons
+
 1.20
 
 * My turn button

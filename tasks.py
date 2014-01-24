@@ -716,6 +716,9 @@ class NickChange3Task(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
+    def get_refresh(self):
+        return True
+
     def get_graphics(self, page=0):
         graphics = Graphics()
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
@@ -745,12 +748,11 @@ class NickChange4Task(Task):
         if task_data['data'] is None:
             _logger.debug('saving nick value as %s' % tests.get_nick())
             self._task_master.write_task_data('nick', tests.get_nick())
-            task_data['data'] = [tests.get_nick(), tests.get_colors()]
+            task_data['data'] = tests.get_nick()
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            # data[0] is nick; data[1] are colors
-            if not tests.get_nick() == task_data['data'][0]:
+            if not tests.get_nick() == task_data['data']:
                 task_data['new_nick'] = tests.get_nick()
                 self._task_master.write_task_data(self.uid, task_data)
                 return True
@@ -761,6 +763,9 @@ class NickChange4Task(Task):
         return True
 
     def get_graphics(self, page=0):
+
+        def button_callback(button):
+            tests.goto_home_view()
 
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'nickchange4.html')
@@ -862,6 +867,9 @@ class WriteSave3Task(Task):
         self._name = _('Write Save Step Three')
         self.uid = 'write-save-task-3'
 
+    def get_refresh(self):
+        return True
+
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
@@ -907,6 +915,10 @@ class WriteSave4Task(Task):
         return True
 
     def get_graphics(self, page=0):
+
+        def button_callback(button):
+            tests.goto_home_view()
+
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
                            'writesave4.html')
 
