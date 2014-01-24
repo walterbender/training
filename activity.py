@@ -78,6 +78,8 @@ class TrainingActivity(activity.Activity):
         self.set_canvas(center_in_panel)
         center_in_panel.show()
 
+        Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
+
         self._task_master.set_events(Gdk.EventMask.KEY_PRESS_MASK)
         self._task_master.connect('key_press_event',
                                   self._task_master.keypress_cb)
@@ -86,6 +88,9 @@ class TrainingActivity(activity.Activity):
 
         self.completed = False
         self._task_master.task_master()
+
+    def _configure_cb(self, event):
+        self._task_master.reload_graphics()
 
     def write_file(self, file_path):
         self._task_master.write_task_data('current_task',
