@@ -1,5 +1,9 @@
 NEWS
 
+1.22
+
+* Check for configuration changes so portrait/laptop mode works
+
 1.21
 
 * Fixed regressions in Nick Task
