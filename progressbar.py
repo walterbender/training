@@ -18,8 +18,6 @@ from gi.repository import Gdk
 
 from sugar3.graphics import style
 
-from tasks import SECTIONS
-
 _HEIGHT = 15
 _BLACK = style.COLOR_BLACK.get_html()
 _WHITE = style.COLOR_WHITE.get_html()
@@ -28,7 +26,7 @@ _SIZE = 'small'
 
 class ProgressBar(Gtk.Grid):
 
-    def __init__(self, name, section, progress_button_data,
+    def __init__(self, user_name, section_name, progress_button_data,
                  prev_task_button_cb, next_task_button_cb, progress_button_cb):
         Gtk.Grid.__init__(self)
 
@@ -44,7 +42,7 @@ class ProgressBar(Gtk.Grid):
         self._section_label.set_justify(Gtk.Justification.LEFT)
         span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
         self._section_label.set_markup(
-            span + SECTIONS[section]['name'] + '</span>')
+            span + section_name + '</span>')
         alignment1.add(self._section_label)
         self._section_label.show()
 
@@ -108,7 +106,7 @@ class ProgressBar(Gtk.Grid):
         self._name_label.set_use_markup(True)
         self._name_label.set_justify(Gtk.Justification.RIGHT)
         span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
-        self._name_label.set_markup(span + name + '</span>')
+        self._name_label.set_markup(span + user_name + '</span>')
         alignment5.add(self._name_label)
         self._name_label.show()
 

@@ -26,7 +26,6 @@ from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics import style
 
 from graphics import Graphics, FONT_SIZES
-from tasks import SECTIONS
 
 import logging
 _logger = logging.getLogger('training-activity-check-progress')
@@ -100,7 +99,7 @@ class ProgressSummary():
     def get_graphics(self):
         colors = []
         strokes = []
-        for i in range(len(SECTIONS)):
+        for i in range(self._task_master.get_number_of_sections()):
             if i in self._progress:
                 colors.append(style.COLOR_BLACK.get_html())
                 strokes.append(style.COLOR_BLACK.get_svg())
@@ -111,10 +110,10 @@ class ProgressSummary():
             # width=int(Gdk.Screen.width() / 1.5),
             # height=int(Gdk.Screen.height() / 1.5 - style.GRID_CELL_SIZE)
         )
-        for i in range(len(SECTIONS)):
+        for i in range(self._task_master.get_number_of_sections()):
             button = graphics.add_text_icon_and_button(
-                SECTIONS[i]['name'],
-                SECTIONS[i]['icon'],
+                self._task_master.get_section_name(i),
+                self._task_master.get_section_icon(i),
                 # button_label='go',
                 button_icon='go-right-page',
                 size=FONT_SIZES[self._font_size],

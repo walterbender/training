@@ -17,12 +17,12 @@
 """D-bus service providing access to the shell's functionality"""
 
 import dbus
+
 from gi.repository import Gtk
 
 from jarabe.model import shell
 from jarabe.model import bundleregistry
 from jarabe.journal import journalactivity
-
 
 _DBUS_SERVICE = 'org.sugarlabs.Shell'
 _DBUS_SHELL_IFACE = 'org.sugarlabs.Shell'

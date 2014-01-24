@@ -246,13 +246,21 @@ class TrainingActivity(activity.Activity):
             self.viewhelp.show()
 
     def add_badge(self, msg, icon="training-trophy", name="One Academy"):
+        sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')
+        if not os.path.exists(sugar_icons):
+            try:
+                subprocess.call(['mkdir', sugar_icons])
+            except OSError, e:
+                _logger.error('Could not mkdir %s, %s' % (sugar_icons, e))
+
         badge = {
             'icon': icon,
             'from': name,
             'message': msg
         }
-        icon_path = os.path.join(self.bundle_path, 'icons', (icon + '.svg'))
-        sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')
+
+        icon_dir = os.path.join(self.bundle_path, 'icon')
+        icon_path = os.path.join(icon_dir, icon + '.svg')
         try:
             subprocess.call(['cp', icon_path, sugar_icons])
         except OSError, e:

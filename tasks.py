@@ -23,91 +23,99 @@ _logger = logging.getLogger('training-activity-tasks')
 from graphics import Graphics, FONT_SIZES
 import tests
 
-SECTIONS = [{'name': _('Welcome to One Academy'),
-             'icon': 'badge-intro'},
-            {'name': _('1. Getting to Know the Toolbar'),
-             'icon': 'badge-intro'},
-            {'name': _('2. Getting Connected'),
-             'icon': 'badge-intro'},
-            {'name': _('3. Getting to Know Sugar Activities'),
-             'icon': 'badge-intro'},
-            {'name': _('4. Getting to Know the Journal'),
-             'icon': 'badge-intro'},
-            {'name': _('5. Getting to Know the Frame'),
-             'icon': 'badge-intro'},
-            {'name': _('6. Getting to Know the Views'),
-             'icon': 'badge-intro'},
-            {'name': _('7. Getting to Know Settings'),
-             'icon': 'badge-intro'},
-            {'name': _('8. Getting to Know more Activities'),
-             'icon': 'badge-intro'},
-            {'name': _('9. Getting to Know Collaboration'),
-             'icon': 'badge-intro'},
+
+def get_tasks(task_master):
+    task_list = [
+        {'name': _('Welcome to One Academy'),
+         'icon': 'badge-intro',
+         'tasks': [Intro1Task(task_master),
+                   EnterNameTask(task_master),
+                   BadgeIntroTask(task_master)]},
+        {'name': _('1. Getting to Know the Toolbar'),
+         'icon': 'badge-intro',
+         'tasks': [Toolbars0Task(task_master),
+                   Toolbars1Task(task_master),
+                   Toolbars2Task(task_master),
+                   Toolbars3Task(task_master),
+                   Toolbars4Task(task_master),
+                   Toolbars5Task(task_master),
+                   Toolbars6Task(task_master),
+                   Toolbars7Task(task_master),
+                   Toolbars8Task(task_master),
+                   BadgeToolbarTask(task_master)]},
+        {'name': _('2. Getting Connected'),
+         'icon': 'badge-intro',
+         'tasks': [Network1Task(task_master),
+                   EnterSchoolNameTask(task_master),
+                   EnterEmailTask(task_master),
+                   ValidateEmailTask(task_master),
+                   BadgeNetworkTask(task_master)]},
+        {'name': _('3. Getting to Know Sugar Activities'),
+         'icon': 'badge-intro',
+         'tasks': [WriteSave1Task(task_master),
+                   WriteSave2Task(task_master),
+                   WriteSave3Task(task_master),
+                   WriteSave4Task(task_master),
+                   WriteSave5Task(task_master),
+                   Speak1Task(task_master),
+                   Speak2Task(task_master),
+                   Speak3Task(task_master),
+                   Speak4Task(task_master),
+                   BadgeActivitiesTask(task_master)]},
+        {'name': _('4. Getting to Know the Journal'),
+         'icon': 'badge-intro',
+         'tasks': [Journal1Task(task_master),
+                   AddStarredTask(task_master),
+                   RemoveStarredTask(task_master),
+                   BadgeJournalTask(task_master)]},
+        {'name': _('5. Getting to Know the Frame'),
+         'icon': 'badge-intro',
+         'tasks': [BatteryTask(task_master),
+                   SoundTask(task_master),
+                   BadgeFrameTask(task_master)]},
+        {'name': _('6. Getting to Know the Views'),
+         'icon': 'badge-intro',
+         'tasks': [Views1Task(task_master),
+                   Views2Task(task_master),
+                   AddFavoriteTask(task_master),
+                   RemoveFavoriteTask(task_master),
+                   BadgeViewsTask(task_master)]},
+        {'name': _('7. Getting to Know Settings'),
+         'icon': 'badge-intro',
+         'tasks': [NickChange1Task(task_master),
+                   NickChange2Task(task_master),
+                   NickChange3Task(task_master),
+                   NickChange4Task(task_master),
+                   NickChange5Task(task_master),
+                   BadgeSettingsTask(task_master)]},
+        {'name': _('8. Getting to Know more Activities'),
+         'icon': 'badge-intro',
+         'tasks': [BadgeMoreActivitiesTask(task_master)]},
+        {'name': _('9. Getting to Know Collaboration'),
+         'icon': 'badge-intro',
+         'tasks': [BadgeCollaborationTask(task_master)]}
+    ]
+
+    if tests.is_XO():
+        task_list.append(
             {'name': _('10. Getting to Know the XO'),
-             'icon': 'badge-intro'},
-            {'name': _('Wrap Up'),
-             'icon': 'badge-intro'}]
+             'icon': 'badge-intro',
+             'tasks': [Tablet1Task(task_master),
+                       Rotate1Task(task_master),
+                       Rotate2Task(task_master),
+                       GameKeyTask(task_master),
+                       Tablet2Task(task_master),
+                       BadgeXOTask(task_master)]}
+        )
 
+    task_list.append(
+        {'name': _('Wrap Up'),
+         'icon': 'badge-intro',
+         'tasks': [Finished1Task(task_master),
+                   FinishedAllTasks(task_master)]}
+    )
 
-def get_task_list(task_master):
-    return [[Intro1Task(task_master),
-             EnterNameTask(task_master),
-             BadgeIntroTask(task_master)],
-            [Toolbars0Task(task_master),
-             Toolbars1Task(task_master),
-             Toolbars2Task(task_master),
-             Toolbars3Task(task_master),
-             Toolbars4Task(task_master),
-             Toolbars5Task(task_master),
-             Toolbars6Task(task_master),
-             Toolbars7Task(task_master),
-             Toolbars8Task(task_master),
-             BadgeToolbarTask(task_master)],
-            [Network1Task(task_master),
-             EnterSchoolNameTask(task_master),
-             EnterEmailTask(task_master),
-             ValidateEmailTask(task_master),
-             BadgeNetworkTask(task_master)],
-            [# Record
-             WriteSave1Task(task_master),
-             WriteSave2Task(task_master),
-             WriteSave3Task(task_master),
-             WriteSave4Task(task_master),
-             WriteSave5Task(task_master),
-             Speak1Task(task_master),
-             Speak2Task(task_master),
-             Speak3Task(task_master),
-             Speak4Task(task_master),
-             BadgeActivitiesTask(task_master)],
-            [Journal1Task(task_master),
-             AddStarredTask(task_master),
-             RemoveStarredTask(task_master),
-             BadgeJournalTask(task_master)],
-            [BatteryTask(task_master),
-             SoundTask(task_master),
-             BadgeFrameTask(task_master)],
-            [Views1Task(task_master),
-             Views2Task(task_master),
-             AddFavoriteTask(task_master),
-             RemoveFavoriteTask(task_master),
-             BadgeViewsTask(task_master)],
-            [NickChange1Task(task_master),
-             NickChange2Task(task_master),
-             NickChange3Task(task_master),
-             NickChange4Task(task_master),
-             NickChange5Task(task_master),
-             BadgeSettingsTask(task_master)],
-            [#Turtle, Physics
-             BadgeMoreActivitiesTask(task_master)],
-            [BadgeCollaborationTask(task_master)],
-            [Tablet1Task(task_master),
-             Rotate1Task(task_master),
-             Rotate2Task(task_master),
-             GameKeyTask(task_master),
-             Tablet2Task(task_master),
-             BadgeXOTask(task_master)],
-            [Finished1Task(task_master),
-             FinishedAllTasks(task_master)]]
+    return task_list
 
 
 class Task():
@@ -1374,9 +1382,6 @@ class GameKeyTask(Task):
         return True
 
     def test(self, task_data):
-        if not tests.is_XO():
-            _logger.error('Skipping %s on non-XO hardware' % self._name)
-            return True
         if task_data['data'] is None:
             self._task_master.grab_focus()
             self._task_master.keyname = None
@@ -1413,9 +1418,6 @@ class Tablet1Task(Task):
         return True
 
     def test(self, task_data):
-        if not tests.is_XO():
-            _logger.error('Skipping %s on non-XO hardware' % self._name)
-            return True
         return tests.is_tablet_mode()
 
     def get_graphics(self, page=0):
@@ -1442,9 +1444,6 @@ class Tablet2Task(Task):
         return ['tablet-task-1']
 
     def test(self, task_data):
-        if not tests.is_XO():
-            _logger.error('Skipping %s on non-XO hardware' % self._name)
-            return True
         return not tests.is_tablet_mode()
 
     def get_graphics(self, page=0):
@@ -1472,9 +1471,6 @@ class Rotate1Task(Task):
         return ['tablet-task-1']
 
     def test(self, task_data):
-        if not tests.is_XO():
-            _logger.error('Skipping %s on non-XO hardware' % self._name)
-            return True
         return not tests.is_landscape()
 
     def get_graphics(self, page=0):
@@ -1503,9 +1499,6 @@ class Rotate2Task(Task):
         return ['tablet-task-1']
 
     def test(self, task_data):
-        if tests.is_XO():
-            _logger.error('Skipping %s on non-XO hardware' % self._name)
-            return True
         return tests.is_landscape()
 
     def get_graphics(self, page=0):
