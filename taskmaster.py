@@ -503,11 +503,10 @@ class TaskMaster(Gtk.Grid):
         return count
 
     def read_task_data(self, uid):
-        data_path = os.path.join(self.activity.get_activity_root(), 'data',
-                                 'training_data')
+        usb_data_path = self.activity.volume_data[0]['usb_path']
         uid_data = None
-        if os.path.exists(data_path):
-            fd = open(data_path, 'r')
+        if os.path.exists(usb_data_path):
+            fd = open(usb_data_path, 'r')
             json_data = fd.read()
             fd.close()
             data = {}
@@ -521,11 +520,13 @@ class TaskMaster(Gtk.Grid):
         return uid_data
 
     def write_task_data(self, uid, uid_data):
-        data_path = os.path.join(self.activity.get_activity_root(), 'data',
-                                 'training_data')
+        sugar_data_path = self.activity.volume_data[0]['sugar_path']
+        usb_data_path = self.activity.volume_data[0]['usb_path']
+
+        # Read before write
         data = {}
-        if os.path.exists(data_path):
-            fd = open(data_path, 'r')
+        if os.path.exists(usb_data_path):
+            fd = open(usb_data_path, 'r')
             json_data = fd.read()
             fd.close()
             if len(json_data) > 0:
@@ -534,8 +535,17 @@ class TaskMaster(Gtk.Grid):
                 except ValueError, e:
                     _logger.error('Cannot load training data: %s' % e)
         data[uid] = uid_data
+
+        # Make sure the volume UID is present
+        data['training_data_uid'] = self.activity.volume_data[0]['uid']
+
+        # Write to the USB and ...
         json_data = json.dumps(data)
-        fd = open(data_path, 'w')
+        fd = open(usb_data_path, 'w')
+        fd.write(json_data)
+        fd.close()
+        # ... save shadow copy in Sugar
+        fd = open(sugar_data_path, 'w')
         fd.write(json_data)
         fd.close()
 

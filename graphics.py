@@ -157,6 +157,7 @@ class Graphics(Gtk.ScrolledWindow):
         width = 800  # Gdk.Screen.width() - offset * 4
         # height = 480  # Gdk.Screen.height() - offset * 5
         height = int(height * Gdk.Screen.height() / 900.)
+        _logger.debug('height is %d' % height)
         self._web_view.set_size_request(width, height)
         self._web_view.set_full_content_zoom(True)
         self._web_view.load_uri(uri)

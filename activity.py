@@ -38,7 +38,7 @@ from toolbar_utils import separator_factory, label_factory, button_factory
 from taskmaster import TaskMaster
 from graphics import FONT_SIZES
 from checkprogress import CheckProgress
-from tests import get_nick
+import tests
 
 import logging
 _logger = logging.getLogger('training-activity')
@@ -56,45 +56,77 @@ class TrainingActivity(activity.Activity):
 
         self.connect('realize', self.__realize_cb)
 
-        self.font_size = 5
-        self.zoom_level = 0.833
-        self.check_progress = None
-        self.bundle_path = activity.get_bundle_path()
-
-        self._load_extension()
-
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
+        else:
+            self.font_size = 5
+        self.zoom_level = self.font_size / float(len(FONT_SIZES))
 
         self._setup_toolbars()
 
-        self.modify_bg(Gtk.StateType.NORMAL, style.COLOR_WHITE.get_gdk_color())
+        self.volume_data = []
+        for path in tests.get_volume_paths():
+            name = 'training-data-' + os.path.basename(path)
+            self.volume_data.append(
+                {'uid': name,
+                 'sugar_path': os.path.join(self.get_activity_root(),
+                                            'data', name),
+                 'usb_path': os.path.join(path, name)})
 
-        self._task_master = TaskMaster(self)
+        if len(self.volume_data) == 0:
+            _logger.error('NO USB KEY INSERTED')
+            alert = ConfirmationAlert()
+            alert.props.title = _('USB key required')
+            alert.props.msg = _('You must insert a USB key before launching'
+                                'this activity.')
+            alert.connect('response', self._remove_alert_cb)
+            self.add_alert(alert)
+        elif len(self.volume_data) > 1:
+            _logger.error('MULTIPLE USB KEYS INSERTED')
+            alert = ConfirmationAlert()
+            alert.props.title = _('Multiple USB keys found')
+            alert.props.msg = _('Only one USB key must be inserted while'
+                                'running this program.\nPlease remove any'
+                                'additional USB keys before launching'
+                                'this activity.')
+            alert.connect('response', self._remove_alert_cb)
+            self.add_alert(alert)
+        else:
+            self.check_progress = None
+            self.bundle_path = activity.get_bundle_path()
 
-        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-        center_in_panel.add(self._task_master)
-        self._task_master.show()
-        self.set_canvas(center_in_panel)
-        center_in_panel.show()
+            self._load_extension()
 
-        Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
+            self.modify_bg(Gtk.StateType.NORMAL,
+                           style.COLOR_WHITE.get_gdk_color())
 
-        self._task_master.set_events(Gdk.EventMask.KEY_PRESS_MASK)
-        self._task_master.connect('key_press_event',
-                                  self._task_master.keypress_cb)
-        self._task_master.set_can_focus(True)
-        self._task_master.grab_focus()
+            self._task_master = TaskMaster(self)
 
-        self.completed = False
-        self._task_master.task_master()
+            center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
+            center_in_panel.add(self._task_master)
+            self._task_master.show()
+            self.set_canvas(center_in_panel)
+            center_in_panel.show()
+
+            Gdk.Screen.get_default().connect('size-changed',
+                                             self._configure_cb)
+
+            self._task_master.set_events(Gdk.EventMask.KEY_PRESS_MASK)
+            self._task_master.connect('key_press_event',
+                                      self._task_master.keypress_cb)
+            self._task_master.set_can_focus(True)
+            self._task_master.grab_focus()
+
+            self.completed = False
+            self._task_master.task_master()
 
     def _configure_cb(self, event):
         self._task_master.reload_graphics()
 
     def write_file(self, file_path):
-        self._task_master.write_task_data('current_task',
-                                          self._task_master.current_task)
+        if len(self.volume_data) == 1:
+            self._task_master.write_task_data('current_task',
+                                              self._task_master.current_task)
         self.metadata['font_size'] = str(self.font_size)
 
     def update_activity_title(self):

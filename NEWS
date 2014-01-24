@@ -1,5 +1,13 @@
 NEWS
 
+1.23
+
+* Fixed bug with installing badge icon
+* Made task list into list of dictionarys (one per section)
+* Isolated XO-specific tasks
+* Require USB key
+* Save data to both XO and USB key
+
 1.22
 
 * Check for configuration changes so portrait/laptop mode works
