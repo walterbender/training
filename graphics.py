@@ -22,8 +22,9 @@ from sugar3.graphics.radiotoolbutton import RadioToolButton
 import logging
 _logger = logging.getLogger('training-activity-page')
 
+# Repeated font sizes at the end to enable web graphics to continue to scale
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
-              'xx-large']
+              'xx-large', 'xx-large', 'xx-large', 'xx-large']
 
 
 class Graphics(Gtk.ScrolledWindow):
@@ -151,13 +152,10 @@ class Graphics(Gtk.ScrolledWindow):
         button.show()
         return button
 
-    def add_uri(self, uri, height=700):
+    def add_uri(self, uri, height=610):
         self._web_view = WebKit.WebView()
-        # offset = style.GRID_CELL_SIZE
-        width = 800  # Gdk.Screen.width() - offset * 4
-        # height = 480  # Gdk.Screen.height() - offset * 5
+        width = 800
         height = int(height * Gdk.Screen.height() / 900.)
-        _logger.debug('height is %d' % height)
         self._web_view.set_size_request(width, height)
         self._web_view.set_full_content_zoom(True)
         self._web_view.load_uri(uri)

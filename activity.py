@@ -77,7 +77,7 @@ class TrainingActivity(activity.Activity):
             _logger.error('NO USB KEY INSERTED')
             alert = ConfirmationAlert()
             alert.props.title = _('USB key required')
-            alert.props.msg = _('You must insert a USB key before launching'
+            alert.props.msg = _('You must insert a USB key before launching '
                                 'this activity.')
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
@@ -85,9 +85,9 @@ class TrainingActivity(activity.Activity):
             _logger.error('MULTIPLE USB KEYS INSERTED')
             alert = ConfirmationAlert()
             alert.props.title = _('Multiple USB keys found')
-            alert.props.msg = _('Only one USB key must be inserted while'
-                                'running this program.\nPlease remove any'
-                                'additional USB keys before launching'
+            alert.props.msg = _('Only one USB key must be inserted while '
+                                'running this program.\nPlease remove any '
+                                'additional USB keys before launching '
                                 'this activity.')
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
@@ -127,6 +127,7 @@ class TrainingActivity(activity.Activity):
         if len(self.volume_data) == 1:
             self._task_master.write_task_data('current_task',
                                               self._task_master.current_task)
+            self.update_activity_title()
         self.metadata['font_size'] = str(self.font_size)
 
     def update_activity_title(self):

@@ -405,6 +405,15 @@ def get_rtf():
     return paths
 
 
+def get_odt():
+    dsobjects, nobjects = datastore.find({'mime_type':
+        ['application/vnd.oasis.opendocument.text']})
+    paths = []
+    for dsobject in dsobjects:
+        paths.append(dsobject.file_path)
+    return paths
+
+
 def get_uitree_node(name):
     return True
     uiroot = uitree.get_root()

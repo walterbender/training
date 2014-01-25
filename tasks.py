@@ -232,25 +232,64 @@ class Task():
             return ''
 
 
-class Intro1Task(Task):
+class HTMLTask(Task):
 
     def __init__(self, task_master):
         Task.__init__(self, task_master)
-        self._name = _('Intro One')
-        self.uid = 'intro-task-1'
+        self._uri = 'introduction1.html'
+        self._prompt = _('Next')
+        self._height = 610
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'introduction1.html')
+                           self._uri)
 
         graphics = Graphics()
-        graphics.add_uri('file://' + url)
+        graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
 
-        return graphics, _("Let's go!")
+        return graphics, self._prompt
+
+
+class HTMLHomeTask(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._uri = 'introduction1.html'
+        self._prompt = _('Next')
+        self._height = 305
+
+    def get_my_turn(self):
+        return True
+
+    def get_graphics(self, page=0):
+
+        def button_callback(button):
+            tests.goto_home_view()
+
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           self._uri)
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url, height=self._height)
+        graphics.set_zoom_level(self._zoom_level)
+        graphics.add_button(None, button_callback, button_icon='home')
+        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+
+        return graphics, self._prompt
+
+
+class Intro1Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Intro One')
+        self.uid = 'intro-task-1'
+        self._uri = 'introduction1.html'
+        self._prompt = _("Let's go!")
 
 
 class EnterNameTask(Task):
@@ -440,36 +479,25 @@ class ValidateEmailTask(Task):
         return graphics, _('Next')
 
 
-class Toolbars0Task(Task):
+class Toolbars0Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Toolbars test')
         self.uid = 'toolbars-task-0'
+        self._uri = 'toolbars0.html'
 
     def get_refresh(self):
         return True
 
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'toolbars0.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Toolbars1Task(Task):
+class Toolbars1Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Toolbars Stop')
         self.uid = 'toolbars-task-1'
+        self._uri = 'toolbars1.html'
 
     def is_collectable(self):
         return True
@@ -485,23 +513,14 @@ class Toolbars1Task(Task):
             return tests.get_launch_count(self._task_master.activity) > \
                 task_data['data']
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'toolbars1.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Toolbars2Task(Task):
+class Toolbars2Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Show View Toolbar')
         self.uid = 'toolbars-task-2'
+        self._uri = 'toolbars2.html'
 
     def is_collectable(self):
         return True
@@ -509,23 +528,14 @@ class Toolbars2Task(Task):
     def test(self, task_data):
         return tests.is_expanded(self._task_master.activity.view_toolbar_button)
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'toolbars2.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Toolbars3Task(Task):
+class Toolbars3Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Hide View Toolbar')
         self.uid = 'toolbars-task-3'
+        self._uri = 'toolbars3.html'
 
     def is_collectable(self):
         return True
@@ -537,23 +547,14 @@ class Toolbars3Task(Task):
         return not tests.is_expanded(
             self._task_master.activity.view_toolbar_button)
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'toolbars3.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Toolbars4Task(Task):
+class Toolbars4Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Enter Fullscreen')
         self.uid = 'toolbars-task-4'
+        self._uri = 'toolbars4.html'
 
     def is_collectable(self):
         return True
@@ -561,23 +562,14 @@ class Toolbars4Task(Task):
     def test(self, task_data):
         return tests.is_fullscreen(self._task_master.activity)
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'toolbars4.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Toolbars5Task(Task):
+class Toolbars5Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Exit Fullscreen')
         self.uid = 'toolbars-task-5'
+        self._uri = 'toolbars5.html'
 
     def is_collectable(self):
         return True
@@ -588,23 +580,14 @@ class Toolbars5Task(Task):
     def test(self, task_data):
         return not tests.is_fullscreen(self._task_master.activity)
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'toolbars5.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Toolbars6Task(Task):
+class Toolbars6Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Activity Toolbar')
         self.uid = 'toolbars-task-6'
+        self._uri = 'toolbars6.html'
 
     def is_collectable(self):
         return True
@@ -612,23 +595,14 @@ class Toolbars6Task(Task):
     def test(self, task_data):
         return tests.is_expanded(self._task_master.activity.activity_button)
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'toolbars6.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Toolbars7Task(Task):
+class Toolbars7Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Description Box')
         self.uid = 'toolbars-task-7'
+        self._uri = 'toolbars7.html'
 
     def is_collectable(self):
         return True
@@ -636,23 +610,14 @@ class Toolbars7Task(Task):
     def test(self, task_data):
         return len(tests.get_description(self._task_master.activity)) > 0
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'toolbars7.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Toolbars8Task(Task):
+class Toolbars8Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Description Summary')
         self.uid = 'toolbars-task-8'
+        self._uri = 'toolbars8.html'
 
     def get_requires(self):
         return ['toolbars-task-7']
@@ -660,91 +625,47 @@ class Toolbars8Task(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'toolbars8.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class NickChange1Task(Task):
+class NickChange1Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Nick Change Step One')
         self.uid = 'nick-change-task-1'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'nickchange1.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
+        self._uri = 'nickchange1.html'
 
 
-class NickChange2Task(Task):
+class NickChange2Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Nick Change Step Two')
         self.uid = 'nick-change-task-2'
+        self._uri = 'nickchange2.html'
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self, page=0):
-        graphics = Graphics()
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'nickchange2.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class NickChange3Task(Task):
+class NickChange3Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Nick Change Step Three')
         self.uid = 'nick-change-task-3'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
+        self._uri = 'nickchange3.html'
 
     def get_refresh(self):
         return True
 
-    def get_graphics(self, page=0):
-        graphics = Graphics()
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'nickchange3.html')
 
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class NickChange4Task(Task):
+class NickChange4Task(HTMLHomeTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLHomeTask.__init__(self, task_master)
         self._name = _('Nick Change Step Four')
         self.uid = 'nick-change-task-4'
+        self._uri = 'nickchange4.html'
 
     def is_collectable(self):
         return True
@@ -767,41 +688,17 @@ class NickChange4Task(Task):
             else:
                 return False
 
-    def get_my_turn(self):
-        return True
 
-    def get_graphics(self, page=0):
-
-        def button_callback(button):
-            tests.goto_home_view()
-
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'nickchange4.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url, height=300)
-        graphics.set_zoom_level(self._zoom_level)
-        graphics.add_button(None, button_callback, button_icon='home')
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-
-        return graphics, _('Next')
-
-
-class NickChange5Task(Task):
+class NickChange5Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Nick Change Step Five')
         self.uid = 'nick-change-task-5'
+        self._uri = 'nickchange5.html'
 
     def get_requires(self):
         return ['nick-change-task-4']
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_help_info(self):
-        return ('My Settings', 'my_settings.html')
 
     def get_graphics(self, page=0):
         nick_task_data = self._task_master.read_task_data(
@@ -820,87 +717,43 @@ class NickChange5Task(Task):
         return graphics, _('Next')
 
 
-class WriteSave1Task(Task):
+class WriteSave1Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Write Save Step One')
         self.uid = 'write-save-task-1'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_help_info(self):
-        return ('My Settings', 'my_settings.html')
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'writesave1.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
+        self._uri = 'writesave1.html'
 
 
-class WriteSave2Task(Task):
+class WriteSave2Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Write Save Step Two')
         self.uid = 'write-save-task-2'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_help_info(self):
-        return ('My Settings', 'my_settings.html')
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'writesave2.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
+        self._uri = 'writesave2.html'
 
 
-class WriteSave3Task(Task):
+class WriteSave3Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Write Save Step Three')
         self.uid = 'write-save-task-3'
+        self._uri = 'writesave3.html'
 
     def get_refresh(self):
         return True
 
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
 
-    def get_help_info(self):
-        return ('My Settings', 'my_settings.html')
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'writesave3.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class WriteSave4Task(Task):
+class WriteSave4Task(HTMLHomeTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLHomeTask.__init__(self, task_master)
         self._name = _('Write Save Step Four')
         self.uid = 'write-save-task-4'
+        self._uri = 'writesave4.html'
 
     def is_collectable(self):
         return True
@@ -909,134 +762,63 @@ class WriteSave4Task(Task):
         return True
 
     def test(self, task_data):
-        paths = tests.get_rtf()
+        paths = tests.get_odt()
         for path in paths:
             # Check to see if there is a picture in the file
             if tests.find_string(path, '\\pict'):
                 return True
         return False
 
-    def get_help_info(self):
-        return ('My Settings', 'my_settings.html')
-
     def get_my_turn(self):
         return True
 
-    def get_graphics(self, page=0):
 
-        def button_callback(button):
-            tests.goto_home_view()
-
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'writesave4.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url, height=300)
-        graphics.set_zoom_level(self._zoom_level)
-        graphics.add_button(None, button_callback, button_icon='home')
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-
-        return graphics, _('Next')
-
-
-class WriteSave5Task(Task):
+class WriteSave5Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Write Save Step Five')
         self.uid = 'write-save-task-5'
+        self._uri = 'writesave5.html'
 
     def get_requires(self):
         return ['write-save-task-4']
 
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
 
-    def get_help_info(self):
-        return ('My Settings', 'my_settings.html')
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'writesave5.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Speak1Task(Task):
+class Speak1Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Speak Step One')
         self.uid = 'speak-task-1'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'speak1.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
+        self._uri = 'speak1.html'
 
 
-class Speak2Task(Task):
+class Speak2Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Speak Step Two')
         self.uid = 'speak-task-2'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        graphics = Graphics()
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'speak2.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
+        self._uri = 'speak2.html'
 
 
-class Speak3Task(Task):
+class Speak3Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Speak Step Three')
         self.uid = 'speak-task-3'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        graphics = Graphics()
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'speak3.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
+        self._uri = 'speak3.html'
 
 
-class Speak4Task(Task):
+class Speak4Task(HTMLHomeTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLHomeTask.__init__(self, task_master)
         self._name = _('Speak Step Four')
         self.uid = 'speak-task-4'
+        self._uri = 'speak4.html'
 
     def is_collectable(self):
         return True
@@ -1049,21 +831,6 @@ class Speak4Task(Task):
 
     def get_my_turn(self):
         return True
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'speak4.html')
-
-        def button_callback(button):
-            tests.goto_home_view()
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url, height=300)
-        graphics.set_zoom_level(self._zoom_level)
-        graphics.add_button(None, button_callback, button_icon='home')
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-
-        return graphics, _('Next')
 
 
 class AddFavoriteTask(Task):
@@ -1138,54 +905,31 @@ class RemoveFavoriteTask(Task):
         return graphics, _('Next')
 
 
-class Journal1Task(Task):
+class Journal1Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Introducing the Journal')
         self.uid = 'journal-task-1'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'journal1.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
+        self._uri = 'journal1.html'
 
 
-class Views1Task(Task):
+class Views1Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Introducing the Views')
         self.uid = 'views-task-1'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'views1.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
+        self._uri = 'views1.html'
 
 
-class Views2Task(Task):
+class Views2Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Exploring the Views')
         self.uid = 'views-task-2'
+        self._uri = 'views2.html'
         self._views = []
 
     def is_collectable(self):
@@ -1202,16 +946,6 @@ class Views2Task(Task):
             if 'neighborhood' not in self._views:
                 self._views.append('neighborhood')
         return len(self._views) > 2
-
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'views2.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
 
 
 class AddStarredTask(Task):
@@ -1335,6 +1069,7 @@ class BatteryTask(Task):
                                              colors=tests.get_colors())
         for i, button in enumerate(buttons):
             button.connect('clicked', self._battery_button_callback, i)
+            button.set_active(False)
 
         return graphics, _('Next')
 
@@ -1513,36 +1248,25 @@ class Rotate2Task(Task):
         return graphics, _('Next')
 
 
-class Network1Task(Task):
+class Network1Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Network 1')
         self.uid = 'network-task-1'
+        self._uri = 'network1.html'
 
     def is_collectable(self):
         return True
 
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'network1.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
-
-class Finished1Task(Task):
+class Finished1Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Fill out a form 1')
         self.uid = 'finished-task-1'
+        self._uri = 'finished1.html'
 
     def is_collectable(self):
         return True
@@ -1558,16 +1282,6 @@ class Finished1Task(Task):
             return tests.get_launch_count(self._task_master.activity) > \
                 task_data['data']
 
-    def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'finished1.html')
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
-
 
 class BadgeTask(Task):
 
@@ -1575,30 +1289,28 @@ class BadgeTask(Task):
         Task.__init__(self, task_master)
         self._name = _('Badge Task')
         self.uid = 'badge-task'
+        self._section_index = 0
+        self._message = _("Congratulations %s!\n"
+                          "You’ve earned another badge!") % \
+            self._get_user_name().split()[0]
 
     def after_button_press(self):
         task_data = self._task_master.read_task_data(self.uid)
         if not 'badge' in task_data:
             task_data['badge'] = True
-            name = self._get_user_name().split()[0]
-            self._task_master.activity.add_badge(
-                _('Congratulations %s!\n'
-                  "You’ve earned another badge!" % name),
-                icon='badge-intro')
+            self._task_master.activity.add_badge(self._message,
+                icon=self._task_master.get_section_icon(self._section_index))
             self._task_master.write_task_data(self.uid, task_data)
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self, page=0):
-        name = self._get_user_name().split()[0]
         graphics = Graphics()
-        graphics.add_text(
-            _('Congratulations %s!\n'
-              "You’ve earned another badge!\n\n" % name),
-            bold=True,
-            size=FONT_SIZES[self._font_size])
-        graphics.add_icon('badge-intro')
+        graphics.add_text(self._message, bold=True,
+                          size=FONT_SIZES[self._font_size])
+        graphics.add_icon(
+            self._task_master.get_section_icon(self._section_index))
         graphics.add_text(
             _('\n\nMost badges require you to complete multiple tasks.\n\n'
               'Click on Next to go to your next one!'),
@@ -1613,28 +1325,10 @@ class BadgeIntroTask(BadgeTask):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Intro')
         self.uid = 'badge-intro'
-
-    def after_button_press(self):
-        task_data = self._task_master.read_task_data(self.uid)
-        if not 'badge' in task_data:
-            task_data['badge'] = True
-            name = self._task_master.read_task_data('name').split()[0]
-            self._task_master.activity.add_badge(
-                _('Congratulations %s!\n'
-                  "You’ve earned your first badge!" % name),
-                icon='badge-intro')
-            self._task_master.write_task_data(self.uid, task_data)
-
-    def get_graphics(self, page=0):
-        name = self._get_user_name().split()[0]
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'introduction4.html?NAME=%s' % name)
-
-        graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
-
-        return graphics, _('Next')
+        self._section_index = 0
+        self._message = _("Congratulations %s!\n"
+                          "You’ve earned your first badge!") % \
+            self._get_user_name().split()[0]
 
 
 class BadgeToolbarTask(BadgeTask):
@@ -1642,6 +1336,7 @@ class BadgeToolbarTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Toolbar')
+        self._section_index = 1
         self.uid = 'badge-toolbar'
 
 
@@ -1649,6 +1344,7 @@ class BadgeNetworkTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Network')
+        self._section_index = 2
         self.uid = 'badge-network'
 
 
@@ -1656,6 +1352,7 @@ class BadgeActivitiesTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Activities')
+        self._section_index = 3
         self.uid = 'badge-activities'
 
 
@@ -1663,6 +1360,7 @@ class BadgeJournalTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Journal')
+        self._section_index = 4
         self.uid = 'badge-journal'
 
 
@@ -1670,6 +1368,7 @@ class BadgeFrameTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Frame')
+        self._section_index = 5
         self.uid = 'badge-frame'
 
 
@@ -1677,6 +1376,7 @@ class BadgeViewsTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge View')
+        self._section_index = 6
         self.uid = 'badge-view'
 
 
@@ -1684,6 +1384,7 @@ class BadgeSettingsTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Settings')
+        self._section_index = 7
         self.uid = 'badge-settings'
 
 
@@ -1691,12 +1392,15 @@ class BadgeMoreActivitiesTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge More Activities')
+        self._section_index = 8
         self.uid = 'badge-more-activities'
+
 
 class BadgeCollaborationTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Collaboration')
+        self._section_index = 9
         self.uid = 'badge-collaboration'
 
 
@@ -1704,6 +1408,7 @@ class BadgeXOTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge XO')
+        self._section_index = 10
         self.uid = 'badge-xo'
 
 

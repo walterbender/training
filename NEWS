@@ -2,11 +2,16 @@ NEWS
 
 1.23
 
+* Fixed web sizing issues
+* Using ODT for Write task
+* Using proper icon for Badge tasks
+* Style-sheet updates
 * Fixed bug with installing badge icon
 * Made task list into list of dictionarys (one per section)
 * Isolated XO-specific tasks
 * Require USB key
 * Save data to both XO and USB key
+* Update instance name each time
 
 1.22
 
