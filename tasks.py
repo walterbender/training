@@ -70,6 +70,7 @@ def get_tasks(task_master):
          'tasks': [Journal1Task(task_master),
                    AddStarredTask(task_master),
                    RemoveStarredTask(task_master),
+                   Journal5Task(task_master),
                    BadgeJournalTask(task_master)]},
         {'name': _('5. Getting to Know the Frame'),
          'icon': 'badge-intro',
@@ -1055,15 +1056,6 @@ class RemoveFavoriteTask(Task):
         return graphics, _('Next')
 
 
-class Journal1Task(HTMLTask):
-
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
-        self._name = _('Introducing the Journal')
-        self.uid = 'journal-task-1'
-        self._uri = 'journal1.html'
-
-
 class Views1Task(HTMLTask):
 
     def __init__(self, task_master):
@@ -1096,6 +1088,15 @@ class Views2Task(HTMLTask):
             if 'neighborhood' not in self._views:
                 self._views.append('neighborhood')
         return len(self._views) > 2
+
+
+class Journal1Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Introducing the Journal')
+        self.uid = 'journal-task-1'
+        self._uri = 'journal1.html'
 
 
 class AddStarredTask(Task):
@@ -1179,6 +1180,28 @@ class RemoveStarredTask(Task):
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
 
         return graphics, _('Next')
+
+
+class Journal5Task(HTMLHomeTask):
+
+    def __init__(self, task_master):
+        HTMLHomeTask.__init__(self, task_master)
+        self._name = _('Introducing the Portfolio')
+        self.uid = 'journal-task-5'
+        self._uri = 'journal5.html'
+
+    def get_requires(self):
+        return ['add-starred-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if not tests.saw_new_launch('org.sugarlabs.PortfolioActivity',
+                                    task_data['start_time']):
+            return False
+        paths = tests.get_pdf()
+        return len(paths) > 0
 
 
 class ClipboardTask(Task):
