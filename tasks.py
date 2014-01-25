@@ -17,6 +17,8 @@ from gettext import gettext as _
 
 from gi.repository import GObject
 
+from sugar3.datastore import datastore
+
 import logging
 _logger = logging.getLogger('training-activity-tasks')
 
@@ -1361,10 +1363,10 @@ class Network1Task(HTMLTask):
         return True
 
 
-class Finished1Task(HTMLTask):
+class Finished1Task(HTMLHomeTask):
 
     def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
+        HTMLHomeTask.__init__(self, task_master)
         self._name = _('Fill out a form 1')
         self.uid = 'finished-task-1'
         self._uri = 'finished1.html'
@@ -1374,14 +1376,33 @@ class Finished1Task(HTMLTask):
 
     def test(self, task_data):
         if task_data['data'] is None:
-            task_data['data'] = \
-                tests.get_launch_count(self._task_master.activity)
+            task_data['data'] = _('Assessment') + ' ' + self._get_user_name()
             self._task_master.write_task_data(self.uid, task_data)
+            # Create the assessment document in the Journal
+            dsobject = datastore.create()
+            if dsobject is not None:
+                _logger.debug('creating Assessment entry in Journal')
+                dsobject.metadata['title'] = task_data['data'] + '.rtf'
+                dsobject.metadata['icon-color'] = \
+                    tests.get_colors().to_string()
+                dsobject.metadata['tags'] = \
+                    self._task_master.activity.volume_data[0]['uid']
+                dsobject.metadata['mime_type'] = 'text/rtf'
+                dsobject.set_file_path(
+                    os.path.join(self._task_master.activity.bundle_path,
+                                 'Assessment.rtf'))
+                datastore.write(dsobject)
+                dsobject.destroy()
             return False
         else:
-            _logger.debug(tests.get_launch_count(self._task_master.activity))
-            return tests.get_launch_count(self._task_master.activity) > \
-                task_data['data']
+            # Look for the assessment document on the USB stick
+            # FIX ME: What if they changed the name???
+            _logger.debug(os.path.join(
+                self._task_master.activity.volume_data[0]['usb_path'],
+                task_data['data'] + '.rtf'))
+            return os.path.exists(os.path.join(
+                self._task_master.activity.volume_data[0]['usb_path'],
+                task_data['data'] + '.rtf'))
 
 
 class BadgeTask(Task):

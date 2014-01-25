@@ -505,7 +505,9 @@ class TaskMaster(Gtk.Grid):
         return count
 
     def read_task_data(self, uid):
-        usb_data_path = self.activity.volume_data[0]['usb_path']
+        usb_data_path = os.path.join(
+            self.activity.volume_data[0]['usb_path'],
+            self.activity.volume_data[0]['uid'])
         uid_data = None
         if os.path.exists(usb_data_path):
             fd = open(usb_data_path, 'r')
@@ -522,8 +524,12 @@ class TaskMaster(Gtk.Grid):
         return uid_data
 
     def write_task_data(self, uid, uid_data):
-        sugar_data_path = self.activity.volume_data[0]['sugar_path']
-        usb_data_path = self.activity.volume_data[0]['usb_path']
+        sugar_data_path = os.path.join(
+            self.activity.volume_data[0]['sugar_path'],
+            self.activity.volume_data[0]['uid'])
+        usb_data_path = os.path.join(
+            self.activity.volume_data[0]['usb_path'],
+            self.activity.volume_data[0]['uid'])
 
         # Read before write
         data = {}

@@ -77,8 +77,8 @@ class TrainingActivity(activity.Activity):
             self.volume_data.append(
                 {'uid': name,
                  'sugar_path': os.path.join(self.get_activity_root(),
-                                            'data', name),
-                 'usb_path': os.path.join(path, name)})
+                                            'data'),
+                 'usb_path': path})
 
         if len(self.volume_data) == 0:
             _logger.error('NO USB KEY INSERTED')
@@ -107,7 +107,7 @@ class TrainingActivity(activity.Activity):
                     _logger.warning('USB UID does not match instance data')
                 # Flash a welcome screen
                 self._load_intro_graphics(file_name='introduction1a.html')
-                GObject.timeout_add(3000, self._launch_task_master)
+                GObject.timeout_add(1500, self._launch_task_master)
             else:
                 self._launch_task_master()
 
