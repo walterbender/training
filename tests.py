@@ -385,7 +385,7 @@ def get_activity(activity):
     return dsobjects
 
 
-def get_audio(self):
+def get_audio():
     paths = []
     dsobjects, nobjects = datastore.find({'mime_type': ['audio/ogg']})
     for dsobject in dsobjects:
@@ -393,7 +393,7 @@ def get_audio(self):
     return paths
 
 
-def get_image(self):
+def get_image():
     paths = []
     dsobjects, nobjects = datastore.find({'mime_type': ['image/png',
                                                         'image/jpeg']})
@@ -402,7 +402,7 @@ def get_image(self):
     return paths
 
 
-def get_jpg(self):
+def get_jpg():
     paths = []
     dsobjects, nobjects = datastore.find({'mime_type': ['image/jpeg']})
     for dsobject in dsobjects:

@@ -52,7 +52,7 @@ def get_tasks(task_master):
                    BadgeNetworkTask(task_master)]},
         {'name': _('3. Getting to Know Sugar Activities'),
          'icon': 'badge-intro',
-         'tasks': [RecordSave1Task(task_master),
+         'tasks': [Record1Task(task_master),
                    WriteSave1Task(task_master),
                    WriteSave2Task(task_master),
                    WriteSave3Task(task_master),
@@ -733,14 +733,16 @@ class Turtle1Task(HTMLHomeTask):
         return True
 
     def test(self, task_data):
-        if len(tests.get_activity('org.laptop.TurtleArtActivity')) < 1:
-            return False
-        if not tests.find_string(path, 'left') and \
-           not tests.find_string(path, 'right'):
-            return False
-        if not tests.find_string(path, 'forward') and \
-           not tests.find_string(path, 'back'):
-            return False
+        for activity in tests.get_activity('org.laptop.TurtleArtActivity'):
+            path = activity.file_path
+            if not tests.find_string(path, 'left') and \
+               not tests.find_string(path, 'right'):
+                return False
+            if not tests.find_string(path, 'forward') and \
+               not tests.find_string(path, 'back'):
+                return False
+            return True
+        return False
 
     def get_my_turn(self):
         return True
@@ -1389,15 +1391,16 @@ class BadgeTask(Task):
         self._name = _('Badge Task')
         self.uid = 'badge-task'
         self._section_index = 0
-        self._message = _("Congratulations %s!\n"
-                          "You’ve earned another badge!") % \
-            self._get_user_name().split()[0]
+        self._title = _("Congratulations!\nYou’ve earned another badge!")
+        self._message = _('Click on Next to go to your next one!')
+
 
     def after_button_press(self):
         task_data = self._task_master.read_task_data(self.uid)
         if not 'badge' in task_data:
             task_data['badge'] = True
-            self._task_master.activity.add_badge(self._message,
+            self._task_master.activity.add_badge(
+                self._title,
                 icon=self._task_master.get_section_icon(self._section_index))
             self._task_master.write_task_data(self.uid, task_data)
 
@@ -1406,13 +1409,12 @@ class BadgeTask(Task):
 
     def get_graphics(self, page=0):
         graphics = Graphics()
-        graphics.add_text(self._message, bold=True,
+        graphics.add_text(self._title, bold=True,
                           size=FONT_SIZES[self._font_size])
         graphics.add_icon(
             self._task_master.get_section_icon(self._section_index))
         graphics.add_text(
-            _('\n\nMost badges require you to complete multiple tasks.\n\n'
-              'Click on Next to go to your next one!'),
+            '\n\n' + self._name + '\n\n' + self._message + '\n\n',
             size=FONT_SIZES[self._font_size])
 
         return graphics, _('Next')
@@ -1425,9 +1427,7 @@ class BadgeIntroTask(BadgeTask):
         self._name = _('Badge Intro')
         self.uid = 'badge-intro'
         self._section_index = 0
-        self._message = _("Congratulations %s!\n"
-                          "You’ve earned your first badge!") % \
-            self._get_user_name().split()[0]
+        self._title = _("Congratulations!\nYou’ve earned your first badge!")
 
 
 class BadgeToolbarTask(BadgeTask):

@@ -131,8 +131,8 @@ class TaskMaster(Gtk.Grid):
         if self.current_task < self._get_number_of_tasks():
             section, task_index = self.get_section_index()
             # Do we skip this task?
-            if self._task_list[section]['tasks'][task_index].is_completed() and \
-               self._task_list[section]['tasks'][task_index].skip_if_completed():
+            task = self._task_list[section]['tasks'][task_index]
+            if task.is_completed() and task.skip_if_completed():
                 _logger.debug('skipping task %d' % task_index)
                 self.current_task += 1  # Assume there is a next task
                 task_index += 1
@@ -262,23 +262,25 @@ class TaskMaster(Gtk.Grid):
                     all_requirements.append(task.uid)
             last = len(section['tasks']) - 1
             if section['tasks'][last].uid[0:5] == 'badge':
-                _logger.debug('setting requirements for %s to %r' %
-                              (section['tasks'][last].uid,
-                               section_requirements))
+                # _logger.debug('setting requirements for %s to %r' %
+                #               (section['tasks'][last].uid,
+                #                section_requirements))
                 section['tasks'][last].set_requires(section_requirements)
         self._task_list[-1]['tasks'][-1].set_requires(all_requirements)
-        _logger.debug('setting requirements for %s to %r' %
-                      (self._task_list[-1]['tasks'][-1].uid, all_requirements))
+        # _logger.debug('setting requirements for %s to %r' %
+        #             (self._task_list[-1]['tasks'][-1].uid, all_requirements))
 
     def _check_requirements(self, section, task_index, switch_task=True):
         ''' Check to make sure all the requirements at met '''
         requires = self._task_list[section]['tasks'][task_index].get_requires()
         for uid in requires:
-            if not self._uid_to_task(uid, section=section).is_completed():
+            # Don't restrict search to current section
+            if not self._uid_to_task(uid, section=None).is_completed():
                 if switch_task:
                     _logger.debug(
                         'Task %s required task %s... switching to %s' %
-                        (self._task_list[section]['tasks'][task_index].uid, uid, uid))
+                        (self._task_list[section]['tasks'][task_index].uid,
+                         uid, uid))
                     self.current_task = self.uid_to_task_number(uid)
                 return False
         return True
@@ -484,7 +486,7 @@ class TaskMaster(Gtk.Grid):
                     if task.uid == uid:
                         return task
         _logger.error('UID %s not found' % uid)
-        return self._task_list[0][0]
+        return self._task_list[0]['tasks'][0]
 
     def _get_number_of_completed_tasks(self):
         count = 0

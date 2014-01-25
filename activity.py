@@ -320,7 +320,7 @@ class TrainingActivity(activity.Activity):
             'message': msg
         }
 
-        icon_dir = os.path.join(self.bundle_path, 'icon')
+        icon_dir = os.path.join(self.bundle_path, 'icons')
         icon_path = os.path.join(icon_dir, icon + '.svg')
         try:
             subprocess.call(['cp', icon_path, sugar_icons])
