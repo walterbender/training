@@ -19,6 +19,7 @@ from gettext import gettext as _
 
 from gi.repository import Gtk
 from gi.repository import Gdk
+from gi.repository import GObject
 
 from sugar3.activity import activity
 from sugar3.activity.widgets import StopButton
@@ -36,7 +37,7 @@ except:
 
 from toolbar_utils import separator_factory, label_factory, button_factory
 from taskmaster import TaskMaster
-from graphics import FONT_SIZES
+from graphics import Graphics, FONT_SIZES
 from checkprogress import CheckProgress
 import tests
 
@@ -63,6 +64,10 @@ class TrainingActivity(activity.Activity):
         self.zoom_level = self.font_size / float(len(FONT_SIZES))
 
         self._setup_toolbars()
+        self.modify_bg(Gtk.StateType.NORMAL,
+                       style.COLOR_WHITE.get_gdk_color())
+
+        self.bundle_path = activity.get_bundle_path()
 
         self.volume_data = []
         for path in tests.get_volume_paths():
@@ -81,6 +86,7 @@ class TrainingActivity(activity.Activity):
                                 'this activity.')
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
+            self._load_intro_graphics()
         elif len(self.volume_data) > 1:
             _logger.error('MULTIPLE USB KEYS INSERTED')
             alert = ConfirmationAlert()
@@ -91,14 +97,19 @@ class TrainingActivity(activity.Activity):
                                 'this activity.')
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
+            self._load_intro_graphics()
         else:
+            if 'training_data_uid' in self.metadata:
+                # Flash a welcome screen
+                self._load_intro_graphics(file_name='introduction1a.html')
+                GObject.timeout_add(3000, self._launch_task_master)
+            else:
+                self._launch_task_master()
+
+    def _launch_task_master(self):
             self.check_progress = None
-            self.bundle_path = activity.get_bundle_path()
 
             self._load_extension()
-
-            self.modify_bg(Gtk.StateType.NORMAL,
-                           style.COLOR_WHITE.get_gdk_color())
 
             self._task_master = TaskMaster(self)
 
@@ -120,6 +131,17 @@ class TrainingActivity(activity.Activity):
             self.completed = False
             self._task_master.task_master()
 
+    def _load_intro_graphics(self, file_name='generic-problem.html'):
+        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
+        url = os.path.join(self.bundle_path, 'html', file_name)
+        graphics = Graphics()
+        graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(0.75)
+        center_in_panel.add(graphics)
+        graphics.show()
+        self.set_canvas(center_in_panel)
+        center_in_panel.show()
+
     def _configure_cb(self, event):
         self._task_master.reload_graphics()
 
@@ -128,6 +150,7 @@ class TrainingActivity(activity.Activity):
             self._task_master.write_task_data('current_task',
                                               self._task_master.current_task)
             self.update_activity_title()
+            self.metadata['training_data_uid'] = self.volume_data[0]['uid']
         self.metadata['font_size'] = str(self.font_size)
 
     def update_activity_title(self):

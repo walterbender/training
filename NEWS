@@ -1,5 +1,10 @@
 NEWS
 
+1.24
+
+* Flash a welcome back screen
+* Load a Generic Error screen
+
 1.23
 
 * Fixed web sizing issues
