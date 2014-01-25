@@ -964,8 +964,20 @@ class Speak4Task(HTMLHomeTask):
         return True
 
     def test(self, task_data):
-        return tests.saw_new_launch('vu.lux.olpc.Speak',
-                                    task_data['start_time'])
+        if not tests.saw_new_launch('vu.lux.olpc.Speak',
+                                    task_data['start_time']):
+            return False
+
+        # Has any setting changed?
+        status = tests.get_speak_settings(
+            tests.get_most_recent_instance('vu.lux.olpc.Speak'))
+        if len(status['eyes']) != 2 or \
+           status['eyes'][0] != 1 or \
+           status['pitch'] != 49 or \
+           status['rate'] != 49 or \
+           status['mouth'] != 1:
+            return True
+        return False
 
     def get_my_turn(self):
         return True

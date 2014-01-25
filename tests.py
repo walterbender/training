@@ -435,6 +435,18 @@ def get_activity(bundle_id):
     return dsobjects
 
 
+def get_most_recent_instance(bundle_id):
+    dsobjects, nobjects = datastore.find({'activity': [bundle_id]})
+    most_recent_time = -1
+    most_recent_instance = None
+    for activity in dsobjects:
+        last_launch_time = get_last_launch_time(activity)
+        if last_launch_time > most_recent_time:
+            most_recent_time = get_last_launch_time(activity)
+            most_recent_instance = activity
+    return most_recent_instance
+
+
 def get_audio():
     paths = []
     dsobjects, nobjects = datastore.find({'mime_type': ['audio/ogg']})
@@ -484,6 +496,14 @@ def get_odt():
     for dsobject in dsobjects:
         paths.append(dsobject.file_path)
     return paths
+
+
+def get_speak_settings(activity):
+    file_path = activity.file_path
+    configuration = json.loads(file(file_path, 'r').read())
+    status = json.loads(configuration['status'])
+    _logger.debug(status)
+    return status
 
 
 def get_uitree_node(name):

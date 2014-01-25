@@ -268,6 +268,7 @@ class TrainingActivity(activity.Activity):
         self.window_xid = window.get_window().get_xid()
 
     def set_copy_widget(self, webkit=None, text_entry=None):
+        # Each task is responsible for setting a widget for copy
         if webkit is not None:
             self._webkit = webkit
         else:
@@ -281,7 +282,6 @@ class TrainingActivity(activity.Activity):
             webkit is not None or text_entry is not None)
 
     def _copy_cb(self, button):
-        # Each task is responsible for setting up a widget for copy
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         if self._copy_entry is not None:
             self._copy_entry.copy_clipboard()
@@ -291,12 +291,12 @@ class TrainingActivity(activity.Activity):
             _logger.debug('No widget set for copy.')
 
     def set_paste_widget(self, text_entry=None):
+        # Each task is responsible for setting a widget for paste
         if text_entry is not None:
             self._paste_entry = text_entry
         self._paste_button.set_sensitive(text_entry is not None)
 
     def _paste_cb(self, button):
-        # Each task is responsible for setting a widget for paste
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         self.clipboard_text = clipboard.wait_for_text()
         if self._paste_entry is not None:
