@@ -1,9 +1,18 @@
 NEWS
 
+1.25
+
+* Added compare instance UID with USB UID. Log WARNING is not a match
+* Added PDF test for Portfolio task
+* Modified Write task to look for a Picture in ODT
+* Added Record task
+* Added Physics task (with sharing)
+* Added Turtle task (draw a square)
+
 1.24
 
-* Flash a welcome back screen
-* Load a Generic Error screen
+* Welcome Back splash screen
+* Generic Error splash screen
 
 1.23
 
@@ -12,7 +21,7 @@ NEWS
 * Using proper icon for Badge tasks
 * Style-sheet updates
 * Fixed bug with installing badge icon
-* Made task list into list of dictionarys (one per section)
+* Made task list into list of dictionaries (one per section)
 * Isolated XO-specific tasks
 * Require USB key
 * Save data to both XO and USB key

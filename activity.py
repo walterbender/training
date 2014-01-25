@@ -44,6 +44,8 @@ import tests
 import logging
 _logger = logging.getLogger('training-activity')
 
+_TRAINING_DATA_UID = 'training_data_uid'
+
 
 class TrainingActivity(activity.Activity):
     ''' A series of training exercises '''
@@ -99,7 +101,10 @@ class TrainingActivity(activity.Activity):
             self.add_alert(alert)
             self._load_intro_graphics()
         else:
-            if 'training_data_uid' in self.metadata:
+            if _TRAINING_DATA_UID in self.metadata:
+                if self.metadata[_TRAINING_DATA_UID] != \
+                   self.volume_data[0]['uid']:
+                    _logger.warning('USB UID does not match instance data')
                 # Flash a welcome screen
                 self._load_intro_graphics(file_name='introduction1a.html')
                 GObject.timeout_add(3000, self._launch_task_master)
@@ -150,7 +155,7 @@ class TrainingActivity(activity.Activity):
             self._task_master.write_task_data('current_task',
                                               self._task_master.current_task)
             self.update_activity_title()
-            self.metadata['training_data_uid'] = self.volume_data[0]['uid']
+            self.metadata[_TRAINING_DATA_UID] = self.volume_data[0]['uid']
         self.metadata['font_size'] = str(self.font_size)
 
     def update_activity_title(self):

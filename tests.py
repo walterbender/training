@@ -350,6 +350,12 @@ def goto_neighborhood_view():
         _logger.error('ERROR setting zoom level %s' % e)
 
 
+def get_share_scope(activity):
+    if 'share-scope' in activity.metadata:
+        return activity.metadata['share-scope'] == 'public'
+    return False
+
+
 def get_launch_count(activity):
     if 'launch-times' in activity.metadata:
         return len(activity.metadata['launch-times'].split(','))
@@ -396,9 +402,25 @@ def get_image(self):
     return paths
 
 
+def get_jpg(self):
+    paths = []
+    dsobjects, nobjects = datastore.find({'mime_type': ['image/jpeg']})
+    for dsobject in dsobjects:
+        paths.append(dsobject.file_path)
+    return paths
+
+
 def get_rtf():
     dsobjects, nobjects = datastore.find({'mime_type': ['text/rtf',
                                                         'application/rtf']})
+    paths = []
+    for dsobject in dsobjects:
+        paths.append(dsobject.file_path)
+    return paths
+
+
+def get_pdf():
+    dsobjects, nobjects = datastore.find({'mime_type': ['application/pdf']})
     paths = []
     for dsobject in dsobjects:
         paths.append(dsobject.file_path)

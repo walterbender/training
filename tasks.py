@@ -52,7 +52,8 @@ def get_tasks(task_master):
                    BadgeNetworkTask(task_master)]},
         {'name': _('3. Getting to Know Sugar Activities'),
          'icon': 'badge-intro',
-         'tasks': [WriteSave1Task(task_master),
+         'tasks': [RecordSave1Task(task_master),
+                   WriteSave1Task(task_master),
                    WriteSave2Task(task_master),
                    WriteSave3Task(task_master),
                    WriteSave4Task(task_master),
@@ -90,10 +91,13 @@ def get_tasks(task_master):
                    BadgeSettingsTask(task_master)]},
         {'name': _('8. Getting to Know more Activities'),
          'icon': 'badge-intro',
-         'tasks': [BadgeMoreActivitiesTask(task_master)]},
+         'tasks': [Turtle1Task(task_master),
+                   Physics1Task(task_master),
+                   BadgeMoreActivitiesTask(task_master)]},
         {'name': _('9. Getting to Know Collaboration'),
          'icon': 'badge-intro',
-         'tasks': [BadgeCollaborationTask(task_master)]}
+         'tasks': [Physics2Task(task_master),
+                   BadgeCollaborationTask(task_master)]}
     ]
 
     if tests.is_XO():
@@ -717,6 +721,97 @@ class NickChange5Task(HTMLTask):
         return graphics, _('Next')
 
 
+class Turtle1Task(HTMLHomeTask):
+
+    def __init__(self, task_master):
+        HTMLHomeTask.__init__(self, task_master)
+        self._name = _('Turtle Square')
+        self.uid = 'turtle-task-1'
+        self._uri = 'turtle1.html'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if len(tests.get_activity('org.laptop.TurtleArtActivity')) < 1:
+            return False
+        if not tests.find_string(path, 'left') and \
+           not tests.find_string(path, 'right'):
+            return False
+        if not tests.find_string(path, 'forward') and \
+           not tests.find_string(path, 'back'):
+            return False
+
+    def get_my_turn(self):
+        return True
+
+
+class Physics1Task(HTMLHomeTask):
+
+    def __init__(self, task_master):
+        HTMLHomeTask.__init__(self, task_master)
+        self._name = _('Physics Play')
+        self.uid = 'physics-play-task'
+        self._uri = 'physics1.html'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        return len(tests.get_activity('org.laptop.physics')) > 0
+
+    def get_my_turn(self):
+        return True
+
+
+class Physics2Task(HTMLHomeTask):
+
+    def __init__(self, task_master):
+        HTMLHomeTask.__init__(self, task_master)
+        self._name = _('Physics Share')
+        self.uid = 'physics-share-task'
+        self._uri = 'physics2.html'
+
+    def is_collectable(self):
+        return True
+
+    def get_requires(self):
+        return ['physics-play-task']
+
+    def test(self, task_data):
+        for activity in tests.get_activity('org.laptop.physics'):
+            if tests.get_share_scope(activity):
+                return True
+        return False
+
+    def get_my_turn(self):
+        return True
+
+
+class Record1Task(HTMLHomeTask):
+
+    def __init__(self, task_master):
+        HTMLHomeTask.__init__(self, task_master)
+        self._name = _('Record Save')
+        self.uid = 'record-save-task-1'
+        self._uri = 'recordsave1.html'
+
+    def is_collectable(self):
+        return True
+
+    def skip_if_completed(self):
+        return True
+
+    def test(self, task_data):
+        if len(tests.get_activity('org.laptop.RecordActivity')) < 1:
+            return False
+        paths = tests.get_jpg()
+        return len(paths) > 0
+
+    def get_my_turn(self):
+        return True
+
+
 class WriteSave1Task(HTMLTask):
 
     def __init__(self, task_master):
@@ -755,6 +850,9 @@ class WriteSave4Task(HTMLHomeTask):
         self.uid = 'write-save-task-4'
         self._uri = 'writesave4.html'
 
+    def get_requires(self):
+        return ['record-save-task-1']
+
     def is_collectable(self):
         return True
 
@@ -764,8 +862,9 @@ class WriteSave4Task(HTMLHomeTask):
     def test(self, task_data):
         paths = tests.get_odt()
         for path in paths:
-            # Check to see if there is a picture in the file
-            if tests.find_string(path, '\\pict'):
+            # Check to see if there is a picture in the file:
+            # look for '\\pict' in RTF, 'Pictures' in ODT
+            if tests.find_string(path, 'Pictures'):
                 return True
         return False
 
