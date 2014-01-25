@@ -73,7 +73,8 @@ def get_tasks(task_master):
                    BadgeJournalTask(task_master)]},
         {'name': _('5. Getting to Know the Frame'),
          'icon': 'badge-intro',
-         'tasks': [BatteryTask(task_master),
+         'tasks': [ClipboardTask(task_master),
+                   BatteryTask(task_master),
                    SoundTask(task_master),
                    BadgeFrameTask(task_master)]},
         {'name': _('6. Getting to Know the Views'),
@@ -735,6 +736,9 @@ class Turtle1Task(HTMLHomeTask):
         return True
 
     def test(self, task_data):
+        if not tests.saw_new_launch('org.laptop.TurtleArtActivity',
+                                    task_data['start_time']):
+            return False
         for activity in tests.get_activity('org.laptop.TurtleArtActivity'):
             path = activity.file_path
             if not tests.find_string(path, 'left') and \
@@ -762,7 +766,8 @@ class Physics1Task(HTMLHomeTask):
         return True
 
     def test(self, task_data):
-        return len(tests.get_activity('org.laptop.physics')) > 0
+        return tests.saw_new_launch('org.laptop.physics',
+                                    task_data['start_time'])
 
     def get_my_turn(self):
         return True
@@ -807,7 +812,8 @@ class Record1Task(HTMLHomeTask):
         return True
 
     def test(self, task_data):
-        if len(tests.get_activity('org.laptop.RecordActivity')) < 1:
+        if not tests.saw_new_launch('org.laptop.RecordActivity',
+                                    task_data['start_time']):
             return False
         paths = tests.get_jpg()
         return len(paths) > 0
@@ -864,6 +870,9 @@ class WriteSave4Task(HTMLHomeTask):
         return True
 
     def test(self, task_data):
+        if not tests.saw_new_launch('org.laptop.AbiWordActivity',
+                                    task_data['start_time']):
+            return False
         paths = tests.get_odt()
         for path in paths:
             # Check to see if there is a picture in the file:
@@ -930,7 +939,8 @@ class Speak4Task(HTMLHomeTask):
         return True
 
     def test(self, task_data):
-        return len(tests.get_activity('vu.lux.olpc.Speak')) > 0
+        return tests.saw_new_launch('vu.lux.olpc.Speak',
+                                    task_data['start_time'])
 
     def get_my_turn(self):
         return True
@@ -1133,6 +1143,34 @@ class RemoveStarredTask(Task):
 
         return graphics, _('Next')
 
+
+class ClipboardTask(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Copy to Clipboard')
+        self.uid = 'copy-to-clipboard-task'
+        self._uri = 'clipboard1.html'
+        self._entries = []
+        self._prompt = _('Next')
+        self._height = 500
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           self._uri)
+
+        graphics = Graphics()
+        graphics.add_uri('file://' + url, height=self._height)
+        graphics.set_zoom_level(self._zoom_level)
+        self._entries.append(graphics.add_entry())
+        return graphics, self._prompt
+
+    def test(self, task_data):
+        if not tests.is_clipboard_text_available():
+            return False
+        if len(self._entries[0].get_text()) > 0:
+            return True
+        return False
 
 class BatteryTask(Task):
 

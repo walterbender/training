@@ -17,6 +17,7 @@ import dbus
 
 from gi.repository import Gio
 from gi.repository import Gdk
+from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GConf
 from gi.repository import GObject
@@ -98,6 +99,16 @@ def get_volume_names():
         names.append(mount.get_name())
 
     return names
+
+
+def is_clipboard_text_available():
+    clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+    text_view = Gtk.TextView()
+    text_buffer = text_view.get_buffer()
+    text_buffer.paste_clipboard(clipboard, None, True)
+    bounds = text_buffer.get_bounds()
+
+    return len(text_buffer.get_text(bounds[0], bounds[1], True)) > 0
 
 
 def get_volume_paths():
@@ -356,6 +367,45 @@ def get_share_scope(activity):
     return False
 
 
+def saw_new_launch(bundle_id, timestamp):
+    for activity in get_activity(bundle_id):
+        _logger.debug('%d > %d?' %
+                      (get_last_launch_time(activity), int(timestamp)))
+        if get_last_launch_time(activity) > int(timestamp):
+            return True
+    return False
+
+
+def saw_new_instance(bundle_id, timestamp):
+    for activity in get_activity(bundle_id):
+        _logger.debug('%d > %d?' %
+                      (get_creation_time(activity), int(timestamp)))
+        if get_creation_time(activity) > int(timestamp):
+            return True
+    return False
+
+
+def get_creation_time(activity):
+    if 'creation_time' in activity.metadata:
+        return int(activity.metadata['creation_time'])
+    else:
+        _logger.error('No creation time found')
+        return 0
+
+
+def get_last_launch_time(activity):
+    if 'launch-times' in activity.metadata:
+        launch_times = activity.metadata['launch-times'].split(',')
+        try:
+            return int(launch_times[-1])
+        except Exception, e:
+            _logger.error('Malformed launch times found: %s' % e)
+            return 0
+    else:
+        _logger.error('No launch times found')
+        return 0
+
+
 def get_launch_count(activity):
     if 'launch-times' in activity.metadata:
         return len(activity.metadata['launch-times'].split(','))
@@ -380,8 +430,8 @@ def get_favorites():
     return favorites_list
 
 
-def get_activity(activity):
-    dsobjects, nobjects = datastore.find({'activity': [activity]})
+def get_activity(bundle_id):
+    dsobjects, nobjects = datastore.find({'activity': [bundle_id]})
     return dsobjects
 
 
