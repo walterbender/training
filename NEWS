@@ -1,5 +1,11 @@
 NEWS
 
+1.26
+
+* Added clipboard test
+* Added copy/paste task
+* Added new instance test
+
 1.25
 
 * Added compare instance UID with USB UID. Log WARNING is not a match
