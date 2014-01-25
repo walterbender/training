@@ -336,6 +336,7 @@ class EnterNameTask(Task):
             self._entries.append(graphics.add_entry(text=target))
         else:
             self._entries.append(graphics.add_entry())
+        self._task_master.activity.text_entry = self._entries[-1]
 
         return graphics, _('Next')
 
@@ -377,6 +378,7 @@ class EnterSchoolNameTask(Task):
             self._entries.append(graphics.add_entry(text=target))
         else:
             self._entries.append(graphics.add_entry())
+        self._task_master.activity.text_entry = self._entries[-1]
 
         return graphics, _('Next')
 
@@ -427,6 +429,7 @@ class EnterEmailTask(Task):
             self._entries.append(graphics.add_entry(text=email))
         else:
             self._entries.append(graphics.add_entry())
+        self._task_master.activity.text_entry = self._entries[-1]
 
         return graphics, _('Next')
 
@@ -481,6 +484,8 @@ class ValidateEmailTask(Task):
               'email address correctly by typing it again below.\n\n'),
             size=FONT_SIZES[self._font_size])
         self._entries.append(graphics.add_entry())
+        # Paste to second entry
+        self._task_master.activity.text_entry = self._entries[-1]
         graphics.add_text('\n\n')
 
         return graphics, _('Next')
@@ -1163,6 +1168,7 @@ class ClipboardTask(Task):
         graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
         self._entries.append(graphics.add_entry())
+        self._task_master.activity.text_entry = self._entries[-1]
         return graphics, self._prompt
 
     def test(self, task_data):

@@ -70,6 +70,8 @@ class TrainingActivity(activity.Activity):
                        style.COLOR_WHITE.get_gdk_color())
 
         self.bundle_path = activity.get_bundle_path()
+        self.text_entry = None
+        self.clipboard_text = ''
 
         self.volume_data = []
         for path in tests.get_volume_paths():
@@ -184,6 +186,7 @@ class TrainingActivity(activity.Activity):
         view_toolbar = Gtk.Toolbar()
         self.view_toolbar_button = ToolbarButton(
             page=view_toolbar,
+            label=_('View'),
             icon_name='toolbar-view')
         toolbox.toolbar.insert(self.view_toolbar_button, 1)
         view_toolbar.show()
@@ -203,6 +206,23 @@ class TrainingActivity(activity.Activity):
                                         self._zoom_out_cb,
                                         tooltip=_('Decrease font size'))
         self._set_zoom_buttons_sensitivity()
+
+        edit_toolbar = Gtk.Toolbar()
+        self.edit_toolbar_button = ToolbarButton(
+            page=edit_toolbar,
+            label=_('Edit'),
+            icon_name='toolbar-edit')
+        toolbox.toolbar.insert(self.edit_toolbar_button, 1)
+        edit_toolbar.show()
+        self.edit_toolbar_button.show()
+
+        button_factory('edit-copy', edit_toolbar,
+                       self._copy_cb, tooltip=_('Copy'),
+                       ) # accelerator='<Ctrl>C')
+
+        button_factory('edit-paste', edit_toolbar,
+                       self._paste_cb, tooltip=_('Paste'),
+                       accelerator='<Ctrl>V')
 
         self.help_button = button_factory('toolbar-help',
                                           toolbox.toolbar,
@@ -242,6 +262,23 @@ class TrainingActivity(activity.Activity):
 
     def __realize_cb(self, window):
         self.window_xid = window.get_window().get_xid()
+
+    def _copy_cb(self, button):
+        # Each task is responsible for setting up a text buffer
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        if self.text_entry is not None:
+            self.text_entry.copy_clipboard() # clipboard)
+        else:
+            _logger.debug('No where to copy text from.')
+
+    def _paste_cb(self, button):
+        # Each task is responsible for setting up a text buffer
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        self.clipboard_text = clipboard.wait_for_text()
+        if self.text_entry is not None:
+            self.text_entry.paste_clipboard()
+        else:
+            _logger.debug('No where to paste %s to.' % self.clipboard_text)
 
     def _fullscreen_cb(self, button):
         ''' Hide the Sugar toolbars. '''
