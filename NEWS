@@ -4,10 +4,11 @@ NEWS
 
 * Added compare instance UID with USB UID. Log WARNING is not a match
 * Added PDF test for Portfolio task
-* Modified Write task to look for a Picture in ODT
+* Modified Write task to look for a "Picture" in ODT
 * Added Record task
 * Added Physics task (with sharing)
 * Added Turtle task (draw a square)
+* Added assessment task (including copying to USB)
 
 1.24
 
