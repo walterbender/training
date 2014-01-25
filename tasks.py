@@ -221,6 +221,8 @@ class Task():
 
     def get_graphics(self, page=0):
         ''' Graphics to present with the task '''
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
         return None, _('Next')
 
     def is_completed(self):
@@ -255,8 +257,11 @@ class HTMLTask(Task):
                            self._uri)
 
         graphics = Graphics()
-        graphics.add_uri('file://' + url, height=self._height)
+        webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
 
         return graphics, self._prompt
 
@@ -281,10 +286,13 @@ class HTMLHomeTask(HTMLTask):
                            self._uri)
 
         graphics = Graphics()
-        graphics.add_uri('file://' + url, height=self._height)
+        webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
         graphics.add_button(None, button_callback, button_icon='home')
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
 
         return graphics, self._prompt
 
@@ -336,7 +344,9 @@ class EnterNameTask(Task):
             self._entries.append(graphics.add_entry(text=target))
         else:
             self._entries.append(graphics.add_entry())
-        self._task_master.activity.text_entry = self._entries[-1]
+
+        self._task_master.activity.set_copy_widget(text_entry=self._entries[-1])
+        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
 
         return graphics, _('Next')
 
@@ -378,7 +388,9 @@ class EnterSchoolNameTask(Task):
             self._entries.append(graphics.add_entry(text=target))
         else:
             self._entries.append(graphics.add_entry())
-        self._task_master.activity.text_entry = self._entries[-1]
+
+        self._task_master.activity.set_copy_widget(text_entry=self._entries[-1])
+        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
 
         return graphics, _('Next')
 
@@ -429,7 +441,9 @@ class EnterEmailTask(Task):
             self._entries.append(graphics.add_entry(text=email))
         else:
             self._entries.append(graphics.add_entry())
-        self._task_master.activity.text_entry = self._entries[-1]
+
+        self._task_master.activity.set_copy_widget(text_entry=self._entries[-1])
+        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
 
         return graphics, _('Next')
 
@@ -487,6 +501,9 @@ class ValidateEmailTask(Task):
         # Paste to second entry
         self._task_master.activity.text_entry = self._entries[-1]
         graphics.add_text('\n\n')
+
+        self._task_master.activity.set_copy_widget(text_entry=self._entries[0])
+        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
 
         return graphics, _('Next')
 
@@ -723,8 +740,11 @@ class NickChange5Task(HTMLTask):
                            'nickchange5.html?NAME=%s' % new_nick)
 
         graphics = Graphics()
-        graphics.add_uri('file://' + url)
+        webkit = graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
 
         return graphics, _('Next')
 
@@ -1165,10 +1185,13 @@ class ClipboardTask(Task):
                            self._uri)
 
         graphics = Graphics()
-        graphics.add_uri('file://' + url, height=self._height)
+        webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
         self._entries.append(graphics.add_entry())
-        self._task_master.activity.text_entry = self._entries[-1]
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
+
         return graphics, self._prompt
 
     def test(self, task_data):
@@ -1218,6 +1241,9 @@ class BatteryTask(Task):
             button.connect('clicked', self._battery_button_callback, i)
             button.set_active(False)
 
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
+
         return graphics, _('Next')
 
 
@@ -1249,6 +1275,9 @@ class SoundTask(Task):
                             'the slider to adjust it.\n\n'),
                           size=FONT_SIZES[self._font_size])
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
 
         return graphics, _('Next')
 
@@ -1286,6 +1315,9 @@ class GameKeyTask(Task):
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
                           size=FONT_SIZES[self._font_size])
 
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
+
         return graphics, _('Next')
 
 
@@ -1309,6 +1341,10 @@ class Tablet1Task(Task):
                           size=FONT_SIZES[self._font_size])
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
                           size=FONT_SIZES[self._font_size])
+
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
+
         return graphics, _('Next')
 
 
@@ -1335,6 +1371,9 @@ class Tablet2Task(Task):
                           size=FONT_SIZES[self._font_size])
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
                           size=FONT_SIZES[self._font_size])
+
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
 
         return graphics, _('Next')
 
@@ -1364,6 +1403,9 @@ class Rotate1Task(Task):
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
                           size=FONT_SIZES[self._font_size])
 
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
+
         return graphics, _('Next')
 
 
@@ -1391,6 +1433,9 @@ class Rotate2Task(Task):
                           size=FONT_SIZES[self._font_size])
         graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
                           size=FONT_SIZES[self._font_size])
+
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
 
         return graphics, _('Next')
 
@@ -1481,6 +1526,9 @@ class BadgeTask(Task):
         graphics.add_text(
             '\n\n' + self._name + '\n\n' + self._message + '\n\n',
             size=FONT_SIZES[self._font_size])
+
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
 
         return graphics, _('Next')
 
@@ -1591,5 +1639,8 @@ class FinishedAllTasks(Task):
         graphics = Graphics()
         graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
                           size=FONT_SIZES[self._font_size])
+
+        self._task_master.activity.set_copy_widget()
+        self._task_master.activity.set_paste_widget()
 
         return graphics, _('Done')

@@ -70,8 +70,10 @@ class TrainingActivity(activity.Activity):
                        style.COLOR_WHITE.get_gdk_color())
 
         self.bundle_path = activity.get_bundle_path()
-        self.text_entry = None
-        self.clipboard_text = ''
+        self._copy_entry = None
+        self._paste_entry = None
+        self._webkit = None
+        self._clipboard_text = ''
 
         self.volume_data = []
         for path in tests.get_volume_paths():
@@ -216,13 +218,15 @@ class TrainingActivity(activity.Activity):
         edit_toolbar.show()
         self.edit_toolbar_button.show()
 
-        button_factory('edit-copy', edit_toolbar,
-                       self._copy_cb, tooltip=_('Copy'),
-                       ) # accelerator='<Ctrl>C')
+        self._copy_button = button_factory('edit-copy', edit_toolbar,
+                                           self._copy_cb, tooltip=_('Copy'),
+                                           accelerator='<Ctrl>C')
+        self._copy_button.set_sensitive(False)
 
-        button_factory('edit-paste', edit_toolbar,
-                       self._paste_cb, tooltip=_('Paste'),
-                       accelerator='<Ctrl>V')
+        self._paste_button = button_factory('edit-paste', edit_toolbar,
+                                            self._paste_cb, tooltip=_('Paste'),
+                                            accelerator='<Ctrl>V')
+        self._paste_button.set_sensitive(False)
 
         self.help_button = button_factory('toolbar-help',
                                           toolbox.toolbar,
@@ -263,22 +267,43 @@ class TrainingActivity(activity.Activity):
     def __realize_cb(self, window):
         self.window_xid = window.get_window().get_xid()
 
-    def _copy_cb(self, button):
-        # Each task is responsible for setting up a text buffer
-        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        if self.text_entry is not None:
-            self.text_entry.copy_clipboard() # clipboard)
+    def set_copy_widget(self, webkit=None, text_entry=None):
+        if webkit is not None:
+            self._webkit = webkit
         else:
-            _logger.debug('No where to copy text from.')
+            self._webkit = None
+        if text_entry is not None:
+            self._copy_entry = text_entry
+        else:
+            self._copy_entry = None
+
+        self._copy_button.set_sensitive(
+            webkit is not None or text_entry is not None)
+
+    def _copy_cb(self, button):
+        # Each task is responsible for setting up a widget for copy
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        if self._copy_entry is not None:
+            self._copy_entry.copy_clipboard()
+        elif self._webkit is not None:
+            self._webkit.copy_clipboard()
+        else:
+            _logger.debug('No widget set for copy.')
+
+    def set_paste_widget(self, text_entry=None):
+        if text_entry is not None:
+            self._paste_entry = text_entry
+        self._paste_button.set_sensitive(text_entry is not None)
 
     def _paste_cb(self, button):
-        # Each task is responsible for setting up a text buffer
+        # Each task is responsible for setting a widget for paste
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         self.clipboard_text = clipboard.wait_for_text()
-        if self.text_entry is not None:
-            self.text_entry.paste_clipboard()
+        if self._paste_entry is not None:
+            self._paste_entry.paste_clipboard()
         else:
-            _logger.debug('No where to paste %s to.' % self.clipboard_text)
+            _logger.debug('No widget set for paste (%s).' %
+                          self.clipboard_text)
 
     def _fullscreen_cb(self, button):
         ''' Hide the Sugar toolbars. '''

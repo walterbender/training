@@ -161,6 +161,7 @@ class Graphics(Gtk.ScrolledWindow):
         self._web_view.load_uri(uri)
         self._attach(self._web_view)
         self._web_view.show()
+        return self._web_view
 
     def set_zoom_level(self, zoom_level):
         if self._web_view is not None:
