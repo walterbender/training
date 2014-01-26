@@ -2,7 +2,8 @@ NEWS
 
 1.27
 
-* Added logic for USB full, USB read-only, USB merge, USB copy
+* Added logic for USB full, USB read-only
+* Added logic for USB merge, USB copy
 * Added Portfolio task
 * Added Detail View task
 * Added test for USB full

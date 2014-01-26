@@ -359,18 +359,21 @@ class TrainingActivity(activity.Activity):
 
     def write_file(self, file_path):
         if len(self.volume_data) == 1:
-            self._task_master.write_task_data('current_task',
-                                              self._task_master.current_task)
-            self.update_activity_title()
             self.metadata[_TRAINING_DATA_UID] = self.volume_data[0]['uid']
-            email = self._task_master.read_task_data('email_address')
-            if email is None:
-                email = ''
-            self.metadata[_TRAINING_DATA_EMAIL] = email
-            name = self._task_master.read_task_data('name')
-            if name is None:
-                name = ''
-            self.metadata[_TRAINING_DATA_FULLNAME] = name
+
+            # We may have failed before getting to init of taskmaster
+            if hasattr(self, '_task_master'):
+                self._task_master.write_task_data(
+                    'current_task', self._task_master.current_task)
+                self.update_activity_title()
+                email = self._task_master.read_task_data('email_address')
+                if email is None:
+                    email = ''
+                self.metadata[_TRAINING_DATA_EMAIL] = email
+                name = self._task_master.read_task_data('name')
+                if name is None:
+                    name = ''
+                self.metadata[_TRAINING_DATA_FULLNAME] = name
 
         self.metadata['font_size'] = str(self.font_size)
 

@@ -63,7 +63,7 @@ def is_full(path):
     stat = os.statvfs(path)
     free_space = stat[statvfs.F_BSIZE] * stat[statvfs.F_BAVAIL]
     _logger.debug('free space: %d MB' % int(free_space / (1024 * 1024)))
-    if free_space < 1024 * 1024 * 5:
+    if free_space < 1024 * 1024 * 10:
         _logger.error('free space: %d MB' % int(free_space / (1024 * 1024)))
         return True
     return False
@@ -76,14 +76,14 @@ def is_writeable(path):
         data = fd.read()
         fd.close()
     except Exception, e:
-        _logger.error('Could not open %s for reading %s: %s' % (path, e))
+        _logger.error('Could not open %s for reading: %s' % (path, e))
         return False
     try:
         fd = open(path, 'w')
         fd.write(data)
         fd.close()
     except Exception, e:
-        _logger.error('Could not open %s for writing %s: %s' % (path, e))
+        _logger.error('Could not open %s for writing: %s' % (path, e))
         return False
     return True
 
