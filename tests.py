@@ -399,8 +399,6 @@ def get_share_scope(activity):
 
 def saw_new_launch(bundle_id, timestamp):
     for activity in get_activity(bundle_id):
-        _logger.debug('%d > %d?' %
-                      (get_last_launch_time(activity), int(timestamp)))
         if get_last_launch_time(activity) > int(timestamp):
             return True
     return False
@@ -408,8 +406,6 @@ def saw_new_launch(bundle_id, timestamp):
 
 def saw_new_instance(bundle_id, timestamp):
     for activity in get_activity(bundle_id):
-        _logger.debug('%d > %d?' %
-                      (get_creation_time(activity), int(timestamp)))
         if get_creation_time(activity) > int(timestamp):
             return True
     return False
@@ -532,7 +528,6 @@ def get_speak_settings(activity):
     file_path = activity.file_path
     configuration = json.loads(file(file_path, 'r').read())
     status = json.loads(configuration['status'])
-    _logger.debug(status)
     return status
 
 
