@@ -4,6 +4,8 @@ NEWS
 
 * Added Portfolio task
 * Added Detail View task
+* Added test for USB full
+* Added test for read-only USB
 
 1.26
 

@@ -45,6 +45,8 @@ import logging
 _logger = logging.getLogger('training-activity')
 
 _TRAINING_DATA_UID = 'training_data_uid'
+_TRAINING_DATA_EMAIL = 'training_data_email'
+_TRAINING_DATA_FULLNAME = 'training_data_fullname'
 
 
 class TrainingActivity(activity.Activity):
@@ -92,7 +94,7 @@ class TrainingActivity(activity.Activity):
                                 'this activity.')
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
-            self._load_intro_graphics()
+            self._load_intro_graphics(file_name='no-usb.html')
         elif len(self.volume_data) > 1:
             _logger.error('MULTIPLE USB KEYS INSERTED')
             alert = ConfirmationAlert()
@@ -103,49 +105,215 @@ class TrainingActivity(activity.Activity):
                                 'this activity.')
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
-            self._load_intro_graphics()
+            self._load_intro_graphics(file_name='too-many-usbs.html')
+        elif tests.is_full(tests.get_volume_names()[0]):
+            _logger.error('USB IS FULL')
+            alert = ConfirmationAlert()
+            alert.props.title = _('USB key is full')
+            alert.props.msg = _('Please do something about it.')
+            alert.connect('response', self._remove_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics(file_name='usb-is-full.html')
+        elif not tests.is_writeable(self.volume_data[0]['usb_path']):
+            _logger.error('CANNOT WRITE TO USB')
+            alert = ConfirmationAlert()
+            alert.props.title = _('Cannot write to USB')
+            alert.props.msg = _('Please do something about it.')
+            alert.connect('response', self._remove_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics(file_name='cannot-write-to-usb.html')
         else:
             if _TRAINING_DATA_UID in self.metadata:
-                if self.metadata[_TRAINING_DATA_UID] != \
+                # This is a relaunch of the activity.
+                # In any case, welcome back the user.
+                error = False
+                if self.metadata[_TRAINING_DATA_UID] == \
                    self.volume_data[0]['uid']:
+                    # Need to sync up file on USB with file on disk,
+                    # but only if the email addresses match. Otherwise,
+                    # raise an error.
+                    error = not self._sync_data_from_USB()
+                else:
+                    # Could be a mismatch between the USB UID and the
+                    # instance UID, in which case, we should go with
+                    # the data on the USB.
                     _logger.warning('USB UID does not match instance data')
-                # Flash a welcome screen
-                self._load_intro_graphics(file_name='introduction1a.html')
-                GObject.timeout_add(1500, self._launch_task_master)
+                    # Need some confirmation here???
+                    self._copy_data_from_USB()
+                if not error:
+                    # Flash a welcome screen
+                    self._load_intro_graphics(file_name='introduction1a.html')
+                    GObject.timeout_add(1500, self._launch_task_master)
             else:
-                self._launch_task_master()
+                # A new activity instance
+                usb_path = self._check_for_USB_data()
+                if usb_path is not None:
+                    # Start this new instance with data from the USB
+                    self._copy_data_from_USB()
+                    # Confirm???
+                    self._load_intro_graphics(file_name='introduction1a.html')
+                    GObject.timeout_add(1500, self._launch_task_master)
+                else:
+                    self._launch_task_master()
+
+    def _check_for_USB_data(self):
+        usb_path = os.path.join(self.volume_data[0]['usb_path'],
+                                self.volume_data[0]['uid'])
+        if os.path.exists(usb_path):
+            return usb_path
+        else:
+            return None
+
+    def _sync_data_from_USB(self):
+        usb_data_path = self._check_for_USB_data()
+        if usb_path is not None:
+            usb_data = {}
+            if os.path.exists(usb_data_path):
+                fd = open(usb_data_path, 'r')
+                json_data = fd.read()
+                fd.close()
+                if len(json_data) > 0:
+                    try:
+                        usb_data = json.loads(json_data)
+                    except ValueError, e:
+                        _logger.error('Cannot load USB data: %s' % e)
+
+            sugar_data_path = os.path.join(
+                self.activity.volume_data[0]['sugar_path'],
+                self.activity.volume_data[0]['uid'])
+            sugar_data = {}
+            if os.path.exists(sugar_data_path):
+                fd = open(sugar_data_path, 'r')
+                json_data = fd.read()
+                fd.close()
+                if len(json_data) > 0:
+                    try:
+                        sugar_data = json.loads(json_data)
+                    except ValueError, e:
+                        _logger.error('Cannot load Sugar data: %s' % e)
+
+            # First, check to make sure email_address matches
+            if 'email_address' in usb_data:
+                usb_email = usb_data['email_address']
+            else:
+                usb_email = None
+            if 'email_address' in sugar_data:
+                sugar_email = sugar_data['email_address']
+            else:
+                sugar_email = None
+            if usb_email != sugar_email:
+                if usb_email is None and sugar_email is not None:
+                    _logger.warning('Using email address from XO: %s' %
+                                    sugar_email)
+                    usb_data['email_address'] = sugar_email
+                elif usb_email is not None and sugar_email is None:
+                    _logger.warning('Using email address from USB: %s' %
+                                    usb_email)
+                    sugar_data['email_address'] = usb_email
+                elif usb_email is None and sugar_email is None:
+                    _logger.warning('No email address found')
+                else:
+                    # FIX ME: We need to resolve this, but for right now, punt.
+                    alert = ConfirmationAlert()
+                    alert.props.title = _('Data mismatch')
+                    alert.props.msg = _('Are you %s or %s?' %
+                                        (usb_email, sugar_email))
+                    alert.connect('response', self._remove_alert_cb)
+                    self.add_alert(alert)
+                    self._load_intro_graphics(file_name='data-mismatch.html')
+                    return False
+
+            def count_completed(data):
+                count = 0
+                for key in data:
+                    if isinstance(data[key], dict) and \
+                       'completed' in usb_data[key] and \
+                       usb_data[key]['completed']:
+                        count += 1
+                return count
+
+            # The database with the most completed tasks takes precedence.
+            if count_completed(usb_data) > count_completed(sugar_data):
+                data_one = usb_data
+                data_two = sugar_data
+            else:
+                data_one = sugar_data
+                data_two = usb_data
+
+            # Copy completed tasks from one to two
+            for key in data_one:
+                if isinstance(data_one[key], dict) and \
+                   'completed' in data_one[key] and \
+                   data_one[key]['completed']:
+                    data_two[key] = data_one[key]
+            # Copy completed tasks from two to one
+            for key in data_two:
+                if isinstance(data_two[key], dict) and \
+                   'completed' in data_two[key] and \
+                   data_two[key]['completed']:
+                    data_one[key] = data_two[key]
+            # Copy incompleted tasks from one to two
+            for key in data_one:
+                if isinstance(data_one[key], dict) and \
+                   not 'completed' in data_one[key] or \
+                   not data_one[key]['completed']:
+                    data_two[key] = data_one[key]
+            # Copy incompleted tasks from two to one
+            for key in data_two:
+                if isinstance(data_two[key], dict) and \
+                   not 'completed' in data_one[key] or \
+                   not data_one[key]['completed']:
+                    data_one[key] = data_two[key]
+        else:
+            _logger.error('No data to sync on USB')
+        return True
+
+    def _copy_data_from_USB(self):
+        usb_path = self._check_for_USB_data()
+        if usb_path is not None:
+            try:
+                subprocess.call(['cp', usb_path,
+                                 self.volume_data[0]['sugar_path']])
+            except OSError, e:
+                _logger.error('Could not copy %s to %s: %s' % (
+                    usb_path, self.volume_data[0]['sugar_path'], e))
+        else:
+            _logger.error('No data found on USB')
 
     def _launch_task_master(self):
-            self.check_progress = None
+        self.check_progress = None
 
-            self._load_extension()
+        self._load_extension()
 
-            self._task_master = TaskMaster(self)
+        self._task_master = TaskMaster(self)
 
-            center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-            center_in_panel.add(self._task_master)
-            self._task_master.show()
-            self.set_canvas(center_in_panel)
-            center_in_panel.show()
+        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
+        center_in_panel.add(self._task_master)
+        self._task_master.show()
+        self.set_canvas(center_in_panel)
+        center_in_panel.show()
 
-            Gdk.Screen.get_default().connect('size-changed',
-                                             self._configure_cb)
+        Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
 
-            self._task_master.set_events(Gdk.EventMask.KEY_PRESS_MASK)
-            self._task_master.connect('key_press_event',
-                                      self._task_master.keypress_cb)
-            self._task_master.set_can_focus(True)
-            self._task_master.grab_focus()
+        self._task_master.set_events(Gdk.EventMask.KEY_PRESS_MASK)
+        self._task_master.connect('key_press_event',
+                                  self._task_master.keypress_cb)
+        self._task_master.set_can_focus(True)
+        self._task_master.grab_focus()
 
-            self.completed = False
-            self._task_master.task_master()
+        self.completed = False
+        self._task_master.task_master()
 
-    def _load_intro_graphics(self, file_name='generic-problem.html'):
+    def _load_intro_graphics(self, file_name='generic-problem.html',
+                             message=None):
         center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
         url = os.path.join(self.bundle_path, 'html', file_name)
         graphics = Graphics()
-        graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(0.75)
+        if message is None:
+            graphics.add_uri('file://' + url)
+        else:
+            graphics.add_uri('file://' + url + '?MSG=' + message)
+        graphics.set_zoom_level(0.667)
         center_in_panel.add(graphics)
         graphics.show()
         self.set_canvas(center_in_panel)
@@ -160,6 +328,15 @@ class TrainingActivity(activity.Activity):
                                               self._task_master.current_task)
             self.update_activity_title()
             self.metadata[_TRAINING_DATA_UID] = self.volume_data[0]['uid']
+            email = self._task_master.read_task_data('email_address')
+            if email is None:
+                email = ''
+            self.metadata[_TRAINING_DATA_EMAIL] = email
+            name = self._task_master.read_task_data('name')
+            if name is None:
+                name = ''
+            self.metadata[_TRAINING_DATA_FULLNAME] = name
+
         self.metadata['font_size'] = str(self.font_size)
 
     def update_activity_title(self):

@@ -58,6 +58,16 @@ battery_model = None
 proxy = None
 
 
+def is_full(volume):
+    # FIX ME: is volume full?
+    return False
+
+
+def is_writeable(path):
+    # FIX ME: is path writable?
+    return True
+
+
 def is_landscape():
     return Gdk.Screen.width() > Gdk.Screen.height()
 
