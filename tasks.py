@@ -1021,84 +1021,6 @@ class Speak4Task(HTMLHomeTask):
         return True
 
 
-class AddFavoriteTask(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Add Favorite Task')
-        self.uid = 'add-favorites-task'
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if task_data['data'] is None:
-            favorites_list = tests.get_favorites()
-            task_data['data'] = len(favorites_list)
-            self._task_master.write_task_data(self.uid, task_data)
-            return False
-        else:
-            return len(tests.get_favorites()) > task_data['data']
-
-    def get_help_info(self):
-        return ('Home', 'home_view.html')
-
-    def get_graphics(self, page=0):
-        path = os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Help.activity', 'images',
-                            'Journal_main_annotated.png')
-        graphics = Graphics()
-        graphics.add_text(_('Try adding a favorite to your homeview.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-        graphics.add_image(path)
-
-        return graphics, _('Next')
-
-
-class RemoveFavoriteTask(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Remove Favorite Task')
-        self.uid = 'remove-favorites-task'
-
-    def get_requires(self):
-        return ['add-favorites-task']
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if task_data['data'] is None:
-            favorites_list = tests.get_favorites()
-            task_data['data'] = len(favorites_list)
-            self._task_master.write_task_data(self.uid, task_data)
-            return False
-        else:
-            return len(tests.get_favorites()) < task_data['data']
-
-    def get_help_info(self):
-        return ('Home', 'home_view.html')
-
-    def get_graphics(self, page=0):
-        path = os.path.join(os.path.expanduser('~'), 'Activities',
-                            'Help.activity', 'images',
-                            'Journal_main_annotated.png')
-        graphics = Graphics()
-        graphics.add_text(
-            _('Now try removing a favorite to your homeview.\n\n'),
-            size=FONT_SIZES[self._font_size])
-        graphics.add_image(path)
-
-        return graphics, _('Next')
-
-
 class Views1Task(HTMLTask):
 
     def __init__(self, task_master):
@@ -1134,6 +1056,63 @@ class Views2Task(HTMLTask):
             if 'neighborhood' not in self._views:
                 self._views.append('neighborhood')
         return len(self._views) > 2
+
+
+class AddFavoriteTask(HTMLHomeTask):
+
+    def __init__(self, task_master):
+        HTMLHomeTask.__init__(self, task_master)
+        self._name = _('Add Favorite Task')
+        self.uid = 'add-favorites-task'
+        self._uri = 'views3.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            favorites_list = tests.get_favorites()
+            task_data['data'] = len(favorites_list)
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            return len(tests.get_favorites()) > task_data['data']
+
+    def get_help_info(self):
+        return ('Home', 'home_view.html')
+
+
+class RemoveFavoriteTask(Task):
+
+    def __init__(self, task_master):
+        Task.__init__(self, task_master)
+        self._name = _('Remove Favorite Task')
+        self.uid = 'remove-favorites-task'
+        self._uri = 'views4.html'
+
+    def get_requires(self):
+        return ['add-favorites-task']
+
+    def get_requires(self):
+        return ['validate-email-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            favorites_list = tests.get_favorites()
+            task_data['data'] = len(favorites_list)
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            return len(tests.get_favorites()) < task_data['data']
+
+    def get_help_info(self):
+        return ('Home', 'home_view.html')
 
 
 class Journal1Task(HTMLTask):
