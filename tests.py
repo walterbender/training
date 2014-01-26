@@ -14,6 +14,7 @@ import os
 import json
 import subprocess
 import dbus
+import statvfs
 
 from gi.repository import Gio
 from gi.repository import Gdk
@@ -58,13 +59,32 @@ battery_model = None
 proxy = None
 
 
-def is_full(volume):
-    # FIX ME: is volume full?
+def is_full(path):
+    stat = os.statvfs(path)
+    free_space = stat[statvfs.F_BSIZE] * stat[statvfs.F_BAVAIL]
+    _logger.debug('free space: %d MB' % int(free_space / (1024 * 1024)))
+    if free_space < 1024 * 1024 * 5:
+        _logger.error('free space: %d MB' % int(free_space / (1024 * 1024)))
+        return True
     return False
 
 
 def is_writeable(path):
     # FIX ME: is path writable?
+    try:
+        fd = open(path, 'r')
+        data = fd.read()
+        fd.close()
+    except Exception, e:
+        _logger.error('Could not open %s for reading %s: %s' % (path, e))
+        return False
+    try:
+        fd = open(path, 'w')
+        fd.write(data)
+        fd.close()
+    except Exception, e:
+        _logger.error('Could not open %s for writing %s: %s' % (path, e))
+        return False
     return True
 
 

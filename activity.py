@@ -79,7 +79,12 @@ class TrainingActivity(activity.Activity):
 
         self.volume_data = []
         for path in tests.get_volume_paths():
-            name = 'training-data-' + os.path.basename(path)
+            # Expecting XXXX-XXXX
+            basename = os.path.basename(path)
+            if len(basename) > 9:
+                basename = basename[0:9]
+            name = 'training-data-' + basename
+            logging.error(name)
             self.volume_data.append(
                 {'uid': name,
                  'sugar_path': os.path.join(self.get_activity_root(),
@@ -106,7 +111,7 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(file_name='too-many-usbs.html')
-        elif tests.is_full(tests.get_volume_names()[0]):
+        elif tests.is_full(self.volume_data[0]['usb_path']):
             _logger.error('USB IS FULL')
             alert = ConfirmationAlert()
             alert.props.title = _('USB key is full')
@@ -114,7 +119,9 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(file_name='usb-is-full.html')
-        elif not tests.is_writeable(self.volume_data[0]['usb_path']):
+        elif not tests.is_writeable(os.path.join(
+                self.volume_data[0]['usb_path'],
+                self.volume_data[0]['uid'])):
             _logger.error('CANNOT WRITE TO USB')
             alert = ConfirmationAlert()
             alert.props.title = _('Cannot write to USB')
@@ -166,7 +173,7 @@ class TrainingActivity(activity.Activity):
 
     def _sync_data_from_USB(self):
         usb_data_path = self._check_for_USB_data()
-        if usb_path is not None:
+        if usb_data_path is not None:
             usb_data = {}
             if os.path.exists(usb_data_path):
                 fd = open(usb_data_path, 'r')
@@ -175,12 +182,15 @@ class TrainingActivity(activity.Activity):
                 if len(json_data) > 0:
                     try:
                         usb_data = json.loads(json_data)
+                        _logger.error(usb_data)
                     except ValueError, e:
                         _logger.error('Cannot load USB data: %s' % e)
+            else:
+                _logger.error('Cannot find USB data: %s' % usb_data_path)
 
             sugar_data_path = os.path.join(
-                self.activity.volume_data[0]['sugar_path'],
-                self.activity.volume_data[0]['uid'])
+                self.volume_data[0]['sugar_path'],
+                self.volume_data[0]['uid'])
             sugar_data = {}
             if os.path.exists(sugar_data_path):
                 fd = open(sugar_data_path, 'r')
@@ -191,6 +201,8 @@ class TrainingActivity(activity.Activity):
                         sugar_data = json.loads(json_data)
                     except ValueError, e:
                         _logger.error('Cannot load Sugar data: %s' % e)
+            else:
+                _logger.error('Cannot find Sugar data: %s' % sugar_data_path)
 
             # First, check to make sure email_address matches
             if 'email_address' in usb_data:
@@ -203,7 +215,7 @@ class TrainingActivity(activity.Activity):
                 sugar_email = None
             if usb_email != sugar_email:
                 if usb_email is None and sugar_email is not None:
-                    _logger.warning('Using email address from XO: %s' %
+                    _logger.warning('Using email address from Sugar: %s' %
                                     sugar_email)
                     usb_data['email_address'] = sugar_email
                 elif usb_email is not None and sugar_email is None:
@@ -227,16 +239,18 @@ class TrainingActivity(activity.Activity):
                 count = 0
                 for key in data:
                     if isinstance(data[key], dict) and \
-                       'completed' in usb_data[key] and \
-                       usb_data[key]['completed']:
+                       'completed' in data[key] and \
+                       data[key]['completed']:
                         count += 1
                 return count
 
             # The database with the most completed tasks takes precedence.
-            if count_completed(usb_data) > count_completed(sugar_data):
+            if count_completed(usb_data) >= count_completed(sugar_data):
+                _logger.debug('data sync: USB data takes precedence')
                 data_one = usb_data
                 data_two = sugar_data
             else:
+                _logger.debug('data sync: Sugar data takes precedence')
                 data_one = sugar_data
                 data_two = usb_data
 
@@ -246,24 +260,48 @@ class TrainingActivity(activity.Activity):
                    'completed' in data_one[key] and \
                    data_one[key]['completed']:
                     data_two[key] = data_one[key]
+
             # Copy completed tasks from two to one
             for key in data_two:
                 if isinstance(data_two[key], dict) and \
                    'completed' in data_two[key] and \
                    data_two[key]['completed']:
                     data_one[key] = data_two[key]
+
             # Copy incompleted tasks from one to two
             for key in data_one:
+                _logger.debug('key in data_one: %s' % key)
                 if isinstance(data_one[key], dict) and \
-                   not 'completed' in data_one[key] or \
-                   not data_one[key]['completed']:
+                   (not 'completed' in data_one[key] or \
+                   not data_one[key]['completed']):
                     data_two[key] = data_one[key]
+
             # Copy incompleted tasks from two to one
             for key in data_two:
+                _logger.debug('key in data_two: %s' % key)
                 if isinstance(data_two[key], dict) and \
-                   not 'completed' in data_one[key] or \
-                   not data_one[key]['completed']:
+                   (not 'completed' in data_one[key] or \
+                   not data_one[key]['completed']):
                     data_one[key] = data_two[key]
+
+            # Copy name, email_address, current_task...
+            for key in data_one:
+                if not isinstance(data_one[key], dict):
+                    data_two[key] = data_one[key]
+            for key in data_two:
+                if not isinstance(data_two[key], dict):
+                    data_one[key] = data_two[key]
+
+            # Finally, write to the USB and ...
+            json_data = json.dumps(data_one)
+            fd = open(usb_data_path, 'w')
+            fd.write(json_data)
+            fd.close()
+
+            # ...save a shadow copy in Sugar
+            fd = open(sugar_data_path, 'w')
+            fd.write(json_data)
+            fd.close()
         else:
             _logger.error('No data to sync on USB')
         return True
