@@ -32,6 +32,8 @@ def get_tasks(task_master):
          'icon': 'badge-intro',
          'tasks': [Intro1Task(task_master),
                    EnterNameTask(task_master),
+                   EnterEmailTask(task_master),
+                   ValidateEmailTask(task_master),
                    BadgeIntroTask(task_master)]},
         {'name': _('1. Getting to Know the Toolbar'),
          'icon': 'badge-intro',
@@ -49,8 +51,6 @@ def get_tasks(task_master):
          'icon': 'badge-intro',
          'tasks': [Network1Task(task_master),
                    EnterSchoolNameTask(task_master),
-                   EnterEmailTask(task_master),
-                   ValidateEmailTask(task_master),
                    BadgeNetworkTask(task_master)]},
         {'name': _('3. Getting to Know Sugar Activities'),
          'icon': 'badge-intro',
@@ -444,8 +444,10 @@ class EnterEmailTask(Task):
         else:
             self._entries.append(graphics.add_entry())
 
-        self._task_master.activity.set_copy_widget(text_entry=self._entries[-1])
-        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
+        self._task_master.activity.set_copy_widget(
+            text_entry=self._entries[-1])
+        self._task_master.activity.set_paste_widget(
+            text_entry=self._entries[-1])
 
         return graphics, _('Next')
 
@@ -505,7 +507,8 @@ class ValidateEmailTask(Task):
         graphics.add_text('\n\n')
 
         self._task_master.activity.set_copy_widget(text_entry=self._entries[0])
-        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
+        self._task_master.activity.set_paste_widget(
+            text_entry=self._entries[-1])
 
         return graphics, _('Next')
 
@@ -530,6 +533,9 @@ class Toolbars1Task(HTMLTask):
         self.uid = 'toolbars-task-1'
         self._uri = 'toolbars1.html'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -553,6 +559,9 @@ class Toolbars2Task(HTMLTask):
         self.uid = 'toolbars-task-2'
         self._uri = 'toolbars2.html'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -572,7 +581,7 @@ class Toolbars3Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['toolbars-task-2']
+        return ['validate-email-task', 'toolbars-task-2']
 
     def test(self, task_data):
         return not tests.is_expanded(
@@ -586,6 +595,9 @@ class Toolbars4Task(HTMLTask):
         self._name = _('Enter Fullscreen')
         self.uid = 'toolbars-task-4'
         self._uri = 'toolbars4.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -606,7 +618,7 @@ class Toolbars5Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['toolbars-task-4']
+        return ['validate-email-task', 'toolbars-task-4']
 
     def test(self, task_data):
         return not tests.is_fullscreen(self._task_master.activity)
@@ -619,6 +631,9 @@ class Toolbars6Task(HTMLTask):
         self._name = _('Activity Toolbar')
         self.uid = 'toolbars-task-6'
         self._uri = 'toolbars6.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -634,6 +649,9 @@ class Toolbars7Task(HTMLTask):
         self._name = _('Description Box')
         self.uid = 'toolbars-task-7'
         self._uri = 'toolbars7.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -698,6 +716,9 @@ class NickChange4Task(HTMLHomeTask):
         self.uid = 'nick-change-task-4'
         self._uri = 'nickchange4.html'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -759,6 +780,9 @@ class Turtle1Task(HTMLHomeTask):
         self.uid = 'turtle-task-1'
         self._uri = 'turtle1.html'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -789,6 +813,9 @@ class Physics1Task(HTMLHomeTask):
         self.uid = 'physics-play-task'
         self._uri = 'physics1.html'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -807,6 +834,9 @@ class Physics2Task(HTMLHomeTask):
         self._name = _('Physics Share')
         self.uid = 'physics-share-task'
         self._uri = 'physics2.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -831,6 +861,9 @@ class Record1Task(HTMLHomeTask):
         self._name = _('Record Save')
         self.uid = 'record-save-task-1'
         self._uri = 'recordsave1.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -888,7 +921,7 @@ class WriteSave4Task(HTMLHomeTask):
         self._uri = 'writesave4.html'
 
     def get_requires(self):
-        return ['record-save-task-1']
+        return ['validate-email-task', 'record-save-task-1']
 
     def is_collectable(self):
         return True
@@ -959,6 +992,9 @@ class Speak4Task(HTMLHomeTask):
         self.uid = 'speak-task-4'
         self._uri = 'speak4.html'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -991,6 +1027,9 @@ class AddFavoriteTask(Task):
         Task.__init__(self, task_master)
         self._name = _('Add Favorite Task')
         self.uid = 'add-favorites-task'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -1028,6 +1067,9 @@ class RemoveFavoriteTask(Task):
 
     def get_requires(self):
         return ['add-favorites-task']
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -1075,6 +1117,9 @@ class Views2Task(HTMLTask):
         self._uri = 'views2.html'
         self._views = []
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -1108,6 +1153,9 @@ class AddStarredTask(HTMLHomeTask):
         self.uid = 'add-starred-task'
         self._uri = 'journal2.html'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -1135,7 +1183,7 @@ class RemoveStarredTask(HTMLHomeTask):
         self._uri = 'journal3.html'
 
     def get_requires(self):
-        return ['add-starred-task']
+        return ['validate-email-task', 'add-starred-task']
 
     def is_collectable(self):
         return True
@@ -1164,7 +1212,7 @@ class DetailViewTask(HTMLHomeTask):
         self._uri = 'journal4.html'
 
     def get_requires(self):
-        return ['write-save-task-4']
+        return ['validate-email-task', 'write-save-task-4']
 
     def is_collectable(self):
         return True
@@ -1255,6 +1303,9 @@ class BatteryTask(Task):
         self.uid = 'battery-task'
         self._battery_level = None
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -1301,6 +1352,9 @@ class SoundTask(Task):
         self.uid = 'sound-task'
         self._battery_level = None
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -1334,6 +1388,9 @@ class GameKeyTask(Task):
         Task.__init__(self, task_master)
         self._name = _('Game Key Task')
         self.uid = 'game-task'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -1374,6 +1431,9 @@ class Tablet1Task(Task):
         self._name = _('Tablet Task 1')
         self.uid = 'tablet-task-1'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -1400,6 +1460,9 @@ class Tablet2Task(Task):
         Task.__init__(self, task_master)
         self._name = _('Tablet Task 2')
         self.uid = 'tablet-task-2'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -1431,6 +1494,9 @@ class Rotate1Task(Task):
         self._name = _('Rotate Task 1')
         self.uid = 'rotate-task-1'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -1461,6 +1527,9 @@ class Rotate2Task(Task):
         Task.__init__(self, task_master)
         self._name = _('Rotate Task 2')
         self.uid = 'rotate-task-2'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
@@ -1494,6 +1563,9 @@ class Network1Task(HTMLTask):
         self.uid = 'network-task-1'
         self._uri = 'network1.html'
 
+    def get_requires(self):
+        return ['validate-email-task']
+
     def is_collectable(self):
         return True
 
@@ -1505,6 +1577,9 @@ class Finished1Task(HTMLHomeTask):
         self._name = _('Fill out a form 1')
         self.uid = 'finished-task-1'
         self._uri = 'finished1.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
 
     def is_collectable(self):
         return True
