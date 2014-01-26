@@ -402,7 +402,7 @@ def get_last_launch_time(activity):
             _logger.error('Malformed launch times found: %s' % e)
             return 0
     else:
-        _logger.error('No launch times found')
+        # _logger.error('No launch times found')
         return 0
 
 

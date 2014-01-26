@@ -70,6 +70,7 @@ def get_tasks(task_master):
          'tasks': [Journal1Task(task_master),
                    AddStarredTask(task_master),
                    RemoveStarredTask(task_master),
+                   DetailViewTask(task_master),
                    Journal5Task(task_master),
                    BadgeJournalTask(task_master)]},
         {'name': _('5. Getting to Know the Frame'),
@@ -1099,12 +1100,13 @@ class Journal1Task(HTMLTask):
         self._uri = 'journal1.html'
 
 
-class AddStarredTask(Task):
+class AddStarredTask(HTMLHomeTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLHomeTask.__init__(self, task_master)
         self._name = _('Add Starred Task')
         self.uid = 'add-starred-task'
+        self._uri = 'journal2.html'
 
     def is_collectable(self):
         return True
@@ -1123,28 +1125,14 @@ class AddStarredTask(Task):
     def get_my_turn(self):
         return True
 
-    def get_graphics(self, page=0):
 
-        def button_callback(button):
-            tests.goto_journal()
-
-        graphics = Graphics()
-        graphics.add_text(
-            _('Try adding a star from an item in your journal.\n\n'),
-            size=FONT_SIZES[self._font_size])
-        graphics.add_button(None, button_callback,
-                            button_icon='activity-journal')
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-
-        return graphics, _('Next')
-
-
-class RemoveStarredTask(Task):
+class RemoveStarredTask(HTMLHomeTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        HTMLHomeTask.__init__(self, task_master)
         self._name = _('Remove Starred Task')
         self.uid = 'remove-starred-task'
+        self._uri = 'journal3.html'
 
     def get_requires(self):
         return ['add-starred-task']
@@ -1166,20 +1154,43 @@ class RemoveStarredTask(Task):
     def get_my_turn(self):
         return True
 
-    def get_graphics(self, page=0):
 
-        def button_callback(button):
-            tests.goto_journal()
+class DetailViewTask(HTMLHomeTask):
 
-        graphics = Graphics()
-        graphics.add_text(
-            _('Now try removing a star from an item in your journal.\n\n'),
-            size=FONT_SIZES[self._font_size])
-        graphics.add_button(None, button_callback,
-                            button_icon='activity-journal')
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
+    def __init__(self, task_master):
+        HTMLHomeTask.__init__(self, task_master)
+        self._name = _('Journal Detail View Task')
+        self.uid = 'journal-detail-view-task'
+        self._uri = 'journal4.html'
 
-        return graphics, _('Next')
+    def get_requires(self):
+        return ['write-save-task-4']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            activity = tests.get_most_recent_instance(
+                'org.laptop.AbiWordActivity')
+            if activity is not None and 'description' in activity.metadata:
+                task_data['data'] = activity.metadata['description']
+            else:
+                task_data['data'] = ''
+            return False
+        else:
+            # Make sure description has changed and entry is 'starred'
+            activity = tests.get_most_recent_instance(
+                'org.laptop.AbiWordActivity')
+            if activity is None or not 'keep' in activity.metadata or \
+               not 'description' in activity.metadata:
+                return False
+            return \
+                not task_data['data'] == activity.metadata['description'] \
+                and int(activity.metadata['keep']) == 1
+
+    def get_my_turn(self):
+        return True
 
 
 class Journal5Task(HTMLHomeTask):

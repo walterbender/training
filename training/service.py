@@ -17,12 +17,14 @@
 """D-bus service providing access to the shell's functionality"""
 
 import dbus
+import logging
 
 from gi.repository import Gtk
 
 from jarabe.model import shell
 from jarabe.model import bundleregistry
 from jarabe.journal import journalactivity
+# from jarabe.model import network
 
 _DBUS_SERVICE = 'org.sugarlabs.Shell'
 _DBUS_SHELL_IFACE = 'org.sugarlabs.Shell'
@@ -40,7 +42,76 @@ class ShellService(dbus.service.Object):
         dbus.service.Object.__init__(self, bus_name, _DBUS_PATH)
 
         self._shell_model = shell.get_model()
+
         self._journal = journalactivity.get_journal()
+
+        '''
+        # From sugar/extensions/devices/network.py
+        self._bus = dbus.SystemBus()
+        self._devices = {}
+        self._netmgr = None
+
+        try:
+            obj = self._bus.get_object(network.NM_SERVICE, network.NM_PATH)
+            self._netmgr = dbus.Interface(obj, network.NM_IFACE)
+        except dbus.DBusException:
+            logging.error('%s service not available', network.NM_SERVICE)
+            return
+
+        self._netmgr.GetDevices(reply_handler=self.__get_devices_reply_cb,
+                                error_handler=self.__get_devices_error_cb)
+
+        self._bus.add_signal_receiver(self.__device_added_cb,
+                                      signal_name='DeviceAdded',
+                                      dbus_interface=network.NM_IFACE)
+        self._bus.add_signal_receiver(self.__device_removed_cb,
+                                      signal_name='DeviceRemoved',
+                                      dbus_interface=network.NM_IFACE)
+
+    def __get_devices_reply_cb(self, devices):
+        for device_op in devices:
+            self._check_device(device_op)
+
+    def __get_devices_error_cb(self, err):
+        logging.error('Failed to get devices: %s', err)
+
+    def _check_device(self, device_op):
+        if device_op in self._devices:
+            return
+
+        nm_device = self._bus.get_object(network.NM_SERVICE, device_op)
+        props = dbus.Interface(nm_device, dbus.PROPERTIES_IFACE)
+
+        device_type = props.Get(network.NM_DEVICE_IFACE, 'DeviceType')
+
+        if device_type == network.NM_DEVICE_TYPE_WIFI:
+            self._devices[device_op] = nm_device
+
+            self._device_props = dbus.Interface(self._device,
+                                            dbus.PROPERTIES_IFACE)
+            self._device_props.GetAll(
+                network.NM_DEVICE_IFACE, byte_arrays=True,
+                reply_handler=self.__get_device_props_reply_cb,
+                error_handler=self.__get_device_props_error_cb)
+
+            self._device_props.Get(
+                network.NM_WIRELESS_IFACE, 'ActiveAccessPoint',
+                reply_handler=self.__get_active_ap_reply_cb,
+                error_handler=self.__get_active_ap_error_cb)
+
+            self._bus.add_signal_receiver(
+                self.__state_changed_cb,
+                signal_name='StateChanged',
+                path=self._device.object_path,
+                dbus_interface=network.NM_DEVICE_IFACE)
+
+    def __device_added_cb(self, device_op):
+        self._check_device(device_op)
+
+    def __device_removed_cb(self, device_op):
+        if device_op in self._devices:
+            self._devices[device_op] = None
+        '''
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='i', out_signature='')
