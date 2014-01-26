@@ -182,7 +182,6 @@ class TrainingActivity(activity.Activity):
                 if len(json_data) > 0:
                     try:
                         usb_data = json.loads(json_data)
-                        _logger.error(usb_data)
                     except ValueError, e:
                         _logger.error('Cannot load USB data: %s' % e)
             else:
@@ -270,7 +269,6 @@ class TrainingActivity(activity.Activity):
 
             # Copy incompleted tasks from one to two
             for key in data_one:
-                _logger.debug('key in data_one: %s' % key)
                 if isinstance(data_one[key], dict) and \
                    (not 'completed' in data_one[key] or \
                    not data_one[key]['completed']):
@@ -278,7 +276,6 @@ class TrainingActivity(activity.Activity):
 
             # Copy incompleted tasks from two to one
             for key in data_two:
-                _logger.debug('key in data_two: %s' % key)
                 if isinstance(data_two[key], dict) and \
                    (not 'completed' in data_one[key] or \
                    not data_one[key]['completed']):

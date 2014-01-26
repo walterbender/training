@@ -106,15 +106,11 @@ class ProgressSummary():
             else:
                 colors.append(style.COLOR_BUTTON_GREY.get_html())
                 strokes.append(style.COLOR_BUTTON_GREY.get_svg())
-        graphics = Graphics(
-            # width=int(Gdk.Screen.width() / 1.5),
-            # height=int(Gdk.Screen.height() / 1.5 - style.GRID_CELL_SIZE)
-        )
+        graphics = Graphics()
         for i in range(self._task_master.get_number_of_sections()):
             button = graphics.add_text_icon_and_button(
                 self._task_master.get_section_name(i),
                 self._task_master.get_section_icon(i),
-                # button_label='go',
                 button_icon='go-right-page',
                 size=FONT_SIZES[self._font_size],
                 icon_size=style.STANDARD_ICON_SIZE,

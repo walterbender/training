@@ -1566,9 +1566,6 @@ class Network1Task(HTMLTask):
     def get_requires(self):
         return ['validate-email-task']
 
-    def is_collectable(self):
-        return True
-
 
 class Finished1Task(HTMLHomeTask):
 
