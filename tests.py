@@ -95,6 +95,7 @@ def is_writeable(path):
         return True
     return False
 
+
 def is_landscape():
     return Gdk.Screen.width() > Gdk.Screen.height()
 
@@ -547,7 +548,7 @@ def get_uitree_node(name):
         return dbus.Interface(proxy, 'org.sugarlabs.Shell').FindChild(name)
     except Exception, e:
         _logger.error('ERROR calling find child: %s' % e)
-    return True
+    return False
 
 
 def find_string(path, string):

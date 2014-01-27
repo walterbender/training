@@ -1,5 +1,10 @@
 NEWS
 
+1.28
+
+* Martin patch to fix "writeable" test.
+* Some clean up of uitest code: moving it to Sugar service
+
 1.27
 
 * Added logic for USB full, USB read-only
