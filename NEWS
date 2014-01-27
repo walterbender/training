@@ -3,11 +3,13 @@ NEWS
 1.27
 
 * Added logic for USB full, USB read-only
+* Added logic for unexpected training data files found
 * Added logic for USB merge, USB copy
 * Added Portfolio task
 * Added Detail View task
 * Added test for USB full
 * Added test for read-only USB
+* Moved Add/Remove Favorites tasks to HTML
 
 1.26
 

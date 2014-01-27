@@ -91,6 +91,19 @@ class TrainingActivity(activity.Activity):
                                             'data'),
                  'usb_path': path})
 
+        # Lots of corner cases to consider:
+        # (1) We require a USB key
+        # (2) Only one USB key
+        # (3) At least 10MB of free space
+        # (4) No unexpected data files on USB key
+        # (5) File is read/write
+        # (6) We are resuming the activity:
+        #     * Is there a data file to sync on the USB key?
+        #       - Do the email addresses match?
+        #     * Is there a mismatch between the instance and the USB key?
+        # (7) We are launching a new instance
+        #     * Is there a data file to sync on the USB key?
+        #     * Create a new data file on the USB key
         if len(self.volume_data) == 0:
             _logger.error('NO USB KEY INSERTED')
             alert = ConfirmationAlert()
@@ -119,6 +132,16 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(file_name='usb-is-full.html')
+        elif tests.unexpected_training_data_files(
+                self.volume_data[0]['usb_path'],
+                self.volume_data[0]['uid']):
+            _logger.error('UNEXPECTED TRAINING DATA FILES FOUND')
+            alert = ConfirmationAlert()
+            alert.props.title = _('Unexpected training data found')
+            alert.props.msg = _('Are you trying to recover lost data?')
+            alert.connect('response', self._remove_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics()
         elif not tests.is_writeable(os.path.join(
                 self.volume_data[0]['usb_path'],
                 self.volume_data[0]['uid'])):

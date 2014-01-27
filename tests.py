@@ -15,6 +15,7 @@ import json
 import subprocess
 import dbus
 import statvfs
+import glob
 
 from gi.repository import Gio
 from gi.repository import Gdk
@@ -59,18 +60,32 @@ battery_model = None
 proxy = None
 
 
+def unexpected_training_data_files(path, name):
+    ''' There should be at most one file training-data-XXXX-XXXX and it should
+        match the volume path basename. '''
+    files = glob.glob(os.path.join(path, 'training-data-*'))
+    if len(files) > 1:
+        _logger.error(files)
+        return True
+    if len(files) == 1 and not os.path.exists(os.path.join(path, name)):
+        _logger.error(files)
+        return True
+    return False
+
+
 def is_full(path):
+    ''' Make sure we have some room to write our data '''
     stat = os.statvfs(path)
     free_space = stat[statvfs.F_BSIZE] * stat[statvfs.F_BAVAIL]
     _logger.debug('free space: %d MB' % int(free_space / (1024 * 1024)))
-    if free_space < 1024 * 1024 * 10:
+    if free_space < 1024 * 1024 * 10:  # 10MB is very conservative
         _logger.error('free space: %d MB' % int(free_space / (1024 * 1024)))
         return True
     return False
 
 
 def is_writeable(path):
-    # FIX ME: is path writable?
+    ''' Make sure we can write to the data file '''
     try:
         fd = open(path, 'r')
         data = fd.read()
