@@ -142,9 +142,7 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics()
-        elif not tests.is_writeable(os.path.join(
-                self.volume_data[0]['usb_path'],
-                self.volume_data[0]['uid'])):
+        elif not tests.is_writeable(self.volume_data[0]['usb_path']):
             _logger.error('CANNOT WRITE TO USB')
             alert = ConfirmationAlert()
             alert.props.title = _('Cannot write to USB')
