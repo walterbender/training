@@ -26,6 +26,8 @@ from jarabe.model import bundleregistry
 from jarabe.journal import journalactivity
 # from jarabe.model import network
 
+from sugar3.test import uitree
+
 _DBUS_SERVICE = 'org.sugarlabs.Shell'
 _DBUS_SHELL_IFACE = 'org.sugarlabs.Shell'
 _DBUS_PATH = '/org/sugarlabs/Shell'
@@ -162,3 +164,12 @@ class ShellService(dbus.service.Object):
         journalactivity.get_journal().show_journal()
         activity.set_active(True)
         return True
+
+    @dbus.service.method(_DBUS_SHELL_IFACE,
+                         in_signature='s', out_signature='b')
+    def FindChild(self, target):
+        """Find a child in the uitree
+        """
+        uiroot = uitree.get_root()
+        node = uiroot.find_child(name=target)
+        return node is not None

@@ -24,7 +24,6 @@ from gi.repository import GLib
 from gi.repository import GConf
 from gi.repository import GObject
 
-from sugar3.test import uitree
 from sugar3 import env
 from sugar3.datastore import datastore
 from sugar3 import profile
@@ -547,35 +546,15 @@ def get_speak_settings(activity):
 
 
 def get_uitree_node(name):
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+    try:
+        return dbus.Interface(proxy, 'org.sugarlabs.Shell').FindChild(name)
+    except Exception, e:
+        _logger.error('ERROR calling find child: %s' % e)
     return True
-    uiroot = uitree.get_root()
-    # print uiroot.dump()
-    for node in uiroot.get_children():
-        if name in [node.name, node.role_name]:
-            return True
-        for node1 in node.get_children():
-            if name in [node1.name, node1.role_name]:
-                return True
-            for node2 in node1.get_children():
-                if name in [node2.name, node2.role_name]:
-                    return True
-                for node3 in node2.get_children():
-                    if name in [node3.name, node3.role_name]:
-                        return True
-                    for node4 in node3.get_children():
-                        if name in [node4.name, node4.role_name]:
-                            return True
-                        for node5 in node4.get_children():
-                            if name in [node5.name, node5.role_name]:
-                                return True
-                            for node6 in node5.get_children():
-                                if name in [node6.name, node6.role_name]:
-                                    # help(node6)
-                                    return True
-                                for node7 in node6.get_children():
-                                    if name in [node7.name, node7.role_name]:
-                                        return True
-        return False
 
 
 def find_string(path, string):
