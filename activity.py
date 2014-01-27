@@ -368,7 +368,8 @@ class TrainingActivity(activity.Activity):
         if message is None:
             graphics.add_uri('file://' + url)
         else:
-            graphics.add_uri('file://' + url + '?MSG=' + message)
+            graphics.add_uri('file://' + url + '?MSG=' + \
+                             tests.get_safe_text(message))
         graphics.set_zoom_level(0.667)
         center_in_panel.add(graphics)
         graphics.show()

@@ -14,16 +14,16 @@
     var vars = query.split("&");
     for (var i=0;i<vars.length;i++) {
       var pair = vars[i].split("=");
-    	// If first entry with this name
+      var res = unescape(pair[1])
       if (typeof query_string[pair[0]] === "undefined") {
-        query_string[pair[0]] = pair[1];
+        query_string[pair[0]] = res;
     	// If second entry with this name
       } else if (typeof query_string[pair[0]] === "string") {
-        var arr = [ query_string[pair[0]], pair[1] ];
+        var arr = [ query_string[pair[0]], res ];
         query_string[pair[0]] = arr;
     	// If third or later entry with this name
       } else {
-        query_string[pair[0]].push(pair[1]);
+        query_string[pair[0]].push(res);
       }
     } 
     return query_string;

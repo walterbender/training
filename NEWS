@@ -1,5 +1,10 @@
 NEWS
 
+1.29
+
+* Use safe text when sending text to URLs.
+* Fixed safe text parsing in URLs.
+
 1.28
 
 * Martin patch to fix "writeable" test.

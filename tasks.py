@@ -760,7 +760,8 @@ class NickChange5Task(HTMLTask):
         else:
             new_nick = ''
         url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'nickchange5.html?NAME=%s' % new_nick)
+                           'nickchange5.html?NAME=%s' %
+                           tests.get_safe_text(new_nick))
 
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url)
