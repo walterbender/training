@@ -14,6 +14,7 @@ import os
 import json
 import subprocess
 import dbus
+import stat
 import statvfs
 import glob
 
@@ -86,22 +87,14 @@ def is_full(path):
 
 def is_writeable(path):
     ''' Make sure we can write to the data file '''
-    try:
-        fd = open(path, 'r')
-        data = fd.read()
-        fd.close()
-    except Exception, e:
-        _logger.error('Could not open %s for reading: %s' % (path, e))
+    if not os.path.exists(path):
         return False
-    try:
-        fd = open(path, 'w')
-        fd.write(data)
-        fd.close()
-    except Exception, e:
-        _logger.error('Could not open %s for writing: %s' % (path, e))
-        return False
-    return True
-
+    stats = os.stat(path)
+    if (stats.st_uid == os.geteuid() and stats.st_mode & stat.S_IWUSR) or \
+       (stats.st_gid == os.getegid() and stats.st_mode & stat.S_IWGRP) or \
+       (stats.st_mode & stat.S_IWOTH):
+        return True
+    return False
 
 def is_landscape():
     return Gdk.Screen.width() > Gdk.Screen.height()
