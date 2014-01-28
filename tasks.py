@@ -74,7 +74,8 @@ def get_tasks(task_master):
                    Journal2Task(task_master),
                    Journal3Task(task_master),
                    Journal4Task(task_master),
-                   Journal5Task(task_master)]},
+                   Journal5Task(task_master),
+                   Journal6Task(task_master)]},
         {'name': _('5. Getting to Know the Frame'),
          'icon': 'badge-intro',
          'tasks': [ClipboardTask(task_master),
@@ -1044,7 +1045,7 @@ class Journal1Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Introducing the Journal')
+        self._name = _('Getting to Know the Journal')
         self.uid = 'journal-1-task'
         self._uri = 'Journal/journal1.html'
 
@@ -1053,7 +1054,7 @@ class Journal2Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Introducing the Journal')
+        self._name = _('Viewing the Journal')
         self.uid = 'journal-2-task'
         self._uri = 'Journal/journal2.html'
 
@@ -1062,16 +1063,51 @@ class Journal3Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Introducing the Journal')
+        self._name = _('Viewing the Journal Video')
         self.uid = 'journal-3-task'
         self._uri = 'Journal/journal3.html'
+
+    def get_refresh(self):
+        return True
+
+    def get_requires(self):
+        return ['validate-email-task']
+
+    def is_collectable(self):
+        return True
+
+    def get_my_turn(self):
+        return True
+
+    def skip_if_completed(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            activity = tests.get_most_recent_instance(
+                'org.laptop.AbiWordActivity')
+            if activity is not None and 'description' in activity.metadata:
+                task_data['data'] = activity.metadata['description']
+            else:
+                task_data['data'] = ''
+            return False
+        else:
+            # Make sure description has changed and entry is 'starred'
+            activity = tests.get_most_recent_instance(
+                'org.laptop.AbiWordActivity')
+            if activity is None or not 'keep' in activity.metadata or \
+               not 'description' in activity.metadata:
+                return False
+            return \
+                not task_data['data'] == activity.metadata['description'] \
+                and int(activity.metadata['keep']) == 1
 
 
 class Journal4Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Introducing the Journal')
+        self._name = _('Introducing the Portfolio')
         self.uid = 'journal-4-task'
         self._uri = 'Journal/journal4.html'
 
@@ -1080,9 +1116,40 @@ class Journal5Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Introducing the Journal')
+        self._name = _('Usining the Portfolio Video')
         self.uid = 'journal-5-task'
         self._uri = 'Journal/journal5.html'
+
+    def get_refresh(self):
+        return True
+
+    def get_requires(self):
+        return ['validate-email-task']
+
+    def is_collectable(self):
+        return True
+
+    def get_my_turn(self):
+        return True
+
+    def skip_if_completed(self):
+        return True
+
+    def test(self, task_data):
+        if not tests.saw_new_launch('org.sugarlabs.PortfolioActivity',
+                                    task_data['start_time']):
+            return False
+        paths = tests.get_pdf()
+        return len(paths) > 0
+
+
+class Journal6Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Journal Badge')
+        self.uid = 'journal-6-task'
+        self._uri = 'Journal/journal6.html'
 
 
 '''
