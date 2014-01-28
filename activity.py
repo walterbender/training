@@ -94,6 +94,7 @@ class TrainingActivity(activity.Activity):
 
         # Before we begin, we need to find any and all USB keys
         # and any and all training-data files on them.
+        OK = True
         _logger.debug(tests.get_volume_paths())
         for path in tests.get_volume_paths():
             os.path.basename(path)
@@ -114,9 +115,10 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(file_name='insert-usb.html')
+            OK = False
 
         # (2) Only one USB key
-        if len(self.volume_data) > 1:
+        if OK and len(self.volume_data) > 1:
             _logger.error('MULTIPLE USB KEYS INSERTED')
             alert = ConfirmationAlert()
             alert.props.title = _('Multiple USB keys found')
@@ -127,11 +129,12 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=alert.props.msg)
-
-        volume = self.volume_data[0]
+            OK = False
+        elif OK:
+            volume = self.volume_data[0]
 
         # (3) At least 10MB of free space
-        if tests.is_full(volume['usb_path'],
+        if OK and tests.is_full(volume['usb_path'],
                            required=_MINIMUM_SPACE):
             _logger.error('USB IS FULL')
             alert = ConfirmationAlert()
@@ -140,9 +143,10 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=alert.props.msg)
+            OK = False
 
         # (4) File is read/write
-        if not tests.is_writeable(volume['usb_path']):
+        if OK and not tests.is_writeable(volume['usb_path']):
             _logger.error('CANNOT WRITE TO USB')
             alert = ConfirmationAlert()
             alert.props.title = _('Cannot write to USB')
@@ -150,6 +154,7 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=alert.props.msg)
+            OK = False
 
         # (5) Only one set of training data per USB key
         # We expect UIDs to formated as XXXX-XXXX
@@ -158,16 +163,16 @@ class TrainingActivity(activity.Activity):
         # (a) If there are no files, we will assign the UID based on the
         #     volume path;
         # (b) If there is one file with a valid UID, we use that UID;
-        if len(volume['files']) == 0:
+        if OK and len(volume['files']) == 0:
             volume['uid'] = 'training-data-%s' % \
                             tests.format_volume_name(volume['basename'])
             _logger.debug('No training data found. Using UID %s' % 
                           volume['uid'])
-        elif len(volume['files']) == 1:
+        elif OK and len(volume['files']) == 1:
             volume['uid'] = 'training-data-%s' % volume['files'][0][-9:]
             _logger.debug('Training data found. Using UID %s' % 
                           volume['uid'])
-        else:
+        elif OK:
             _logger.error('MULTIPLE TRAINING-DATA FILES FOUND')
             alert = ConfirmationAlert()
             alert.props.title = _('Multiple training-data files found.')
@@ -176,6 +181,7 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=alert.props.msg)
+            OK = False
 
         # (6) We are resuming the activity
         #     or are we are launching a new instance.
@@ -183,14 +189,16 @@ class TrainingActivity(activity.Activity):
         # We need to sync up file on USB with file on disk,
         # but only if the email addresses match. Otherwise,
         # raise an error.
-        path = self._check_for_USB_data()
-        if path is None:
-            self._launch_task_master()
-        elif self._sync_data_from_USB(path):
-            self._copy_data_from_USB()
-            # Flash a welcome back screen
-            self._load_intro_graphics(file_name='Welcome/welcome-back.html')
-            GObject.timeout_add(1500, self._launch_task_master)
+        if OK:
+            path = self._check_for_USB_data()
+            if path is None:
+                self._launch_task_master()
+            elif self._sync_data_from_USB(path):
+                self._copy_data_from_USB()
+                # Flash a welcome back screen
+                self._load_intro_graphics(
+                    file_name='Welcome/welcome-back.html')
+                GObject.timeout_add(1500, self._launch_task_master)
 
         '''
             # Could be a mismatch between the USB UID and the
@@ -699,6 +707,6 @@ class TrainingActivity(activity.Activity):
         if response_id is Gtk.ResponseType.OK:
             self.close()
 
-    def _close_alert_cb(self, alert, response_id, path, old_name, new_name):
+    def _close_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
         self.close()
