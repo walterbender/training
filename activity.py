@@ -80,38 +80,13 @@ class TrainingActivity(activity.Activity):
         self._clipboard_text = ''
 
         self.volume_data = []
-        for path in tests.get_volume_paths():
-            # Expecting XXXX-XXXX
-            basename = os.path.basename(path)
-            uid = tests.format_volume_name(basename)
-            if uid != basename:
-                # Found some other volume name format,
-                # so we need to look for training data.
-                files = look_for_training_data(path)
-                # For now, use the first file we find
-                uid = files[-9:]
-                if uid != tests.format_volume_name(uid):
-                    _logger.error('MALFORMED UID %s' % uid)
-                    alert = ConfirmationAlert()
-                    alert.props.title = _('UID mismatch')
-                    alert.props.msg = _('Renaming %s to %s' % )
-                    alert.connect('response', self._rename_alert_cb, path,
-                                  uid, tests.format_volume_name(uid))
-                    self.add_alert(alert)
-            name = 'training-data-' + uid
-            logging.error(uid)
-            self.volume_data.append(
-                {'uid': name,
-                 'sugar_path': os.path.join(self.get_activity_root(),
-                                            'data'),
-                 'usb_path': path})
 
         # Lots of corner cases to consider:
         # (1) We require a USB key
-        # (2) Only one USB key
+        # (2) Only one data file on USB key
         # (3) At least 10MB of free space
-        # (4) No unexpected data files on USB key
-        # (5) File is read/write
+        # (4) File is read/write
+        # (5) Only one set of training data per USB key
         # (6) We are resuming the activity:
         #     * Is there a data file to sync on the USB key?
         #       - Do the email addresses match?
@@ -119,16 +94,32 @@ class TrainingActivity(activity.Activity):
         # (7) We are launching a new instance
         #     * Is there a data file to sync on the USB key?
         #     * Create a new data file on the USB key
+
+        # Before we begin, we need to find any and all USB keys
+        # and any and all training-data files on them.
+        _logger.debug(tests.get_volume_paths())
+        for path in tests.get_volume_paths():
+            os.path.basename(path)
+            self.volume_data.append(
+                {'basename': os.path.basename(path),
+                 'files': tests.look_for_training_data(path),
+                 'sugar_path': os.path.join(self.get_activity_root(), 'data'),
+                 'usb_path': path})
+            _logger.debug(self.volume_data[-1])
+
+        # (1) We require a USB key
         if len(self.volume_data) == 0:
             _logger.error('NO USB KEY INSERTED')
             alert = ConfirmationAlert()
             alert.props.title = _('USB key required')
             alert.props.msg = _('You must insert a USB key before launching '
                                 'this activity.')
-            alert.connect('response', self._remove_alert_cb)
+            alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
-            self._load_intro_graphics(file_name='no-usb.html')
-        elif len(self.volume_data) > 1:
+            self._load_intro_graphics(message=alert.props.msg)
+
+        # (2) Only one USB key
+        if len(self.volume_data) > 1:
             _logger.error('MULTIPLE USB KEYS INSERTED')
             alert = ConfirmationAlert()
             alert.props.title = _('Multiple USB keys found')
@@ -136,69 +127,84 @@ class TrainingActivity(activity.Activity):
                                 'running this program.\nPlease remove any '
                                 'additional USB keys before launching '
                                 'this activity.')
-            alert.connect('response', self._remove_alert_cb)
+            alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
-            self._load_intro_graphics(file_name='too-many-usbs.html')
-        elif tests.is_full(self.volume_data[0]['usb_path'],
+            self._load_intro_graphics(message=alert.props.msg)
+
+        volume = self.volume_data[0]
+
+        # (3) At least 10MB of free space
+        if tests.is_full(volume['usb_path'],
                            required=_MINIMUM_SPACE):
             _logger.error('USB IS FULL')
             alert = ConfirmationAlert()
             alert.props.title = _('USB key is full')
-            alert.props.msg = _('Please do something about it.')
-            alert.connect('response', self._remove_alert_cb)
+            alert.props.msg = _('No room on USB')
+            alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
-            self._load_intro_graphics(file_name='usb-is-full.html')
-        elif tests.unexpected_training_data_files(
-                self.volume_data[0]['usb_path'],
-                self.volume_data[0]['uid']):
-            _logger.error('UNEXPECTED TRAINING DATA FILES FOUND')
-            alert = ConfirmationAlert()
-            alert.props.title = _('Unexpected training data found')
-            alert.props.msg = _('Are you trying to recover lost data?')
-            alert.connect('response', self._remove_alert_cb)
-            self.add_alert(alert)
-            self._load_intro_graphics()
-        elif not tests.is_writeable(self.volume_data[0]['usb_path']):
+            self._load_intro_graphics(message=alert.props.msg)
+
+        # (4) File is read/write
+        if not tests.is_writeable(volume['usb_path']):
             _logger.error('CANNOT WRITE TO USB')
             alert = ConfirmationAlert()
             alert.props.title = _('Cannot write to USB')
-            alert.props.msg = _('Please do something about it.')
-            alert.connect('response', self._remove_alert_cb)
+            alert.props.msg = _('USB key seems to be read-only.')
+            alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
-            self._load_intro_graphics(file_name='cannot-write-to-usb.html')
+            self._load_intro_graphics(message=alert.props.msg)
+
+        # (5) Only one set of training data per USB key
+        # We expect UIDs to formated as XXXX-XXXX
+        # We need to make sure we have proper UIDs associated with
+        # the USBs and the files on them match the UID.
+        # (a) If there are no files, we will assign the UID based on the
+        #     volume path;
+        # (b) If there is one file with a valid UID, we use that UID;
+        if len(volume['files']) == 0:
+            volume['uid'] = 'training-data-%s' % \
+                            tests.format_volume_name(volume['basename'])
+            _logger.debug('No training data found. Using UID %s' % 
+                          volume['uid'])
+        elif len(volume['files']) == 1:
+            volume['uid'] = 'training-data-%s' % volume['files'][0][-9:]
+            _logger.debug('Training data found. Using UID %s' % 
+                          volume['uid'])
         else:
-            if _TRAINING_DATA_UID in self.metadata:
-                # This is a relaunch of the activity.
-                # In any case, welcome back the user.
-                error = False
-                if self.metadata[_TRAINING_DATA_UID] == \
-                   self.volume_data[0]['uid']:
-                    # Need to sync up file on USB with file on disk,
-                    # but only if the email addresses match. Otherwise,
-                    # raise an error.
-                    error = not self._sync_data_from_USB()
-                else:
-                    # Could be a mismatch between the USB UID and the
-                    # instance UID, in which case, we should go with
-                    # the data on the USB.
-                    _logger.warning('USB UID does not match instance data')
-                    # Need some confirmation here???
-                    self._copy_data_from_USB()
-                if not error:
-                    # Flash a welcome screen
-                    self._load_intro_graphics(file_name='introduction1a.html')
-                    GObject.timeout_add(1500, self._launch_task_master)
+            _logger.error('MULTIPLE TRAINING-DATA FILES FOUND')
+            alert = ConfirmationAlert()
+            alert.props.title = _('Multiple training-data files found.')
+            alert.props.msg = _('There can only be one set of training '
+                                'data per USB key.')
+            alert.connect('response', self._close_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics(message=alert.props.msg)
+
+        # (6) We are resuming the activity
+        # (7) or are we are launching a new instance.
+
+        # We need to sync up file on USB with file on disk,
+        # but only if the email addresses match. Otherwise,
+        # raise an error.
+        error = not self._sync_data_from_USB()
+        if not error:
+            self._copy_data_from_USB()
+            # Flash a welcome screen
+            self._load_intro_graphics(file_name='Welcome/welcome-back.html')
+            GObject.timeout_add(1500, self._launch_task_master)
+        else:
+            # Could be a mismatch between the USB UID and the
+            # instance UID, in which case, we should go with
+            # the data on the USB.
+            usb_path = self._check_for_USB_data()
+            if usb_path is not None:
+                # Start this new instance with data from the USB
+                self._copy_data_from_USB()
+                self._load_intro_graphics(
+                    file_name='Welcome/welcome-back.html')
+                GObject.timeout_add(1500, self._launch_task_master)
             else:
-                # A new activity instance
-                usb_path = self._check_for_USB_data()
-                if usb_path is not None:
-                    # Start this new instance with data from the USB
-                    self._copy_data_from_USB()
-                    # Confirm???
-                    self._load_intro_graphics(file_name='introduction1a.html')
-                    GObject.timeout_add(1500, self._launch_task_master)
-                else:
-                    self._launch_task_master()
+                self._launch_task_master()
 
     def _check_for_USB_data(self):
         usb_path = os.path.join(self.volume_data[0]['usb_path'],
@@ -268,7 +274,7 @@ class TrainingActivity(activity.Activity):
                                         (usb_email, sugar_email))
                     alert.connect('response', self._remove_alert_cb)
                     self.add_alert(alert)
-                    self._load_intro_graphics(file_name='data-mismatch.html')
+                    self._load_intro_graphics(message=alert.props.msg)
                     return False
 
             def count_completed(data):
@@ -379,7 +385,7 @@ class TrainingActivity(activity.Activity):
     def _load_intro_graphics(self, file_name='generic-problem.html',
                              message=None):
         center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-        url = os.path.join(self.bundle_path, 'html', file_name)
+        url = os.path.join(self.bundle_path, 'html-content', file_name)
         graphics = Graphics()
         if message is None:
             graphics.add_uri('file://' + url)
@@ -694,16 +700,6 @@ class TrainingActivity(activity.Activity):
         if response_id is Gtk.ResponseType.OK:
             self.close()
 
-    def _rename_alert_cb(self, alert, response_id, path, old_name, new_name):
+    def _close_alert_cb(self, alert, response_id, path, old_name, new_name):
         self.remove_alert(alert)
-        if response_id is Gtk.ResponseType.OK:
-            try:
-                _logger.warning('moving %s to %s' %
-                                (os.path.join(path, old_name),
-                                 os.path.join(path, new_name))
-                subprocess.call(['mv', os.path.join(path, old_name),
-                                 os.path.join(path, new_name)])
-            except OSError, e:
-                _logger.error('Could not mv %s to %s: %s' %
-                              (os.path.join(path, old_name),
-                               os.path.join(path, new_name), e))
+        self.close()
