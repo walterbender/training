@@ -30,11 +30,13 @@ def get_tasks(task_master):
     task_list = [
         {'name': _('Welcome to One Academy'),
          'icon': 'badge-intro',
-         'tasks': [Intro1Task(task_master),
-                   EnterNameTask(task_master),
-                   EnterEmailTask(task_master),
-                   ValidateEmailTask(task_master),
-                   BadgeIntroTask(task_master)]},
+         'tasks': [Welcome1Task(task_master),
+                   Welcome2Task(task_master),
+                   Welcome3Task(task_master),
+                   Welcome4Task(task_master),
+                   Welcome5Task(task_master),
+                   Welcome6Task(task_master),
+                   Welcome7Task(task_master)]},
         {'name': _('1. Getting to Know the Toolbar'),
          'icon': 'badge-intro',
          'tasks': [Toolbars0Task(task_master),
@@ -139,6 +141,7 @@ class Task():
         self._pause_between_tests = 1000
         self._requires = []
         self._page_count = 1
+        self._prompt = _('Next')
 
     def set_font_size(self, size):
         if size < len(FONT_SIZES):
@@ -248,14 +251,13 @@ class HTMLTask(Task):
     def __init__(self, task_master):
         Task.__init__(self, task_master)
         self._uri = 'introduction1.html'
-        self._prompt = _('Next')
         self._height = 610
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
         graphics = Graphics()
@@ -272,8 +274,7 @@ class HTMLHomeTask(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._uri = 'introduction1.html'
-        self._prompt = _('Next')
+        self._uri = 'Welcome/welcome1.html'
         self._height = 305
 
     def get_my_turn(self):
@@ -299,111 +300,116 @@ class HTMLHomeTask(HTMLTask):
         return graphics, self._prompt
 
 
-class Intro1Task(HTMLTask):
+class BadgeTask(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Intro One')
-        self.uid = 'intro-task-1'
-        self._uri = 'introduction1.html'
+        self._name = _('Badge Task')
+        self.uid = 'badge-task'
+        self._section_index = 0
+        self._title = _("Congratulations!\nYou’ve earned another badge!")
+        self._message = _('Click on Next to go to your next one!')
+        self._uri = 'Welcome/welcome7.html'
+
+    def after_button_press(self):
+        task_data = self._task_master.read_task_data(self.uid)
+        if not 'badge' in task_data:
+            task_data['badge'] = True
+            self._task_master.activity.add_badge(
+                self._title,
+                icon=self._task_master.get_section_icon(self._section_index))
+            self._task_master.write_task_data(self.uid, task_data)
+
+    def test(self, task_data):
+        return self._task_master.button_was_pressed
+
+
+class Welcome1Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Welcome One')
+        self.uid = 'welcome-1-task'
+        self._uri = 'Welcome/welcome1.html'
         self._prompt = _("Let's go!")
 
 
-class EnterNameTask(Task):
+class Welcome2Task(Task):
 
     def __init__(self, task_master):
         Task.__init__(self, task_master)
-        self._name = _('Enter Name')
-        self.uid = 'enter-name-task'
-        self._entries = []
+        self._name = _('Enter Your Name')  # Welcome Two
+        self.uid = 'enter-name-task'  # 'welcome-2-task'
+        self._uri = 'Welcome/welcome2.html'
+        self._entry = None
 
     def is_collectable(self):
         return True
 
     def test(self, task_data):
-        if len(self._entries) == 0:
+        if self._entry is None:
             _logger.error('missing entry')
             return False
-        if len(self._entries[0].get_text()) == 0:
+        if len(self._entry.get_text()) == 0:
             return False
         else:
             return True
 
     def after_button_press(self):
-        self._task_master.write_task_data('name', self._entries[0].get_text())
+        self._task_master.write_task_data('name', self._entry.get_text())
         self._task_master.activity.update_activity_title()
 
     def get_graphics(self, page=0):
-        self._entries = []
+        self._entry = None
         target = self._get_user_name()
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'introduction2.html')
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri)
 
         graphics = Graphics()
-        graphics.add_uri('file://' + url, height=400)
+        webkit = graphics.add_uri('file://' + url, height=400)
         graphics.set_zoom_level(self._zoom_level)
         if target is not None:
-            self._entries.append(graphics.add_entry(text=target))
+            self._entry = graphics.add_entry(text=target)
         else:
-            self._entries.append(graphics.add_entry())
+            self._entry = graphics.add_entry()
 
-        self._task_master.activity.set_copy_widget(text_entry=self._entries[-1])
-        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
+        self._task_master.activity.set_copy_widget(text_entry=self._entry)
+        self._task_master.activity.set_paste_widget(text_entry=self._entry)
 
-        return graphics, _('Next')
+        return graphics, self._prompt
 
 
-class EnterSchoolNameTask(Task):
+class Welcome3Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Enter School Name')
-        self.uid = 'enter-school-name-task'
-        self._entries = []
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if len(self._entries) == 0:
-            _logger.error('missing entry')
-            return False
-        if len(self._entries[0].get_text()) == 0:
-            return False
-        else:
-            return True
-
-    def after_button_press(self):
-        self._task_master.write_task_data('school_name',
-                                          self._entries[0].get_text())
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Welcome Three')
+        self.uid = 'welcome-3-task'
+        self._uri = 'Welcome/welcome3.html'
 
     def get_graphics(self, page=0):
-        self._entries = []
-        target = self._task_master.read_task_data('school_name')
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'network2.html')
-
+        name = self._get_user_name().split()[0]
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           '%s?NAME=%s' %
+                           (self._uri, tests.get_safe_text(name)))
         graphics = Graphics()
-        graphics.add_uri('file://' + url)
+        webkit = graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
-        if target is not None:
-            self._entries.append(graphics.add_entry(text=target))
-        else:
-            self._entries.append(graphics.add_entry())
 
-        self._task_master.activity.set_copy_widget(text_entry=self._entries[-1])
-        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
 
-        return graphics, _('Next')
+        return graphics, self._prompt
 
 
-class EnterEmailTask(Task):
+class Welcome4Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Enter Email')
-        self.uid = 'enter-email-task'
-        self._entries = []
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Enter Your Email')  # Welcome Four
+        self.uid = 'enter-email-task'  # 'welcome-4-task'
+        self._uri = 'Welcome/welcome4.html'
+        self._entry = None
 
     def get_requires(self):
         return ['enter-name-task']
@@ -412,10 +418,10 @@ class EnterEmailTask(Task):
         return True
 
     def test(self, task_data):
-        if len(self._entries) == 0:
+        if self._entry is None:
             _logger.error('missing entry')
             return False
-        entry = self._entries[0].get_text()
+        entry = self._entry.get_text()
         if len(entry) == 0:
             return False
         realname, email_address = email.utils.parseaddr(entry)
@@ -426,41 +432,37 @@ class EnterEmailTask(Task):
         return True
 
     def after_button_press(self):
-        _logger.debug('Writing email address: %s' %
-                      self._entries[0].get_text())
+        _logger.debug('Writing email address: %s' % self._entry.get_text())
         self._task_master.write_task_data('email_address',
-                                          self._entries[0].get_text())
+                                          self._entry.get_text())
 
     def get_graphics(self, page=0):
-        self._entries = []
-        name = self._get_user_name().split()[0]
+        self._entry = []
         email = self._task_master.read_task_data('email_address')
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'introduction3.html?NAME=%s' %
-                           tests.get_safe_text(name))
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri)
 
         graphics = Graphics()
-        graphics.add_uri('file://' + url)
+        webkit = graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
         if email is not None:
-            self._entries.append(graphics.add_entry(text=email))
+            self._entry = graphics.add_entry(text=email)
         else:
-            self._entries.append(graphics.add_entry())
+            self._entry = graphics.add_entry()
 
-        self._task_master.activity.set_copy_widget(
-            text_entry=self._entries[-1])
-        self._task_master.activity.set_paste_widget(
-            text_entry=self._entries[-1])
+        self._task_master.activity.set_copy_widget(text_entry=self._entry)
+        self._task_master.activity.set_paste_widget(text_entry=self._entry)
 
-        return graphics, _('Next')
+        return graphics, self._prompt
 
 
-class ValidateEmailTask(Task):
+class Welcome5Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Validate Email')
-        self.uid = 'validate-email-task'
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Validate Email')  # Welcome Five
+        self.uid = 'validate-email-task' # 'welcome-5-task'
+        self._uri = 'Welcome/welcome5.html'
         self._entries = []
 
     def is_collectable(self):
@@ -496,27 +498,100 @@ class ValidateEmailTask(Task):
     def get_graphics(self, page=0):
         self._entries = []
         email = self._task_master.read_task_data('email_address')
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri)
+
         graphics = Graphics()
-        if email is not None:
-            self._entries.append(graphics.add_entry(text=email))
-        else:  # Should never happen
-            _logger.error('missing email address')
-            self._entries.append(graphics.add_entry())
-        graphics.add_text('\n\n')
-        graphics.add_text(
-            _('Please confirm that you typed your\n'
-              'email address correctly by typing it again below.\n\n'),
-            size=FONT_SIZES[self._font_size])
+        self._entries.append(graphics.add_entry(text=email))
+        webkit = graphics.add_uri('file://' + url, height=400)
+        graphics.set_zoom_level(self._zoom_level)
+        if email is None:  # Should never happen
+            email = ''
         self._entries.append(graphics.add_entry())
         # Paste to second entry
-        self._task_master.activity.text_entry = self._entries[-1]
-        graphics.add_text('\n\n')
-
         self._task_master.activity.set_copy_widget(text_entry=self._entries[0])
         self._task_master.activity.set_paste_widget(
             text_entry=self._entries[-1])
 
-        return graphics, _('Next')
+        return graphics, self._prompt
+
+
+class Welcome6Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Welcome Four')
+        self.uid = 'welcome-6-task'
+        self._uri = 'Welcome/welcome6.html'
+
+
+class Welcome7Task(BadgeTask):
+
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Welcome Seven')
+        self.uid = 'welcome-7-task'
+        self._uri = 'Welcome/welcome7.html'
+        self._section_index = 0
+
+    def get_graphics(self, page=0):
+        name = self._get_user_name().split()[0]
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           '%s?NAME=%s' %
+                           (self._uri, tests.get_safe_text(name)))
+        graphics = Graphics()
+        webkit = graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
+
+        return graphics, self._prompt
+
+
+class EnterSchoolNameTask(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Enter School Name')
+        self.uid = 'enter-school-name-task'
+        self._entry = None
+        self._uri = 'Connection/connection2.html'
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if self._entry is None:
+            _logger.error('missing entry')
+            return False
+        if len(self._entry.get_text()) == 0:
+            return False
+        else:
+            return True
+
+    def after_button_press(self):
+        self._task_master.write_task_data('school_name',
+                                          self._entry.get_text())
+
+    def get_graphics(self, page=0):
+        self._entries = []
+        target = self._task_master.read_task_data('school_name')
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri)
+
+        graphics = Graphics()
+        webkit = graphics.add_uri('file://' + url)
+        graphics.set_zoom_level(self._zoom_level)
+        if target is not None:
+            self._entry = graphics.add_entry(text=target)
+        else:
+            self._entry = graphics.add_entry()
+
+        self._task_master.activity.set_copy_widget(text_entry=self._entry)
+        self._task_master.activity.set_paste_widget(text_entry=self._entry)
+
+        return graphics, self._prompt
 
 
 class Toolbars0Task(HTMLTask):
@@ -524,8 +599,8 @@ class Toolbars0Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Toolbars test')
-        self.uid = 'toolbars-task-0'
-        self._uri = 'toolbars0.html'
+        self.uid = 'toolbars-task-1'
+        self._uri = 'Toolbar/toolbars1.html'
 
     def get_refresh(self):
         return True
@@ -1598,6 +1673,7 @@ class Finished1Task(HTMLHomeTask):
                 task_data['data'] + '.rtf'))
 
 
+'''
 class BadgeTask(Task):
 
     def __init__(self, task_master):
@@ -1635,7 +1711,7 @@ class BadgeTask(Task):
         self._task_master.activity.set_paste_widget()
 
         return graphics, _('Next')
-
+'''
 
 class BadgeIntroTask(BadgeTask):
 

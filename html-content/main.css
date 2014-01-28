@@ -1,0 +1,34 @@
+@charset "utf-8";
+.titlecontent {
+	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 36px;
+	font-style: normal;
+	font-weight: normal;
+	color: #000000;
+	text-align: center;
+	height: auto;
+	width: 1000px;
+	margin-right: auto;
+	margin-left: auto;
+}
+.heading {
+	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 48px;
+	font-style: normal;
+	font-weight: normal;
+}
+.content {
+	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 36px;
+	font-style: normal;
+	font-weight: normal;
+	color: #000000;
+	text-align: left;
+	height: auto;
+	width: 1000px;
+	margin-right: auto;
+	margin-left: auto;
+}
+   
+
+ 

@@ -87,13 +87,10 @@ class TrainingActivity(activity.Activity):
         # (3) At least 10MB of free space
         # (4) File is read/write
         # (5) Only one set of training data per USB key
-        # (6) We are resuming the activity:
+        # (6) We are resuming the activity or
+        #     we are launching a new instance
         #     * Is there a data file to sync on the USB key?
-        #       - Do the email addresses match?
-        #     * Is there a mismatch between the instance and the USB key?
-        # (7) We are launching a new instance
-        #     * Is there a data file to sync on the USB key?
-        #     * Create a new data file on the USB key
+        #     * Do we create a new data file on the USB key
 
         # Before we begin, we need to find any and all USB keys
         # and any and all training-data files on them.
@@ -116,7 +113,7 @@ class TrainingActivity(activity.Activity):
                                 'this activity.')
             alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
-            self._load_intro_graphics(message=alert.props.msg)
+            self._load_intro_graphics(file_name='insert-usb.html')
 
         # (2) Only one USB key
         if len(self.volume_data) > 1:
@@ -181,18 +178,21 @@ class TrainingActivity(activity.Activity):
             self._load_intro_graphics(message=alert.props.msg)
 
         # (6) We are resuming the activity
-        # (7) or are we are launching a new instance.
+        #     or are we are launching a new instance.
 
         # We need to sync up file on USB with file on disk,
         # but only if the email addresses match. Otherwise,
         # raise an error.
-        error = not self._sync_data_from_USB()
-        if not error:
+        path = self._check_for_USB_data()
+        if path is None:
+            self._launch_task_master()
+        elif self._sync_data_from_USB(path):
             self._copy_data_from_USB()
-            # Flash a welcome screen
+            # Flash a welcome back screen
             self._load_intro_graphics(file_name='Welcome/welcome-back.html')
             GObject.timeout_add(1500, self._launch_task_master)
-        else:
+
+        '''
             # Could be a mismatch between the USB UID and the
             # instance UID, in which case, we should go with
             # the data on the USB.
@@ -203,8 +203,7 @@ class TrainingActivity(activity.Activity):
                 self._load_intro_graphics(
                     file_name='Welcome/welcome-back.html')
                 GObject.timeout_add(1500, self._launch_task_master)
-            else:
-                self._launch_task_master()
+        '''
 
     def _check_for_USB_data(self):
         usb_path = os.path.join(self.volume_data[0]['usb_path'],
@@ -214,8 +213,7 @@ class TrainingActivity(activity.Activity):
         else:
             return None
 
-    def _sync_data_from_USB(self):
-        usb_data_path = self._check_for_USB_data()
+    def _sync_data_from_USB(self, usb_data_path=None):
         if usb_data_path is not None:
             usb_data = {}
             if os.path.exists(usb_data_path):
@@ -272,7 +270,7 @@ class TrainingActivity(activity.Activity):
                     alert.props.title = _('Data mismatch')
                     alert.props.msg = _('Are you %s or %s?' %
                                         (usb_email, sugar_email))
-                    alert.connect('response', self._remove_alert_cb)
+                    alert.connect('response', self._close_alert_cb)
                     self.add_alert(alert)
                     self._load_intro_graphics(message=alert.props.msg)
                     return False
@@ -342,9 +340,10 @@ class TrainingActivity(activity.Activity):
             fd = open(sugar_data_path, 'w')
             fd.write(json_data)
             fd.close()
+            return True
         else:
             _logger.error('No data to sync on USB')
-        return True
+            return False
 
     def _copy_data_from_USB(self):
         usb_path = self._check_for_USB_data()
