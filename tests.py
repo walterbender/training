@@ -17,6 +17,7 @@ import dbus
 import stat
 import statvfs
 import glob
+from random import uniform
 
 from gi.repository import Gio
 from gi.repository import Gdk
@@ -55,15 +56,21 @@ _UP_STATE_DISCHARGE_PENDING = 6
 
 _WARN_MIN_PERCENTAGE = 15
 
+_MINIMUM_SPACE = 1024 * 1024 * 10
+
 volume_monitor = None
 battery_model = None
 proxy = None
 
 
+def look_for_training_data(path):
+    return glob.glob(os.path.join(path, 'training-data-*'))
+
+
 def unexpected_training_data_files(path, name):
     ''' There should be at most one file training-data-XXXX-XXXX and it should
         match the volume path basename. '''
-    files = glob.glob(os.path.join(path, 'training-data-*'))
+    files = look_for_training_data(path)
     if len(files) > 1:
         _logger.error(files)
         return True
@@ -73,12 +80,12 @@ def unexpected_training_data_files(path, name):
     return False
 
 
-def is_full(path):
+def is_full(path, required=_MINIMUM_SPACE):
     ''' Make sure we have some room to write our data '''
     stat = os.statvfs(path)
     free_space = stat[statvfs.F_BSIZE] * stat[statvfs.F_BAVAIL]
     _logger.debug('free space: %d MB' % int(free_space / (1024 * 1024)))
-    if free_space < 1024 * 1024 * 10:  # 10MB is very conservative
+    if free_space < required:
         _logger.error('free space: %d MB' % int(free_space / (1024 * 1024)))
         return True
     return False
@@ -127,6 +134,16 @@ def get_sound_level():
     return client.get_int('/desktop/sugar/sound/volume')
 
 
+def is_clipboard_text_available():
+    clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+    text_view = Gtk.TextView()
+    text_buffer = text_view.get_buffer()
+    text_buffer.paste_clipboard(clipboard, None, True)
+    bounds = text_buffer.get_bounds()
+
+    return len(text_buffer.get_text(bounds[0], bounds[1], True)) > 0
+
+
 def get_volume_names():
     global volume_monitor
     if volume_monitor is None:
@@ -139,14 +156,36 @@ def get_volume_names():
     return names
 
 
-def is_clipboard_text_available():
-    clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-    text_view = Gtk.TextView()
-    text_buffer = text_view.get_buffer()
-    text_buffer.paste_clipboard(clipboard, None, True)
-    bounds = text_buffer.get_bounds()
+def format_volume_name(name):
+    ''' Looking for XXXX-XXXX format '''
 
-    return len(text_buffer.get_text(bounds[0], bounds[1], True)) > 0
+    def is_hex(string):
+        for c in string.upper():
+            if not c in '0123456789ABCDEF':
+                return False
+        return True
+
+    def generate_uid(left=None):
+        if left is None:
+            left = '%04x' % int(uniform(0, int(0xFFFF)))
+        right = '%04x' % int(uniform(0, int(0xFFFF)))
+        uid = '%s-%s' % (left, right)
+        return uid.upper()
+
+    if not '-' in name:
+        return generate_uid()
+    hex_strings = name.split('-')
+    if len(hex_strings) != 2:
+        return generate_uid()
+    if len(hex_strings[0]) != 4:
+        return generate_uid()
+    if not is_hex(hex_strings[0]):
+        return generate_uid()
+    if len(hex_strings[1]) < 4:
+        return generate_uid(hex_strings[0])
+    if not is_hex(hex_strings[0]):
+        return generate_uid(hex_strings[0])
+    return name[0:9]
 
 
 def get_volume_paths():

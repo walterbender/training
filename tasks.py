@@ -408,6 +408,9 @@ class EnterEmailTask(Task):
     def get_requires(self):
         return ['enter-name-task']
 
+    def skip_if_completed(self):
+        return True
+
     def test(self, task_data):
         if len(self._entries) == 0:
             _logger.error('missing entry')
@@ -461,6 +464,9 @@ class ValidateEmailTask(Task):
         self._entries = []
 
     def is_collectable(self):
+        return True
+
+    def skip_if_completed(self):
         return True
 
     def get_requires(self):

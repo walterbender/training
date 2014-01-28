@@ -4,6 +4,8 @@ NEWS
 
 * Use safe text when sending text to URLs.
 * Fixed safe text parsing in URLs.
+* Don't let user change email after it has been validated.
+* New logic for generated UIDs from volume path
 
 1.28
 

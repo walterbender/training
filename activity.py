@@ -48,6 +48,8 @@ _TRAINING_DATA_UID = 'training_data_uid'
 _TRAINING_DATA_EMAIL = 'training_data_email'
 _TRAINING_DATA_FULLNAME = 'training_data_fullname'
 
+_MINIMUM_SPACE = 1024 * 1024 * 10  # 10MB is very conservative
+
 
 class TrainingActivity(activity.Activity):
     ''' A series of training exercises '''
@@ -81,10 +83,23 @@ class TrainingActivity(activity.Activity):
         for path in tests.get_volume_paths():
             # Expecting XXXX-XXXX
             basename = os.path.basename(path)
-            if len(basename) > 9:
-                basename = basename[0:9]
-            name = 'training-data-' + basename
-            logging.error(name)
+            uid = tests.format_volume_name(basename)
+            if uid != basename:
+                # Found some other volume name format,
+                # so we need to look for training data.
+                files = look_for_training_data(path)
+                # For now, use the first file we find
+                uid = files[-9:]
+                if uid != tests.format_volume_name(uid):
+                    _logger.error('MALFORMED UID %s' % uid)
+                    alert = ConfirmationAlert()
+                    alert.props.title = _('UID mismatch')
+                    alert.props.msg = _('Renaming %s to %s' % )
+                    alert.connect('response', self._rename_alert_cb, path,
+                                  uid, tests.format_volume_name(uid))
+                    self.add_alert(alert)
+            name = 'training-data-' + uid
+            logging.error(uid)
             self.volume_data.append(
                 {'uid': name,
                  'sugar_path': os.path.join(self.get_activity_root(),
@@ -124,7 +139,8 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(file_name='too-many-usbs.html')
-        elif tests.is_full(self.volume_data[0]['usb_path']):
+        elif tests.is_full(self.volume_data[0]['usb_path'],
+                           required=_MINIMUM_SPACE):
             _logger.error('USB IS FULL')
             alert = ConfirmationAlert()
             alert.props.title = _('USB key is full')
@@ -677,3 +693,17 @@ class TrainingActivity(activity.Activity):
         self.remove_alert(alert)
         if response_id is Gtk.ResponseType.OK:
             self.close()
+
+    def _rename_alert_cb(self, alert, response_id, path, old_name, new_name):
+        self.remove_alert(alert)
+        if response_id is Gtk.ResponseType.OK:
+            try:
+                _logger.warning('moving %s to %s' %
+                                (os.path.join(path, old_name),
+                                 os.path.join(path, new_name))
+                subprocess.call(['mv', os.path.join(path, old_name),
+                                 os.path.join(path, new_name)])
+            except OSError, e:
+                _logger.error('Could not mv %s to %s: %s' %
+                              (os.path.join(path, old_name),
+                               os.path.join(path, new_name), e))
