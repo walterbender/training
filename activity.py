@@ -409,7 +409,7 @@ class TrainingActivity(activity.Activity):
         self._task_master.reload_graphics()
 
     def write_file(self, file_path):
-        if len(self.volume_data) == 1:
+        if len(self.volume_data) == 1 and len(self.volume_data['files']) == 1:
             self.metadata[_TRAINING_DATA_UID] = self.volume_data[0]['uid']
 
             # We may have failed before getting to init of taskmaster

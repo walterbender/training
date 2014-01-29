@@ -606,8 +606,14 @@ class Toolbar3Task(HTMLTask):
             return False
         else:
             _logger.debug(tests.get_launch_count(self._task_master.activity))
-            return tests.get_launch_count(self._task_master.activity) > \
-                task_data['data']
+            launch_count = tests.get_launch_count(self._task_master.activity)
+            if launch_count > task_data['data']:
+                return True
+            else:
+                # FIX ME: If the user switches to a new instance, the
+                # the launch count is no longer valid. Reseting it here,
+                # but this may require an extra cycle of stop and start.
+                task_data['data'] = launch_count
 
 
 class Toolbar4Task(HTMLTask):
