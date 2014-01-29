@@ -811,6 +811,7 @@ class Connected6Task(HTMLTask):
         self._name = _('Enter School Name')  # Connected Six
         self.uid = 'enter-school-name-task'  # 'connected-6-task'
         self._entry = None
+        self._height = 400
         self._uri = 'Connected/connected6.html'
 
     def is_collectable(self):
@@ -1803,7 +1804,7 @@ class XO6Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        return not tests.is_tablet_mode()
+        return not btests.is_tablet_mode()
 
 
 class XO7Task(HTMLTask):
@@ -1823,19 +1824,19 @@ class XO7Task(HTMLTask):
 
     def test(self, task_data):
         if len(self._goals) == 0:
-            if tests.is_landscape():
-                self._goals.append(True)
-            return False
-        elif len(self._goals) == 1:
             if not tests.is_landscape():
                 self._goals.append(True)
             return False
-        elif len(self._goals) == 2:
+        elif len(self._goals) == 1:
             if tests.is_landscape():
                 self._goals.append(True)
             return False
+        elif len(self._goals) == 2:
+            if not tests.is_landscape():
+                self._goals.append(True)
+            return False
         else:
-            return not tests.is_landscape()
+            return tests.is_landscape()
 
 
 class XO8Task(BadgeTask):
