@@ -58,6 +58,10 @@ _WARN_MIN_PERCENTAGE = 15
 
 _MINIMUM_SPACE = 1024 * 1024 * 10
 
+_DBUS_SERVICE = 'org.sugarlabs.SugarServices'
+_DBUS_SHELL_IFACE = 'org.sugarlabs.SugarServices'
+_DBUS_PATH = '/org/sugarlabs/SugarServices'
+ 
 volume_monitor = None
 battery_model = None
 proxy = None
@@ -298,11 +302,11 @@ def is_activity_open(bundle_name):
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
         return \
-            dbus.Interface(proxy, 'org.sugarlabs.Shell').GetActivityName() == \
+            dbus.Interface(proxy, _DBUS_SERVICE).GetActivityName() == \
             bundle_name and is_activity_view()
     except Exception, e:
         _logger.error('ERROR getting activity name %s' % e)
@@ -313,10 +317,10 @@ def is_journal_open():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
-        return dbus.Interface(proxy, 'org.sugarlabs.Shell').IsJournal() and \
+        return dbus.Interface(proxy, _DBUS_SERVICE).IsJournal() and \
             is_activity_view()
     except Exception, e:
         _logger.error('ERROR getting zoom level %s' % e)
@@ -327,11 +331,11 @@ def is_activity_view():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
         zoom_level = \
-            dbus.Interface(proxy, 'org.sugarlabs.Shell').GetZoomLevel()
+            dbus.Interface(proxy, _DBUS_SERVICE).GetZoomLevel()
     except Exception, e:
         _logger.error('ERROR getting zoom level %s' % e)
         return False
@@ -343,11 +347,11 @@ def is_home_view():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
         zoom_level = \
-            dbus.Interface(proxy, 'org.sugarlabs.Shell').GetZoomLevel()
+            dbus.Interface(proxy, _DBUS_SERVICE).GetZoomLevel()
     except Exception, e:
         _logger.error('ERROR getting zoom level %s' % e)
         return False
@@ -359,11 +363,11 @@ def is_neighborhood_view():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
         zoom_level = \
-            dbus.Interface(proxy, 'org.sugarlabs.Shell').GetZoomLevel()
+            dbus.Interface(proxy, _DBUS_SERVICE).GetZoomLevel()
     except Exception, e:
         _logger.error('ERROR getting zoom level %s' % e)
         return False
@@ -375,10 +379,10 @@ def goto_activity_view():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
-        dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+        dbus.Interface(proxy, _DBUS_SERVICE).SetZoomLevel(
             shell.ShellModel.ZOOM_ACTIVITY)
     except Exception, e:
         _logger.error('ERROR setting zoom level %s' % e)
@@ -389,10 +393,10 @@ def goto_journal():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
     try:
-        if dbus.Interface(proxy, 'org.sugarlabs.Shell').OpenJournal():
-            dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+        if dbus.Interface(proxy, _DBUS_SERVICE).OpenJournal():
+            dbus.Interface(proxy, _DBUS_SERVICE).SetZoomLevel(
                 shell.ShellModel.ZOOM_ACTIVITY)
         else:
             _logger.error('Could not find journal to open???')
@@ -405,10 +409,10 @@ def set_journal_active():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
     try:
-        if dbus.Interface(proxy, 'org.sugarlabs.Shell').OpenJournal():
-            dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+        if dbus.Interface(proxy, _DBUS_SERVICE).OpenJournal():
+            dbus.Interface(proxy, _DBUS_SERVICE).SetZoomLevel(
                 shell.ShellModel.ZOOM_HOME)
         else:
             _logger.error('Could not find journal to open???')
@@ -420,10 +424,10 @@ def goto_home_view():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
-        dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+        dbus.Interface(proxy, _DBUS_SERVICE).SetZoomLevel(
             shell.ShellModel.ZOOM_HOME)
     except Exception, e:
         _logger.error('ERROR setting zoom level %s' % e)
@@ -433,10 +437,10 @@ def goto_neighborhood_view():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
-        dbus.Interface(proxy, 'org.sugarlabs.Shell').SetZoomLevel(
+        dbus.Interface(proxy, _DBUS_SERVICE).SetZoomLevel(
             shell.ShellModel.ZOOM_MESH)
     except Exception, e:
         _logger.error('ERROR setting zoom level %s' % e)
@@ -586,9 +590,9 @@ def get_uitree_node(name):
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
     try:
-        return dbus.Interface(proxy, 'org.sugarlabs.Shell').FindChild(name)
+        return dbus.Interface(proxy, _DBUS_SERVICE).FindChild(name)
     except Exception, e:
         _logger.error('ERROR calling find child: %s' % e)
     return False
@@ -688,10 +692,10 @@ def nm_status():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
-        status = dbus.Interface(proxy, 'org.sugarlabs.Shell').NMStatus()
+        status = dbus.Interface(proxy, _DBUS_SERVICE).NMStatus()
         logging.debug(status)
     except Exception, e:
         _logger.error('ERROR getting NM Status: %s' % e)

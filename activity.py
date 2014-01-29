@@ -667,8 +667,9 @@ class TrainingActivity(activity.Activity):
         extensions_path = os.path.join(os.path.expanduser('~'), '.sugar',
                                       'default', 'extensions')
         webservice_path = os.path.join(extensions_path, 'webservice')
-        training_path = os.path.join(self.bundle_path, 'training')
-        init_path = os.path.join(self.bundle_path, 'training', '__init__.py')
+        sugarservices_path = os.path.join(self.bundle_path, 'sugarservices')
+        init_path = os.path.join(self.bundle_path, 'sugarservices',
+                                 '__init__.py')
 
         if not os.path.exists(extensions_path):
             try:
@@ -685,19 +686,20 @@ class TrainingActivity(activity.Activity):
             except OSError, e:
                 _logger.error('Could not cp %s to %s, %s' %
                               (init_path, webservice_path, e))
-        if not os.path.exists(os.path.join(webservice_path, 'training')):
-            _logger.error('Training webservice not found. Installing...')
+        if not os.path.exists(os.path.join(webservice_path, 'sugarservices')):
+            _logger.error('SugarServices webservice not found. Installing...')
             try:
-                subprocess.call(['cp', '-r', training_path, webservice_path])
+                subprocess.call(['cp', '-r', sugarservices_path,
+                                 webservice_path])
             except OSError, e:
                 _logger.error('Could not copy %s to %s, %s' %
-                              (training_path), webservice_path, e)
+                              (sugarservices_path, webservice_path, e))
 
             alert = ConfirmationAlert()
             alert.props.title = _('Restart required')
             alert.props.msg = _('We needed to install some software on your '
                                 'system.\nSugar must be restarted before '
-                                'training can commence.')
+                                'sugarservices can commence.')
 
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)

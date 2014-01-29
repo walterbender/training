@@ -1,4 +1,5 @@
 # Copyright (c) 2014 Martin Abente Lahaye. - tch@sugarlabs.org
+# Copyright (c) 2014 Walter Bender - walter@sugarlabs.org
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,13 +19,13 @@ import logging
 
 from jarabe.webservice import account
 
-from service import ShellService
+from sugarservices.sugarservices import SugarServices
 
 class Account(account.Account):
 
     def __init__(self):
-        logging.info('loading training extension')
-        self._service = ShellService()
+        logging.info('loading sugarservices extension')
+        self._services = SugarServices()
 
     def get_token_state(self):
         return self.STATE_VALID

@@ -14,33 +14,30 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-"""D-bus service providing access to the shell's functionality"""
+'''D-bus service providing access to various Sugar services.'''
 
 import dbus
-import json
 import logging
 
-from gi.repository import Gtk
-
 from jarabe.model import shell
-from jarabe.model import bundleregistry
+from jarabe.model import network
 from jarabe.journal import journalactivity
 
 from sugar3.test import uitree
 
-# import network
-from jarabe.model import network
+_DBUS_SERVICE = 'org.sugarlabs.SugarServices'
+_DBUS_SHELL_IFACE = 'org.sugarlabs.SugarServices'
+_DBUS_PATH = '/org/sugarlabs/SugarServices'
 
 
-_DBUS_SERVICE = 'org.sugarlabs.Shell'
-_DBUS_SHELL_IFACE = 'org.sugarlabs.Shell'
-_DBUS_PATH = '/org/sugarlabs/Shell'
-
-
-class ShellService(dbus.service.Object):
-    """Provides d-bus service to script the shell's operations
+class SugarServices(dbus.service.Object):
+    '''
+    Provides d-bus service to script Sugar shell operations
     Fork of sugar/src/jarabe/view/service.py
-    """
+
+    Also provides d-bus service to the Sugar Journal to Network Manager
+    Fork of sugar/extensions/devices/network.py
+    '''
 
     def __init__(self):
         bus = dbus.SessionBus()
@@ -60,16 +57,16 @@ class ShellService(dbus.service.Object):
         try:
             self._network = NetworkManagerObserver()
         except Exception, e:
-            logging.error('Problem getting NM: %s' % e)
+            logging.error('Problem getting NetworkManager: %s' % e)
             return
 
-        logging.error('NETWORK MANAGER SERVICE AVAILABLE')
+        logging.debug('Sugar Services launched...')
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='i', out_signature='')
     def SetZoomLevel(self, zoom_level):
-        """Set Zoom Level of Sugar Shell
-        """
+        '''Set Zoom Level of Sugar Shell
+        '''
         if zoom_level in [shell.ShellModel.ZOOM_HOME,
                           shell.ShellModel.ZOOM_MESH,
                           shell.ShellModel.ZOOM_ACTIVITY]:
@@ -79,31 +76,31 @@ class ShellService(dbus.service.Object):
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='', out_signature='i')
     def GetZoomLevel(self):
-        """Get Zoom Level of Sugar Shell
-        """
+        '''Get Zoom Level of Sugar Shell
+        '''
         return self._shell_model._get_zoom_level()
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='', out_signature='b')
     def IsJournal(self):
-        """Is the current activity the Journal?
-        """
+        '''Is the current activity the Journal?
+        '''
         active_activity = self._shell_model.get_active_activity()
         return active_activity.is_journal()
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='', out_signature='s')
     def GetActivityName(self):
-        """Get bundle name of the current activity
-        """
+        '''Get bundle name of the current activity
+        '''
         active_activity = self._shell_model.get_active_activity()
         return active_activity.get_activity_name()
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='', out_signature='b')
     def OpenJournal(self):
-        """Open the journal
-        """
+        '''Open the journal
+        '''
         starting_activity = activity = self._shell_model.get_active_activity()
         while not activity.is_journal():
             activity = self._shell_model.get_next_activity(current=activity)
@@ -118,8 +115,8 @@ class ShellService(dbus.service.Object):
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='s', out_signature='b')
     def FindChild(self, target):
-        """Find a child in the uitree
-        """
+        '''Find a child in the uitree
+        '''
         uiroot = uitree.get_root()
         node = uiroot.find_child(name=target)
         return node is not None
@@ -132,7 +129,8 @@ class ShellService(dbus.service.Object):
 
 
 class NetworkManagerObserver(object):
-    # Borrowing liberally from extensions/devices/network.py
+    ''' Borrowing liberally from sugar/extensions/devices/network.py
+    '''
 
     def __init__(self):
         self._bus = dbus.SystemBus()
@@ -170,6 +168,8 @@ class NetworkManagerObserver(object):
         nm_device = self._bus.get_object(network.NM_SERVICE, device_op)
         props = dbus.Interface(nm_device, dbus.PROPERTIES_IFACE)
 
+        # Could expand to other devices, but for the time being, we
+        # only care about wireless devices.
         device_type = props.Get(network.NM_DEVICE_IFACE, 'DeviceType')
         if device_type == network.NM_DEVICE_TYPE_WIFI:
             device = WirelessDeviceObserver(nm_device)
@@ -189,7 +189,7 @@ class WirelessDeviceObserver(object):
 
     def __init__(self, device):
         self._device = device
-        self.device_view = WirelessDeviceView(self._device)
+        self.device_view = WirelessDevice(self._device)
 
     def disconnect(self):
         self.device_view.disconnect()
@@ -197,11 +197,15 @@ class WirelessDeviceObserver(object):
         self.device_view = None
 
 
-class WirelessDeviceView():
+class WirelessDevice():
+    ''' Similar to DeviceView, but absent any UI. Just maintaining the
+        state of the device.
+    '''
 
     def __init__(self, device):
         self.status = 'init'
         self.state = ''
+        self.address = None
         self._bus = dbus.SystemBus()
         self._device = device
         self._device_props = None
@@ -343,7 +347,7 @@ class WirelessDeviceView():
            self.state == network.NM_DEVICE_STATE_SECONDARIES:
             pass
         elif self.state == network.NM_DEVICE_STATE_ACTIVATED:
-            address = self._device_props.Get(
+            self.address = self._device_props.Get(
                 network.NM_DEVICE_IFACE, 'Ip4Address')
         else:
             self.state = 'unknown'
