@@ -723,8 +723,10 @@ class Connected4Task(HTMLTask):
     def get_refresh(self):
         return True
 
-    def test(self):
-        # FIX ME
+    def test(self, task_data):
+        return tests.nm_status() == 'network-wireless-connected'
+
+    def is_collectable(self):
         return True
 
 

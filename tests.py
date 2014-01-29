@@ -301,7 +301,7 @@ def is_activity_open(bundle_name):
             dbus.Interface(proxy, 'org.sugarlabs.Shell').GetActivityName() == \
             bundle_name and is_activity_view()
     except Exception, e:
-        _logger.error('ERROR setting zoom level %s' % e)
+        _logger.error('ERROR getting activity name %s' % e)
         return False
 
 
@@ -315,7 +315,7 @@ def is_journal_open():
         return dbus.Interface(proxy, 'org.sugarlabs.Shell').IsJournal() and \
             is_activity_view()
     except Exception, e:
-        _logger.error('ERROR setting zoom level %s' % e)
+        _logger.error('ERROR getting zoom level %s' % e)
         return False
 
 
@@ -329,7 +329,7 @@ def is_activity_view():
         zoom_level = \
             dbus.Interface(proxy, 'org.sugarlabs.Shell').GetZoomLevel()
     except Exception, e:
-        _logger.error('ERROR setting zoom level %s' % e)
+        _logger.error('ERROR getting zoom level %s' % e)
         return False
 
     return zoom_level == shell.ShellModel.ZOOM_ACTIVITY
@@ -345,7 +345,7 @@ def is_home_view():
         zoom_level = \
             dbus.Interface(proxy, 'org.sugarlabs.Shell').GetZoomLevel()
     except Exception, e:
-        _logger.error('ERROR setting zoom level %s' % e)
+        _logger.error('ERROR getting zoom level %s' % e)
         return False
 
     return zoom_level == shell.ShellModel.ZOOM_HOME
@@ -361,7 +361,7 @@ def is_neighborhood_view():
         zoom_level = \
             dbus.Interface(proxy, 'org.sugarlabs.Shell').GetZoomLevel()
     except Exception, e:
-        _logger.error('ERROR setting zoom level %s' % e)
+        _logger.error('ERROR getting zoom level %s' % e)
         return False
 
     return zoom_level == shell.ShellModel.ZOOM_MESH
@@ -678,3 +678,29 @@ class DeviceModel(GObject.GObject):
             self.notify('time-remaining')
 
         self.emit('updated')
+
+
+def nm_status():
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object('org.sugarlabs.Shell', '/org/sugarlabs/Shell')
+
+    try:
+        status = dbus.Interface(proxy, 'org.sugarlabs.Shell').NMStatus()
+        logging.debug(status)
+    except Exception, e:
+        _logger.error('ERROR getting NM Status: %s' % e)
+        return None
+
+    if status in ['network-wireless-connected',
+                  'network-wireless-disconnected',
+                  'network-adhoc-1-connected',
+                  'network-adhoc-1-disconnected',
+                  'network-adhoc-6-connected',
+                  'network-adhoc-6-disconnected',
+                  'network-adhoc-11-connected',
+                  'network-adhoc-11-disconnected']:
+        return status
+    else:
+        return 'unknown'
