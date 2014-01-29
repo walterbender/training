@@ -43,6 +43,7 @@ class TaskMaster(Gtk.Grid):
         self.keyname = None
 
         self._name = None
+        self._email = None
         self._graphics = None
         self._summary = None
         self._page = 0
@@ -185,10 +186,10 @@ class TaskMaster(Gtk.Grid):
         '''To run a task, we need graphics to display, a test to call that
             returns True or False, and perhaps some data '''
 
+        task = self._task_list[section]['tasks'][task_index]
         if self._first_time:
-            self._uid = self._task_list[section]['tasks'][task_index].uid
-            title, help_file = \
-                self._task_list[section]['tasks'][task_index].get_help_info()
+            self._uid = task.uid
+            title, help_file = task.get_help_info()
             if title is None or help_file is None:
                 self.activity.help_button.set_sensitive(False)
             else:
@@ -207,12 +208,9 @@ class TaskMaster(Gtk.Grid):
                 self._task_data['start_time'] = int(self._start_time + 0.5)
                 self._task_data['accumulated_time'] = 0
                 self._task_data['completed'] = False
-                self._task_data['task'] = \
-                    self._task_list[section]['tasks'][task_index].get_name()
-                self._task_data['data'] = \
-                    self._task_list[section]['tasks'][task_index].get_data()
-                self._task_data['collectable'] = \
-                    self._task_list[section]['tasks'][task_index].is_collectable()
+                self._task_data['task'] = task.get_name()
+                self._task_data['data'] = task.get_data()
+                self._task_data['collectable'] = task.is_collectable()
                 self.write_task_data(self._uid, self._task_data)
             elif 'completed' in self._task_data and \
                  self._task_data['completed']:
@@ -220,10 +218,8 @@ class TaskMaster(Gtk.Grid):
 
             self._first_time = False
 
-        GObject.timeout_add(
-            self._task_list[section]['tasks'][task_index].get_pause_time(),
-            self._test, self._task_list[section]['tasks'][task_index].test,
-            self._task_data, self._uid)
+        GObject.timeout_add(task.get_pause_time(), self._test, task.test,
+                            self._task_data, self._uid)
 
     def _update_accumutaled_time(self, task_data):
         end_time = time.time()
@@ -616,6 +612,7 @@ class TaskMaster(Gtk.Grid):
         if task_index == 0 or self._progress_bar is None:
             if self._progress_bar is not None:
                 self._progress_bar.destroy()
+
             buttons = []
             if tasks_in_section > 1:
                 for i in range(tasks_in_section - 1):
@@ -623,12 +620,18 @@ class TaskMaster(Gtk.Grid):
                         {'label': str(i + 1),
                          'tooltip':
                          self._task_list[section]['tasks'][i].get_name()})
+
             if self._name is None:
                 self._name = self.read_task_data('name')
-            if self._name is None:
-                name = get_nick()
-            else:
+            if self._email is None:
+                self._email = self.read_task_data('email_address')
+            if self._name is not None and self._email is not None:
+                name = '%s\n%s' % (self._name, self._email)
+            elif self._name is not None:
                 name = self._name
+            else:
+                name = ''
+
             self._progress_bar = ProgressBar(name,
                                              self._task_list[section]['name'],
                                              buttons,
