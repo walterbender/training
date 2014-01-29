@@ -1,5 +1,9 @@
 NEWS
 
+1.30
+
+* Add tests for network connectivity
+
 1.29
 
 * Use safe text when sending text to URLs.
