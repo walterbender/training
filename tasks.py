@@ -75,31 +75,42 @@ def get_tasks(task_master):
                    Journal3Task(task_master),
                    Journal4Task(task_master),
                    Journal5Task(task_master),
-                   Journal6Task(task_master)]},
+                   Journal6Task(task_master),
+                   Journal7Task(task_master),
+                   Journal8Task(task_master)]},
         {'name': _('5. Getting to Know the Frame'),
          'icon': 'badge-intro',
-         'tasks': [ClipboardTask(task_master),
-                   BatteryTask(task_master),
-                   SoundTask(task_master),
-                   BadgeFrameTask(task_master)]},
+         'tasks': [Frame1Task(task_master),
+                   Frame2Task(task_master),
+                   Frame3Task(task_master),
+                   Frame4Task(task_master),
+                   Frame5Task(task_master),
+                   Frame6Task(task_master),
+                   Frame7Task(task_master),
+                   Frame8Task(task_master)]},
         {'name': _('6. Getting to Know the Views'),
          'icon': 'badge-intro',
          'tasks': [Views1Task(task_master),
                    Views2Task(task_master),
-                   AddFavoriteTask(task_master),
-                   RemoveFavoriteTask(task_master),
-                   BadgeViewsTask(task_master)]},
+                   Views3Task(task_master),
+                   Views4Task(task_master),
+                   Views5Task(task_master),
+                   Views6Task(task_master),
+                   Views7Task(task_master),
+                   Views8Task(task_master),
+                   Views9Task(task_master)]},
         {'name': _('7. Getting to Know Settings'),
          'icon': 'badge-intro',
-         'tasks': [NickChange1Task(task_master),
-                   NickChange2Task(task_master),
-                   NickChange3Task(task_master),
-                   NickChange4Task(task_master),
-                   NickChange5Task(task_master),
-                   BadgeSettingsTask(task_master)]},
+         'tasks': [Settings1Task(task_master),
+                   Settings2Task(task_master),
+                   Settings3Task(task_master),
+                   Settings4Task(task_master),
+                   Settings5Task(task_master),
+                   Settings6Task(task_master)]},
         {'name': _('8. Getting to Know more Activities'),
          'icon': 'badge-intro',
-         'tasks': [Turtle1Task(task_master),
+         'tasks': [MoreActivities1Task(task_master),
+                   Turtle1Task(task_master),
                    Physics1Task(task_master),
                    BadgeMoreActivitiesTask(task_master)]},
         {'name': _('9. Getting to Know Collaboration'),
@@ -110,14 +121,22 @@ def get_tasks(task_master):
 
     if tests.is_XO():
         task_list.append(
-            {'name': _('10. Getting to Know the XO'),
+            {'name': _('10. Learning More About the XO'),
              'icon': 'badge-intro',
-             'tasks': [Tablet1Task(task_master),
-                       Rotate1Task(task_master),
-                       Rotate2Task(task_master),
-                       GameKeyTask(task_master),
-                       Tablet2Task(task_master),
-                       BadgeXOTask(task_master)]}
+             'tasks': [XO1Task(task_master),
+                       XO2Task(task_master),
+                       XO3Task(task_master),
+                       XO4Task(task_master),
+                       XO5Task(task_master),
+                       XO6Task(task_master),
+                       XO7Task(task_master),
+                       XO8Task(task_master)]},
+                   #     Tablet1Task(task_master),
+                   #     Rotate1Task(task_master),
+                   #     Rotate2Task(task_master),
+                   #     GameKeyTask(task_master),
+                   #     Tablet2Task(task_master),
+                   #     BadgeXOTask(task_master)]}
         )
 
     task_list.append(
@@ -1138,10 +1157,19 @@ class Journal5Task(HTMLTask):
         return True
 
     def test(self, task_data):
+        # Make sure there are newly starred items and that the Portfolio
+        # activity has been launched; then look for a PDF file.
+        if task_data['data'] is None:
+            task_data['data'] = tests.get_starred_count()
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        if not tests.get_starred_count() > task_data['data']:
+            return False
         if not tests.saw_new_launch('org.sugarlabs.PortfolioActivity',
                                     task_data['start_time']):
             return False
         paths = tests.get_pdf()
+        # FIX ME: test file creation time
         return len(paths) > 0
 
 
@@ -1149,175 +1177,358 @@ class Journal6Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Journal Badge')
+        self._name = _('Copy your Presentation to USB')
         self.uid = 'journal-6-task'
         self._uri = 'Journal/journal6.html'
 
 
-'''
-class AddStarredTask(HTMLHomeTask):
-
-    def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
-        self._name = _('Add Starred Task')
-        self.uid = 'add-starred-task'
-        self._uri = 'journal2.html'
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if task_data['data'] is None:
-            task_data['data'] = tests.get_starred_count()
-            self._task_master.write_task_data(self.uid, task_data)
-            return False
-        else:
-            return tests.get_starred_count() > task_data['data']
-
-    def get_help_info(self):
-        return ('Home', 'home_view.html')
-
-    def get_my_turn(self):
-        return True
-
-
-class RemoveStarredTask(HTMLHomeTask):
-
-    def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
-        self._name = _('Remove Starred Task')
-        self.uid = 'remove-starred-task'
-        self._uri = 'journal3.html'
-
-    def get_requires(self):
-        return ['validate-email-task', 'add-starred-task']
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if task_data['data'] is None:
-            task_data['data'] = tests.get_starred_count()
-            self._task_master.write_task_data(self.uid, task_data)
-            return False
-        else:
-            return tests.get_starred_count() < task_data['data']
-
-    def get_help_info(self):
-        return ('Home', 'home_view.html')
-
-    def get_my_turn(self):
-        return True
-
-
-class DetailViewTask(HTMLHomeTask):
-
-    def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
-        self._name = _('Journal Detail View Task')
-        self.uid = 'journal-detail-view-task'
-        self._uri = 'journal4.html'
-
-    def get_requires(self):
-        return ['validate-email-task', 'write-save-task-4']
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if task_data['data'] is None:
-            activity = tests.get_most_recent_instance(
-                'org.laptop.AbiWordActivity')
-            if activity is not None and 'description' in activity.metadata:
-                task_data['data'] = activity.metadata['description']
-            else:
-                task_data['data'] = ''
-            return False
-        else:
-            # Make sure description has changed and entry is 'starred'
-            activity = tests.get_most_recent_instance(
-                'org.laptop.AbiWordActivity')
-            if activity is None or not 'keep' in activity.metadata or \
-               not 'description' in activity.metadata:
-                return False
-            return \
-                not task_data['data'] == activity.metadata['description'] \
-                and int(activity.metadata['keep']) == 1
-
-    def get_my_turn(self):
-        return True
-
-
-class Journal5Task(HTMLHomeTask):
-
-    def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
-        self._name = _('Introducing the Portfolio')
-        self.uid = 'journal-task-5'
-        self._uri = 'journal5.html'
-
-    def get_requires(self):
-        return ['add-starred-task']
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if not tests.saw_new_launch('org.sugarlabs.PortfolioActivity',
-                                    task_data['start_time']):
-            return False
-        paths = tests.get_pdf()
-        return len(paths) > 0
-'''
-
-class NickChange1Task(HTMLTask):
+class Journal7Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Nick Change Step One')
-        self.uid = 'nick-change-task-1'
-        self._uri = 'nickchange1.html'
-
-
-class NickChange2Task(HTMLTask):
-
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
-        self._name = _('Nick Change Step Two')
-        self.uid = 'nick-change-task-2'
-        self._uri = 'nickchange2.html'
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-
-class NickChange3Task(HTMLTask):
-
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
-        self._name = _('Nick Change Step Three')
-        self.uid = 'nick-change-task-3'
-        self._uri = 'nickchange3.html'
+        self._name = _('Copy your Presentation to USB')
+        self.uid = 'journal-7-task'
+        self._uri = 'Journal/journal7.html'
 
     def get_refresh(self):
         return True
 
+    def get_requires(self):
+        return ['validate-email-task', 'journal-5-task']
 
-class NickChange4Task(HTMLHomeTask):
+    def is_collectable(self):
+        return True
+
+    def get_my_turn(self):
+        return True
+
+    def skip_if_completed(self):
+        return True
+
+    def test(self, task_data):
+        files = tests.look_for_file_type(
+            self._task_master.activity.volume_data[0]['usb_path'], '.pdf')
+        # FIX ME: test file creation time
+        return len(files) > 0
+
+
+class Journal8Task(HTMLTask):
 
     def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
-        self._name = _('Nick Change Step Four')
-        self.uid = 'nick-change-task-4'
-        self._uri = 'nickchange4.html'
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Journal Badge')
+        self.uid = 'journal-8-task'
+        self._uri = 'Journal/journal8.html'
+        self._section = 4
+
+
+class Frame1Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Getting to Know the Frame')
+        self.uid = 'frame-1-task'
+        self._uri = 'Frame/frame1.html'
+
+
+class Frame2Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Three Ways to Open the Frame')
+        self.uid = 'frame-2-task'
+        self._uri = 'Frame/frame2.html'
+
+    # FIX ME: We need some sort of test here
+
+
+class Frame3Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Checking the Battery')
+        self.uid = 'frame-3-task'
+        self._uri = 'Frame/frame3.html'
+        self._battery_level is None:
+        self._height = 400
 
     def get_requires(self):
         return ['validate-email-task']
 
     def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if self._battery_level is None:
+            return False
+        level = tests.get_battery_level()
+        if abs(level - self._battery_level) <= 10:
+            return True
+        else:
+            return False
+
+    def _battery_button_callback(self, widget, i):
+        self._battery_level = i * 20
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+                           self._uri)
+
+        graphics = Graphics()
+        webkit = graphics.add_uri('file://' + url, height=self._height)
+        graphics.set_zoom_level(self._zoom_level)
+        buttons = graphics.add_radio_buttons(['battery-000', 'battery-020',
+                                              'battery-040', 'battery-060',
+                                              'battery-080', 'battery-100'],
+                                             colors=tests.get_colors())
+        for i, button in enumerate(buttons):
+            button.connect('clicked', self._battery_button_callback, i)
+            button.set_active(False)
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
+
+        return graphics, self._prompt
+
+
+class Frame4Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Changing the Volume')
+        self.uid = 'frame-4-task'
+        self._uri = 'Frame/frame4.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            task_data['data'] = tests.get_sound_level()
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            return not tests.get_sound_level() == task_data['data']
+
+
+class Frame5Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Using the Frame to Read Text')
+        self.uid = 'frame-5-task'
+        self._uri = 'Frame/frame5.html'
+
+    # FIX ME: We need some sort of test here
+
+
+class Frame6Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Bottom of the Frame Recap')
+        self.uid = 'frame-6-task'
+        self._uri = 'Frame/frame6.html'
+
+
+class Frame7Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Top of the Frame Recap')
+        self.uid = 'frame-7-task'
+        self._uri = 'Frame/frame7.html'
+
+
+class Frame8Task(BadgeTask):
+
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Frame Badge')
+        self.uid = 'frame-8-task'
+        self._uri = 'Frame/frame8.html'
+        self._section = 5
+
+
+class Views1Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Getting to Know the Views')
+        self.uid = 'views-1-task'
+        self._uri = 'Views/views1.html'
+
+
+class Views2Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('The Four Views of Sugar')
+        self.uid = 'views-2-task'
+        self._uri = 'Views/views2.html'
+
+
+class Views3Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('The Views of Sugar Video')
+        self.uid = 'views-3-task'
+        self._uri = 'Views/views3.html'
+
+
+class Views4Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Adding a Favourite to the Home View')
+        self.uid = 'views-4-task'
+        self._uri = 'Views/views4.html'
+
+
+class Views5Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Adding a Favourite to the Home View Video')
+        self.uid = 'views-5-task'
+        self._uri = 'Views/views5.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
+
+    def get_refresh(self):
+        return True
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            favorites_list = tests.get_favorites()
+            task_data['data'] = len(favorites_list)
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            return len(tests.get_favorites()) > task_data['data']
+
+    def get_help_info(self):
+        return ('Home', 'home_view.html')
+
+
+class Views6Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Removing a Favourite from the Home View')
+        self.uid = 'views-6-task'
+        self._uri = 'Views/views6.html'
+
+
+class Views7Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Removing a Favourite from the Home View Video')
+        self.uid = 'views-7-task'
+        self._uri = 'Views/views7.html'
+
+    def get_requires(self):
+        return ['validate-email-task', 'views-5-task']
+
+    def is_collectable(self):
+        return True
+
+    def get_refresh(self):
+        return True
+
+    def test(self, task_data):
+        if task_data['data'] is None:
+            favorites_list = tests.get_favorites()
+            task_data['data'] = len(favorites_list)
+            self._task_master.write_task_data(self.uid, task_data)
+            return False
+        else:
+            return len(tests.get_favorites()) < task_data['data']
+
+    def get_help_info(self):
+        return ('Home', 'home_view.html')
+
+
+class Views8Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Switch Between the Four Views')
+        self.uid = 'views-8-task'
+        self._uri = 'Views/views8.html'
+        self._views = []
+
+    def get_requires(self):
+        return ['validate-email-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if tests.is_activity_view():
+            if 'activity' not in self._views:
+                self._views.append('activity')
+        elif tests.is_home_view():
+            if 'home' not in self._views:
+                self._views.append('home')
+        elif tests.is_neighborhood_view():
+            if 'neighborhood' not in self._views:
+                self._views.append('neighborhood')
+        return len(self._views) > 2
+
+
+class Views9Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Views Badge')
+        self.uid = 'views-9-task'
+        self._uri = 'Views/views9.html'
+        self._section = 6
+
+
+class Settings1Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Exploring the Sugar Settings')
+        self.uid = 'settings-1-task'
+        self._uri = 'Settings/settings1.html'
+
+
+class Settings2Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Changing the XO Nickname and Colours')
+        self.uid = 'settings-2-task'
+        self._uri = 'Settings/settings2.html'
+
+
+class Settings3Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Changing the XO Nickname and Colours Video')
+        self.uid = 'settings-3-task'
+        self._uri = 'Settings/settings3.html'
+
+    def get_requires(self):
+        return ['validate-email-task']
+
+    def is_collectable(self):
+        return True
+
+    def get_refresh(self):
         return True
 
     def skip_if_completed(self):
@@ -1339,36 +1550,40 @@ class NickChange4Task(HTMLHomeTask):
                 return False
 
 
-class NickChange5Task(HTMLTask):
+class Settings4Task(HTMLHomeTask):
+
+    def __init__(self, task_master):
+        HTMLHomeTask.__init__(self, task_master)
+        self._name = _('Important Settings')
+        self.uid = 'settings-4-task'
+        self._uri = 'Settings/settings4.html'
+
+
+class Settings5Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Nick Change Step Five')
-        self.uid = 'nick-change-task-5'
-        self._uri = 'nickchange5.html'
+        self._name = _('Other settings')
+        self.uid = 'settings-5-task'
+        self._section_index = 7
+        self._uri = 'Settings/settings5.html'
 
-    def get_requires(self):
-        return ['nick-change-task-4']
 
-    def get_graphics(self, page=0):
-        nick_task_data = self._task_master.read_task_data(
-            self.get_requires()[0])
-        if 'new_nick' in nick_task_data:
-            new_nick = nick_task_data['new_nick']
-        else:
-            new_nick = ''
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
-                           'nickchange5.html?NAME=%s' %
-                           tests.get_safe_text(new_nick))
+class Settings6Task(BadgeTask):
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge Settings')
+        self._section_index = 7
+        self.uid = 'settings-6-task'
+        self._uri = 'Settings/settings6.html'
 
-        graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url)
-        graphics.set_zoom_level(self._zoom_level)
 
-        self._task_master.activity.set_copy_widget(webkit=webkit)
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Next')
+class MoreActvities1Task(HTMLTask):
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Learning About More Activities')
+        self.uid = 'more-activities-1-task'
+        self._uri = 'MoreActivities/moreactivities1.html'
 
 
 class Turtle1Task(HTMLHomeTask):
@@ -1453,100 +1668,6 @@ class Physics2Task(HTMLHomeTask):
         return True
 
 
-class Views1Task(HTMLTask):
-
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
-        self._name = _('Introducing the Views')
-        self.uid = 'views-task-1'
-        self._uri = 'views1.html'
-
-
-class Views2Task(HTMLTask):
-
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
-        self._name = _('Exploring the Views')
-        self.uid = 'views-task-2'
-        self._uri = 'views2.html'
-        self._views = []
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if tests.is_activity_view():
-            if 'activity' not in self._views:
-                self._views.append('activity')
-        elif tests.is_home_view():
-            if 'home' not in self._views:
-                self._views.append('home')
-        elif tests.is_neighborhood_view():
-            if 'neighborhood' not in self._views:
-                self._views.append('neighborhood')
-        return len(self._views) > 2
-
-
-class AddFavoriteTask(HTMLHomeTask):
-
-    def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
-        self._name = _('Add Favorite Task')
-        self.uid = 'add-favorites-task'
-        self._uri = 'views3.html'
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if task_data['data'] is None:
-            favorites_list = tests.get_favorites()
-            task_data['data'] = len(favorites_list)
-            self._task_master.write_task_data(self.uid, task_data)
-            return False
-        else:
-            return len(tests.get_favorites()) > task_data['data']
-
-    def get_help_info(self):
-        return ('Home', 'home_view.html')
-
-
-class RemoveFavoriteTask(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Remove Favorite Task')
-        self.uid = 'remove-favorites-task'
-        self._uri = 'views4.html'
-
-    def get_requires(self):
-        return ['add-favorites-task']
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
-    def test(self, task_data):
-        if task_data['data'] is None:
-            favorites_list = tests.get_favorites()
-            task_data['data'] = len(favorites_list)
-            self._task_master.write_task_data(self.uid, task_data)
-            return False
-        else:
-            return len(tests.get_favorites()) < task_data['data']
-
-    def get_help_info(self):
-        return ('Home', 'home_view.html')
-
-
 class ClipboardTask(Task):
 
     def __init__(self, task_master):
@@ -1579,13 +1700,35 @@ class ClipboardTask(Task):
             return True
         return False
 
-class BatteryTask(Task):
+
+class XO1Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Battery Task')
-        self.uid = 'battery-task'
-        self._battery_level = None
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Learning More About the XO')
+        self.uid = 'xo-1-task'
+        self._uri = 'XO/xo1.html'
+
+
+class XO2Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Switch to Tablet Mode')
+        self.uid = 'xo-2-task'
+        self._uri = 'XO/xo2.html'
+
+
+class XO3Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Switch to Tablet Mode Video')
+        self.uid = 'xo-3-task'
+        self._uri = 'XO/xo3.html'
+
+    def get_refresh(self):
+        return True
 
     def get_requires(self):
         return ['validate-email-task']
@@ -1593,88 +1736,20 @@ class BatteryTask(Task):
     def is_collectable(self):
         return True
 
-    def test(self, task_data):
-        if self._battery_level is None:
-            return False
-        level = tests.get_battery_level()
-        if abs(level - self._battery_level) <= 10:
-            return True
-        else:
-            return False
-
-    def _battery_button_callback(self, widget, i):
-        self._battery_level = i * 20
-
     def get_my_turn(self):
         return True
 
-    def get_graphics(self, page=0):
-        graphics = Graphics()
-        graphics.add_text(_('Check the battery levels and then click\n'
-                            'on the matching battery indicator.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-        buttons = graphics.add_radio_buttons(['battery-000', 'battery-020',
-                                              'battery-040', 'battery-060',
-                                              'battery-080', 'battery-100'],
-                                             colors=tests.get_colors())
-        for i, button in enumerate(buttons):
-            button.connect('clicked', self._battery_button_callback, i)
-            button.set_active(False)
-
-        self._task_master.activity.set_copy_widget()
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Next')
-
-
-class SoundTask(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Sound Task')
-        self.uid = 'sound-task'
-        self._battery_level = None
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
     def test(self, task_data):
-        if task_data['data'] is None:
-            task_data['data'] = tests.get_sound_level()
-            self._task_master.write_task_data(self.uid, task_data)
-            return False
-        else:
-            return not tests.get_sound_level() == task_data['data']
-
-    def get_my_turn(self):
-        return True
-
-    def get_graphics(self, page=0):
-        graphics = Graphics()
-        graphics.add_text(_('Check the sound level and then use\n'
-                            'the slider to adjust it.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-
-        self._task_master.activity.set_copy_widget()
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Next')
+        return tests.is_tablet_mode()
 
 
-class GameKeyTask(Task):
+class XO4Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Game Key Task')
-        self.uid = 'game-task'
-
-    def get_requires(self):
-        return ['validate-email-task']
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Play with the Gamepad Keys')
+        self.uid = 'xo-4-task'
+        self._uri = 'XO/xo4.html'
 
     def is_collectable(self):
         return True
@@ -1694,161 +1769,80 @@ class GameKeyTask(Task):
             else:
                 return False
 
-    def get_graphics(self, page=0):
 
-        graphics = Graphics()
-        graphics.add_text(_('Click on a Game Key'),
-                          size=FONT_SIZES[self._font_size])
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-
-        self._task_master.activity.set_copy_widget()
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Next')
-
-
-class Tablet1Task(Task):
+class XO5Task(HTMLTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Tablet Task 1')
-        self.uid = 'tablet-task-1'
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Switch Back to Laptop Mode')
+        self.uid = 'xo-5-task'
+        self._uri = 'XO/xo5.html'
+
+
+class XO6Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Switch Back to Laptop Mode Video')
+        self.uid = 'xo-6-task'
+        self._uri = 'XO/xo6.html'
+
+    def get_refresh(self):
+        return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return ['validate-email-task', 'xo-3-task']
 
     def is_collectable(self):
+        return True
+
+    def get_my_turn(self):
         return True
 
     def test(self, task_data):
         return tests.is_tablet_mode()
 
-    def get_graphics(self, page=0):
 
-        graphics = Graphics()
-        graphics.add_text(_('Switch to Tablet Mode'),
-                          size=FONT_SIZES[self._font_size])
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-
-        self._task_master.activity.set_copy_widget()
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Next')
-
-
-class Tablet2Task(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Tablet Task 2')
-        self.uid = 'tablet-task-2'
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
-    def get_requires(self):
-        return ['tablet-task-1']
-
-    def test(self, task_data):
-        return not tests.is_tablet_mode()
-
-    def get_graphics(self, page=0):
-
-        graphics = Graphics()
-        graphics.add_text(_('Switch to back to Laptop Mode'),
-                          size=FONT_SIZES[self._font_size])
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-
-        self._task_master.activity.set_copy_widget()
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Next')
-
-
-class Rotate1Task(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Rotate Task 1')
-        self.uid = 'rotate-task-1'
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
-    def get_requires(self):
-        return ['tablet-task-1']
-
-    def test(self, task_data):
-        return not tests.is_landscape()
-
-    def get_graphics(self, page=0):
-
-        graphics = Graphics()
-        graphics.add_text(_('Hit the rotate button to switch to '
-                            'Portrait mode.'),
-                          size=FONT_SIZES[self._font_size])
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-
-        self._task_master.activity.set_copy_widget()
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Next')
-
-
-class Rotate2Task(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Rotate Task 2')
-        self.uid = 'rotate-task-2'
-
-    def get_requires(self):
-        return ['validate-email-task']
-
-    def is_collectable(self):
-        return True
-
-    def get_requires(self):
-        return ['tablet-task-1']
-
-    def test(self, task_data):
-        return tests.is_landscape()
-
-    def get_graphics(self, page=0):
-
-        graphics = Graphics()
-        graphics.add_text(_('Hit the rotate button to switch to '
-                            'Landscape mode.'),
-                          size=FONT_SIZES[self._font_size])
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-
-        self._task_master.activity.set_copy_widget()
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Next')
-
-
-class Network1Task(HTMLTask):
+class XO7Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Network 1')
-        self.uid = 'network-task-1'
-        self._uri = 'network1.html'
+        self._name = _('Change the Screen Orientation')
+        self.uid = 'xo-7-task'
+        self._uri = 'XO/xo7.html'
+        self._goals = []
 
     def get_requires(self):
         return ['validate-email-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if len(self._goals) == 0:
+            if tests.is_landscape():
+                self._goals.append(True)
+            return False
+        elif len(self._goals) == 1:
+            if not tests.is_landscape():
+                self._goals.append(True)
+            return False
+        elif len(self._goals) == 2:
+            if tests.is_landscape():
+                self._goals.append(True)
+            return False
+        else:
+            return not tests.is_landscape():
+
+
+class XO8Task(BadgeTask):
+
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('XO Badge')
+        self.uid = 'xo-8-task'
+        self._uri = 'XO/xo8.html'
+        self._section = 10
 
 
 class Finished1Task(HTMLHomeTask):
@@ -1896,94 +1890,6 @@ class Finished1Task(HTMLHomeTask):
                 task_data['data'] + '.rtf'))
 
 
-'''
-class BadgeTask(Task):
-
-    def __init__(self, task_master):
-        Task.__init__(self, task_master)
-        self._name = _('Badge Task')
-        self.uid = 'badge-task'
-        self._section_index = 0
-        self._title = _("Congratulations!\nYou’ve earned another badge!")
-        self._message = _('Click on Next to go to your next one!')
-
-
-    def after_button_press(self):
-        task_data = self._task_master.read_task_data(self.uid)
-        if not 'badge' in task_data:
-            task_data['badge'] = True
-            self._task_master.activity.add_badge(
-                self._title,
-                icon=self._task_master.get_section_icon(self._section_index))
-            self._task_master.write_task_data(self.uid, task_data)
-
-    def test(self, task_data):
-        return self._task_master.button_was_pressed
-
-    def get_graphics(self, page=0):
-        graphics = Graphics()
-        graphics.add_text(self._title, bold=True,
-                          size=FONT_SIZES[self._font_size])
-        graphics.add_icon(
-            self._task_master.get_section_icon(self._section_index))
-        graphics.add_text(
-            '\n\n' + self._name + '\n\n' + self._message + '\n\n',
-            size=FONT_SIZES[self._font_size])
-
-        self._task_master.activity.set_copy_widget()
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Next')
-'''
-
-class BadgeNetworkTask(BadgeTask):
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
-        self._name = _('Badge Network')
-        self._section_index = 2
-        self.uid = 'badge-network'
-
-
-class BadgeActivitiesTask(BadgeTask):
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
-        self._name = _('Badge Activities')
-        self._section_index = 3
-        self.uid = 'badge-activities'
-
-
-class BadgeJournalTask(BadgeTask):
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
-        self._name = _('Badge Journal')
-        self._section_index = 4
-        self.uid = 'badge-journal'
-
-
-class BadgeFrameTask(BadgeTask):
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
-        self._name = _('Badge Frame')
-        self._section_index = 5
-        self.uid = 'badge-frame'
-
-
-class BadgeViewsTask(BadgeTask):
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
-        self._name = _('Badge View')
-        self._section_index = 6
-        self.uid = 'badge-view'
-
-
-class BadgeSettingsTask(BadgeTask):
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
-        self._name = _('Badge Settings')
-        self._section_index = 7
-        self.uid = 'badge-settings'
-
-
 class BadgeMoreActivitiesTask(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
@@ -1998,14 +1904,6 @@ class BadgeCollaborationTask(BadgeTask):
         self._name = _('Badge Collaboration')
         self._section_index = 9
         self.uid = 'badge-collaboration'
-
-
-class BadgeXOTask(BadgeTask):
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
-        self._name = _('Badge XO')
-        self._section_index = 10
-        self.uid = 'badge-xo'
 
 
 class FinishedAllTasks(Task):

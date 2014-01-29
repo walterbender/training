@@ -63,6 +63,10 @@ battery_model = None
 proxy = None
 
 
+def look_for_file_type(path, suffix):
+    return glob.glob(os.path.join(path, '*' + suffix))
+
+
 def look_for_training_data(path):
     return glob.glob(os.path.join(path, 'training-data-*'))
 

@@ -197,7 +197,7 @@ class TrainingActivity(activity.Activity):
                 self._copy_data_from_USB()
                 # Flash a welcome back screen
                 self._load_intro_graphics(
-                    file_name='Welcome/welcome-back.html')
+                    file_name='welcome-back.html')
                 GObject.timeout_add(1500, self._launch_task_master)
 
         '''
@@ -209,7 +209,7 @@ class TrainingActivity(activity.Activity):
                 # Start this new instance with data from the USB
                 self._copy_data_from_USB()
                 self._load_intro_graphics(
-                    file_name='Welcome/welcome-back.html')
+                    file_name='welcome-back.html')
                 GObject.timeout_add(1500, self._launch_task_master)
         '''
 
