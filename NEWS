@@ -1,5 +1,11 @@
 NEWS
 
+1.31
+
+* New content
+* Common image directory
+* Merged new content with tests in old content
+
 1.30
 
 * Add tests for network connectivity
