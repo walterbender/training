@@ -326,8 +326,8 @@ class TrainingActivity(activity.Activity):
             # Copy incompleted tasks from two to one
             for key in data_two:
                 if isinstance(data_two[key], dict) and \
-                   (not 'completed' in data_one[key] or \
-                   not data_one[key]['completed']):
+                   (not 'completed' in data_two[key] or \
+                   not data_two[key]['completed']):
                     data_one[key] = data_two[key]
 
             # Copy name, email_address, current_task...
