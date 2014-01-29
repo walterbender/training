@@ -305,7 +305,7 @@ class HTMLHomeTask(HTMLTask):
         def button_callback(button):
             tests.goto_home_view()
 
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
         graphics = Graphics()
@@ -771,8 +771,6 @@ class Connected5Task(HTMLTask):
         entry0 = self._entries[0].get_text()
         entry1 = self._entries[1].get_text()
         if len(entry0) == 0 or len(entry1) == 0:
-            return False
-        if entry0 != entry1:
             return False
         realname, email_address = email.utils.parseaddr(entry1)
         if email_address == '':
@@ -1249,7 +1247,7 @@ class Frame3Task(HTMLTask):
         self._name = _('Checking the Battery')
         self.uid = 'frame-3-task'
         self._uri = 'Frame/frame3.html'
-        self._battery_level is None:
+        self._battery_level = None
         self._height = 400
 
     def get_requires(self):
@@ -1271,7 +1269,7 @@ class Frame3Task(HTMLTask):
         self._battery_level = i * 20
 
     def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
         graphics = Graphics()
@@ -1379,6 +1377,9 @@ class Views3Task(HTMLTask):
         self.uid = 'views-3-task'
         self._uri = 'Views/views3.html'
 
+    def get_refresh(self):
+        return True
+
 
 class Views4Task(HTMLTask):
 
@@ -1404,6 +1405,9 @@ class Views5Task(HTMLTask):
         return True
 
     def is_collectable(self):
+        return True
+
+    def get_my_turn(self):
         return True
 
     def test(self, task_data):
@@ -1443,6 +1447,9 @@ class Views7Task(HTMLTask):
         return True
 
     def get_refresh(self):
+        return True
+
+    def get_my_turn(self):
         return True
 
     def test(self, task_data):
@@ -1534,6 +1541,9 @@ class Settings3Task(HTMLTask):
     def skip_if_completed(self):
         return True
 
+    def get_my_turn(self):
+        return True
+
     def test(self, task_data):
         if task_data['data'] is None:
             _logger.debug('saving nick value as %s' % tests.get_nick())
@@ -1550,10 +1560,10 @@ class Settings3Task(HTMLTask):
                 return False
 
 
-class Settings4Task(HTMLHomeTask):
+class Settings4Task(HTMLTask):
 
     def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Important Settings')
         self.uid = 'settings-4-task'
         self._uri = 'Settings/settings4.html'
@@ -1565,7 +1575,6 @@ class Settings5Task(HTMLTask):
         HTMLTask.__init__(self, task_master)
         self._name = _('Other settings')
         self.uid = 'settings-5-task'
-        self._section_index = 7
         self._uri = 'Settings/settings5.html'
 
 
@@ -1573,12 +1582,12 @@ class Settings6Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Settings')
-        self._section_index = 7
         self.uid = 'settings-6-task'
         self._uri = 'Settings/settings6.html'
+        self._section_index = 7
 
 
-class MoreActvities1Task(HTMLTask):
+class MoreActivities1Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Learning About More Activities')
@@ -1586,13 +1595,13 @@ class MoreActvities1Task(HTMLTask):
         self._uri = 'MoreActivities/moreactivities1.html'
 
 
-class Turtle1Task(HTMLHomeTask):
+class Turtle1Task(HTMLTask):
 
     def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Square')
         self.uid = 'turtle-task-1'
-        self._uri = 'turtle1.html'
+        self._uri = 'MoreActivities/turtle1.html'
 
     def get_requires(self):
         return ['validate-email-task']
@@ -1619,13 +1628,13 @@ class Turtle1Task(HTMLHomeTask):
         return True
 
 
-class Physics1Task(HTMLHomeTask):
+class Physics1Task(HTMLTask):
 
     def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Physics Play')
         self.uid = 'physics-play-task'
-        self._uri = 'physics1.html'
+        self._uri = 'MoreActivities/physics1.html'
 
     def get_requires(self):
         return ['validate-email-task']
@@ -1641,13 +1650,13 @@ class Physics1Task(HTMLHomeTask):
         return True
 
 
-class Physics2Task(HTMLHomeTask):
+class Physics2Task(HTMLTask):
 
     def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Physics Share')
         self.uid = 'physics-share-task'
-        self._uri = 'physics2.html'
+        self._uri = 'Collaboration/physics2.html'
 
     def get_requires(self):
         return ['validate-email-task']
@@ -1680,7 +1689,7 @@ class ClipboardTask(Task):
         self._height = 500
 
     def get_graphics(self, page=0):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html',
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
         graphics = Graphics()
@@ -1832,7 +1841,7 @@ class XO7Task(HTMLTask):
                 self._goals.append(True)
             return False
         else:
-            return not tests.is_landscape():
+            return not tests.is_landscape()
 
 
 class XO8Task(BadgeTask):
@@ -1845,10 +1854,10 @@ class XO8Task(BadgeTask):
         self._section = 10
 
 
-class Finished1Task(HTMLHomeTask):
+class Finished1Task(HTMLTask):
 
     def __init__(self, task_master):
-        HTMLHomeTask.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
         self._name = _('Fill out a form 1')
         self.uid = 'finished-task-1'
         self._uri = 'finished1.html'
