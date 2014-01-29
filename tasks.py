@@ -131,12 +131,6 @@ def get_tasks(task_master):
                        XO6Task(task_master),
                        XO7Task(task_master),
                        XO8Task(task_master)]},
-                   #     Tablet1Task(task_master),
-                   #     Rotate1Task(task_master),
-                   #     Rotate2Task(task_master),
-                   #     GameKeyTask(task_master),
-                   #     Tablet2Task(task_master),
-                   #     BadgeXOTask(task_master)]}
         )
 
     task_list.append(
@@ -1809,7 +1803,7 @@ class XO6Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        return tests.is_tablet_mode()
+        return not tests.is_tablet_mode()
 
 
 class XO7Task(HTMLTask):
