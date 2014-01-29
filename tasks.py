@@ -837,7 +837,7 @@ class Connected6Task(HTMLTask):
                            self._uri)
 
         graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url)
+        webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
         if target is not None:
             self._entry = graphics.add_entry(text=target)
