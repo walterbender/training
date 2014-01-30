@@ -1896,15 +1896,19 @@ class BadgeCollaborationTask(BadgeTask):
         self.uid = 'badge-collaboration'
 
 
-class FinishedAllTasks(Task):
+class FinishedAllTasks(BadgeTask):
 
     def __init__(self, task_master):
-        Task.__init__(self, task_master)
+        BadgeTask.__init__(self, task_master)
         self._name = _('Finished All Tasks')
         self.uid = 'finished'
+        if tests.is_XO():
+            self._section_index = 11
+        else:
+            self._section_index = 10
 
     def test(self, task_data):
-        self._task_master.completed = True
+        self._task_master.activity.completed = True
         return True
 
     def get_graphics(self, page=0):

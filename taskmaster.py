@@ -27,7 +27,9 @@ _logger = logging.getLogger('training-activity-taskmaster')
 
 import tasks
 from progressbar import ProgressBar
-from tests import get_nick, goto_home_view
+import tests
+from graphics import Graphics
+
 
 class TaskMaster(Gtk.Grid):
 
@@ -148,6 +150,15 @@ class TaskMaster(Gtk.Grid):
             self._first_time = True
             self._run_task(section, task_index)
         else:
+            self._graphics = Graphics()
+            url = os.path.join(self.get_bundle_path(), 'html-content',
+                               'completed.html')
+            self._graphics.add_uri('file://' + url + '?NAME=' + \
+                                   tests.get_safe_text(
+                                       self.read_task_data('name')))
+            self._graphics.set_zoom_level(0.667)
+            self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
+            self._graphics.show()
             self.activity.complete = True
 
     def _task_button_cb(self, button):
@@ -162,7 +173,7 @@ class TaskMaster(Gtk.Grid):
 
     def _my_turn_button_cb(self, button):
         ''' Take me to the Home Page. '''
-        goto_home_view()
+        tests.goto_home_view()
 
     def _refresh_button_cb(self, button):
         ''' Refresh the current page's graphics '''
@@ -284,7 +295,8 @@ class TaskMaster(Gtk.Grid):
     def load_progress_summary(self, summary):
         ''' Interrupt the flow of tasks by showing progress summary '''
         self._destroy_graphics()
-        self._progress_bar.hide()
+        if self._progress_bar is not None:
+            self._progress_bar.hide()
         self._prev_page_button.hide()
         self._next_page_button.hide()
         if hasattr(self, '_summary') and self._summary is not None:
@@ -330,6 +342,8 @@ class TaskMaster(Gtk.Grid):
         self._task_list[section]['tasks'][task_index].set_zoom_level(
             self.activity.zoom_level)
 
+        if self._graphics is not None:
+            self._graphics.destroy()
         self._graphics, label = \
             self._task_list[section]['tasks'][task_index].get_graphics()
 
@@ -371,7 +385,8 @@ class TaskMaster(Gtk.Grid):
         if hasattr(self, 'task_button'):
             self._task_button.destroy()
         self._graphics, self._task_button = \
-            self._task_list[section]['tasks'][task_index].get_graphics(page=self._page)
+            self._task_list[section]['tasks'][task_index].get_graphics(
+                page=self._page)
         self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
         self._graphics.show()
         if self._task_button is not None:
@@ -504,19 +519,50 @@ class TaskMaster(Gtk.Grid):
         usb_data_path = os.path.join(
             self.activity.volume_data[0]['usb_path'],
             self.activity.volume_data[0]['uid'])
+
         uid_data = None
+        usb_read_failed = False
+        sugar_read_failed = False
+        data = {}
+
         if os.path.exists(usb_data_path):
-            fd = open(usb_data_path, 'r')
-            json_data = fd.read()
-            fd.close()
-            data = {}
+            try:
+                fd = open(usb_data_path, 'r')
+                json_data = fd.read()
+                fd.close()
+            except Exception, e:
+                # Maybe USB key has been pulled?
+                _logger.error('Could not read from %s: %s' %
+                              (usb_data_path, e))
+                usb_read_failed = True
             try:
                 if len(json_data) > 0:
                     data = json.loads(json_data)
             except ValueError, e:
                 _logger.error('Cannot read training data: %s' % e)
-            if uid in data:
-                uid_data = data[uid]
+                usb_read_failed = True
+
+        # If for some reason USB read fails, try reading from Sugar
+        if usb_read_failed:
+            if os.path.exists(sugar_data_path):
+                try:
+                    fd = open(sugar_data_path, 'r')
+                    json_data = fd.read()
+                    fd.close()
+                except Exception, e:
+                    _logger.error('Could not read from %s: %s' %
+                                  (sugar_data_path, e))
+                    sugar_read_failed = True
+                if len(json_data) > 0:
+                    try:
+                        data = json.loads(json_data)
+                    except ValueError, e:
+                        _logger.error('Cannot load training data: %s' % e)
+                        sugar_read_failed = True
+
+        if uid in data:
+            uid_data = data[uid]
+
         return uid_data
 
     def write_task_data(self, uid, uid_data):
@@ -528,30 +574,74 @@ class TaskMaster(Gtk.Grid):
             self.activity.volume_data[0]['uid'])
 
         # Read before write
+        usb_read_failed = False
+        sugar_read_failed = False
         data = {}
+
         if os.path.exists(usb_data_path):
-            fd = open(usb_data_path, 'r')
-            json_data = fd.read()
-            fd.close()
+            try:
+                fd = open(usb_data_path, 'r')
+                json_data = fd.read()
+                fd.close()
+            except Exception, e:
+                # Maybe USB key has been pulled?
+                _logger.error('Could not read from %s: %s' %
+                              (usb_data_path, e))
+                usb_read_failed = True
             if len(json_data) > 0:
                 try:
                     data = json.loads(json_data)
                 except ValueError, e:
                     _logger.error('Cannot load training data: %s' % e)
+                    usb_read_failed = True
+
+        # If for some reason USB read fails, try reading from Sugar
+        if usb_read_failed:
+            if os.path.exists(sugar_data_path):
+                try:
+                    fd = open(sugar_data_path, 'r')
+                    json_data = fd.read()
+                    fd.close()
+                except Exception, e:
+                    _logger.error('Could not read from %s: %s' %
+                                  (sugar_data_path, e))
+                    sugar_read_failed = True
+                if len(json_data) > 0:
+                    try:
+                        data = json.loads(json_data)
+                    except ValueError, e:
+                        _logger.error('Cannot load training data: %s' % e)
+                        sugar_read_failed = True
+
+        if usb_read_failed and sugar_read_failed:
+            _logger.error('Cannot read training data in read before write')
+            return
+
         data[uid] = uid_data
 
         # Make sure the volume UID is present
         data['training_data_uid'] = self.activity.volume_data[0]['uid']
 
-        # Write to the USB and ...
         json_data = json.dumps(data)
-        fd = open(usb_data_path, 'w')
-        fd.write(json_data)
-        fd.close()
+
+        # Write to the USB and ...
+        if not usb_read_failed:
+            try:
+                fd = open(usb_data_path, 'w')
+                fd.write(json_data)
+                fd.close()
+            except Exception, e:
+                _logger.error('Could not write to %s: %s' %
+                              (usb_data_path, e))
+
         # ... save shadow copy in Sugar
-        fd = open(sugar_data_path, 'w')
-        fd.write(json_data)
-        fd.close()
+        try:
+            fd = open(sugar_data_path, 'w')
+            fd.write(json_data)
+            fd.close()
+        except Exception, e:
+            _logger.error('Could not write to %s: %s' %
+                          (sugar_data_path, e))
 
     def _prev_task_button_cb(self, button):
         section, task_index = self.get_section_index()
