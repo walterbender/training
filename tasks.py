@@ -988,8 +988,8 @@ class Activities5Task(HTMLTask):
                                     task_data['start_time']):
             return False
         # We need the clipboard text for the Speak task
-        if not tests.is_clipboard_text_available():
-            return False
+        # if not tests.is_clipboard_text_available():
+        #     return False
         paths = tests.get_odt()
         for path in paths:
             # Check to see if there is a picture in the file:
