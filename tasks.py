@@ -1748,9 +1748,6 @@ class XO3Task(HTMLTask):
     def is_collectable(self):
         return True
 
-    def get_my_turn(self):
-        return True
-
     def test(self, task_data):
         return tests.is_tablet_mode()
 
@@ -1806,9 +1803,6 @@ class XO6Task(HTMLTask):
         return ['validate-email-task', 'xo-3-task']
 
     def is_collectable(self):
-        return True
-
-    def get_my_turn(self):
         return True
 
     def test(self, task_data):
