@@ -6,6 +6,7 @@ NEWS
 * Added splash screen for completed
 * Check version number of sugarservices
 * read_task_data w/o uid will return all data
+* Notification of data transfer progress
 
 1.33
 

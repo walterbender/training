@@ -59,6 +59,10 @@ _SUGARSERVICES_VERSION = 1
 
 class TrainingActivity(activity.Activity):
     ''' A series of training exercises '''
+    transfer_started_signal = GObject.Signal('started', arg_types=([]))
+    transfer_progressed_signal = GObject.Signal('progressed', arg_types=([]))
+    transfer_completed_signal = GObject.Signal('completed', arg_types=([]))
+    transfer_failed_signal = GObject.Signal('failed', arg_types=([]))
 
     def __init__(self, handle):
         ''' Initialize the toolbars and the game board '''
@@ -68,6 +72,10 @@ class TrainingActivity(activity.Activity):
             _logger.error(str(e))
 
         self.connect('realize', self.__realize_cb)
+        self.connect('started', self.__transfer_started_cb)
+        self.connect('progressed', self.__transfer_progressed_cb)
+        self.connect('completed', self.__transfer_completed_cb)
+        self.connect('failed', self.__transfer_failed_cb)
 
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
@@ -515,6 +523,13 @@ class TrainingActivity(activity.Activity):
                        self._check_progress_cb,
                        tooltip=_('Check progress'))
 
+        self.transfer_button = button_factory(
+            'transfer',
+            toolbox.toolbar,
+            self._transfer_cb,
+            tooltip=_('Training data upload status'))
+        self.transfer_button.hide()
+
         self.back = button_factory('go-previous-paired',
                                    toolbox.toolbar,
                                    self._go_back_cb,
@@ -537,6 +552,30 @@ class TrainingActivity(activity.Activity):
         stop_button.props.accelerator = '<Ctrl>q'
         toolbox.toolbar.insert(stop_button, -1)
         stop_button.show()
+
+    def _transfer_cb(self, button):
+        ''' Hide the button to dismiss notification '''
+        self.transfer_button.set_tooltip(_('Training data upload status'))
+        self.transfer_button.hide()
+
+    def __transfer_started_cb(self, widget):
+        self.transfer_button.set_icon_name('transfer')
+        self.transfer_button.set_tooltip(_('Data transfer started'))
+        self.transfer_button.show()
+
+    def __transfer_progressed_cb(self, widget):
+        self.transfer_button.set_tooltip(_('Data transfer progressing'))
+        self.transfer_button.show()
+
+    def __transfer_completed_cb(self, widget):
+        self.transfer_button.set_icon_name('transfer-complete')
+        self.transfer_button.set_tooltip(_('Data transfer completed'))
+        self.transfer_button.show()
+
+    def __transfer_failed_cb(self, widget):
+        self.transfer_button.set_icon_name('transfer-failed')
+        self.transfer_button.set_tooltip(_('Data transfer failed'))
+        self.transfer_button.show()
 
     def __realize_cb(self, window):
         self.window_xid = window.get_window().get_xid()
