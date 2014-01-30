@@ -946,9 +946,6 @@ class Activities3Task(HTMLTask):
     def get_my_turn(self):
         return True
 
-    def skip_if_completed(self):
-        return True
-
     def test(self, task_data):
         if not tests.saw_new_launch('org.laptop.RecordActivity',
                                     task_data['start_time']):
@@ -981,9 +978,6 @@ class Activities5Task(HTMLTask):
         return True
 
     def get_refresh(self):
-        return True
-
-    def skip_if_completed(self):
         return True
 
     def get_my_turn(self):
@@ -1029,9 +1023,6 @@ class Activities7Task(HTMLTask):
         return True
 
     def get_refresh(self):
-        return True
-
-    def skip_if_completed(self):
         return True
 
     def get_my_turn(self):
@@ -1101,9 +1092,6 @@ class Journal3Task(HTMLTask):
     def get_my_turn(self):
         return True
 
-    def skip_if_completed(self):
-        return True
-
     def test(self, task_data):
         if task_data['data'] is None:
             activity = tests.get_most_recent_instance(
@@ -1154,9 +1142,6 @@ class Journal5Task(HTMLTask):
     def get_my_turn(self):
         return True
 
-    def skip_if_completed(self):
-        return True
-
     def test(self, task_data):
         # Make sure there are newly starred items and that the Portfolio
         # activity has been launched; then look for a PDF file.
@@ -1201,9 +1186,6 @@ class Journal7Task(HTMLTask):
         return True
 
     def get_my_turn(self):
-        return True
-
-    def skip_if_completed(self):
         return True
 
     def test(self, task_data):
