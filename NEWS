@@ -1,5 +1,13 @@
 NEWS
 
+1.33
+
+* Fix write bug due to multiple datafile check
+* Fix problem with height of HTML content on email task
+* Put placeholder content into moreactivities1.html (which had been a
+  duplicate of xo1.html)
+* Fixed problem with animation in Stop task (using .gif instead of .jpg)
+
 1.32
 
 * Rename/reorg Sugar webservice

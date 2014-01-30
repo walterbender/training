@@ -355,6 +355,7 @@ class Welcome2Task(Task):
         self.uid = 'enter-name-task'  # 'welcome-2-task'
         self._uri = 'Welcome/welcome2.html'
         self._entry = None
+        self._height = 400
 
     def is_collectable(self):
         return True
@@ -379,7 +380,7 @@ class Welcome2Task(Task):
                            self._uri)
 
         graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url, height=400)
+        webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
         if target is not None:
             self._entry = graphics.add_entry(text=target)
@@ -406,7 +407,7 @@ class Welcome3Task(HTMLTask):
                            '%s?NAME=%s' %
                            (self._uri, tests.get_safe_text(name)))
         graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url)
+        webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
 
         self._task_master.activity.set_copy_widget(webkit=webkit)
@@ -423,6 +424,7 @@ class Welcome4Task(HTMLTask):
         self.uid = 'enter-email-task'  # 'welcome-4-task'
         self._uri = 'Welcome/welcome4.html'
         self._entry = None
+        self._height = 400
 
     def get_requires(self):
         return ['enter-name-task']
@@ -456,7 +458,7 @@ class Welcome4Task(HTMLTask):
                            self._uri)
 
         graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url)
+        webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
         if email is not None:
             self._entry = graphics.add_entry(text=email)
