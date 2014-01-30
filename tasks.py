@@ -22,6 +22,7 @@ from sugar3.datastore import datastore
 import logging
 _logger = logging.getLogger('training-activity-tasks')
 
+from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
 from graphics import Graphics, FONT_SIZES
 import tests
 
@@ -253,7 +254,7 @@ class Task():
 
     def _get_user_name(self):
         ''' Get user's name. '''
-        name = self._task_master.read_task_data('name')
+        name = self._task_master.read_task_data(NAME_UID)
         if name is not None:
             return name
         else:
@@ -370,7 +371,7 @@ class Welcome2Task(Task):
             return True
 
     def after_button_press(self):
-        self._task_master.write_task_data('name', self._entry.get_text())
+        self._task_master.write_task_data(NAME_UID, self._entry.get_text())
         self._task_master.activity.update_activity_title()
 
     def get_graphics(self, page=0):
@@ -448,12 +449,11 @@ class Welcome4Task(HTMLTask):
 
     def after_button_press(self):
         _logger.debug('Writing email address: %s' % self._entry.get_text())
-        self._task_master.write_task_data('email_address',
-                                          self._entry.get_text())
+        self._task_master.write_task_data(EMAIL_UID, self._entry.get_text())
 
     def get_graphics(self, page=0):
         self._entry = []
-        email = self._task_master.read_task_data('email_address')
+        email = self._task_master.read_task_data(EMAIL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
@@ -507,12 +507,12 @@ class Welcome5Task(HTMLTask):
         return True
 
     def after_button_press(self):
-        self._task_master.write_task_data('email_address',
+        self._task_master.write_task_data(EMAIL_UID,
                                           self._entries[1].get_text())
 
     def get_graphics(self, page=0):
         self._entries = []
-        email = self._task_master.read_task_data('email_address')
+        email = self._task_master.read_task_data(EMAIL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
@@ -782,15 +782,15 @@ class Connected5Task(HTMLTask):
         return True
 
     def after_button_press(self):
-        self._task_master.write_task_data('email_address',
+        self._task_master.write_task_data(EMAIL_UID,
                                           self._entries[1].get_text())
 
     def get_graphics(self, page=0):
         self._entries = []
-        name = self._task_master.read_task_data('name')
+        name = self._task_master.read_task_data(NAME_UID)
         if name is None:  # Should never happen
             name = ''
-        email = self._task_master.read_task_data('email_address')
+        email = self._task_master.read_task_data(EMAIL_UID)
         if email is None:  # Should never happen
             email = ''
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
@@ -835,12 +835,11 @@ class Connected6Task(HTMLTask):
             return True
 
     def after_button_press(self):
-        self._task_master.write_task_data('school_name',
-                                          self._entry.get_text())
+        self._task_master.write_task_data(SCHOOL_UID, self._entry.get_text())
 
     def get_graphics(self, page=0):
         self._entries = []
-        target = self._task_master.read_task_data('school_name')
+        target = self._task_master.read_task_data(SCHOOL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
@@ -872,13 +871,13 @@ class Connected7Task(HTMLTask):
 
     def get_graphics(self, page=0):
         self._entries = []
-        name = self._task_master.read_task_data('name')
+        name = self._task_master.read_task_data(NAME_UID)
         if name is None:  # Should never happen
             name = ''
-        email = self._task_master.read_task_data('email_address')
+        email = self._task_master.read_task_data(EMAIL_UID)
         if email is None:  # Should never happen
             email = ''
-        school = self._task_master.read_task_data('school_name')
+        school = self._task_master.read_task_data(SCHOOL_UID)
         if school is None:  # Should never happen
             school = ''
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',

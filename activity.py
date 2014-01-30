@@ -35,6 +35,13 @@ try:
 except:
     _HELP_AVAILABLE = False
 
+NAME_UID = 'name'
+EMAIL_UID = 'email_address'
+SCHOOL_UID = 'school_name'
+TRAINING_DATA_UID = 'training_data_uid'
+_TRAINING_DATA_EMAIL = 'training_data_email'
+_TRAINING_DATA_FULLNAME = 'training_data_fullname'
+
 from toolbar_utils import separator_factory, label_factory, button_factory
 from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
@@ -44,11 +51,10 @@ import tests
 import logging
 _logger = logging.getLogger('training-activity')
 
-_TRAINING_DATA_UID = 'training_data_uid'
-_TRAINING_DATA_EMAIL = 'training_data_email'
-_TRAINING_DATA_FULLNAME = 'training_data_fullname'
 
 _MINIMUM_SPACE = 1024 * 1024 * 10  # 10MB is very conservative
+
+_SUGARSERVICES_VERSION = 1
 
 
 class TrainingActivity(activity.Activity):
@@ -80,6 +86,8 @@ class TrainingActivity(activity.Activity):
         self._webkit = None
         self._clipboard_text = ''
 
+        OK = self._load_extension()
+
         self.volume_data = []
 
         # Lots of corner cases to consider:
@@ -95,7 +103,6 @@ class TrainingActivity(activity.Activity):
 
         # Before we begin, we need to find any and all USB keys
         # and any and all training-data files on them.
-        OK = True
         _logger.debug(tests.get_volume_paths())
         for path in tests.get_volume_paths():
             os.path.basename(path)
@@ -107,7 +114,7 @@ class TrainingActivity(activity.Activity):
             _logger.debug(self.volume_data[-1])
 
         # (1) We require a USB key
-        if len(self.volume_data) == 0:
+        if OK and len(self.volume_data) == 0:
             _logger.error('NO USB KEY INSERTED')
             alert = ConfirmationAlert()
             alert.props.title = _('USB key required')
@@ -254,23 +261,23 @@ class TrainingActivity(activity.Activity):
                 _logger.error('Cannot find Sugar data: %s' % sugar_data_path)
 
             # First, check to make sure email_address matches
-            if 'email_address' in usb_data:
-                usb_email = usb_data['email_address']
+            if EMAIL_UID in usb_data:
+                usb_email = usb_data[EMAIL_UID]
             else:
                 usb_email = None
-            if 'email_address' in sugar_data:
-                sugar_email = sugar_data['email_address']
+            if EMAIL_UID in sugar_data:
+                sugar_email = sugar_data[EMAIL_UID]
             else:
                 sugar_email = None
             if usb_email != sugar_email:
                 if usb_email is None and sugar_email is not None:
                     _logger.warning('Using email address from Sugar: %s' %
                                     sugar_email)
-                    usb_data['email_address'] = sugar_email
+                    usb_data[EMAIL_UID] = sugar_email
                 elif usb_email is not None and sugar_email is None:
                     _logger.warning('Using email address from USB: %s' %
                                     usb_email)
-                    sugar_data['email_address'] = usb_email
+                    sugar_data[EMAIL_UID] = usb_email
                 elif usb_email is None and sugar_email is None:
                     _logger.warning('No email address found')
                 else:
@@ -369,8 +376,6 @@ class TrainingActivity(activity.Activity):
     def _launch_task_master(self):
         self.check_progress = None
 
-        self._load_extension()
-
         self._task_master = TaskMaster(self)
 
         center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
@@ -413,18 +418,18 @@ class TrainingActivity(activity.Activity):
         # Only write if we have a valid USB/data file to work with.
         if len(self.volume_data) == 1 and \
            len(self.volume_data[0]['files']) == 1:
-            self.metadata[_TRAINING_DATA_UID] = self.volume_data[0]['uid']
+            self.metadata[TRAINING_DATA_UID] = self.volume_data[0]['uid']
 
             # We may have failed before getting to init of taskmaster
             if hasattr(self, '_task_master'):
                 self._task_master.write_task_data(
                     'current_task', self._task_master.current_task)
                 self.update_activity_title()
-                email = self._task_master.read_task_data('email_address')
+                email = self._task_master.read_task_data(EMAIL_UID)
                 if email is None:
                     email = ''
                 self.metadata[_TRAINING_DATA_EMAIL] = email
-                name = self._task_master.read_task_data('name')
+                name = self._task_master.read_task_data(NAME_UID)
                 if name is None:
                     name = ''
                 self.metadata[_TRAINING_DATA_FULLNAME] = name
@@ -432,7 +437,7 @@ class TrainingActivity(activity.Activity):
         self.metadata['font_size'] = str(self.font_size)
 
     def update_activity_title(self):
-        name = self._task_master.read_task_data('name')
+        name = self._task_master.read_task_data(NAME_UID)
         if name is not None:
             bundle_name = activity.get_bundle_name()
             if self.metadata['title'] != _('%s %s Activity') % (name,
@@ -679,6 +684,7 @@ class TrainingActivity(activity.Activity):
                 subprocess.call(['mkdir', extensions_path])
             except OSError, e:
                 _logger.error('Could not mkdir %s, %s' % (extensions_path, e))
+
         if not os.path.exists(webservice_path):
             try:
                 subprocess.call(['mkdir', webservice_path])
@@ -689,8 +695,17 @@ class TrainingActivity(activity.Activity):
             except OSError, e:
                 _logger.error('Could not cp %s to %s, %s' %
                               (init_path, webservice_path, e))
+
+        install = False
+        _logger.error(tests.get_sugarservices_version())
         if not os.path.exists(os.path.join(webservice_path, 'sugarservices')):
             _logger.error('SugarServices webservice not found. Installing...')
+            install = True
+        elif tests.get_sugarservices_version() < _SUGARSERVICES_VERSION:
+            _logger.error('Found old SugarServices version. Installing...')
+            install = True
+
+        if install:
             try:
                 subprocess.call(['cp', '-r', sugarservices_path,
                                  webservice_path])
@@ -706,6 +721,9 @@ class TrainingActivity(activity.Activity):
 
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
+            self._load_intro_graphics(message=_('Sugar restart required.'))
+
+        return not install
 
     def _remove_alert_cb(self, alert, response_id):
         self.remove_alert(alert)

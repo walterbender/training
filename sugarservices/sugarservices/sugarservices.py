@@ -40,6 +40,8 @@ class SugarServices(dbus.service.Object):
     '''
 
     def __init__(self):
+        self._version = 1
+
         bus = dbus.SessionBus()
         bus_name = dbus.service.BusName(_DBUS_SERVICE, bus=bus)
         dbus.service.Object.__init__(self, bus_name, _DBUS_PATH)
@@ -61,6 +63,13 @@ class SugarServices(dbus.service.Object):
             return
 
         logging.debug('Sugar Services launched...')
+
+    @dbus.service.method(_DBUS_SHELL_IFACE,
+                         in_signature='', out_signature='i')
+    def GetVersion(self):
+        '''Get version number of SugarServices
+        '''
+        return self._version
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='i', out_signature='')

@@ -298,6 +298,19 @@ def get_title(activity):
         return ''
 
 
+def get_sugarservices_version():
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
+
+    try:
+        return dbus.Interface(proxy, _DBUS_SERVICE).GetVersion()
+    except Exception, e:
+        _logger.error('ERROR getting sugarservice version: %s' % e)
+        return 0
+
+
 def is_activity_open(bundle_name):
     global proxy
     if proxy is None:

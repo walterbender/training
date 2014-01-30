@@ -29,6 +29,7 @@ import tasks
 from progressbar import ProgressBar
 import tests
 from graphics import Graphics
+from activity import TRAINING_DATA_UID, NAME_UID, EMAIL_UID
 
 
 class TaskMaster(Gtk.Grid):
@@ -155,7 +156,7 @@ class TaskMaster(Gtk.Grid):
                                'completed.html')
             self._graphics.add_uri('file://' + url + '?NAME=' + \
                                    tests.get_safe_text(
-                                       self.read_task_data('name')))
+                                       self.read_task_data(NAME_UID)))
             self._graphics.set_zoom_level(0.667)
             self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
             self._graphics.show()
@@ -418,7 +419,7 @@ class TaskMaster(Gtk.Grid):
         return len(self._task_list)
 
     def get_section_name(self, section):
-        return self._task_list[section]['name']
+        return self._task_list[section][NAME_UID]
 
     def get_section_icon(self, section):
         return self._task_list[section]['icon']
@@ -620,7 +621,7 @@ class TaskMaster(Gtk.Grid):
         data[uid] = uid_data
 
         # Make sure the volume UID is present
-        data['training_data_uid'] = self.activity.volume_data[0]['uid']
+        data[TRAINING_DATA_UID] = self.activity.volume_data[0]['uid']
 
         json_data = json.dumps(data)
 
@@ -712,9 +713,9 @@ class TaskMaster(Gtk.Grid):
                          self._task_list[section]['tasks'][i].get_name()})
 
             if self._name is None:
-                self._name = self.read_task_data('name')
+                self._name = self.read_task_data(NAME_UID)
             if self._email is None:
-                self._email = self.read_task_data('email_address')
+                self._email = self.read_task_data(EMAIL_UID)
             if self._name is not None and self._email is not None:
                 name = '%s\n%s' % (self._name, self._email)
             elif self._name is not None:
@@ -723,7 +724,7 @@ class TaskMaster(Gtk.Grid):
                 name = ''
 
             self._progress_bar = ProgressBar(name,
-                                             self._task_list[section]['name'],
+                                             self._task_list[section][NAME_UID],
                                              buttons,
                                              self._prev_task_button_cb,
                                              self._next_task_button_cb,
