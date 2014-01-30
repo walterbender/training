@@ -581,8 +581,12 @@ def get_odt():
 
 def get_speak_settings(activity):
     file_path = activity.file_path
-    configuration = json.loads(file(file_path, 'r').read())
-    status = json.loads(configuration['status'])
+    try:
+        configuration = json.loads(file(file_path, 'r').read())
+        status = json.loads(configuration['status'])
+    except Exception, e:
+        _logger.error('Could not read json data from Speak activity: %s' % e)
+        return None
     return status
 
 

@@ -7,6 +7,7 @@ NEWS
 * Put placeholder content into moreactivities1.html (which had been a
   duplicate of xo1.html)
 * Fixed problem with animation in Stop task (using .gif instead of .jpg)
+* Fixed problem with Speak task test
 
 1.32
 

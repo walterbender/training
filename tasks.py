@@ -1035,6 +1035,8 @@ class Activities7Task(HTMLTask):
         # Has any setting changed?
         status = tests.get_speak_settings(
             tests.get_most_recent_instance('vu.lux.olpc.Speak'))
+        if status is None:
+            return False
         if len(status['eyes']) != 2 or \
            status['eyes'][0] != 1 or \
            status['pitch'] != 49 or \

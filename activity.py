@@ -68,6 +68,7 @@ class TrainingActivity(activity.Activity):
         else:
             self.font_size = 5
         self.zoom_level = self.font_size / float(len(FONT_SIZES))
+        _logger.debug('zoom level is %f' % self.zoom_level)
 
         self._setup_toolbars()
         self.modify_bg(Gtk.StateType.NORMAL,
