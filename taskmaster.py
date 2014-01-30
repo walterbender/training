@@ -516,9 +516,12 @@ class TaskMaster(Gtk.Grid):
                     count += 1
         return count
 
-    def read_task_data(self, uid):
+    def read_task_data(self, uid=None):
         usb_data_path = os.path.join(
             self.activity.volume_data[0]['usb_path'],
+            self.activity.volume_data[0]['uid'])
+        sugar_data_path = os.path.join(
+            self.activity.volume_data[0]['sugar_path'],
             self.activity.volume_data[0]['uid'])
 
         uid_data = None
@@ -561,7 +564,9 @@ class TaskMaster(Gtk.Grid):
                         _logger.error('Cannot load training data: %s' % e)
                         sugar_read_failed = True
 
-        if uid in data:
+        if uid is None:
+            return data
+        elif uid in data:
             uid_data = data[uid]
 
         return uid_data

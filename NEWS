@@ -4,6 +4,8 @@ NEWS
 
 * Caught case where USB is removed mid-stream
 * Added splash screen for completed
+* Check version number of sugarservices
+* read_task_data w/o uid will return all data
 
 1.33
 
