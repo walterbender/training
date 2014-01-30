@@ -1790,7 +1790,7 @@ class XO6Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        return not btests.is_tablet_mode()
+        return not tests.is_tablet_mode()
 
 
 class XO7Task(HTMLTask):

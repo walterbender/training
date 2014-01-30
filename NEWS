@@ -8,6 +8,7 @@ NEWS
   duplicate of xo1.html)
 * Fixed problem with animation in Stop task (using .gif instead of .jpg)
 * Fixed problem with Speak task test
+* Fixed typo breaking tablet mode tests
 
 1.32
 

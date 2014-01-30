@@ -585,7 +585,9 @@ def get_speak_settings(activity):
         configuration = json.loads(file(file_path, 'r').read())
         status = json.loads(configuration['status'])
     except Exception, e:
-        _logger.error('Could not read json data from Speak activity: %s' % e)
+        # This is due to the fact that the Speak activity has not yet written
+        # out its data.
+        # _logger.error('Could not read json data from Speak activity: %s' % e)
         return None
     return status
 
