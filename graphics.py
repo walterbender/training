@@ -203,15 +203,23 @@ class Graphics(Gtk.ScrolledWindow):
         return button
 
     def add_yes_no_buttons(self, callback):
+        grid = Gtk.Grid()
+        grid.set_row_spacing(style.DEFAULT_SPACING)
+        grid.set_column_spacing(style.DEFAULT_SPACING)
+        grid.set_border_width(style.DEFAULT_SPACING * 2)
+        grid.set_column_homogeneous(True)
         yesbutton = Gtk.Button()
         yesbutton.set_label(_('Yes'))
         nobutton = Gtk.Button()
         nobutton.set_label(_('No'))
-        self._attach_two(yesbutton, nobutton)
+        grid.attach(yesbutton, 0, 0, 1, 1)
         yesbutton.connect('clicked', callback, 'yes')
         yesbutton.show()
+        grid.attach(nobutton, 1, 0, 1, 1)
         nobutton.connect('clicked', callback, 'no')
         nobutton.show()
+        self._attach_center(grid)
+        grid.show()
 
     def add_radio_buttons(self, button_icons, colors=None):
         alignment = Gtk.Alignment.new(0.5, 0.5, 0, 0)

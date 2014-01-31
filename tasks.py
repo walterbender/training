@@ -2088,6 +2088,7 @@ class Assessment1Task(HTMLTask):
         self.uid = 'assessment-1-task'
         self._uri = 'Assessment/assessment1.html'
         self._result = None
+        self._height = 400
 
     def button_callback(self, button, arg):
         if arg == 'yes':
