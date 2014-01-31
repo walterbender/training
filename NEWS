@@ -12,6 +12,7 @@ NEWS
 * New tests for More Activities, Collaboration, Assessment
 * Added yes/no button mechanism
 * Added jump-to-task mechanism
+* Commented out reconfirmation of name, email in Connection section
 
 1.33
 

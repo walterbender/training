@@ -55,7 +55,7 @@ def get_tasks(task_master):
                    Connected2Task(task_master),
                    Connected3Task(task_master),
                    Connected4Task(task_master),
-                   Connected5Task(task_master),
+                   # Connected5Task(task_master),
                    Connected6Task(task_master),
                    Connected7Task(task_master),
                    Connected8Task(task_master)]},
