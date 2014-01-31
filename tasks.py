@@ -965,7 +965,8 @@ class Activities3Task(HTMLTask):
                                     task_data['start_time']):
             return False
         paths = tests.get_jpg()
-        return len(paths) > 0
+        return len(paths) > 0 and \
+            tests.get_modified_time(paths[0]) > task_data['start_time']
 
 
 class Activities4Task(HTMLTask):
@@ -1171,8 +1172,8 @@ class Journal5Task(HTMLTask):
                                     task_data['start_time']):
             return False
         paths = tests.get_pdf()
-        # FIX ME: test file creation time
-        return len(paths) > 0
+        return len(paths) > 0 and \
+            tests.get_modified_time(paths[0]) > task_data['start_time']
 
 
 class Journal6Task(HTMLTask):
@@ -1205,10 +1206,10 @@ class Journal7Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        files = tests.look_for_file_type(
+        paths = tests.look_for_file_type(
             self._task_master.activity.volume_data[0]['usb_path'], '.pdf')
-        # FIX ME: test file creation time
-        return len(files) > 0
+        return len(paths) > 0 and \
+            tests.get_modified_time(paths[0]) > task_data['start_time']
 
 
 class Journal8Task(HTMLTask):
@@ -1758,8 +1759,8 @@ class Turtle9Task(HTMLTask):
 
     def test(self, task_data):
         paths = tests.get_png()
-        # FIX ME: test file creation time
-        return len(paths) > 0
+        return len(paths) > 0 and \
+            tests.get_modified_time(paths[0]) > task_data['start_time']
 
     def get_my_turn(self):
         return True

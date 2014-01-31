@@ -196,6 +196,10 @@ def format_volume_name(name):
     return name[0:9]
 
 
+def get_modified_time(path):
+    return int(os.path.getmtime(path))
+
+
 def get_volume_paths():
     global volume_monitor
     if volume_monitor is None:

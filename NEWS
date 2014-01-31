@@ -13,6 +13,7 @@ NEWS
 * Added yes/no button mechanism
 * Added jump-to-task mechanism
 * Commented out reconfirmation of name, email in Connection section
+* Add modified-time tests
 
 1.33
 
