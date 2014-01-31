@@ -26,6 +26,7 @@ from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
 from graphics import Graphics, FONT_SIZES
 import tests
 
+from reporter import Reporter
 
 def get_tasks(task_master):
     task_list = [
@@ -325,6 +326,10 @@ class BadgeTask(HTMLTask):
         self._title = _("Congratulations!\nYou’ve earned another badge!")
         self._uri = 'Welcome/welcome7.html'
 
+    def _report_progress(self): 
+        reporter = Reporter(self._task_master.activity)
+        reporter.report([self._task_master.read_task_data()])
+
     def after_button_press(self):
         task_data = self._task_master.read_task_data(self.uid)
         if not 'badge' in task_data:
@@ -333,6 +338,7 @@ class BadgeTask(HTMLTask):
                 self._title,
                 icon=self._task_master.get_section_icon(self._section_index))
             self._task_master.write_task_data(self.uid, task_data)
+        self._report_progress()
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
