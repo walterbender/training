@@ -10,11 +10,15 @@
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 import json
+import logging
 
 from gi.repository import GConf
 from gi.repository import Gio
 from gi.repository import GObject
 from gi.repository import Soup
+
+
+_logger = logging.getLogger('training-activity')
 
 
 def _extract_trainee(data):
@@ -58,10 +62,16 @@ class Reporter(GObject.GObject):
         self._activity = activity
 
     def report(self, tasks_data_list):
+        if not self._url or not self._api_key:
+            _logger.error('reporter is missing URL or API-KEY')
+            self._activity.transfer_failed_signal.emit()
+            return
+
         transport_data = []
         for tasks_data in tasks_data_list:
             transport_data.append([_extract_trainee(tasks_data),
                                    _extract_tasks(tasks_data)])
+
         self._send(json.dumps(transport_data))
 
     def _send(self, data):
@@ -80,13 +90,19 @@ class Reporter(GObject.GObject):
 
     def __network_event_cb(self, message, event, connection):
         if event == Gio.SocketClientEvent.CONNECTED:
+            _logger.debug('reporter connected to server')
             self._activity.transfer_started_signal.emit()
 
     def __wrote_body_data_cb(self, message, chunk):
+        _logger.debug('reporter is trasmitting')
         self._activity.transfer_progressed_signal.emit()
 
     def __finished_cb(self, message):
-        if message.status_code == 200:
+        code = message.status_code
+        if code == 200:
+            _logger.debug('reporter completed transmission')
             self._activity.transfer_completed_signal.emit()
         else:
+            # error codes can be found at http://goo.gl/tWVJv2
+            _logger.error('reporter failed transmitting, with code %d', code)
             self._activity.transfer_failed_signal.emit()
