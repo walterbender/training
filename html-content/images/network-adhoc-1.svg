@@ -1,0 +1,15 @@
+<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd' [
+	<!ENTITY stroke_color "#010101">
+	<!ENTITY fill_color "#ffffff">
+]>
+<svg enable-background="new 0 0 55 55" height="55px" id="Layer_1" version="1.1" viewBox="0 0 55 55" width="55px" x="0px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="0px">
+<path
+     d="m 45.753619,44.716729 c 0,0 1.522,0.146 2.417,-1.289 0.895,-1.435 -0.068,-2.755 -0.068,-2.755 l -18.182,-28.857 c 0,0 -0.584,-1.414 -2.271,-1.53 -1.688,-0.117 -2.401,1.353 -2.401,1.353 l -18.3519998,29.034 c 0,0 -0.962,1.32 -0.067,2.755 0.895,1.435 2.417,1.289 2.417,1.289 H 45.753619 z"
+     style="fill:&fill_color;;stroke:&stroke_color;;stroke-width:3.5;" />
+<circle
+     cx="27.375"
+     cy="27.5"
+     r="4"
+     transform="translate(0.125,4)"
+     style="fill:&stroke_color;" />
+</svg>
