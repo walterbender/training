@@ -10,6 +10,8 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+from gettext import gettext as _
+
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import WebKit
@@ -199,6 +201,17 @@ class Graphics(Gtk.ScrolledWindow):
                 button.connect('clicked', callback, arg)
         button.show()
         return button
+
+    def add_yes_no_buttons(self, callback):
+        yesbutton = Gtk.Button()
+        yesbutton.set_label(_('Yes'))
+        nobutton = Gtk.Button()
+        nobutton.set_label(_('No'))
+        self._attach_two(yesbutton, nobutton)
+        yesbutton.connect('clicked', callback, 'yes')
+        yesbutton.show()
+        nobutton.connect('clicked', callback, 'no')
+        nobutton.show()
 
     def add_radio_buttons(self, button_icons, colors=None):
         alignment = Gtk.Alignment.new(0.5, 0.5, 0, 0)

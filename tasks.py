@@ -153,8 +153,7 @@ def get_tasks(task_master):
          'icon': 'badge-intro',
          'tasks': [Assessment1Task(task_master),
                    Assessment2Task(task_master),
-                   Assessment3Task(task_master),
-                   FinishedAllTasks(task_master)]}
+                   Assessment3Task(task_master)]}
     )
 
     return task_list
@@ -2088,6 +2087,32 @@ class Assessment1Task(HTMLTask):
         self._name = _('Assessment')
         self.uid = 'assessment-1-task'
         self._uri = 'Assessment/assessment1.html'
+        self._result = None
+
+    def button_callback(self, button, arg):
+        if arg == 'yes':
+            self._result = True
+            self._task_master.goto_task('assessment-yes-task')
+        else:
+            self._result = False
+            self._task_master.goto_task('assessment-no-task')
+
+    def test(self, task_data):
+        return not self._result is None
+
+    def get_graphics(self, page=0):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri)
+
+        graphics = Graphics()
+        webkit = graphics.add_uri('file://' + url, height=self._height)
+        graphics.set_zoom_level(self._zoom_level)
+        graphics.add_yes_no_buttons(self.button_callback)
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
+
+        return graphics, self._prompt
 
 
 class Assessment2Task(HTMLTask):
@@ -2096,23 +2121,6 @@ class Assessment2Task(HTMLTask):
         self._name = _('Assessment')
         self.uid = 'assessment-yes-task'
         self._uri = 'Assessment/assessment-yes.html'
-
-
-class Assessment3Task(HTMLTask):
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
-        self._name = _('Assessment')
-        self.uid = 'assessment-no-task'
-        self._uri = 'Assessment/assessment-no.html'
-
-
-class Finished1Task(HTMLTask):
-
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
-        self._name = _('Fill out a form 1')
-        self.uid = 'finished-task-1'
-        self._uri = 'finished1.html'
 
     def get_requires(self):
         return ['validate-email-task']
@@ -2151,27 +2159,14 @@ class Finished1Task(HTMLTask):
                 task_data['data'] + '.rtf'))
 
 
-class FinishedAllTasks(BadgeTask):
-
+class Assessment3Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
-        self._name = _('Finished All Tasks')
-        self.uid = 'finished'
+        self._name = _('Assessment Badge')
+        self.uid = 'assessment-no-task'
+        self._uri = 'Assessment/assessment-no.html'
+        self._height = 500
         if tests.is_XO():
             self._section_index = 11
         else:
             self._section_index = 10
-
-    def test(self, task_data):
-        self._task_master.activity.completed = True
-        return True
-
-    def get_graphics(self, page=0):
-        graphics = Graphics()
-        graphics.add_text(_('You are a Sugar Zenmaster.\n\n'),
-                          size=FONT_SIZES[self._font_size])
-
-        self._task_master.activity.set_copy_widget()
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, _('Done')
