@@ -112,12 +112,26 @@ def get_tasks(task_master):
          'icon': 'badge-intro',
          'tasks': [MoreActivities1Task(task_master),
                    Turtle1Task(task_master),
+                   Turtle2Task(task_master),
+                   Turtle3Task(task_master),
+                   Turtle4Task(task_master),
+                   Turtle5Task(task_master),
+                   Turtle6Task(task_master),
+                   Turtle7Task(task_master),
+                   Turtle8Task(task_master),
                    Physics1Task(task_master),
-                   BadgeMoreActivitiesTask(task_master)]},
+                   Physics2Task(task_master),
+                   MoreActivities2Task(task_master)]},
         {'name': _('9. Getting to Know Collaboration'),
          'icon': 'badge-intro',
-         'tasks': [Physics2Task(task_master),
-                   BadgeCollaborationTask(task_master)]}
+         'tasks': [Collaboration1Task(task_master),
+                   Collaboration2Task(task_master),
+                   Collaboration3Task(task_master),
+                   Collaboration4Task(task_master),
+                   Collaboration5Task(task_master),
+                   Collaboration6Task(task_master),
+                   Collaboration7Task(task_master),
+                   Collaboration8Task(task_master)]}
     ]
 
     if tests.is_XO():
@@ -135,9 +149,11 @@ def get_tasks(task_master):
         )
 
     task_list.append(
-        {'name': _('Wrap Up'),
+        {'name': _('Assessment'),
          'icon': 'badge-intro',
-         'tasks': [Finished1Task(task_master),
+         'tasks': [Assessment1Task(task_master),
+                   Assessment2Task(task_master),
+                   Assessment3Task(task_master),
                    FinishedAllTasks(task_master)]}
     )
 
@@ -1585,9 +1601,30 @@ class Turtle1Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Square')
-        self.uid = 'turtle-task-1'
+        self._name = _('Turtle Blocks Introduction')
+        self.uid = 'turtle-1-task'
         self._uri = 'MoreActivities/turtle1.html'
+
+
+class Turtle2Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Square')
+        self.uid = 'turtle-1-task'
+        self._uri = 'MoreActivities/turtle2.html'
+
+
+class Turtle3Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Square Video')
+        self.uid = 'turtle-3-task'
+        self._uri = 'MoreActivities/turtle3.html'
+
+    def get_refresh(self):
+        return True
 
     def get_requires(self):
         return ['validate-email-task']
@@ -1614,13 +1651,140 @@ class Turtle1Task(HTMLTask):
         return True
 
 
+class Turtle4Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Pen')
+        self.uid = 'turtle-4-task'
+        self._uri = 'MoreActivities/turtle4.html'
+
+
+class Turtle5Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Square')
+        self.uid = 'turtle-5-task'
+        self._uri = 'MoreActivities/turtle5.html'
+
+    def get_refresh(self):
+        return True
+
+    def get_requires(self):
+        return ['turtle-3-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if not tests.saw_new_launch('org.laptop.TurtleArtActivity',
+                                    task_data['start_time']):
+            return False
+        for activity in tests.get_activity('org.laptop.TurtleArtActivity'):
+            path = activity.file_path
+            if not tests.find_string(path, 'setpensize') and \
+               not tests.find_string(path, 'setcolor'):
+                return False
+            return True
+        return False
+
+    def get_my_turn(self):
+        return True
+
+
+class Turtle6Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Square')
+        self.uid = 'turtle-6-task'
+        self._uri = 'MoreActivities/turtle6.html'
+
+
+class Turtle7Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Square')
+        self.uid = 'turtle-7-task'
+        self._uri = 'MoreActivities/turtle7.html'
+
+    def get_refresh(self):
+        return True
+
+    def get_requires(self):
+        return ['turtle-5-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        for activity in tests.get_activity('org.laptop.TurtleArtActivity'):
+            path = activity.file_path
+            if not tests.find_string(path, 'show'):
+                return False
+            return True
+        return False
+
+    def get_my_turn(self):
+        return True
+
+
+class Turtle8Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Square')
+        self.uid = 'turtle-8-task'
+        self._uri = 'MoreActivities/turtle8.html'
+
+
+class Turtle9Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Square')
+        self.uid = 'turtle-9-task'
+        self._uri = 'MoreActivities/turtle9.html'
+
+    def get_refresh(self):
+        return True
+
+    def get_requires(self):
+        return ['turtle-7-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        paths = tests.get_png()
+        # FIX ME: test file creation time
+        return len(paths) > 0
+
+    def get_my_turn(self):
+        return True
+
+
 class Physics1Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Physics Play')
-        self.uid = 'physics-play-task'
+        self.uid = 'physics-1-task'
         self._uri = 'MoreActivities/physics1.html'
+
+
+class Physics2Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Physics Play Video')
+        self.uid = 'physics-2-task'
+        self._uri = 'MoreActivities/physics2.html'
+
+    def get_refresh(self):
+        return True
 
     def get_requires(self):
         return ['validate-email-task']
@@ -1636,13 +1800,52 @@ class Physics1Task(HTMLTask):
         return True
 
 
-class Physics2Task(HTMLTask):
+class MoreActivities2Task(BadgeTask):
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('More Activities Badge')
+        self.uid = 'more-activities-2-task'
+        self._uri = 'MoreActivities/moreactivities2.html'
+        self._section = 8
+
+
+class Collaboration1Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Physics Share')
-        self.uid = 'physics-share-task'
-        self._uri = 'Collaboration/physics2.html'
+        self._name = _('Introduction to Collaboration')
+        self.uid = 'collaboration-1-task'
+        self._uri = 'Collaboration/collaboration1.html'
+
+
+class Collaboration2Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Getting Connected')
+        self.uid = 'collaboration-2-task'
+        self._uri = 'Collaboration/collaboration2.html'
+
+
+class Collaboration3Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Collaborating with Physics')
+        self.uid = 'collaboration-3-task'
+        self._uri = 'Collaboration/collaboration3.html'
+
+
+class Collaboration4Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Collaborating with Physics Video')
+        self.uid = 'collaboration-4-task'
+        self._uri = 'Collaboration/collaboration4.html'
+
+    def get_refresh(self):
+        return True
 
     def get_requires(self):
         return ['validate-email-task']
@@ -1651,7 +1854,7 @@ class Physics2Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['physics-play-task']
+        return ['physics-2-task']
 
     def test(self, task_data):
         for activity in tests.get_activity('org.laptop.physics'):
@@ -1663,6 +1866,50 @@ class Physics2Task(HTMLTask):
         return True
 
 
+class Collaboration5Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Collaboration')
+        self.uid = 'collaboration-5-task'
+        self._uri = 'Collaboration/collaboration5.html'
+
+
+class Collaboration6Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Collaboration')
+        self.uid = 'collaboration-6-task'
+        self._uri = 'Collaboration/collaboration6.html'
+
+    def get_refresh(self):
+        return True
+
+    def get_requires(self):
+        return ['collaboration-4-task']
+
+
+class Collaboration7Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Collaboration')
+        self.uid = 'collaboration-7-task'
+        self._uri = 'Collaboration/collaboration7.html'
+
+
+class Collaboration8Task(BadgeTask):
+
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Collaboration Badge')
+        self.uid = 'collaboration-8-task'
+        self._uri = 'Collaboration/collaboration8.html'
+        self._section = 9
+
+
+'''
 class ClipboardTask(Task):
 
     def __init__(self, task_master):
@@ -1684,7 +1931,8 @@ class ClipboardTask(Task):
         self._entries.append(graphics.add_entry())
 
         self._task_master.activity.set_copy_widget(webkit=webkit)
-        self._task_master.activity.set_paste_widget(text_entry=self._entries[-1])
+        self._task_master.activity.set_paste_widget(
+            text_entry=self._entries[-1])
 
         return graphics, self._prompt
 
@@ -1694,7 +1942,7 @@ class ClipboardTask(Task):
         if len(self._entries[0].get_text()) > 0:
             return True
         return False
-
+'''
 
 class XO1Task(HTMLTask):
 
@@ -1834,6 +2082,30 @@ class XO8Task(BadgeTask):
         self._section = 10
 
 
+class Assessment1Task(HTMLTask):
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Assessment')
+        self.uid = 'assessment-1-task'
+        self._uri = 'Assessment/assessment1.html'
+
+
+class Assessment2Task(HTMLTask):
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Assessment')
+        self.uid = 'assessment-yes-task'
+        self._uri = 'Assessment/assessment-yes.html'
+
+
+class Assessment3Task(HTMLTask):
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Assessment')
+        self.uid = 'assessment-no-task'
+        self._uri = 'Assessment/assessment-no.html'
+
+
 class Finished1Task(HTMLTask):
 
     def __init__(self, task_master):
@@ -1877,22 +2149,6 @@ class Finished1Task(HTMLTask):
             return os.path.exists(os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
                 task_data['data'] + '.rtf'))
-
-
-class BadgeMoreActivitiesTask(BadgeTask):
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
-        self._name = _('Badge More Activities')
-        self._section_index = 8
-        self.uid = 'badge-more-activities'
-
-
-class BadgeCollaborationTask(BadgeTask):
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
-        self._name = _('Badge Collaboration')
-        self._section_index = 9
-        self.uid = 'badge-collaboration'
 
 
 class FinishedAllTasks(BadgeTask):

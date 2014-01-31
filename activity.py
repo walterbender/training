@@ -80,7 +80,7 @@ class TrainingActivity(activity.Activity):
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
         else:
-            self.font_size = 7
+            self.font_size = 8
         self.zoom_level = self.font_size / float(len(FONT_SIZES))
         _logger.debug('zoom level is %f' % self.zoom_level)
 

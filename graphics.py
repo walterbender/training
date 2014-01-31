@@ -24,7 +24,8 @@ _logger = logging.getLogger('training-activity-page')
 
 # Repeated font sizes at the end to enable web graphics to continue to scale
 FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'large',
-              'x-large', 'x-large', 'xx-large', 'xx-large']
+              'x-large', 'x-large', 'x-large', 'xx-large', 'xx-large',
+              'xx-large']
 
 
 class Graphics(Gtk.ScrolledWindow):

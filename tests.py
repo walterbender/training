@@ -558,6 +558,14 @@ def get_image():
     return paths
 
 
+def get_png():
+    paths = []
+    dsobjects, nobjects = datastore.find({'mime_type': ['image/png']})
+    for dsobject in dsobjects:
+        paths.append(dsobject.file_path)
+    return paths
+
+
 def get_jpg():
     paths = []
     dsobjects, nobjects = datastore.find({'mime_type': ['image/jpeg']})
