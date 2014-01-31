@@ -8,6 +8,8 @@ NEWS
 * read_task_data w/o uid will return all data
 * Notification of data transfer progress
 * Tweaked default scaling calculation
+* New content for More Activities, Collaboration, Assessment
+* New tests for More Activities, Collaboration, Assessment
 
 1.33
 
