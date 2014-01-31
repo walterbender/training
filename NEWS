@@ -10,6 +10,8 @@ NEWS
 * Tweaked default scaling calculation
 * New content for More Activities, Collaboration, Assessment
 * New tests for More Activities, Collaboration, Assessment
+* Added yes/no button mechanism
+* Added jump-to-task mechanism
 
 1.33
 

@@ -258,15 +258,13 @@ class TaskMaster(Gtk.Grid):
             section, task_index = self.get_section_index()
             self._run_task(section, task_index)
 
-    def goto_task(self, uid):
+    def jump_to_task(self, uid):
         ''' Jump to task associated with uid '''
         self.button_was_pressed = True
         section, task_index = self.get_section_index()
         self._task_list[section]['tasks'][task_index].after_button_press()
-        _logger.debug('Jumping to task %s' % uid)
         self.current_task = self.uid_to_task_number(uid)       
         section, task_index = self.get_section_index()
-        _logger.debug('section %d task %d' % (section, task_index))
         self.write_task_data('current_task', self.current_task)
         self.task_master()
 

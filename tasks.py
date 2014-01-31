@@ -2093,10 +2093,10 @@ class Assessment1Task(HTMLTask):
     def button_callback(self, button, arg):
         if arg == 'yes':
             self._result = True
-            self._task_master.goto_task('assessment-yes-task')
+            self._task_master.jump_to_task('assessment-yes-task')
         else:
             self._result = False
-            self._task_master.goto_task('assessment-no-task')
+            self._task_master.jump_to_task('assessment-no-task')
 
     def test(self, task_data):
         return not self._result is None
