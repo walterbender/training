@@ -504,7 +504,6 @@ class TaskMaster(Gtk.Grid):
         return 0
 
     def _get_number_of_tasks_in_section(self, section_index):
-        _logger.debug(self._task_list[section_index]['name'])
         return len(self._task_list[section_index]['tasks'])
 
     def _get_number_of_collectables_in_section(self, section_index):

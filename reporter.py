@@ -18,7 +18,7 @@ from gi.repository import GObject
 from gi.repository import Soup
 
 
-_logger = logging.getLogger('training-activity')
+_logger = logging.getLogger('training-activity-reporter')
 
 
 def _extract_trainee(data):

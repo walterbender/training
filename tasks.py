@@ -304,36 +304,6 @@ class HTMLTask(Task):
         return graphics, self._prompt
 
 
-class HTMLHomeTask(HTMLTask):
-
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
-        self._uri = 'Welcome/welcome1.html'
-        self._height = 305
-
-    def get_my_turn(self):
-        return True
-
-    def get_graphics(self, page=0):
-
-        def button_callback(button):
-            tests.goto_home_view()
-
-        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
-                           self._uri)
-
-        graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url, height=self._height)
-        graphics.set_zoom_level(self._zoom_level)
-        graphics.add_button(None, button_callback, button_icon='home')
-        graphics.add_text(_('\n\nWhen you are done, you may continue.\n\n'))
-
-        self._task_master.activity.set_copy_widget(webkit=webkit)
-        self._task_master.activity.set_paste_widget()
-
-        return graphics, self._prompt
-
-
 class BadgeTask(HTMLTask):
 
     def __init__(self, task_master):
@@ -345,6 +315,7 @@ class BadgeTask(HTMLTask):
         self._uri = 'Welcome/welcome7.html'
 
     def _report_progress(self): 
+        _logger.debug('reporting...')
         reporter = Reporter(self._task_master.activity)
         reporter.report([self._task_master.read_task_data()])
 
