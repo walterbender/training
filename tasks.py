@@ -1616,7 +1616,9 @@ class Turtle3Task(HTMLTask):
         if not tests.saw_new_launch('org.laptop.TurtleArtActivity',
                                     task_data['start_time']):
             return False
-        for activity in tests.get_activity('org.laptop.TurtleArtActivity'):
+        activity = tests.get_most_recent_instance(
+            'org.laptop.TurtleArtActivity')
+        if activity is not None:
             path = activity.file_path
             if not tests.find_string(path, 'left') and \
                not tests.find_string(path, 'right'):
@@ -1661,7 +1663,9 @@ class Turtle5Task(HTMLTask):
         if not tests.saw_new_launch('org.laptop.TurtleArtActivity',
                                     task_data['start_time']):
             return False
-        for activity in tests.get_activity('org.laptop.TurtleArtActivity'):
+        activity = tests.get_most_recent_instance(
+            'org.laptop.TurtleArtActivity')
+        if activity is not None:
             path = activity.file_path
             if not tests.find_string(path, 'setpensize') and \
                not tests.find_string(path, 'setcolor'):
@@ -1700,7 +1704,9 @@ class Turtle7Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        for activity in tests.get_activity('org.laptop.TurtleArtActivity'):
+        activity = tests.get_most_recent_instance(
+            'org.laptop.TurtleArtActivity')
+        if activity is not None:
             path = activity.file_path
             if not tests.find_string(path, 'show'):
                 return False
@@ -1738,6 +1744,12 @@ class Turtle9Task(HTMLTask):
         return True
 
     def test(self, task_data):
+        activity = tests.get_most_recent_instance(
+            'org.laptop.TurtleArtActivity')
+        if activity is not None:
+            path = activity.file_path
+            if not tests.find_string(path, 'journal'):
+                return False
         paths = tests.get_png()
         return len(paths) > 0 and \
             tests.get_modified_time(paths[0]) > task_data['start_time']
