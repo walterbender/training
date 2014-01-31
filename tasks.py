@@ -174,6 +174,9 @@ class Task():
         self._page_count = 1
         self._prompt = _('Next')
 
+    def get_yes_no_tasks(self):
+        return None, None
+
     def set_font_size(self, size):
         if size < len(FONT_SIZES):
             self._font_size = size
@@ -2095,18 +2098,12 @@ class Assessment1Task(HTMLTask):
         self.uid = 'assessment-1-task'
         self._uri = 'Assessment/assessment1.html'
         self._result = None
-        self._height = 400
 
-    def button_callback(self, button, arg):
-        if arg == 'yes':
-            self._result = True
-            self._task_master.jump_to_task('assessment-yes-task')
-        else:
-            self._result = False
-            self._task_master.jump_to_task('assessment-no-task')
+    def get_yes_no_tasks(self):
+        return 'assessment-yes-task', 'assessment-no-task'
 
     def test(self, task_data):
-        return not self._result is None
+        return self._task_master.button_was_pressed
 
     def get_graphics(self, page=0):
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
@@ -2115,7 +2112,6 @@ class Assessment1Task(HTMLTask):
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
-        graphics.add_yes_no_buttons(self.button_callback)
 
         self._task_master.activity.set_copy_widget(webkit=webkit)
         self._task_master.activity.set_paste_widget()

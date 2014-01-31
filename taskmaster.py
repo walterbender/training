@@ -53,7 +53,8 @@ class TaskMaster(Gtk.Grid):
         self._task_button = None
         self._first_time = True
         self._accumulated_time = 0
-
+        self._yes_task = None
+        self._no_task = None
         self._task_list = tasks.get_tasks(self)
         self._task_data = None
         self._assign_required()
@@ -95,11 +96,29 @@ class TaskMaster(Gtk.Grid):
         grid.attach(left, 0, 0, 1, 1)
         left.show()
 
+        mid = Gtk.Alignment.new(xalign=0.5, yalign=0.5, xscale=0, yscale=0)
+        yes_next_no_grid = Gtk.Grid()
+        yes_next_no_grid.set_row_spacing(style.DEFAULT_SPACING)
+        yes_next_no_grid.set_column_spacing(style.DEFAULT_SPACING)
+        yes_next_no_grid.set_column_homogeneous(True)
+
+        self._yes_button = Gtk.Button(_('Yes'))
+        self._yes_button.connect('clicked', self._jump_to_task_cb, 'yes')
+        yes_next_no_grid.attach(self._yes_button, 0, 0, 1, 1)
+        self._yes_button.hide()
+
         self._task_button = Gtk.Button(_('Next'))
         self._task_button.connect('clicked', self._task_button_cb)
-        mid = Gtk.Alignment.new(xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        mid.add(self._task_button)
+        yes_next_no_grid.attach(self._task_button, 1, 0, 1, 1)
         self._task_button.show()
+
+        self._no_button = Gtk.Button(_('No'))
+        self._no_button.connect('clicked', self._jump_to_task_cb, 'no')
+        yes_next_no_grid.attach(self._no_button, 2, 0, 1, 1)
+        self._no_button.hide()
+
+        mid.add(yes_next_no_grid)
+        yes_next_no_grid.show()
         grid.attach(mid, 1, 0, 1, 1)
         mid.show()
 
@@ -128,7 +147,6 @@ class TaskMaster(Gtk.Grid):
     def task_master(self):
         ''' 'nough said. '''
         if self._summary is not None:
-            _logging.debug('Cannot run tasks while summary is displayed')
             return
         _logger.debug('Task Master: Running task %d' % (self.current_task))
         self._destroy_graphics()
@@ -258,11 +276,15 @@ class TaskMaster(Gtk.Grid):
             section, task_index = self.get_section_index()
             self._run_task(section, task_index)
 
-    def jump_to_task(self, uid):
+    def _jump_to_task_cb(self, widget, flag):
         ''' Jump to task associated with uid '''
         self.button_was_pressed = True
         section, task_index = self.get_section_index()
         self._task_list[section]['tasks'][task_index].after_button_press()
+        if flag == 'yes':
+            uid = self._yes_task
+        else:
+            uid = self._no_task
         self.current_task = self.uid_to_task_number(uid)       
         section, task_index = self.get_section_index()
         self.write_task_data('current_task', self.current_task)
@@ -326,7 +348,6 @@ class TaskMaster(Gtk.Grid):
         ''' When changing font size and zoom level, we regenerate the task
            graphic. '''
         if self._summary is not None:
-            _logging.debug('Cannot run tasks while summary is displayed')
             return
         self._destroy_graphics()
         self._load_graphics()
@@ -370,10 +391,18 @@ class TaskMaster(Gtk.Grid):
             self._prev_page_button.hide()
             self._next_page_button.hide()
 
-        if self._task_button is not None:
+        self._yes_task, self._no_task = \
+            self._task_list[section]['tasks'][task_index].get_yes_no_tasks()
+        if self._yes_task is not None and self._no_task is not None:
+            self._task_button.hide()
+            self._yes_button.show()
+            self._no_button.show()
+        elif self._task_button is not None:
             self._task_button.set_label(label)
             self._task_button.set_sensitive(False)
             self._task_button.show()
+            self._yes_button.hide()
+            self._no_button.hide()
 
         if self._task_list[section]['tasks'][task_index].get_refresh():
             self._refresh_button.show()
@@ -475,6 +504,7 @@ class TaskMaster(Gtk.Grid):
         return 0
 
     def _get_number_of_tasks_in_section(self, section_index):
+        _logger.debug(self._task_list[section_index]['name'])
         return len(self._task_list[section_index]['tasks'])
 
     def _get_number_of_collectables_in_section(self, section_index):
@@ -669,8 +699,6 @@ class TaskMaster(Gtk.Grid):
                 self.current_task -= (task_index - task)
                 break
         section, task_index = self.get_section_index()
-        _logger.debug('running task %d:%d from prev task button' %
-                      (section, task_index))
         self.task_master()
 
     def _next_task_button_cb(self, button):
@@ -685,8 +713,6 @@ class TaskMaster(Gtk.Grid):
                 break
             task += 1
         section, task_index = self.get_section_index()
-        _logger.debug('running task %d:%d from next task button' %
-                      (section, task_index))
         self.task_master()
 
     def _look_for_next_task(self):
@@ -703,15 +729,15 @@ class TaskMaster(Gtk.Grid):
 
     def _progress_button_cb(self, button, i):
         section, task_index = self.get_section_index()
-        _logger.debug('running task %d:%d from progess button' % (section, i))
         self.current_task += (i - task_index)
         self.task_master()
 
     def _update_progress(self):
-        section, task_index = self.get_section_index()
-        if section < 0:  # We haven't started yet
+        section_index, task_index = self.get_section_index()
+        if section_index < 0:  # We haven't started yet
             return
-        tasks_in_section = self._get_number_of_tasks_in_section(section)
+
+        tasks_in_section = self._get_number_of_tasks_in_section(section_index)
 
         # If the task index is 0, then we need to create a new progress bar
         if task_index == 0 or self._progress_bar is None:
@@ -721,10 +747,9 @@ class TaskMaster(Gtk.Grid):
             buttons = []
             if tasks_in_section > 1:
                 for i in range(tasks_in_section - 1):
-                    buttons.append(
-                        {'label': str(i + 1),
-                         'tooltip':
-                         self._task_list[section]['tasks'][i].get_name()})
+                    tooltip = \
+                        self._task_list[section_index]['tasks'][i].get_name()
+                    buttons.append({'label': str(i + 1), 'tooltip': tooltip})
 
             if self._name is None:
                 self._name = self.read_task_data(NAME_UID)
@@ -737,12 +762,13 @@ class TaskMaster(Gtk.Grid):
             else:
                 name = ''
 
-            self._progress_bar = ProgressBar(name,
-                                             self._task_list[section][NAME_UID],
-                                             buttons,
-                                             self._prev_task_button_cb,
-                                             self._next_task_button_cb,
-                                             self._progress_button_cb)
+            self._progress_bar = ProgressBar(
+                name,
+                self._task_list[section_index][NAME_UID],
+                buttons,
+                self._prev_task_button_cb,
+                self._next_task_button_cb,
+                self._progress_button_cb)
             self._progress_bar_alignment.add(self._progress_bar)
             self._progress_bar.show()
 
@@ -752,11 +778,9 @@ class TaskMaster(Gtk.Grid):
             self._progress_bar.show_prev_next_task_buttons()
 
         # Set button sensitivity True for completed tasks and current task
-        _logger.debug('task_index: %d; tasks_in_section: %d' %
-                      (task_index, tasks_in_section))
         if task_index < tasks_in_section:
             for task in range(tasks_in_section - 1):
-                if self._task_list[section]['tasks'][task].is_completed():
+                if self._task_list[section_index]['tasks'][task].is_completed():
                     self._progress_bar.set_button_sensitive(task, True)
                 else:
                     self._progress_bar.set_button_sensitive(task, False)
