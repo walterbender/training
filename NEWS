@@ -16,6 +16,12 @@ NEWS
 * Add modified-time tests
 * Pulled in Martin's reporting glue
 
+NOTE: The reporting mechanism needs some gconf settings:
+      gconftool-2 --set /desktop/sugar/services/training/url
+          "https://localhost:8888/training/report" --type=string
+      gconftool-2 --set /desktop/sugar/services/training/api_key "training"
+           --type=string
+
 1.33
 
 * Fix write bug due to multiple datafile check
