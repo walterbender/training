@@ -530,20 +530,6 @@ class TrainingActivity(activity.Activity):
             tooltip=_('Training data upload status'))
         self.transfer_button.hide()
 
-        self.back = button_factory('go-previous-paired',
-                                   toolbox.toolbar,
-                                   self._go_back_cb,
-                                   tooltip=_('Previous section'))
-        self.back.props.sensitive = False
-        self.back.hide()
-
-        self.forward = button_factory('go-next-paired',
-                                      toolbox.toolbar,
-                                      self._go_forward_cb,
-                                      tooltip=_('Next section'))
-        self.forward.props.sensitive = False
-        self.forward.hide()
-
         self.progress_label = label_factory(toolbox.toolbar, '', width=300)
         self.progress_label.set_use_markup(True)
 
@@ -650,28 +636,6 @@ class TrainingActivity(activity.Activity):
         self.check_progress = CheckProgress(self._task_master)
         self._task_master.load_progress_summary(self.check_progress)
 
-    def _go_back_cb(self, button):
-        section, task = self._task_master.get_section_index()
-        if section > 0:
-            section -= 1
-        _logger.debug('go back %d:%d' % (section, task))
-        uid = self._task_master.section_and_task_to_uid(section)
-        _logger.debug('new uid %s' % (uid))
-        self._task_master.current_task = \
-            self._task_master.uid_to_task_number(uid)
-        self._task_master.task_master()
-
-    def _go_forward_cb(self, button):
-        section, task = self._task_master.get_section_index()
-        if section < self._task_master.get_number_of_sections() - 1:
-            section += 1
-        _logger.debug('go forward %d:%d' % (section, task))
-        uid = self._task_master.section_and_task_to_uid(section)
-        _logger.debug('new uid %s' % (uid))
-        self._task_master.current_task = \
-            self._task_master.uid_to_task_number(uid)
-        self._task_master.task_master()
-
     def _help_cb(self, button):
         title, help_file = self._task_master.get_help_info()
         _logger.debug('%s: %s' % (title, help_file))
@@ -736,7 +700,6 @@ class TrainingActivity(activity.Activity):
                               (init_path, webservice_path, e))
 
         install = False
-        _logger.error(tests.get_sugarservices_version())
         if not os.path.exists(os.path.join(webservice_path, 'sugarservices')):
             _logger.error('SugarServices webservice not found. Installing...')
             install = True

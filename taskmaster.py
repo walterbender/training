@@ -55,6 +55,7 @@ class TaskMaster(Gtk.Grid):
         self._accumulated_time = 0
 
         self._task_list = tasks.get_tasks(self)
+        self._task_data = None
         self._assign_required()
 
         self.current_task = self.read_task_data('current_task')
@@ -134,16 +135,14 @@ class TaskMaster(Gtk.Grid):
         self.activity.button_was_pressed = False
         if self.current_task < self._get_number_of_tasks():
             section, task_index = self.get_section_index()
+
             # Do we skip this task?
             task = self._task_list[section]['tasks'][task_index]
             if task.is_completed() and task.skip_if_completed():
                 _logger.debug('skipping task %d' % task_index)
                 self.current_task += 1  # Assume there is a next task
                 task_index += 1
-            if section > 0:
-                self.activity.back.set_sensitive(True)
-                if section < len(self._task_list) - 1:
-                    self.activity.forward.set_sensitive(True)
+
             # Check to make sure all the requirements at met
             if not self._check_requirements(section, task_index):
                 # Switching to a required task
