@@ -1,0 +1,92 @@
+# Copyright (c) 2014 Martin Abente - tch@sugarlabs.org
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# You should have received a copy of the GNU General Public License
+# along with this library; if not, write to the Free Software
+# Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+import json
+
+from gi.repository import GConf
+from gi.repository import Gio
+from gi.repository import GObject
+from gi.repository import Soup
+
+
+def _extract_trainee(data):
+    trainee = []
+    trainee.append(data.get('training_data_uid', None))
+    trainee.append(data.get('email_address', None))
+    trainee.append(data.get('name', None))
+    trainee.append(data.get('school_name', None))
+    return trainee
+
+
+def _extract_task(rawtask):
+    task = []
+    task.append(rawtask.get('task', None))
+    task.append(rawtask.get('start_time', None))
+    task.append(rawtask.get('end_time', None))
+    task.append(rawtask.get('accumulated_time', None))
+    return task
+
+
+def _extract_tasks(data):
+    tasks = []
+    for uid in data:
+        if 'task' in uid and isinstance(data[uid], dict) and \
+                'completed' in data[uid] and data[uid]['completed']:
+            tasks.append(_extract_task(data[uid]))
+    return tasks
+
+
+class Reporter(GObject.GObject):
+
+    URL = '/desktop/sugar/services/training/url'
+    API_KEY = '/desktop/sugar/services/training/api_key'
+    TYPE = 'application/json'
+
+    def __init__(self, activity):
+        GObject.GObject.__init__(self)
+        client = GConf.Client.get_default()
+        self._url = client.get_string(self.URL)
+        self._api_key = client.get_string(self.API_KEY)
+        self._activity = activity
+
+    def report(self, tasks_data_list):
+        transport_data = []
+        for tasks_data in tasks_data_list:
+            transport_data.append([_extract_trainee(tasks_data),
+                                   _extract_tasks(tasks_data)])
+        self._send(json.dumps(transport_data))
+
+    def _send(self, data):
+        uri = Soup.URI.new(self._url)
+
+        message = Soup.Message(method='POST', uri=uri)
+        message.request_headers.append('x-api-key', self._api_key)
+        message.set_request(self.TYPE, Soup.MemoryUse.COPY, data, len(data))
+        message.connect('network-event', self.__network_event_cb)
+        message.connect('wrote-body-data', self.__wrote_body_data_cb)
+        message.connect('finished', self.__finished_cb)
+
+        session = Soup.SessionSync()
+        session.add_feature_by_type(Soup.ProxyResolverDefault)
+        session.send_message(message)
+
+    def __network_event_cb(self, message, event, connection):
+        if event == Gio.SocketClientEvent.CONNECTED:
+            self._activity.transfer_started_signal.emit()
+
+    def __wrote_body_data_cb(self, message, chunk):
+        self._activity.transfer_progressed_signal.emit()
+
+    def __finished_cb(self, message):
+        if message.status_code == 200:
+            self._activity.transfer_completed_signal.emit()
+        else:
+            self._activity.transfer_failed_signal.emit()
