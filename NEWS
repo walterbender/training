@@ -6,6 +6,8 @@ NEWS
 * Added artwork for Turtle Art pages: forward, right, start, pensize, pencolor,
   show text, etc.
 * Added artwork for most of the Sugar controls: zooms, journal, devices, etc.
+* Numerous copy edits
+* Better testing in Turtle tasks
 
 1.34
 
