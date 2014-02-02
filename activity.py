@@ -54,7 +54,7 @@ _logger = logging.getLogger('training-activity')
 
 _MINIMUM_SPACE = 1024 * 1024 * 10  # 10MB is very conservative
 
-_SUGARSERVICES_VERSION = 1
+_SUGARSERVICES_VERSION = 2
 
 
 class TrainingActivity(activity.Activity):
@@ -111,15 +111,17 @@ class TrainingActivity(activity.Activity):
 
         # Before we begin, we need to find any and all USB keys
         # and any and all training-data files on them.
-        _logger.debug(tests.get_volume_paths())
-        for path in tests.get_volume_paths():
-            os.path.basename(path)
-            self.volume_data.append(
-                {'basename': os.path.basename(path),
-                 'files': tests.look_for_training_data(path),
-                 'sugar_path': os.path.join(self.get_activity_root(), 'data'),
-                 'usb_path': path})
-            _logger.debug(self.volume_data[-1])
+        if OK:
+            _logger.debug(tests.get_volume_paths())
+            for path in tests.get_volume_paths():
+                os.path.basename(path)
+                self.volume_data.append(
+                    {'basename': os.path.basename(path),
+                     'files': tests.look_for_training_data(path),
+                     'sugar_path': os.path.join(self.get_activity_root(),
+                                                'data'),
+                     'usb_path': path})
+                _logger.debug(self.volume_data[-1])
 
         # (1) We require a USB key
         if OK and len(self.volume_data) == 0:
