@@ -27,7 +27,7 @@ _logger = logging.getLogger('training-activity-taskmaster')
 
 import tasks
 from progressbar import ProgressBar
-import tests
+import checks
 from graphics import Graphics
 from activity import TRAINING_DATA_UID, NAME_UID, EMAIL_UID
 
@@ -172,7 +172,7 @@ class TaskMaster(Gtk.Grid):
             url = os.path.join(self.get_bundle_path(), 'html-content',
                                'completed.html')
             self._graphics.add_uri('file://' + url + '?NAME=' + \
-                                   tests.get_safe_text(
+                                   checks.get_safe_text(
                                        self.read_task_data(NAME_UID)))
             self._graphics.set_zoom_level(0.667)
             self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
@@ -191,7 +191,7 @@ class TaskMaster(Gtk.Grid):
 
     def _my_turn_button_cb(self, button):
         ''' Take me to the Home Page. '''
-        tests.goto_home_view()
+        checks.goto_home_view()
 
     def _refresh_button_cb(self, button):
         ''' Refresh the current page's graphics '''

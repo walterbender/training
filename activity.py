@@ -46,7 +46,7 @@ from toolbar_utils import separator_factory, label_factory, button_factory
 from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
 from checkprogress import CheckProgress
-import tests
+import checks
 
 import logging
 _logger = logging.getLogger('training-activity')
@@ -112,12 +112,12 @@ class TrainingActivity(activity.Activity):
         # Before we begin, we need to find any and all USB keys
         # and any and all training-data files on them.
         if OK:
-            _logger.debug(tests.get_volume_paths())
-            for path in tests.get_volume_paths():
+            _logger.debug(checks.get_volume_paths())
+            for path in checks.get_volume_paths():
                 os.path.basename(path)
                 self.volume_data.append(
                     {'basename': os.path.basename(path),
-                     'files': tests.look_for_training_data(path),
+                     'files': checks.look_for_training_data(path),
                      'sugar_path': os.path.join(self.get_activity_root(),
                                                 'data'),
                      'usb_path': path})
@@ -152,7 +152,7 @@ class TrainingActivity(activity.Activity):
             volume = self.volume_data[0]
 
         # (3) At least 10MB of free space
-        if OK and tests.is_full(volume['usb_path'],
+        if OK and checks.is_full(volume['usb_path'],
                            required=_MINIMUM_SPACE):
             _logger.error('USB IS FULL')
             alert = ConfirmationAlert()
@@ -164,7 +164,7 @@ class TrainingActivity(activity.Activity):
             OK = False
 
         # (4) File is read/write
-        if OK and not tests.is_writeable(volume['usb_path']):
+        if OK and not checks.is_writeable(volume['usb_path']):
             _logger.error('CANNOT WRITE TO USB')
             alert = ConfirmationAlert()
             alert.props.title = _('Cannot write to USB')
@@ -183,7 +183,7 @@ class TrainingActivity(activity.Activity):
         # (b) If there is one file with a valid UID, we use that UID;
         if OK and len(volume['files']) == 0:
             volume['uid'] = 'training-data-%s' % \
-                            tests.format_volume_name(volume['basename'])
+                            checks.format_volume_name(volume['basename'])
             _logger.debug('No training data found. Using UID %s' % 
                           volume['uid'])
         elif OK and len(volume['files']) == 1:
@@ -414,7 +414,7 @@ class TrainingActivity(activity.Activity):
             graphics.add_uri('file://' + url)
         else:
             graphics.add_uri('file://' + url + '?MSG=' + \
-                             tests.get_safe_text(message))
+                             checks.get_safe_text(message))
         graphics.set_zoom_level(0.667)
         center_in_panel.add(graphics)
         graphics.show()
@@ -705,7 +705,7 @@ class TrainingActivity(activity.Activity):
         if not os.path.exists(os.path.join(webservice_path, 'sugarservices')):
             _logger.error('SugarServices webservice not found. Installing...')
             install = True
-        elif tests.get_sugarservices_version() < _SUGARSERVICES_VERSION:
+        elif checks.get_sugarservices_version() < _SUGARSERVICES_VERSION:
             _logger.error('Found old SugarServices version. Installing...')
             install = True
 

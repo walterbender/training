@@ -24,7 +24,7 @@ _logger = logging.getLogger('training-activity-tasks')
 
 from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
 from graphics import Graphics, FONT_SIZES
-import tests
+import checks
 
 from reporter import Reporter
 
@@ -135,7 +135,7 @@ def get_tasks(task_master):
                    Collaboration8Task(task_master)]}
     ]
 
-    if tests.is_XO():
+    if checks.is_XO():
         task_list.append(
             {'name': _('10. Learning More About the XO'),
              'icon': 'badge-xo',
@@ -169,7 +169,7 @@ class Task():
         self._task_master = task_master
         self._font_size = 5
         self._zoom_level = 1.0
-        self._pause_between_tests = 1000
+        self._pause_between_checks = 1000
         self._requires = []
         self._page_count = 1
         self._prompt = _('Next')
@@ -230,7 +230,7 @@ class Task():
 
     def get_pause_time(self):
         ''' How long should we pause between testing? '''
-        return self._pause_between_tests
+        return self._pause_between_checks
 
     def set_requires(self, requires):
         self._requires = requires[:]
@@ -401,7 +401,7 @@ class Welcome3Task(HTMLTask):
         name = self._get_user_name().split()[0]
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s' %
-                           (self._uri, tests.get_safe_text(name)))
+                           (self._uri, checks.get_safe_text(name)))
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
@@ -549,7 +549,7 @@ class Welcome7Task(BadgeTask):
         name = self._get_user_name().split()[0]
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s' %
-                           (self._uri, tests.get_safe_text(name)))
+                           (self._uri, checks.get_safe_text(name)))
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url)
         graphics.set_zoom_level(self._zoom_level)
@@ -598,12 +598,12 @@ class Toolbar3Task(HTMLTask):
     def test(self, task_data):
         if task_data['data'] is None:
             task_data['data'] = \
-                tests.get_launch_count(self._task_master.activity)
+                checks.get_launch_count(self._task_master.activity)
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            _logger.debug(tests.get_launch_count(self._task_master.activity))
-            launch_count = tests.get_launch_count(self._task_master.activity)
+            _logger.debug(checks.get_launch_count(self._task_master.activity))
+            launch_count = checks.get_launch_count(self._task_master.activity)
             if launch_count > task_data['data']:
                 return True
             else:
@@ -648,17 +648,17 @@ class Toolbar6Task(HTMLTask):
 
     def test(self, task_data):
         if len(self._goals) == 0:
-            if tests.is_expanded(
+            if checks.is_expanded(
                     self._task_master.activity.view_toolbar_button):
                 self._goals.append(True)
         elif len(self._goals) == 1:
-            if tests.is_fullscreen(self._task_master.activity):
+            if checks.is_fullscreen(self._task_master.activity):
                 self._goals.append(True)
         elif len(self._goals) == 2:
-            if not tests.is_fullscreen(self._task_master.activity):
+            if not checks.is_fullscreen(self._task_master.activity):
                 self._goals.append(True)
         else:
-            return not tests.is_expanded(
+            return not checks.is_expanded(
                 self._task_master.activity.view_toolbar_button)
 
 class Toolbar7Task(HTMLTask):
@@ -688,7 +688,7 @@ class Toolbar8Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        return len(tests.get_description(self._task_master.activity)) > 0
+        return len(checks.get_description(self._task_master.activity)) > 0
 
 
 class Toolbar9Task(BadgeTask):
@@ -740,7 +740,7 @@ class Connected4Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        return tests.nm_status() == 'network-wireless-connected'
+        return checks.nm_status() == 'network-wireless-connected'
 
     def is_collectable(self):
         return True
@@ -791,8 +791,8 @@ class Connected5Task(HTMLTask):
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s&EMAIL=%s' %
                            (self._uri,
-                            tests.get_safe_text(name),
-                            tests.get_safe_text(email)))
+                            checks.get_safe_text(name),
+                            checks.get_safe_text(email)))
 
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url, height=400)
@@ -878,9 +878,9 @@ class Connected7Task(HTMLTask):
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s&EMAIL=%s&SCHOOL=%s' %
                            (self._uri,
-                            tests.get_safe_text(name),
-                            tests.get_safe_text(email),
-                            tests.get_safe_text(school)))
+                            checks.get_safe_text(name),
+                            checks.get_safe_text(email),
+                            checks.get_safe_text(school)))
 
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url, height=400)
@@ -941,12 +941,12 @@ class Activities3Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        if not tests.saw_new_launch('org.laptop.RecordActivity',
+        if not checks.saw_new_launch('org.laptop.RecordActivity',
                                     task_data['start_time']):
             return False
-        paths = tests.get_jpg()
+        paths = checks.get_jpg()
         return len(paths) > 0 and \
-            tests.get_modified_time(paths[0]) > task_data['start_time']
+            checks.get_modified_time(paths[0]) > task_data['start_time']
 
 
 class Activities4Task(HTMLTask):
@@ -979,17 +979,17 @@ class Activities5Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        if not tests.saw_new_launch('org.laptop.AbiWordActivity',
+        if not checks.saw_new_launch('org.laptop.AbiWordActivity',
                                     task_data['start_time']):
             return False
         # We need the clipboard text for the Speak task
-        # if not tests.is_clipboard_text_available():
+        # if not checks.is_clipboard_text_available():
         #     return False
-        paths = tests.get_odt()
+        paths = checks.get_odt()
         for path in paths:
             # Check to see if there is a picture in the file:
             # look for '\\pict' in RTF, 'Pictures' in ODT
-            if tests.find_string(path, 'Pictures'):
+            if checks.find_string(path, 'Pictures'):
                 return True
         return False
 
@@ -1024,12 +1024,12 @@ class Activities7Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        if not tests.saw_new_launch('vu.lux.olpc.Speak',
+        if not checks.saw_new_launch('vu.lux.olpc.Speak',
                                     task_data['start_time']):
             return False
         # Has any setting changed?
-        status = tests.get_speak_settings(
-            tests.get_most_recent_instance('vu.lux.olpc.Speak'))
+        status = checks.get_speak_settings(
+            checks.get_most_recent_instance('vu.lux.olpc.Speak'))
         if status is None:
             return False
         if len(status['eyes']) != 2 or \
@@ -1091,7 +1091,7 @@ class Journal3Task(HTMLTask):
 
     def test(self, task_data):
         if task_data['data'] is None:
-            activity = tests.get_most_recent_instance(
+            activity = checks.get_most_recent_instance(
                 'org.laptop.AbiWordActivity')
             if activity is not None and 'description' in activity.metadata:
                 task_data['data'] = activity.metadata['description']
@@ -1100,7 +1100,7 @@ class Journal3Task(HTMLTask):
             return False
         else:
             # Make sure description has changed and entry is 'starred'
-            activity = tests.get_most_recent_instance(
+            activity = checks.get_most_recent_instance(
                 'org.laptop.AbiWordActivity')
             if activity is None or not 'keep' in activity.metadata or \
                not 'description' in activity.metadata:
@@ -1143,17 +1143,17 @@ class Journal5Task(HTMLTask):
         # Make sure there are newly starred items and that the Portfolio
         # activity has been launched; then look for a PDF file.
         if task_data['data'] is None:
-            task_data['data'] = tests.get_starred_count()
+            task_data['data'] = checks.get_starred_count()
             self._task_master.write_task_data(self.uid, task_data)
             return False
-        if not tests.get_starred_count() > task_data['data']:
+        if not checks.get_starred_count() > task_data['data']:
             return False
-        if not tests.saw_new_launch('org.sugarlabs.PortfolioActivity',
+        if not checks.saw_new_launch('org.sugarlabs.PortfolioActivity',
                                     task_data['start_time']):
             return False
-        paths = tests.get_pdf()
+        paths = checks.get_pdf()
         return len(paths) > 0 and \
-            tests.get_modified_time(paths[0]) > task_data['start_time']
+            checks.get_modified_time(paths[0]) > task_data['start_time']
 
 
 class Journal6Task(HTMLTask):
@@ -1186,10 +1186,10 @@ class Journal7Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        paths = tests.look_for_file_type(
+        paths = checks.look_for_file_type(
             self._task_master.activity.volume_data[0]['usb_path'], '.pdf')
         return len(paths) > 0 and \
-            tests.get_modified_time(paths[0]) > task_data['start_time']
+            checks.get_modified_time(paths[0]) > task_data['start_time']
 
 
 class Journal8Task(HTMLTask):
@@ -1241,7 +1241,7 @@ class Frame3Task(HTMLTask):
     def test(self, task_data):
         if self._battery_level is None:
             return False
-        level = tests.get_battery_level()
+        level = checks.get_battery_level()
         if abs(level - self._battery_level) <= 10:
             return True
         else:
@@ -1260,7 +1260,7 @@ class Frame3Task(HTMLTask):
         buttons = graphics.add_radio_buttons(['battery-000', 'battery-020',
                                               'battery-040', 'battery-060',
                                               'battery-080', 'battery-100'],
-                                             colors=tests.get_colors())
+                                             colors=checks.get_colors())
         for i, button in enumerate(buttons):
             button.connect('clicked', self._battery_button_callback, i)
             button.set_active(False)
@@ -1287,11 +1287,11 @@ class Frame4Task(HTMLTask):
 
     def test(self, task_data):
         if task_data['data'] is None:
-            task_data['data'] = tests.get_sound_level()
+            task_data['data'] = checks.get_sound_level()
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            return not tests.get_sound_level() == task_data['data']
+            return not checks.get_sound_level() == task_data['data']
 
 
 class Frame5Task(HTMLTask):
@@ -1394,12 +1394,12 @@ class Views5Task(HTMLTask):
 
     def test(self, task_data):
         if task_data['data'] is None:
-            favorites_list = tests.get_favorites()
+            favorites_list = checks.get_favorites()
             task_data['data'] = len(favorites_list)
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            return len(tests.get_favorites()) > task_data['data']
+            return len(checks.get_favorites()) > task_data['data']
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
@@ -1436,12 +1436,12 @@ class Views7Task(HTMLTask):
 
     def test(self, task_data):
         if task_data['data'] is None:
-            favorites_list = tests.get_favorites()
+            favorites_list = checks.get_favorites()
             task_data['data'] = len(favorites_list)
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            return len(tests.get_favorites()) < task_data['data']
+            return len(checks.get_favorites()) < task_data['data']
 
     def get_help_info(self):
         return ('Home', 'home_view.html')
@@ -1463,13 +1463,13 @@ class Views8Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        if tests.is_activity_view():
+        if checks.is_activity_view():
             if 'activity' not in self._views:
                 self._views.append('activity')
-        elif tests.is_home_view():
+        elif checks.is_home_view():
             if 'home' not in self._views:
                 self._views.append('home')
-        elif tests.is_neighborhood_view():
+        elif checks.is_neighborhood_view():
             if 'neighborhood' not in self._views:
                 self._views.append('neighborhood')
         return len(self._views) > 2
@@ -1528,14 +1528,14 @@ class Settings3Task(HTMLTask):
 
     def test(self, task_data):
         if task_data['data'] is None:
-            _logger.debug('saving nick value as %s' % tests.get_nick())
-            self._task_master.write_task_data('nick', tests.get_nick())
-            task_data['data'] = tests.get_nick()
+            _logger.debug('saving nick value as %s' % checks.get_nick())
+            self._task_master.write_task_data('nick', checks.get_nick())
+            task_data['data'] = checks.get_nick()
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            if not tests.get_nick() == task_data['data']:
-                task_data['new_nick'] = tests.get_nick()
+            if not checks.get_nick() == task_data['data']:
+                task_data['new_nick'] = checks.get_nick()
                 self._task_master.write_task_data(self.uid, task_data)
                 return True
             else:
@@ -1613,18 +1613,18 @@ class Turtle3Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        if not tests.saw_new_launch('org.laptop.TurtleArtActivity',
+        if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
                                     task_data['start_time']):
             return False
-        activity = tests.get_most_recent_instance(
+        activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
         if activity is not None:
             path = activity.file_path
-            if not tests.find_string(path, 'left') and \
-               not tests.find_string(path, 'right'):
+            if not checks.find_string(path, 'left') and \
+               not checks.find_string(path, 'right'):
                 return False
-            if not tests.find_string(path, 'forward') and \
-               not tests.find_string(path, 'back'):
+            if not checks.find_string(path, 'forward') and \
+               not checks.find_string(path, 'back'):
                 return False
             return True
         return False
@@ -1660,15 +1660,15 @@ class Turtle5Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        if not tests.saw_new_launch('org.laptop.TurtleArtActivity',
+        if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
                                     task_data['start_time']):
             return False
-        activity = tests.get_most_recent_instance(
+        activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
         if activity is not None:
             path = activity.file_path
-            if not tests.find_string(path, 'setpensize') and \
-               not tests.find_string(path, 'setcolor'):
+            if not checks.find_string(path, 'setpensize') and \
+               not checks.find_string(path, 'setcolor'):
                 return False
             return True
         return False
@@ -1704,11 +1704,11 @@ class Turtle7Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        activity = tests.get_most_recent_instance(
+        activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
         if activity is not None:
             path = activity.file_path
-            if not tests.find_string(path, 'show'):
+            if not checks.find_string(path, 'show'):
                 return False
             return True
         return False
@@ -1744,15 +1744,15 @@ class Turtle9Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        activity = tests.get_most_recent_instance(
+        activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
         if activity is not None:
             path = activity.file_path
-            if not tests.find_string(path, 'journal'):
+            if not checks.find_string(path, 'journal'):
                 return False
-        paths = tests.get_png()
+        paths = checks.get_png()
         return len(paths) > 0 and \
-            tests.get_modified_time(paths[0]) > task_data['start_time']
+            checks.get_modified_time(paths[0]) > task_data['start_time']
 
     def get_my_turn(self):
         return True
@@ -1785,7 +1785,7 @@ class Physics2Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        return tests.saw_new_launch('org.laptop.physics',
+        return checks.saw_new_launch('org.laptop.physics',
                                     task_data['start_time'])
 
     def get_my_turn(self):
@@ -1849,8 +1849,8 @@ class Collaboration4Task(HTMLTask):
         return ['physics-2-task']
 
     def test(self, task_data):
-        for activity in tests.get_activity('org.laptop.physics'):
-            if tests.get_share_scope(activity):
+        for activity in checks.get_activity('org.laptop.physics'):
+            if checks.get_share_scope(activity):
                 return True
         return False
 
@@ -1929,7 +1929,7 @@ class ClipboardTask(Task):
         return graphics, self._prompt
 
     def test(self, task_data):
-        if not tests.is_clipboard_text_available():
+        if not checks.is_clipboard_text_available():
             return False
         if len(self._entries[0].get_text()) > 0:
             return True
@@ -1972,7 +1972,7 @@ class XO3Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        return tests.is_tablet_mode()
+        return checks.is_tablet_mode()
 
 
 class XO4Task(HTMLTask):
@@ -1994,7 +1994,7 @@ class XO4Task(HTMLTask):
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            if tests.is_game_key(self._task_master.keyname):
+            if checks.is_game_key(self._task_master.keyname):
                 task_data['data'] = self._task_master.keyname
                 self._task_master.write_task_data(self.uid, task_data)
                 return True
@@ -2029,7 +2029,7 @@ class XO6Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        return not tests.is_tablet_mode()
+        return not checks.is_tablet_mode()
 
 
 class XO7Task(HTMLTask):
@@ -2049,19 +2049,19 @@ class XO7Task(HTMLTask):
 
     def test(self, task_data):
         if len(self._goals) == 0:
-            if not tests.is_landscape():
+            if not checks.is_landscape():
                 self._goals.append(True)
             return False
         elif len(self._goals) == 1:
-            if tests.is_landscape():
+            if checks.is_landscape():
                 self._goals.append(True)
             return False
         elif len(self._goals) == 2:
-            if not tests.is_landscape():
+            if not checks.is_landscape():
                 self._goals.append(True)
             return False
         else:
-            return tests.is_landscape()
+            return checks.is_landscape()
 
 
 class XO8Task(BadgeTask):
@@ -2125,7 +2125,7 @@ class Assessment2Task(HTMLTask):
                 _logger.debug('creating Assessment entry in Journal')
                 dsobject.metadata['title'] = task_data['data'] + '.rtf'
                 dsobject.metadata['icon-color'] = \
-                    tests.get_colors().to_string()
+                    checks.get_colors().to_string()
                 dsobject.metadata['tags'] = \
                     self._task_master.activity.volume_data[0]['uid']
                 dsobject.metadata['mime_type'] = 'text/rtf'
@@ -2153,7 +2153,7 @@ class Assessment3Task(BadgeTask):
         self.uid = 'assessment-no-task'
         self._uri = 'Assessment/assessment-no.html'
         self._height = 500
-        if tests.is_XO():
+        if checks.is_XO():
             self._section_index = 11
         else:
             self._section_index = 10

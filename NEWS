@@ -1,11 +1,16 @@
 NEWS
 
+1.36
+
+* Set vertical alignment of images to middle.
+
 1.35
 
 * Added Sugar icons for Turtle, Write, Portfolio, Speak, and Physics
 * Added artwork for Turtle Art pages: forward, right, start, pensize, pencolor,
   show text, etc.
 * Added artwork for most of the Sugar controls: zooms, journal, devices, etc.
+* Added artwork for the section badges
 * Numerous copy edits
 * Better testing in Turtle tasks
 

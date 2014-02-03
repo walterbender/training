@@ -67,6 +67,22 @@ battery_model = None
 proxy = None
 
 
+def get_webservice_paths():
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
+
+    try:
+        paths = dbus.Interface(proxy, _DBUS_SERVICE).GetWebServiceModulePaths() 
+        _logger.debug(paths)
+        return json.loads(paths)
+
+    except Exception, e:
+        _logger.error('ERROR getting sugarservice version: %s' % e)
+        return []
+
+
 def look_for_file_type(path, suffix):
     return glob.glob(os.path.join(path, '*' + suffix))
 
@@ -617,6 +633,19 @@ def get_speak_settings(activity):
     return status
 
 
+def uitree_dump():
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
+    try:
+        return json.loads(dbus.Interface(proxy, _DBUS_SERVICE).Dump())
+    except Exception, e:
+        print ('ERROR calling Dump: %s' % e)
+        # _logger.error('ERROR calling Dump: %s' % e)
+    return ''
+
+
 def get_uitree_node(name):
     global proxy
     if proxy is None:
@@ -625,8 +654,28 @@ def get_uitree_node(name):
     try:
         return dbus.Interface(proxy, _DBUS_SERVICE).FindChild(name)
     except Exception, e:
-        _logger.error('ERROR calling find child: %s' % e)
+        _logger.error('ERROR calling FindChild: %s' % e)
     return False
+
+
+def click_uitree_node(name):
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
+    try:
+        return dbus.Interface(proxy, _DBUS_SERVICE).Click(name)
+    except Exception, e:
+        _logger.error('ERROR calling Click: %s' % e)
+    return False
+
+
+def select_list_view():
+    click_uitree_node('List view')
+
+
+def select_favorites_view():
+    click_uitree_node('Favorites view')
 
 
 def find_string(path, string):
