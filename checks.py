@@ -67,6 +67,18 @@ battery_model = None
 proxy = None
 
 
+def shutdown():
+    global proxy
+    if proxy is None:
+        bus = dbus.SessionBus()
+        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
+
+    try:
+        dbus.Interface(proxy, _DBUS_SERVICE).Shutdown() 
+    except Exception, e:
+        _logger.error('ERROR shutting down Sugar: %s' % e)
+
+
 def get_webservice_paths():
     global proxy
     if proxy is None:

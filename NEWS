@@ -3,6 +3,10 @@ NEWS
 1.36
 
 * Set vertical alignment of images to middle.
+* Added shutdown when reinstalling sugarservices (won't help if services are
+  not yet installed, since shutdown is a service, but it will work for updates
+  after v3 of sugarservices)
+* Renamed tests to checks so as not to imply there are tests in the training
 
 1.35
 

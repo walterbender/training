@@ -54,7 +54,7 @@ _logger = logging.getLogger('training-activity')
 
 _MINIMUM_SPACE = 1024 * 1024 * 10  # 10MB is very conservative
 
-_SUGARSERVICES_VERSION = 2
+_SUGARSERVICES_VERSION = 3
 
 
 class TrainingActivity(activity.Activity):
@@ -723,7 +723,7 @@ class TrainingActivity(activity.Activity):
                                 'system.\nSugar must be restarted before '
                                 'sugarservices can commence.')
 
-            alert.connect('response', self._remove_alert_cb)
+            alert.connect('response', self._remove_shutdown_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=_('Sugar restart required.'))
 
@@ -737,3 +737,8 @@ class TrainingActivity(activity.Activity):
     def _close_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
         self.close()
+
+    def _shutdown_alert_cb(self, alert, response_id):
+        self.remove_alert(alert)
+        if response_id is Gtk.ResponseType.OK:
+            self.checks.shutdown()
