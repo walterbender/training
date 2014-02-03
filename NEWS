@@ -7,6 +7,7 @@ NEWS
   not yet installed, since shutdown is a service, but it will work for updates
   after v3 of sugarservices)
 * Renamed tests to checks so as not to imply there are tests in the training
+* Using a star to indicate current task on progress bar
 
 1.35
 

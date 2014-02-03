@@ -698,7 +698,7 @@ class Toolbar9Task(BadgeTask):
         self._name = _('Toolbar Badge')
         self.uid = 'toolbar-9-task'
         self._uri = 'Toolbar/toolbar9.html'
-        self._section = 1
+        self._section_index = 1
 
 
 class Connected1Task(HTMLTask):
@@ -899,7 +899,7 @@ class Connected8Task(BadgeTask):
         self._name = _('Connected Badge')
         self.uid = 'connected-8-task'
         self._uri = 'Connected/connected8.html'
-        self._section = 2
+        self._section_index = 2
 
 
 class Activities1Task(HTMLTask):
@@ -1048,7 +1048,7 @@ class Activities8Task(BadgeTask):
         self._name = _('Activities Badge')
         self.uid = 'activities-8-task'
         self._uri = 'Activities/activities8.html'
-        self._section = 3
+        self._section_index = 3
 
 
 class Journal1Task(HTMLTask):
@@ -1199,7 +1199,7 @@ class Journal8Task(HTMLTask):
         self._name = _('Journal Badge')
         self.uid = 'journal-8-task'
         self._uri = 'Journal/journal8.html'
-        self._section = 4
+        self._section_index = 4
 
 
 class Frame1Task(HTMLTask):
@@ -1330,7 +1330,7 @@ class Frame8Task(BadgeTask):
         self._name = _('Frame Badge')
         self.uid = 'frame-8-task'
         self._uri = 'Frame/frame8.html'
-        self._section = 5
+        self._section_index = 5
 
 
 class Views1Task(HTMLTask):
@@ -1482,7 +1482,7 @@ class Views9Task(HTMLTask):
         self._name = _('Views Badge')
         self.uid = 'views-9-task'
         self._uri = 'Views/views9.html'
-        self._section = 6
+        self._section_index = 6
 
 
 class Settings1Task(HTMLTask):
@@ -1798,7 +1798,7 @@ class MoreActivities2Task(BadgeTask):
         self._name = _('More Activities Badge')
         self.uid = 'more-activities-2-task'
         self._uri = 'MoreActivities/moreactivities2.html'
-        self._section = 8
+        self._section_index = 8
 
 
 class Collaboration1Task(HTMLTask):
@@ -1898,7 +1898,7 @@ class Collaboration8Task(BadgeTask):
         self._name = _('Collaboration Badge')
         self.uid = 'collaboration-8-task'
         self._uri = 'Collaboration/collaboration8.html'
-        self._section = 9
+        self._section_index = 9
 
 
 '''
@@ -2071,7 +2071,7 @@ class XO8Task(BadgeTask):
         self._name = _('XO Badge')
         self.uid = 'xo-8-task'
         self._uri = 'XO/xo8.html'
-        self._section = 10
+        self._section_index = 10
 
 
 class Assessment1Task(HTMLTask):
