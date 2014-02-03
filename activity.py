@@ -723,7 +723,7 @@ class TrainingActivity(activity.Activity):
                                 'system.\nSugar must be restarted before '
                                 'sugarservices can commence.')
 
-            alert.connect('response', self._remove_shutdown_cb)
+            alert.connect('response', self._shutdown_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=_('Sugar restart required.'))
 
@@ -741,4 +741,8 @@ class TrainingActivity(activity.Activity):
     def _shutdown_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
         if response_id is Gtk.ResponseType.OK:
-            self.checks.shutdown()
+            try:
+                checks.shutdown()
+            except UnknownMethodException:
+                _logger.error(
+                    'Cannot shutdown since shutdown service is not available')
