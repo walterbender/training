@@ -136,8 +136,12 @@ class ProgressBar(Gtk.Grid):
         box.show()
 
     def set_button_sensitive(self, i, flag=True):
-        if i < len(self._progress_buttons):
-            self._progress_buttons[i].set_sensitive(flag)
+        for b, button in enumerate(self._progress_buttons):
+            if b == i:
+                button.set_sensitive(flag)
+                button.set_label('★')
+            else:
+                button.set_label(str(b + 1))
 
     def hide_prev_next_task_buttons(self):
         self.prev_task_button.hide()
