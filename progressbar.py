@@ -26,7 +26,7 @@ _SIZE = 'small'
 
 class ProgressBar(Gtk.Grid):
 
-    def __init__(self, user_name, section_name, progress_button_data,
+    def __init__(self, user_name, section_name, uid, progress_button_data,
                  prev_task_button_cb, next_task_button_cb, progress_button_cb):
         Gtk.Grid.__init__(self)
 
@@ -41,8 +41,8 @@ class ProgressBar(Gtk.Grid):
         self._section_label.set_use_markup(True)
         self._section_label.set_justify(Gtk.Justification.LEFT)
         span = '<span foreground="%s" size="%s">' % (_BLACK, _SIZE)
-        self._section_label.set_markup(
-            span + section_name + '</span>')
+        self._section_label.set_markup('%s%s\n%s</span>' %
+                                       (span, section_name, uid))
         alignment1.add(self._section_label)
         self._section_label.show()
 

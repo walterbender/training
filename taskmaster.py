@@ -768,9 +768,12 @@ class TaskMaster(Gtk.Grid):
             else:
                 name = ''
 
+            uid = self.activity.volume_data[0]['uid']
+
             self._progress_bar = ProgressBar(
                 name,
                 self._task_list[section_index][NAME_UID],
+                uid,
                 buttons,
                 self._prev_task_button_cb,
                 self._next_task_button_cb,
