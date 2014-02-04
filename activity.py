@@ -124,23 +124,18 @@ class TrainingActivity(activity.Activity):
         '''
 
     def check_volume_data(self):
-        # Lots of corner cases to consider:
-        # (1) We require a USB key
-        # (2) Only one data file on USB key
-        # (3) At least 10MB of free space
-        # (4) File is read/write
-        # (5) Only one set of training data per USB key
-
-        # Before we begin, we need to find any and all USB keys
+        # Before we begin (and before each task),
+        # we need to find any and all USB keys
         # and any and all training-data files on them.
+
         _logger.debug(checks.get_volume_paths())
+        self.volume_data = []
         for path in checks.get_volume_paths():
             os.path.basename(path)
             self.volume_data.append(
                 {'basename': os.path.basename(path),
                  'files': checks.look_for_training_data(path),
-                 'sugar_path': os.path.join(self.get_activity_root(),
-                                            'data'),
+                 'sugar_path': os.path.join(self.get_activity_root(), 'data'),
                  'usb_path': path})
             _logger.debug(self.volume_data[-1])
 

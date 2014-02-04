@@ -146,8 +146,15 @@ class TaskMaster(Gtk.Grid):
 
     def task_master(self):
         ''' 'nough said. '''
+
+        # Recheck USB status each time
+        if not self.activity.check_volume_data():
+            return
+
+        # If we are displaying the task summary, do nothing
         if self._summary is not None:
             return
+
         _logger.debug('Task Master: Running task %d' % (self.current_task))
         self._destroy_graphics()
         self.activity.button_was_pressed = False

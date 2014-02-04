@@ -11,6 +11,8 @@ NEWS
 * Removed duplicate task in Views section
 * Merged Paul's copy edits
 * Reorder sections (and modify code to make reordering easier)
+* Check USB status before each task
+* Reword insert-usb copy
 
 1.35
 
