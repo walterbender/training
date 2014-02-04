@@ -67,7 +67,7 @@ class SugarServices(dbus.service.Object):
     '''
 
     def __init__(self):
-        self._version = 3
+        self._version = 4
 
         bus = dbus.SessionBus()
         bus_name = dbus.service.BusName(_DBUS_SERVICE, bus=bus)
@@ -113,10 +113,10 @@ class SugarServices(dbus.service.Object):
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='', out_signature='')
-    def Shutdown(self):
-        '''Shutdown Sugar
+    def Reboot(self):
+        '''Reboot Sugar
         '''
-        self._session.shutdown()
+        self._session.reboot()
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='i', out_signature='')
