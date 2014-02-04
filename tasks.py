@@ -25,8 +25,10 @@ _logger = logging.getLogger('training-activity-tasks')
 from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
 from graphics import Graphics, FONT_SIZES
 import checks
-
 from reporter import Reporter
+
+HOUR = 60 * 60
+
 
 def get_tasks(task_master):
     task_list = [
@@ -131,6 +133,8 @@ def get_tasks(task_master):
                    Turtle1Task(task_master),
                    Turtle2Task(task_master),
                    Turtle3Task(task_master),
+                   Turtle2aTask(task_master),
+                   Turtle3aTask(task_master),
                    Turtle4Task(task_master),
                    Turtle5Task(task_master),
                    Turtle6Task(task_master),
@@ -942,11 +946,11 @@ class Activities3Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.RecordActivity',
-                                    task_data['start_time']):
+                                     task_data['start_time'] - HOUR):
             return False
         paths = checks.get_jpg()
         return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > task_data['start_time']
+            checks.get_modified_time(paths[0]) > task_data['start_time'] - HOUR
 
 
 class Activities4Task(HTMLTask):
@@ -980,7 +984,7 @@ class Activities5Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.AbiWordActivity',
-                                    task_data['start_time']):
+                                    task_data['start_time'] - HOUR):
             return False
         # We need the clipboard text for the Speak task
         # if not checks.is_clipboard_text_available():
@@ -1025,7 +1029,7 @@ class Activities7Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('vu.lux.olpc.Speak',
-                                    task_data['start_time']):
+                                    task_data['start_time'] - HOUR):
             return False
         # Has any setting changed?
         status = checks.get_speak_settings(
@@ -1149,11 +1153,11 @@ class Journal5Task(HTMLTask):
         if not checks.get_starred_count() > task_data['data']:
             return False
         if not checks.saw_new_launch('org.sugarlabs.PortfolioActivity',
-                                    task_data['start_time']):
+                                    task_data['start_time'] - HOUR):
             return False
         paths = checks.get_pdf()
         return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > task_data['start_time']
+            checks.get_modified_time(paths[0]) > task_data['start_time'] - HOUR
 
 
 class Journal6Task(HTMLTask):
@@ -1189,7 +1193,7 @@ class Journal7Task(HTMLTask):
         paths = checks.look_for_file_type(
             self._task_master.activity.volume_data[0]['usb_path'], '.pdf')
         return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > task_data['start_time']
+            checks.get_modified_time(paths[0]) > task_data['start_time'] - HOUR
 
 
 class Journal8Task(HTMLTask):
@@ -1582,7 +1586,7 @@ class Turtle2Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Square')
-        self.uid = 'turtle-1-task'
+        self.uid = 'turtle-2-task'
         self._uri = 'MoreActivities/turtle2.html'
 
 
@@ -1605,7 +1609,7 @@ class Turtle3Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time']):
+                                    task_data['start_time'] - HOUR):
             return False
         activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1618,6 +1622,47 @@ class Turtle3Task(HTMLTask):
                not checks.find_string(path, 'back'):
                 return False
             return True
+        return False
+
+    def get_my_turn(self):
+        return True
+
+
+class Turtle2aTask(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Square')
+        self.uid = 'turtle-2a-task'
+        self._uri = 'MoreActivities/turtle2a.html'
+
+
+class Turtle3aTask(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Turtle Square Video')
+        self.uid = 'turtle-3a-task'
+        self._uri = 'MoreActivities/turtle3a.html'
+
+    def get_refresh(self):
+        return True
+
+    def get_requires(self):
+        return ['validate-email-task']
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
+                                    task_data['start_time'] - HOUR):
+            return False
+        activity = checks.get_most_recent_instance(
+            'org.laptop.TurtleArtActivity')
+        if activity is not None:
+            path = activity.file_path
+            return checks.find_string(path, 'repeat')
         return False
 
     def get_my_turn(self):
@@ -1652,7 +1697,7 @@ class Turtle5Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time']):
+                                    task_data['start_time'] - HOUR):
             return False
         activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1743,7 +1788,7 @@ class Turtle9Task(HTMLTask):
                 return False
         paths = checks.get_png()
         return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > task_data['start_time']
+            checks.get_modified_time(paths[0]) > task_data['start_time'] - HOUR
 
     def get_my_turn(self):
         return True
@@ -1777,7 +1822,7 @@ class Physics2Task(HTMLTask):
 
     def test(self, task_data):
         return checks.saw_new_launch('org.laptop.physics',
-                                    task_data['start_time'])
+                                    task_data['start_time'] - HOUR)
 
     def get_my_turn(self):
         return True
