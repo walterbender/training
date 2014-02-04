@@ -72,13 +72,19 @@ def reboot():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
-
+        try:
+            proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
+        except Exception, e:
+            _logger.error('ERROR rebooting Sugar (proxy): %s' % e)
+            _vte_reboot()
     try:
         dbus.Interface(proxy, _DBUS_SERVICE).Reboot() 
     except Exception, e:
-        _logger.error('ERROR rebooting down Sugar: %s' % e)
+        _logger.error('ERROR rebooting Sugar: %s' % e)
+        _vte_reboot()
 
+
+def _vte_reboot():
         _logger.error('Trying VTE method...')
         # If we cannot reboot using the Sugar service, try from a VT
         vt = Vte.Terminal()
@@ -347,8 +353,11 @@ def get_sugarservices_version():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
-        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
-
+        try:
+            proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
+        except Exception, e:
+            _logger.error('ERROR getting sugarservice service: %s' % e)
+            return 0
     try:
         return dbus.Interface(proxy, _DBUS_SERVICE).GetVersion()
     except Exception, e:
