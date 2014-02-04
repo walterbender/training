@@ -54,7 +54,7 @@ _logger = logging.getLogger('training-activity')
 
 _MINIMUM_SPACE = 1024 * 1024 * 10  # 10MB is very conservative
 
-_SUGARSERVICES_VERSION = 3
+_SUGARSERVICES_VERSION = 4
 
 
 class TrainingActivity(activity.Activity):
@@ -89,125 +89,17 @@ class TrainingActivity(activity.Activity):
                        style.COLOR_WHITE.get_gdk_color())
 
         self.bundle_path = activity.get_bundle_path()
+        self.volume_data = []
+
         self._copy_entry = None
         self._paste_entry = None
         self._webkit = None
         self._clipboard_text = ''
 
-        OK = self._load_extension()
-
-        self.volume_data = []
-
-        # Lots of corner cases to consider:
-        # (1) We require a USB key
-        # (2) Only one data file on USB key
-        # (3) At least 10MB of free space
-        # (4) File is read/write
-        # (5) Only one set of training data per USB key
-        # (6) We are resuming the activity or
-        #     we are launching a new instance
-        #     * Is there a data file to sync on the USB key?
-        #     * Do we create a new data file on the USB key
-
-        # Before we begin, we need to find any and all USB keys
-        # and any and all training-data files on them.
-        if OK:
-            _logger.debug(checks.get_volume_paths())
-            for path in checks.get_volume_paths():
-                os.path.basename(path)
-                self.volume_data.append(
-                    {'basename': os.path.basename(path),
-                     'files': checks.look_for_training_data(path),
-                     'sugar_path': os.path.join(self.get_activity_root(),
-                                                'data'),
-                     'usb_path': path})
-                _logger.debug(self.volume_data[-1])
-
-        # (1) We require a USB key
-        if OK and len(self.volume_data) == 0:
-            _logger.error('NO USB KEY INSERTED')
-            alert = ConfirmationAlert()
-            alert.props.title = _('USB key required')
-            alert.props.msg = _('You must insert a USB key before launching '
-                                'this activity.')
-            alert.connect('response', self._close_alert_cb)
-            self.add_alert(alert)
-            self._load_intro_graphics(file_name='insert-usb.html')
-            OK = False
-
-        # (2) Only one USB key
-        if OK and len(self.volume_data) > 1:
-            _logger.error('MULTIPLE USB KEYS INSERTED')
-            alert = ConfirmationAlert()
-            alert.props.title = _('Multiple USB keys found')
-            alert.props.msg = _('Only one USB key must be inserted while '
-                                'running this program.\nPlease remove any '
-                                'additional USB keys before launching '
-                                'this activity.')
-            alert.connect('response', self._close_alert_cb)
-            self.add_alert(alert)
-            self._load_intro_graphics(message=alert.props.msg)
-            OK = False
-        elif OK:
-            volume = self.volume_data[0]
-
-        # (3) At least 10MB of free space
-        if OK and checks.is_full(volume['usb_path'],
-                           required=_MINIMUM_SPACE):
-            _logger.error('USB IS FULL')
-            alert = ConfirmationAlert()
-            alert.props.title = _('USB key is full')
-            alert.props.msg = _('No room on USB')
-            alert.connect('response', self._close_alert_cb)
-            self.add_alert(alert)
-            self._load_intro_graphics(message=alert.props.msg)
-            OK = False
-
-        # (4) File is read/write
-        if OK and not checks.is_writeable(volume['usb_path']):
-            _logger.error('CANNOT WRITE TO USB')
-            alert = ConfirmationAlert()
-            alert.props.title = _('Cannot write to USB')
-            alert.props.msg = _('USB key seems to be read-only.')
-            alert.connect('response', self._close_alert_cb)
-            self.add_alert(alert)
-            self._load_intro_graphics(message=alert.props.msg)
-            OK = False
-
-        # (5) Only one set of training data per USB key
-        # We expect UIDs to formated as XXXX-XXXX
-        # We need to make sure we have proper UIDs associated with
-        # the USBs and the files on them match the UID.
-        # (a) If there are no files, we will assign the UID based on the
-        #     volume path;
-        # (b) If there is one file with a valid UID, we use that UID;
-        if OK and len(volume['files']) == 0:
-            volume['uid'] = 'training-data-%s' % \
-                            checks.format_volume_name(volume['basename'])
-            _logger.debug('No training data found. Using UID %s' % 
-                          volume['uid'])
-        elif OK and len(volume['files']) == 1:
-            volume['uid'] = 'training-data-%s' % volume['files'][0][-9:]
-            _logger.debug('Training data found. Using UID %s' % 
-                          volume['uid'])
-        elif OK:
-            _logger.error('MULTIPLE TRAINING-DATA FILES FOUND')
-            alert = ConfirmationAlert()
-            alert.props.title = _('Multiple training-data files found.')
-            alert.props.msg = _('There can only be one set of training '
-                                'data per USB key.')
-            alert.connect('response', self._close_alert_cb)
-            self.add_alert(alert)
-            self._load_intro_graphics(message=alert.props.msg)
-            OK = False
-
-        # (6) We are resuming the activity
-        #     or are we are launching a new instance.
-
-        # We need to sync up file on USB with file on disk,
-        # but only if the email addresses match. Otherwise,
-        # raise an error.
-        if OK:
+        if self._load_extension() and self.check_volume_data():
+            # We are resuming the activity or we are launching a new instance
+            # * Is there a data file to sync on the USB key?
+            # * Do we create a new data file on the USB key?
             path = self._check_for_USB_data()
             if path is None:
                 self._launch_task_master()
@@ -231,6 +123,107 @@ class TrainingActivity(activity.Activity):
                 GObject.timeout_add(1500, self._launch_task_master)
         '''
 
+    def check_volume_data(self):
+        # Lots of corner cases to consider:
+        # (1) We require a USB key
+        # (2) Only one data file on USB key
+        # (3) At least 10MB of free space
+        # (4) File is read/write
+        # (5) Only one set of training data per USB key
+
+        # Before we begin, we need to find any and all USB keys
+        # and any and all training-data files on them.
+        _logger.debug(checks.get_volume_paths())
+        for path in checks.get_volume_paths():
+            os.path.basename(path)
+            self.volume_data.append(
+                {'basename': os.path.basename(path),
+                 'files': checks.look_for_training_data(path),
+                 'sugar_path': os.path.join(self.get_activity_root(),
+                                            'data'),
+                 'usb_path': path})
+            _logger.debug(self.volume_data[-1])
+
+        # (1) We require a USB key
+        if len(self.volume_data) == 0:
+            _logger.error('NO USB KEY INSERTED')
+            alert = ConfirmationAlert()
+            alert.props.title = _('USB key required')
+            alert.props.msg = _('You must insert a USB key before launching '
+                                'this activity.')
+            alert.connect('response', self._close_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics(file_name='insert-usb.html')
+            return False
+
+        # (2) Only one USB key
+        if len(self.volume_data) > 1:
+            _logger.error('MULTIPLE USB KEYS INSERTED')
+            alert = ConfirmationAlert()
+            alert.props.title = _('Multiple USB keys found')
+            alert.props.msg = _('Only one USB key must be inserted while '
+                                'running this program.\nPlease remove any '
+                                'additional USB keys before launching '
+                                'this activity.')
+            alert.connect('response', self._close_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics(message=alert.props.msg)
+            return False
+
+        volume = self.volume_data[0]
+
+        # (3) At least 10MB of free space
+        if checks.is_full(volume['usb_path'],
+                          required=_MINIMUM_SPACE):
+            _logger.error('USB IS FULL')
+            alert = ConfirmationAlert()
+            alert.props.title = _('USB key is full')
+            alert.props.msg = _('No room on USB')
+            alert.connect('response', self._close_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics(message=alert.props.msg)
+            return False
+
+        # (4) File is read/write
+        if not checks.is_writeable(volume['usb_path']):
+            _logger.error('CANNOT WRITE TO USB')
+            alert = ConfirmationAlert()
+            alert.props.title = _('Cannot write to USB')
+            alert.props.msg = _('USB key seems to be read-only.')
+            alert.connect('response', self._close_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics(message=alert.props.msg)
+            return False
+
+        # (5) Only one set of training data per USB key
+        # We expect UIDs to formated as XXXX-XXXX
+        # We need to make sure we have proper UIDs associated with
+        # the USBs and the files on them match the UID.
+        # (a) If there are no files, we will assign the UID based on the
+        #     volume path;
+        # (b) If there is one file with a valid UID, we use that UID;
+        if len(volume['files']) == 0:
+            volume['uid'] = 'training-data-%s' % \
+                            checks.format_volume_name(volume['basename'])
+            _logger.debug('No training data found. Using UID %s' % 
+                          volume['uid'])
+            return True
+        elif len(volume['files']) == 1:
+            volume['uid'] = 'training-data-%s' % volume['files'][0][-9:]
+            _logger.debug('Training data found. Using UID %s' % 
+                          volume['uid'])
+            return True
+        else:
+            _logger.error('MULTIPLE TRAINING-DATA FILES FOUND')
+            alert = ConfirmationAlert()
+            alert.props.title = _('Multiple training-data files found.')
+            alert.props.msg = _('There can only be one set of training '
+                                'data per USB key.')
+            alert.connect('response', self._close_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics(message=alert.props.msg)
+            return False
+
     def _check_for_USB_data(self):
         usb_path = os.path.join(self.volume_data[0]['usb_path'],
                                 self.volume_data[0]['uid'])
@@ -240,6 +233,9 @@ class TrainingActivity(activity.Activity):
             return None
 
     def _sync_data_from_USB(self, usb_data_path=None):
+        # We need to sync up file on USB with file on disk,
+        # but only if the email addresses match. Otherwise,
+        # raise an error.
         if usb_data_path is not None:
             usb_data = {}
             if os.path.exists(usb_data_path):
@@ -723,7 +719,7 @@ class TrainingActivity(activity.Activity):
                                 'system.\nSugar must be restarted before '
                                 'sugarservices can commence.')
 
-            alert.connect('response', self._shutdown_alert_cb)
+            alert.connect('response', self._reboot_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=_('Sugar restart required.'))
 
@@ -738,11 +734,10 @@ class TrainingActivity(activity.Activity):
         self.remove_alert(alert)
         self.close()
 
-    def _shutdown_alert_cb(self, alert, response_id):
+    def _reboot_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
         if response_id is Gtk.ResponseType.OK:
             try:
-                checks.shutdown()
-            except UnknownMethodException:
-                _logger.error(
-                    'Cannot shutdown since shutdown service is not available')
+                checks.reboot()
+            except Exception, e:
+                _logger.error('Cannot reboot: %s' % e)
