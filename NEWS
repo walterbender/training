@@ -13,6 +13,8 @@ NEWS
 * Reorder sections (and modify code to make reordering easier)
 * Check USB status before each task
 * Reword insert-usb copy
+* Added Turtle task to use the Repeat block
+* Generated more artwork for Turtle tasks
 
 1.35
 
