@@ -140,14 +140,14 @@ def get_tasks(task_master):
                    Turtle6Task(task_master),
                    Turtle7Task(task_master),
                    Turtle8Task(task_master),
-                   Physics1Task(task_master),
-                   Physics2Task(task_master),
                    MoreActivities2Task(task_master)]})
     task_list.append(
         {'name': _('Getting to Know Collaboration'),
          'icon': 'badge-views',
          'tasks': [Collaboration1Task(task_master),
                    Collaboration2Task(task_master),
+                   Physics1Task(task_master),
+                   Physics2Task(task_master),
                    Collaboration3Task(task_master),
                    Collaboration4Task(task_master),
                    Collaboration5Task(task_master),
