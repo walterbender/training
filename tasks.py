@@ -1682,7 +1682,7 @@ class Turtle5Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Square')
+        self._name = _('Turtle Pen')
         self.uid = 'turtle-5-task'
         self._uri = 'MoreActivities/turtle5.html'
 
@@ -1717,7 +1717,7 @@ class Turtle6Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Square')
+        self._name = _('Turtle Show Text')
         self.uid = 'turtle-6-task'
         self._uri = 'MoreActivities/turtle6.html'
 
@@ -1726,7 +1726,7 @@ class Turtle7Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Square')
+        self._name = _('Turtle Show Text')
         self.uid = 'turtle-7-task'
         self._uri = 'MoreActivities/turtle7.html'
 
@@ -1757,7 +1757,7 @@ class Turtle8Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Square')
+        self._name = _('Turtle Show Image')
         self.uid = 'turtle-8-task'
         self._uri = 'MoreActivities/turtle8.html'
 
@@ -1766,7 +1766,7 @@ class Turtle9Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Square')
+        self._name = _('Turtle Show Image')
         self.uid = 'turtle-9-task'
         self._uri = 'MoreActivities/turtle9.html'
 

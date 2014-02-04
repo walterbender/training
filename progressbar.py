@@ -112,9 +112,9 @@ class ProgressBar(Gtk.Grid):
 
         n = len(progress_button_data)
         c = 0
-        self.attach(alignment1, c, 1, 7, 1)
+        self.attach(alignment1, c, 1, 6, 1)
         alignment1.show()
-        c += 7
+        c += 6
         self.attach(alignment2, c, 1, 2, 1)
         alignment2.show()
         c += 2
@@ -124,9 +124,9 @@ class ProgressBar(Gtk.Grid):
         self.attach(alignment4, c, 1, 2, 1)
         alignment4.show()
         c += 2
-        self.attach(alignment5, c, 1, 7, 1)
+        self.attach(alignment5, c, 1, 6, 1)
         alignment5.show()
-        c += 7
+        c += 6
 
         box = Gtk.EventBox()
         box.modify_bg(Gtk.StateFlags.NORMAL,
