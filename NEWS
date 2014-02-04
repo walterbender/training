@@ -44,7 +44,8 @@ NEWS
 
 NOTE: The reporting mechanism needs some gconf settings:
       gconftool-2 --set /desktop/sugar/services/training/url
-          "https://localhost:8888/training/report" --type=string
+          "https://harvest.one-education.org:8888/training/report"
+	   --type=string
       gconftool-2 --set /desktop/sugar/services/training/api_key "training"
            --type=string
 
