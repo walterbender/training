@@ -8,6 +8,9 @@ NEWS
   after v3 of sugarservices)
 * Renamed tests to checks so as not to imply there are tests in the training
 * Using a star to indicate current task on progress bar
+* Removed duplicate task in Views section
+* Merged Paul's copy edits
+* Reorder sections (and modify code to make reordering easier)
 
 1.35
 

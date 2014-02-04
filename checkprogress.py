@@ -107,9 +107,14 @@ class ProgressSummary():
                 colors.append(style.COLOR_BUTTON_GREY.get_html())
                 strokes.append(style.COLOR_BUTTON_GREY.get_svg())
         graphics = Graphics()
-        for i in range(self._task_master.get_number_of_sections()):
+        n = self._task_master.get_number_of_sections()
+        for i in range(n):
+            if i == 0 or i == n - 1:
+                name = self._task_master.get_section_name(i)
+            else:
+                name = '%d. %s' % (i, self._task_master.get_section_name(i))
             button = graphics.add_text_icon_and_button(
-                self._task_master.get_section_name(i),
+                name,
                 self._task_master.get_section_icon(i),
                 button_icon='go-right-page',
                 size=FONT_SIZES[self._font_size],

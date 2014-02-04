@@ -39,7 +39,7 @@ def get_tasks(task_master):
                    Welcome5Task(task_master),
                    Welcome6Task(task_master),
                    Welcome7Task(task_master)]},
-        {'name': _('1. Getting to Know the Toolbar'),
+        {'name': _('Getting to Know the Toolbar'),
          'icon': 'badge-toolbar',
          'tasks': [Toolbar1Task(task_master),
                    Toolbar2Task(task_master),
@@ -50,7 +50,7 @@ def get_tasks(task_master):
                    Toolbar7Task(task_master),
                    Toolbar8Task(task_master),
                    Toolbar9Task(task_master)]},
-        {'name': _('2. Getting Connected'),
+        {'name': _('Getting Connected'),
          'icon': 'badge-connected',
          'tasks': [Connected1Task(task_master),
                    Connected2Task(task_master),
@@ -60,7 +60,7 @@ def get_tasks(task_master):
                    Connected6Task(task_master),
                    Connected7Task(task_master),
                    Connected8Task(task_master)]},
-        {'name': _('3. Getting to Know Sugar Activities'),
+        {'name': _('Getting to Know Sugar Activities'),
          'icon': 'badge-activities',
          'tasks': [Activities1Task(task_master),
                    Activities2Task(task_master),
@@ -70,7 +70,7 @@ def get_tasks(task_master):
                    Activities6Task(task_master),
                    Activities7Task(task_master),
                    Activities8Task(task_master)]},
-        {'name': _('4. Getting to Know the Journal'),
+        {'name': _('Getting to Know the Journal'),
          'icon': 'badge-journal',
          'tasks': [Journal1Task(task_master),
                    Journal2Task(task_master),
@@ -80,7 +80,7 @@ def get_tasks(task_master):
                    Journal6Task(task_master),
                    Journal7Task(task_master),
                    Journal8Task(task_master)]},
-        {'name': _('5. Getting to Know the Frame'),
+        {'name': _('Getting to Know the Frame'),
          'icon': 'badge-frame',
          'tasks': [Frame1Task(task_master),
                    Frame2Task(task_master),
@@ -90,7 +90,7 @@ def get_tasks(task_master):
                    Frame6Task(task_master),
                    Frame7Task(task_master),
                    Frame8Task(task_master)]},
-        {'name': _('6. Getting to Know the Views'),
+        {'name': _('Getting to Know the Views'),
          'icon': 'badge-views',
          'tasks': [Views1Task(task_master),
                    Views2Task(task_master),
@@ -99,9 +99,8 @@ def get_tasks(task_master):
                    Views5Task(task_master),
                    Views6Task(task_master),
                    Views7Task(task_master),
-                   Views8Task(task_master),
-                   Views9Task(task_master)]},
-        {'name': _('7. Getting to Know Settings'),
+                   Views8Task(task_master)]},
+        {'name': _('Getting to Know Settings'),
          'icon': 'badge-settings',
          'tasks': [Settings1Task(task_master),
                    Settings2Task(task_master),
@@ -109,7 +108,24 @@ def get_tasks(task_master):
                    Settings4Task(task_master),
                    Settings5Task(task_master),
                    Settings6Task(task_master)]},
-        {'name': _('8. Getting to Know more Activities'),
+    ]
+
+    if checks.is_XO():
+        task_list.append(
+            {'name': _('Learning More About the XO'),
+             'icon': 'badge-xo',
+             'tasks': [XO1Task(task_master),
+                       XO2Task(task_master),
+                       XO3Task(task_master),
+                       XO4Task(task_master),
+                       XO5Task(task_master),
+                       XO6Task(task_master),
+                       XO7Task(task_master),
+                       XO8Task(task_master)]},
+        )
+
+    task_list.append(
+        {'name': _('Getting to Know more Activities'),
          'icon': 'badge-more-activities',
          'tasks': [MoreActivities1Task(task_master),
                    Turtle1Task(task_master),
@@ -123,7 +139,7 @@ def get_tasks(task_master):
                    Physics1Task(task_master),
                    Physics2Task(task_master),
                    MoreActivities2Task(task_master)]},
-        {'name': _('9. Getting to Know Collaboration'),
+        {'name': _('Getting to Know Collaboration'),
          'icon': 'badge-views',
          'tasks': [Collaboration1Task(task_master),
                    Collaboration2Task(task_master),
@@ -133,23 +149,6 @@ def get_tasks(task_master):
                    Collaboration6Task(task_master),
                    Collaboration7Task(task_master),
                    Collaboration8Task(task_master)]}
-    ]
-
-    if checks.is_XO():
-        task_list.append(
-            {'name': _('10. Learning More About the XO'),
-             'icon': 'badge-xo',
-             'tasks': [XO1Task(task_master),
-                       XO2Task(task_master),
-                       XO3Task(task_master),
-                       XO4Task(task_master),
-                       XO5Task(task_master),
-                       XO6Task(task_master),
-                       XO7Task(task_master),
-                       XO8Task(task_master)]},
-        )
-
-    task_list.append(
         {'name': _('Assessment'),
          'icon': 'badge-intro',
          'tasks': [Assessment1Task(task_master),
@@ -1413,15 +1412,6 @@ class Views6Task(HTMLTask):
         self.uid = 'views-6-task'
         self._uri = 'Views/views6.html'
 
-
-class Views7Task(HTMLTask):
-
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
-        self._name = _('Removing a Favourite from the Home View Video')
-        self.uid = 'views-7-task'
-        self._uri = 'Views/views7.html'
-
     def get_requires(self):
         return ['validate-email-task', 'views-5-task']
 
@@ -1447,13 +1437,13 @@ class Views7Task(HTMLTask):
         return ('Home', 'home_view.html')
 
 
-class Views8Task(HTMLTask):
+class Views7Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Switch Between the Four Views')
-        self.uid = 'views-8-task'
-        self._uri = 'Views/views8.html'
+        self.uid = 'views-7-task'
+        self._uri = 'Views/views7.html'
         self._views = []
 
     def get_requires(self):
@@ -1475,13 +1465,13 @@ class Views8Task(HTMLTask):
         return len(self._views) > 2
 
 
-class Views9Task(HTMLTask):
+class Views8Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Views Badge')
-        self.uid = 'views-9-task'
-        self._uri = 'Views/views9.html'
+        self.uid = 'views-8-task'
+        self._uri = 'Views/views8.html'
         self._section_index = 6
 
 
@@ -1798,7 +1788,10 @@ class MoreActivities2Task(BadgeTask):
         self._name = _('More Activities Badge')
         self.uid = 'more-activities-2-task'
         self._uri = 'MoreActivities/moreactivities2.html'
-        self._section_index = 8
+        if checks.is_XO():
+            self._section_index = 9
+        else:
+            self._section_index = 8
 
 
 class Collaboration1Task(HTMLTask):
@@ -1898,7 +1891,10 @@ class Collaboration8Task(BadgeTask):
         self._name = _('Collaboration Badge')
         self.uid = 'collaboration-8-task'
         self._uri = 'Collaboration/collaboration8.html'
-        self._section_index = 9
+        if checks.is_XO():
+            self._section_index = 10
+        else:
+            self._section_index = 9
 
 
 '''
