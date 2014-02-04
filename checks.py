@@ -19,6 +19,7 @@ import statvfs
 import glob
 from random import uniform
 
+from gi.repository import Vte
 from gi.repository import Gio
 from gi.repository import Gdk
 from gi.repository import Gtk
@@ -67,17 +68,29 @@ battery_model = None
 proxy = None
 
 
-def shutdown():
+def reboot():
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
         proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
-        dbus.Interface(proxy, _DBUS_SERVICE).Shutdown() 
+        dbus.Interface(proxy, _DBUS_SERVICE).Reboot() 
     except Exception, e:
-        _logger.error('ERROR shutting down Sugar: %s' % e)
+        _logger.error('ERROR rebooting down Sugar: %s' % e)
 
+        _logger.error('Trying VTE method...')
+        # If we cannot reboot using the Sugar service, try from a VT
+        vt = Vte.Terminal()
+        success_, pid = vt.fork_command_full(
+            Vte.PtyFlags.DEFAULT,
+            os.environ["HOME"],
+            ['/usr/bin/sudo', '/usr/sbin/reboot'],
+            [],
+            GLib.SpawnFlags.DO_NOT_REAP_CHILD,
+            None,
+            None)
+        _logger.error('VTE %s %s' % (str(success_), str(pid)))
 
 def get_webservice_paths():
     global proxy
