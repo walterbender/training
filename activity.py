@@ -40,6 +40,7 @@ EMAIL_UID = 'email_address'
 SCHOOL_UID = 'school_name'
 TRAINING_DATA_UID = 'training_data_uid'
 VERSION_NUMBER = 'version_number'
+COMPLETION_PERCENTAGE = 'completion_percentage'
 TRAINING_DATA_EMAIL = 'training_data_email'
 TRAINING_DATA_FULLNAME = 'training_data_fullname'
 

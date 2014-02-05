@@ -30,7 +30,7 @@ from progressbar import ProgressBar
 import checks
 from graphics import Graphics
 from activity import (TRAINING_DATA_UID, NAME_UID, EMAIL_UID,
-                      VERSION_NUMBER)
+                      VERSION_NUMBER, COMPLETION_PERCENTAGE)
 
 
 class TaskMaster(Gtk.Grid):
@@ -816,4 +816,4 @@ class TaskMaster(Gtk.Grid):
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
              _('Overall: %d%%' % (completion_percentage))))
-        self.write_task_data('completion_percentage', completion_percentage)
+        self.write_task_data(COMPLETION_PERCENTAGE, completion_percentage)
