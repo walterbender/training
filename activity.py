@@ -39,6 +39,7 @@ NAME_UID = 'name'
 EMAIL_UID = 'email_address'
 SCHOOL_UID = 'school_name'
 TRAINING_DATA_UID = 'training_data_uid'
+VERSION_NUMBER = 'version_number'
 _TRAINING_DATA_EMAIL = 'training_data_email'
 _TRAINING_DATA_FULLNAME = 'training_data_fullname'
 
@@ -53,8 +54,8 @@ _logger = logging.getLogger('training-activity')
 
 
 _MINIMUM_SPACE = 1024 * 1024 * 10  # 10MB is very conservative
-
 _SUGARSERVICES_VERSION = 4
+ACTIVITY_VERSION = 1.37
 
 
 class TrainingActivity(activity.Activity):

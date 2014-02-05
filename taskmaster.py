@@ -29,7 +29,8 @@ import tasks
 from progressbar import ProgressBar
 import checks
 from graphics import Graphics
-from activity import TRAINING_DATA_UID, NAME_UID, EMAIL_UID
+from activity import (TRAINING_DATA_UID, NAME_UID, EMAIL_UID,
+                      VERSION_NUMBER, ACTIVITY_VERSION)
 
 
 class TaskMaster(Gtk.Grid):
@@ -670,8 +671,9 @@ class TaskMaster(Gtk.Grid):
 
         data[uid] = uid_data
 
-        # Make sure the volume UID is present
+        # Make sure the volume UID and version number are present
         data[TRAINING_DATA_UID] = self.activity.volume_data[0]['uid']
+        data[VERSION_NUMBER] = ACTIVITY_VERSION
 
         json_data = json.dumps(data)
 
@@ -807,9 +809,11 @@ class TaskMaster(Gtk.Grid):
         else:
             self._progress_bar.next_task_button.set_sensitive(False)
 
+        completion_percentage = int(
+                 (self._get_number_of_completed_collectables() * 100.)
+                 / self._get_number_of_collectables())
         self.activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
-             _('Overall: %d%%' % (int(
-                 (self._get_number_of_completed_collectables() * 100.)
-                 / self._get_number_of_collectables())))))
+             _('Overall: %d%%' % (completion_percentage))))
+        self.write_task_data('completion_percentage', completion_percentage)
