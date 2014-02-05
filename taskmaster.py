@@ -89,7 +89,7 @@ class TaskMaster(Gtk.Grid):
         grid.set_column_spacing(style.DEFAULT_SPACING)
         grid.set_column_homogeneous(True)
 
-        self._refresh_button = Gtk.Button(_('Refresh Page'))
+        self._refresh_button = Gtk.Button(_('Refresh'))
         self._refresh_button.connect('clicked', self._refresh_button_cb)
         left = Gtk.Alignment.new(xalign=0, yalign=0.5, xscale=0, yscale=0)
         left.add(self._refresh_button)

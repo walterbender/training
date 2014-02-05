@@ -1604,8 +1604,8 @@ class Turtle3Task(HTMLTask):
     def get_requires(self):
         return ['validate-email-task']
 
-    def is_collectable(self):
-        return True
+    # def is_collectable(self):
+    #     return True
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
@@ -1651,8 +1651,8 @@ class Turtle3aTask(HTMLTask):
     def get_requires(self):
         return ['validate-email-task']
 
-    def is_collectable(self):
-        return True
+    # def is_collectable(self):
+    #     return True
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
@@ -1692,8 +1692,8 @@ class Turtle5Task(HTMLTask):
     def get_requires(self):
         return ['turtle-3-task']
 
-    def is_collectable(self):
-        return True
+    # def is_collectable(self):
+    #     return True
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
@@ -1736,8 +1736,8 @@ class Turtle7Task(HTMLTask):
     def get_requires(self):
         return ['turtle-5-task']
 
-    def is_collectable(self):
-        return True
+    # def is_collectable(self):
+    #     return True
 
     def test(self, task_data):
         activity = checks.get_most_recent_instance(
@@ -1776,8 +1776,8 @@ class Turtle9Task(HTMLTask):
     def get_requires(self):
         return ['turtle-7-task']
 
-    def is_collectable(self):
-        return True
+    # def is_collectable(self):
+    #     return True
 
     def test(self, task_data):
         activity = checks.get_most_recent_instance(
@@ -1817,8 +1817,8 @@ class Physics2Task(HTMLTask):
     def get_requires(self):
         return ['validate-email-task']
 
-    def is_collectable(self):
-        return True
+    # def is_collectable(self):
+    #     return True
 
     def test(self, task_data):
         return checks.saw_new_launch('org.laptop.physics',
@@ -1881,8 +1881,8 @@ class Collaboration4Task(HTMLTask):
     def get_requires(self):
         return ['validate-email-task']
 
-    def is_collectable(self):
-        return True
+    # def is_collectable(self):
+    #     return True
 
     def get_requires(self):
         return ['physics-2-task']
@@ -2165,15 +2165,16 @@ class Assessment2Task(HTMLTask):
             dsobject = datastore.create()
             if dsobject is not None:
                 _logger.debug('creating Assessment entry in Journal')
-                dsobject.metadata['title'] = task_data['data'] + '.rtf'
+                dsobject.metadata['title'] = task_data['data'] + '.odt'
                 dsobject.metadata['icon-color'] = \
                     checks.get_colors().to_string()
                 dsobject.metadata['tags'] = \
                     self._task_master.activity.volume_data[0]['uid']
-                dsobject.metadata['mime_type'] = 'text/rtf'
+                dsobject.metadata['mime_type'] = \
+                    'application/vnd.oasis.opendocument.text'
                 dsobject.set_file_path(
                     os.path.join(self._task_master.activity.bundle_path,
-                                 'Assessment.rtf'))
+                                 'Assessment.odt'))
                 datastore.write(dsobject)
                 dsobject.destroy()
             return False
@@ -2182,10 +2183,10 @@ class Assessment2Task(HTMLTask):
             # FIX ME: What if they changed the name???
             _logger.debug(os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
-                task_data['data'] + '.rtf'))
+                task_data['data'] + '.odt'))
             return os.path.exists(os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
-                task_data['data'] + '.rtf'))
+                task_data['data'] + '.odt'))
 
 
 class Assessment3Task(BadgeTask):

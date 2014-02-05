@@ -1,5 +1,13 @@
 NEWS
 
+1.37
+* Merged Paul's videos for Views and Toolbars sections
+* Added Laura's rough draft of assessment text
+* Added completion_percentage field to database
+* Added activity version to database
+* Don't include more activities and collaboration tasks in required list
+* Refresh rather than Refresh Page to match video content
+
 1.36
 
 * Set vertical alignment of images to middle.
@@ -16,6 +24,7 @@ NEWS
 * Added Turtle task to use the Repeat block
 * Generated more artwork for Turtle tasks
 * Sugarized the badge icons
+* Added uid to progress bar
 
 1.35
 
