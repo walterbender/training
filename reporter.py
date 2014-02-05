@@ -17,16 +17,22 @@ from gi.repository import Gio
 from gi.repository import GObject
 from gi.repository import Soup
 
+from activity import (TRAINING_DATA_UID, EMAIL_UID, NAME_UID,
+                      SCHOOL_UID, COMPLETION_PERCENTAGE,
+                      VERSION_NUMBER)
+
 
 _logger = logging.getLogger('training-activity-reporter')
 
 
 def _extract_trainee(data):
     trainee = []
-    trainee.append(data.get('training_data_uid', None))
-    trainee.append(data.get('email_address', None))
-    trainee.append(data.get('name', None))
-    trainee.append(data.get('school_name', None))
+    trainee.append(data.get(TRAINING_DATA_UID, None))
+    trainee.append(data.get(EMAIL_UID, None))
+    trainee.append(data.get(NAME_UID, None))
+    trainee.append(data.get(SCHOOL_UID, None))
+    trainee.append(data.get(COMPLETION_PERCENTAGE, None))
+    trainee.append(data.get(VERSION_NUMBER, None))
     return trainee
 
 
