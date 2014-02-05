@@ -15,6 +15,7 @@ import os
 from shutil import copy
 import json
 import subprocess
+from ConfigParser import ConfigParser
 from gettext import gettext as _
 
 from gi.repository import Gtk
@@ -56,7 +57,6 @@ _logger = logging.getLogger('training-activity')
 
 _MINIMUM_SPACE = 1024 * 1024 * 10  # 10MB is very conservative
 _SUGARSERVICES_VERSION = 4
-ACTIVITY_VERSION = 1.37
 
 
 class TrainingActivity(activity.Activity):
@@ -417,9 +417,24 @@ class TrainingActivity(activity.Activity):
     def _configure_cb(self, event):
         self._task_master.reload_graphics()
 
-    def get_version(self):
-        # FIXME: grab from activity.info file
-        return ACTIVITY_VERSION
+    def get_activity_version(self):
+        info_path = os.path.join(self.bundle_path, 'activity', 'activity.info')
+        try:
+            info_file = open(info_path, 'r')
+        except:
+            _logger.error('Could not open %s: %s' % (info_path, e))
+            return 'unknown'
+
+        cp = ConfigParser()
+        cp.readfp(info_file)
+
+        section = 'Activity'
+
+        if cp.has_option(section, 'activity_version'):
+            activity_version = cp.get(section, 'activity_version')
+        else:
+            activity_version = 'unknown'
+        return activity_version
 
     def get_uid(self):
         if len(self.volume_data) == 1:

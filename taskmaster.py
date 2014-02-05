@@ -673,7 +673,7 @@ class TaskMaster(Gtk.Grid):
 
         # Make sure the volume UID and version number are present
         data[TRAINING_DATA_UID] = self.activity.get_uid()
-        data[VERSION_NUMBER] = self.activity.get_version()
+        data[VERSION_NUMBER] = self.activity.get_activity_version()
 
         json_data = json.dumps(data)
 
