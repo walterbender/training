@@ -1,5 +1,9 @@
 NEWS
 
+1.38
+* Better handling of insert/remove USB (no restart required)
+
+
 1.37
 * Merged Paul's videos for Views and Toolbars sections
 * Added Laura's rough draft of assessment text
