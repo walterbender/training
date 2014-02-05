@@ -7,6 +7,8 @@ NEWS
 * Added activity version to database
 * Don't include more activities and collaboration tasks in required list
 * Refresh rather than Refresh Page to match video content
+* Using activity.info for version number
+* Merged Tincho's updates to the reporter
 
 1.36
 

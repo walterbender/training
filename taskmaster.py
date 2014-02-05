@@ -150,7 +150,8 @@ class TaskMaster(Gtk.Grid):
 
         # Recheck USB status each time
         if not self.activity.check_volume_data():
-            return
+            _logger.debug('Check volume data failed')
+            # return
 
         # If we are displaying the task summary, do nothing
         if self._summary is not None:

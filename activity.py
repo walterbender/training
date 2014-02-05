@@ -755,12 +755,11 @@ class TrainingActivity(activity.Activity):
 
     def _remove_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
-        if response_id is Gtk.ResponseType.OK:
-            self.close()
 
     def _close_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
-        self.close()
+        if response_id is Gtk.ResponseType.OK:
+            self.close()
 
     def _reboot_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
