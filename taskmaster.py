@@ -30,7 +30,7 @@ from progressbar import ProgressBar
 import checks
 from graphics import Graphics
 from activity import (TRAINING_DATA_UID, NAME_UID, EMAIL_UID,
-                      VERSION_NUMBER, ACTIVITY_VERSION)
+                      VERSION_NUMBER)
 
 
 class TaskMaster(Gtk.Grid):
@@ -672,8 +672,8 @@ class TaskMaster(Gtk.Grid):
         data[uid] = uid_data
 
         # Make sure the volume UID and version number are present
-        data[TRAINING_DATA_UID] = self.activity.volume_data[0]['uid']
-        data[VERSION_NUMBER] = ACTIVITY_VERSION
+        data[TRAINING_DATA_UID] = self.activity.get_uid()
+        data[VERSION_NUMBER] = self.activity.get_version()
 
         json_data = json.dumps(data)
 

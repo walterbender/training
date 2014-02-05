@@ -416,6 +416,16 @@ class TrainingActivity(activity.Activity):
     def _configure_cb(self, event):
         self._task_master.reload_graphics()
 
+    def get_version(self):
+        # FIXME: grab from activity.info file
+        return ACTIVITY_VERSION
+
+    def get_uid(self):
+        if len(self.volume_data) == 1:
+            return self.volume_data[0]['uid']
+        else:
+            return 'unknown'
+
     def write_file(self, file_path):
         # Only write if we have a valid USB/data file to work with.
         if len(self.volume_data) == 1 and \
