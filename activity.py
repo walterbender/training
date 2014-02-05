@@ -40,8 +40,8 @@ EMAIL_UID = 'email_address'
 SCHOOL_UID = 'school_name'
 TRAINING_DATA_UID = 'training_data_uid'
 VERSION_NUMBER = 'version_number'
-_TRAINING_DATA_EMAIL = 'training_data_email'
-_TRAINING_DATA_FULLNAME = 'training_data_fullname'
+TRAINING_DATA_EMAIL = 'training_data_email'
+TRAINING_DATA_FULLNAME = 'training_data_fullname'
 
 from toolbar_utils import separator_factory, label_factory, button_factory
 from taskmaster import TaskMaster
@@ -440,11 +440,11 @@ class TrainingActivity(activity.Activity):
                 email = self._task_master.read_task_data(EMAIL_UID)
                 if email is None:
                     email = ''
-                self.metadata[_TRAINING_DATA_EMAIL] = email
+                self.metadata[TRAINING_DATA_EMAIL] = email
                 name = self._task_master.read_task_data(NAME_UID)
                 if name is None:
                     name = ''
-                self.metadata[_TRAINING_DATA_FULLNAME] = name
+                self.metadata[TRAINING_DATA_FULLNAME] = name
 
         self.metadata['font_size'] = str(self.font_size)
 
