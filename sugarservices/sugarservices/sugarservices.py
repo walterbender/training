@@ -75,21 +75,25 @@ class SugarServices(dbus.service.Object):
 
         try:
             self._shell_model = shell.get_model()
+            logging.debug('SUGARSERVICES GOT SHELL MODEL')
         except Exception, e:
             logging.error('Problem getting shell model: %s' % e)
 
         try:
             self._session = session.get_session_manager()
+            logging.debug('SUGARSERVICES GOT SESSION MANAGER')
         except Exception, e:
             logging.error('Problem getting session manager: %s' % e)
 
         try:
             self._journal = journalactivity.get_journal()
+            logging.debug('SUGARSERVICES GOT JOURNAL')
         except Exception, e:
             logging.error('Problem getting Journal: %s' % e)
 
         try:
             self._network = NetworkManagerObserver()
+            logging.debug('SUGARSERVICES GOT NETWORK MANAGER')
         except Exception, e:
             logging.error('Problem getting NetworkManager: %s' % e)
             return
