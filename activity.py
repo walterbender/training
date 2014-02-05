@@ -18,6 +18,7 @@ import subprocess
 from ConfigParser import ConfigParser
 from gettext import gettext as _
 
+from gi.repository import Gio
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
@@ -79,6 +80,10 @@ class TrainingActivity(activity.Activity):
         self.connect('completed', self.__transfer_completed_cb)
         self.connect('failed', self.__transfer_failed_cb)
 
+        self.volume_monitor = Gio.VolumeMonitor.get()
+        self.volume_monitor.connect('mount-added', self._mount_added_cb)
+        self.volume_monitor.connect('mount-removed', self._mount_removed_cb)
+
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
         else:
@@ -102,16 +107,7 @@ class TrainingActivity(activity.Activity):
             # We are resuming the activity or we are launching a new instance
             # * Is there a data file to sync on the USB key?
             # * Do we create a new data file on the USB key?
-            path = self._check_for_USB_data()
-            if path is None:
-                self._launch_task_master()
-            elif self._sync_data_from_USB(path):
-                self._copy_data_from_USB()
-                # Flash a welcome back screen
-                self._load_intro_graphics(
-                    file_name='welcome-back.html')
-                GObject.timeout_add(1500, self._launch_task_master)
-
+            self._launcher()
         '''
             # Could be a mismatch between the USB UID and the
             # instance UID, in which case, we should go with
@@ -124,6 +120,16 @@ class TrainingActivity(activity.Activity):
                     file_name='welcome-back.html')
                 GObject.timeout_add(1500, self._launch_task_master)
         '''
+
+    def _launcher(self):
+        path = self._check_for_USB_data()
+        if path is None:
+            self._launch_task_master()
+        elif self._sync_data_from_USB(path):
+            self._copy_data_from_USB()
+            # Flash a welcome back screen
+            self._load_intro_graphics(file_name='welcome-back.html')
+            GObject.timeout_add(1500, self._launch_task_master)
 
     def check_volume_data(self):
         # Before we begin (and before each task),
@@ -148,7 +154,7 @@ class TrainingActivity(activity.Activity):
             alert.props.title = _('USB key required')
             alert.props.msg = _('You must insert a USB key before launching '
                                 'this activity.')
-            alert.connect('response', self._close_alert_cb)
+            alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(file_name='insert-usb.html')
             return False
@@ -162,7 +168,7 @@ class TrainingActivity(activity.Activity):
                                 'running this program.\nPlease remove any '
                                 'additional USB keys before launching '
                                 'this activity.')
-            alert.connect('response', self._close_alert_cb)
+            alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=alert.props.msg)
             return False
@@ -763,3 +769,15 @@ class TrainingActivity(activity.Activity):
                 checks.reboot()
             except Exception, e:
                 _logger.error('Cannot reboot: %s' % e)
+
+    def _mount_added_cb(self, volume_monitor, device):
+        _logger.error('mount added')
+        if self.check_volume_data():
+            _logger.debug('launching')
+            self._launcher()
+
+    def _mount_removed_cb(self, volume_monitor, device):
+        _logger.error('mount removed')
+        if self.check_volume_data():
+            _logger.debug('launching')
+            self._launcher()
