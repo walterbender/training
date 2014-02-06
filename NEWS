@@ -1,8 +1,11 @@
 NEWS
 
 1.39
+* Suspend power management while running the activity
 * Fixed problem with set_active on Battery buttons
 * pep8 cleanup
+* Lots of copy edits
+* Added test for checking progress summary
 
 1.38
 * Better handling of insert/remove USB (no restart required)
