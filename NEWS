@@ -5,6 +5,7 @@ NEWS
 * Fixed problem with set_active on Battery buttons
 * pep8 cleanup
 * ''Lots'' of copy edits
+* New artwork: rotate, dimmer, bright, Gnome
 * Added test for checking progress summary
 * Grab focus when entering text
 
