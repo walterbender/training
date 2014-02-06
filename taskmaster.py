@@ -789,12 +789,12 @@ class TaskMaster(Gtk.Grid):
 
         # Set button sensitivity True for completed tasks and current task
         if task_index < tasks_in_section:
-            for task_index in range(tasks_in_section - 1):
-                task = self._task_list[section_index]['tasks'][task_index]
+            for ti in range(tasks_in_section - 1):
+                task = self._task_list[section_index]['tasks'][ti]
                 if task.is_completed():
-                    self._progress_bar.set_button_sensitive(task_index, True)
+                    self._progress_bar.set_button_sensitive(ti, True)
                 else:
-                    self._progress_bar.set_button_sensitive(task_index, False)
+                    self._progress_bar.set_button_sensitive(ti, False)
             # Current task (last task in section has no button)
             if task_index < tasks_in_section - 1:
                 self._progress_bar.set_button_sensitive(task_index, True)
