@@ -28,7 +28,22 @@ from graphics import Graphics, FONT_SIZES
 import checks
 from reporter import Reporter
 
-HOUR = 60 * 60
+_HOUR = 60 * 60
+
+# These tasks are requirements for other tasks
+_ENTER_NAME_TASK = 'enter-name-task'
+_ENTER_EMAIL_TASK = 'enter-email-task'
+_VALIDATE_EMAIL_TASK = 'validate-email-task'
+_ENTER_SCHOOL_TASK = 'enter-school-task'
+_RECORD_SAVE_TASK = 'record-save-task'
+_WRITE_SAVE_TASK = 'write-save-task'
+_PORTFOLIO_TASK = 'portfolio-task'
+_FAVORITES_TASK = 'adding-favorites-task'
+_TURTLE_SQUARE_TASK = 'turtle-square-task'
+_TURTLE_SHOW_TASK = 'turtle-show-task'
+_PHYSICS_PLAY_TASK = 'physics-play-task'
+_PHYSICS_COLLABORATION_TASK = 'physics-collaboration-task'
+_XO_TABLET_TASK = 'xo-tablet-task'
 
 
 def get_tasks(task_master):
@@ -343,7 +358,7 @@ class Welcome1Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Welcome One')
+        self._name = _('Welcome')
         self.uid = 'welcome-1-task'
         self._uri = 'Welcome/welcome1.html'
         self._prompt = _("Let's go!")
@@ -353,8 +368,8 @@ class Welcome2Task(Task):
 
     def __init__(self, task_master):
         Task.__init__(self, task_master)
-        self._name = _('Enter Your Name')  # Welcome Two
-        self.uid = 'enter-name-task'  # 'welcome-2-task'
+        self._name = _('Enter Your Name')
+        self.uid = _ENTER_NAME_TASK
         self._uri = 'Welcome/welcome2.html'
         self._entry = None
         self._height = 400
@@ -400,7 +415,7 @@ class Welcome3Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Welcome Three')
+        self._name = _('Greetings')
         self.uid = 'welcome-3-task'
         self._uri = 'Welcome/welcome3.html'
 
@@ -423,14 +438,14 @@ class Welcome4Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Enter Your Email')  # Welcome Four
-        self.uid = 'enter-email-task'  # 'welcome-4-task'
+        self._name = _('Enter Your Email')
+        self.uid = _ENTER_EMAIL_TASK
         self._uri = 'Welcome/welcome4.html'
         self._entry = None
         self._height = 400
 
     def get_requires(self):
-        return ['enter-name-task']
+        return [_ENTER_NAME_TASK]
 
     def skip_if_completed(self):
         return True
@@ -478,8 +493,8 @@ class Welcome5Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Validate Email')  # Welcome Five
-        self.uid = 'validate-email-task' # 'welcome-5-task'
+        self._name = _('Validate Email')
+        self.uid = _VALIDATE_EMAIL_TASK
         self._uri = 'Welcome/welcome5.html'
         self._entries = []
 
@@ -490,7 +505,7 @@ class Welcome5Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['enter-email-task']
+        return [_ENTER_EMAIL_TASK]
 
     def test(self, task_data):
         if len(self._entries) < 2:
@@ -539,7 +554,7 @@ class Welcome6Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Welcome Four')
+        self._name = _('Sections')
         self.uid = 'welcome-6-task'
         self._uri = 'Welcome/welcome6.html'
 
@@ -548,7 +563,7 @@ class Welcome7Task(BadgeTask):
 
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
-        self._name = _('Welcome Seven')
+        self._name = _('Welcome Badge')
         self.uid = 'welcome-7-task'
         self._uri = 'Welcome/welcome7.html'
         self._title = _("Congratulations!\nYou’ve earned your first badge!")
@@ -591,7 +606,7 @@ class Toolbar3Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Stopping an Activity Video')
+        self._name = _('Stopping an Activity (Video)')
         self.uid = 'toolbar-3-task'
         self._uri = 'Toolbar/toolbar3.html'
 
@@ -599,7 +614,7 @@ class Toolbar3Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -650,7 +665,7 @@ class Toolbar6Task(HTMLTask):
         self._goals = []
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -691,7 +706,7 @@ class Toolbar8Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -741,7 +756,7 @@ class Connected4Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Connecting to a WiFi Network Video')
+        self._name = _('Connecting to a WiFi Network (Video)')
         self.uid = 'connected-4-task'
         self._uri = 'Connected/connected4.html'
 
@@ -768,7 +783,7 @@ class Connected5Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['enter-name-task', 'enter-email-task']
+        return [_ENTER_NAME_TASK, _VALIDATE_EMAIL_TASK]
 
     def test(self, task_data):
         if len(self._entries) < 2:
@@ -821,8 +836,8 @@ class Connected6Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Enter School Name')  # Connected Six
-        self.uid = 'enter-school-name-task'  # 'connected-6-task'
+        self._name = _('Enter School Name')
+        self.uid = _ENTER_SCHOOL_TASK
         self._uri = 'Connected/connected6.html'
         self._height = 300
         self._graphics = None
@@ -878,7 +893,6 @@ class Connected6Task(HTMLTask):
     def after_button_press(self):
         school = self._entry.get_text()
         self._task_master.write_task_data(SCHOOL_UID, school)
-        _logger.debug(self._override)
         if school in self._schools:
             return True
         else:
@@ -920,8 +934,7 @@ class Connected7Task(HTMLTask):
         self._uri = 'Connected/connected7.html'
 
     def get_requires(self):
-        return ['enter-name-task', 'enter-email-task',
-                'enter-school-name-task']
+        return [_ENTER_NAME_TASK, _VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK]
 
     def get_graphics(self, page=0):
         self._entries = []
@@ -983,15 +996,15 @@ class Activities3Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Take a Picture with Record Video')
-        self.uid = 'record-save-task'  # 'activities-3-task'
+        self._name = _('Take a Picture with Record (Video)')
+        self.uid = _RECORD_SAVE_TASK
         self._uri = 'Activities/activities3.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -1001,11 +1014,12 @@ class Activities3Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.RecordActivity',
-                                     task_data['start_time'] - HOUR):
+                                     task_data['start_time'] - _HOUR):
             return False
         paths = checks.get_jpg()
         return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > task_data['start_time'] - HOUR
+            checks.get_modified_time(paths[0]) > \
+            task_data['start_time'] - _HOUR
 
 
 class Activities4Task(HTMLTask):
@@ -1021,12 +1035,12 @@ class Activities5Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Insert a Picture into a Write Document Video')
+        self._name = _('Insert a Picture into a Write Document (Video)')
         self.uid = 'write-save-task'  # 'activities-5-task'
         self._uri = 'Activities/activities5.html'
 
     def get_requires(self):
-        return ['validate-email-task', 'record-save-task']
+        return [_VALIDATE_EMAIL_TASK, _RECORD_SAVE_TASK]
 
     def is_collectable(self):
         return True
@@ -1039,7 +1053,7 @@ class Activities5Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.AbiWordActivity',
-                                    task_data['start_time'] - HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         # We need the clipboard text for the Speak task
         # if not checks.is_clipboard_text_available():
@@ -1066,12 +1080,12 @@ class Activities7Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Make Speak Talk to You Video')
-        self.uid = 'speak-task'  # 'activities-7-task'
+        self._name = _('Make Speak Talk to You (Video)')
+        self.uid = 'speak-task'
         self._uri = 'Activities/activities7.html'
 
     def get_requires(self):
-        return ['validate-email-task', 'write-save-task']
+        return [_VALIDATE_EMAIL_TASK, _WRITE_SAVE_TASK]
 
     def is_collectable(self):
         return True
@@ -1084,7 +1098,7 @@ class Activities7Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('vu.lux.olpc.Speak',
-                                    task_data['start_time'] - HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         # Has any setting changed?
         status = checks.get_speak_settings(
@@ -1132,7 +1146,7 @@ class Journal3Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Viewing the Journal Video')
+        self._name = _('Viewing the Journal (Video)')
         self.uid = 'journal-3-task'
         self._uri = 'Journal/journal3.html'
 
@@ -1140,7 +1154,7 @@ class Journal3Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -1182,15 +1196,15 @@ class Journal5Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Usining the Portfolio Video')
-        self.uid = 'journal-5-task'
+        self._name = _('Using the Portfolio (Video)')
+        self.uid = _PORTFOLIO_TASK
         self._uri = 'Journal/journal5.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -1208,11 +1222,12 @@ class Journal5Task(HTMLTask):
         if not checks.get_starred_count() > task_data['data']:
             return False
         if not checks.saw_new_launch('org.sugarlabs.PortfolioActivity',
-                                    task_data['start_time'] - HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         paths = checks.get_pdf()
         return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > task_data['start_time'] - HOUR
+            checks.get_modified_time(paths[0]) > \
+            task_data['start_time'] - _HOUR
 
 
 class Journal6Task(HTMLTask):
@@ -1228,7 +1243,7 @@ class Journal7Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Copy your Presentation to USB')
+        self._name = _('Copy your Presentation to USB (Video)')
         self.uid = 'journal-7-task'
         self._uri = 'Journal/journal7.html'
 
@@ -1236,7 +1251,7 @@ class Journal7Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['validate-email-task', 'journal-5-task']
+        return [_VALIDATE_EMAIL_TASK, _PORTFOLIO_TASK]
 
     def is_collectable(self):
         return True
@@ -1248,7 +1263,8 @@ class Journal7Task(HTMLTask):
         paths = checks.look_for_file_type(
             self._task_master.activity.volume_data[0]['usb_path'], '.pdf')
         return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > task_data['start_time'] - HOUR
+            checks.get_modified_time(paths[0]) > \
+            task_data['start_time'] - _HOUR
 
 
 class Journal8Task(HTMLTask):
@@ -1292,7 +1308,7 @@ class Frame3Task(HTMLTask):
         self._height = 400
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -1339,7 +1355,7 @@ class Frame4Task(HTMLTask):
         self._uri = 'Frame/frame4.html'
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -1414,7 +1430,7 @@ class Views3Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('The Views of Sugar Video')
+        self._name = _('The Views of Sugar (Video)')
         self.uid = 'views-3-task'
         self._uri = 'Views/views3.html'
 
@@ -1435,12 +1451,12 @@ class Views5Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Adding a Favourite to the Home View Video')
-        self.uid = 'views-5-task'
+        self._name = _('Adding a Favourite to the Home View (Video)')
+        self.uid = _FAVORITES_TASK
         self._uri = 'Views/views5.html'
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def get_refresh(self):
         return True
@@ -1469,11 +1485,11 @@ class Views6Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Removing a Favourite from the Home View')
-        self.uid = 'views-6-task'
+        self.uid = 'removing-favorites-task'
         self._uri = 'Views/views6.html'
 
     def get_requires(self):
-        return ['validate-email-task', 'views-5-task']
+        return [_VALIDATE_EMAIL_TASK, _FAVORITES_TASK]
 
     def is_collectable(self):
         return True
@@ -1507,7 +1523,7 @@ class Views7Task(HTMLTask):
         self._views = []
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -1557,12 +1573,12 @@ class Settings3Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Changing the XO Nickname and Colours Video')
+        self._name = _('Changing the XO Nickname and Colours (Video)')
         self.uid = 'settings-3-task'
         self._uri = 'Settings/settings3.html'
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -1605,7 +1621,7 @@ class Settings5Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Other settings')
+        self._name = _('Other Settings')
         self.uid = 'settings-5-task'
         self._uri = 'Settings/settings5.html'
 
@@ -1649,22 +1665,22 @@ class Turtle3Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Square Video')
-        self.uid = 'turtle-3-task'
+        self._name = _('Turtle Square (Video)')
+        self.uid = _TURTLE_SQUARE_TASK
         self._uri = 'MoreActivities/turtle3.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     # def is_collectable(self):
     #     return True
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time'] - HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1696,7 +1712,7 @@ class Turtle3aTask(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Square Video')
+        self._name = _('Turtle Square (Video)')
         self.uid = 'turtle-3a-task'
         self._uri = 'MoreActivities/turtle3a.html'
 
@@ -1704,14 +1720,14 @@ class Turtle3aTask(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK, _TURTLE_SQUARE_TASK]
 
     # def is_collectable(self):
     #     return True
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time'] - HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1738,21 +1754,21 @@ class Turtle5Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Pen')
-        self.uid = 'turtle-5-task'
+        self.uid = 'turtle-pen-task'
         self._uri = 'MoreActivities/turtle5.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['turtle-3-task']
+        return [_VALIDATE_EMAIL_TASK, _TURTLE_SQUARE_TASK]
 
     # def is_collectable(self):
     #     return True
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time'] - HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1782,14 +1798,14 @@ class Turtle7Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Show Text')
-        self.uid = 'turtle-7-task'
+        self.uid = _TURTLE_SHOW_TASK
         self._uri = 'MoreActivities/turtle7.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['turtle-5-task']
+        return [_VALIDATE_EMAIL_TASK, _TURTLE_SQUARE_TASK]
 
     # def is_collectable(self):
     #     return True
@@ -1821,15 +1837,15 @@ class Turtle9Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Show Image')
-        self.uid = 'turtle-9-task'
+        self._name = _('Turtle Show Image (Video)')
+        self.uid = 'turtle-journal-task'
         self._uri = 'MoreActivities/turtle9.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['turtle-7-task']
+        return [_VALIDATE_EMAIL_TASK, _TURTLE_SHOW_TASK]
 
     # def is_collectable(self):
     #     return True
@@ -1843,7 +1859,8 @@ class Turtle9Task(HTMLTask):
                 return False
         paths = checks.get_png()
         return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > task_data['start_time'] - HOUR
+            checks.get_modified_time(paths[0]) > \
+            task_data['start_time'] - _HOUR
 
     def get_my_turn(self):
         return True
@@ -1862,22 +1879,22 @@ class Physics2Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Physics Play Video')
-        self.uid = 'physics-2-task'
+        self._name = _('Physics Play (Video)')
+        self.uid = _PHYSICS_PLAY_TASK
         self._uri = 'MoreActivities/physics2.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     # def is_collectable(self):
     #     return True
 
     def test(self, task_data):
         return checks.saw_new_launch('org.laptop.physics',
-                                    task_data['start_time'] - HOUR)
+                                    task_data['start_time'] - _HOUR)
 
     def get_my_turn(self):
         return True
@@ -1926,21 +1943,18 @@ class Collaboration4Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Collaborating with Physics Video')
-        self.uid = 'collaboration-4-task'
+        self._name = _('Collaborating with Physics (Video)')
+        self.uid = _PHYSICS_COLLABORATION_TASK
         self._uri = 'Collaboration/collaboration4.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK, _PHYSICS_PLAY_TASK]
 
     # def is_collectable(self):
     #     return True
-
-    def get_requires(self):
-        return ['physics-2-task']
 
     def test(self, task_data):
         for activity in checks.get_activity('org.laptop.physics'):
@@ -1973,7 +1987,7 @@ class Collaboration6Task(HTMLTask):
         return True
 
     def get_requires(self):
-        return ['collaboration-4-task']
+        return [_VALIDATE_EMAIL_TASK, _PHYSICS_COLLABORATION_TASK]
 
 
 class Collaboration7Task(HTMLTask):
@@ -2055,15 +2069,15 @@ class XO3Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Switch to Tablet Mode Video')
-        self.uid = 'xo-3-task'
+        self._name = _('Switch to Tablet Mode (Video)')
+        self.uid = _XO_TABLET_TASK
         self._uri = 'XO/xo3.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -2077,11 +2091,14 @@ class XO4Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Play with the Gamepad Keys')
-        self.uid = 'xo-4-task'
+        self.uid = 'xo-gamepad-task'
         self._uri = 'XO/xo4.html'
 
     def is_collectable(self):
         return True
+
+    def get_requires(self):
+        return [_VALIDATE_EMAIL_TASK]
 
     def test(self, task_data):
         if task_data['data'] is None:
@@ -2112,15 +2129,15 @@ class XO6Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Switch Back to Laptop Mode Video')
-        self.uid = 'xo-6-task'
+        self._name = _('Switch Back to Laptop Mode (Video)')
+        self.uid = 'xo-laptop-task'
         self._uri = 'XO/xo6.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
-        return ['validate-email-task', 'xo-3-task']
+        return [_VALIDATE_EMAIL_TASK, _XO_TABLET_TASK]
 
     def is_collectable(self):
         return True
@@ -2134,12 +2151,12 @@ class XO7Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Change the Screen Orientation')
-        self.uid = 'xo-7-task'
+        self.uid = 'xo-rotate-task'
         self._uri = 'XO/xo7.html'
         self._goals = []
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK]
 
     def is_collectable(self):
         return True
@@ -2207,7 +2224,7 @@ class Assessment2Task(HTMLTask):
         self._uri = 'Assessment/assessment-yes.html'
 
     def get_requires(self):
-        return ['validate-email-task']
+        return [_VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK]
 
     def is_collectable(self):
         return True
