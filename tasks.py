@@ -207,7 +207,7 @@ class Task():
 
     def after_button_press(self):
         ''' Anything special to do after the task is completed? '''
-        return
+        return True
 
     def get_success(self):
         ''' String to present to the user when task is completed '''
@@ -333,6 +333,7 @@ class BadgeTask(HTMLTask):
                 icon=self._task_master.get_section_icon(self._section_index))
             self._task_master.write_task_data(self.uid, task_data)
         self._report_progress()
+        return True
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -373,6 +374,7 @@ class Welcome2Task(Task):
     def after_button_press(self):
         self._task_master.write_task_data(NAME_UID, self._entry.get_text())
         self._task_master.activity.update_activity_title()
+        return True
 
     def get_graphics(self, page=0):
         self._entry = None
@@ -450,6 +452,7 @@ class Welcome4Task(HTMLTask):
     def after_button_press(self):
         _logger.debug('Writing email address: %s' % self._entry.get_text())
         self._task_master.write_task_data(EMAIL_UID, self._entry.get_text())
+        return True
 
     def get_graphics(self, page=0):
         self._entry = []
@@ -509,6 +512,7 @@ class Welcome5Task(HTMLTask):
     def after_button_press(self):
         self._task_master.write_task_data(EMAIL_UID,
                                           self._entries[1].get_text())
+        return True
 
     def get_graphics(self, page=0):
         self._entries = []
@@ -784,6 +788,7 @@ class Connected5Task(HTMLTask):
     def after_button_press(self):
         self._task_master.write_task_data(EMAIL_UID,
                                           self._entries[1].get_text())
+        return True
 
     def get_graphics(self, page=0):
         self._entries = []
@@ -818,12 +823,13 @@ class Connected6Task(HTMLTask):
         HTMLTask.__init__(self, task_master)
         self._name = _('Enter School Name')  # Connected Six
         self.uid = 'enter-school-name-task'  # 'connected-6-task'
+        self._uri = 'Connected/connected6.html'
+        self._height = 300
+        self._graphics = None
         self._entry = None
         self._buttons = []
+        self._schools = []
         self._completer = None
-        self._grpahics = None
-        self._height = 300
-        self._uri = 'Connected/connected6.html'
 
     def is_collectable(self):
         return True
@@ -832,9 +838,9 @@ class Connected6Task(HTMLTask):
         if self._completer is None:
             f = open(os.path.join(self._task_master.activity.bundle_path,
                                   'schools.txt'), 'r')
-            schools = f.read().split('\n')
+            self._schools = f.read().split('\n')
             f.close()
-            self._completer = checks.Completer(schools)
+            self._completer = checks.Completer(self._schools)
 
         if len(self._entry.get_text()) == 0:
             return False
@@ -862,8 +868,27 @@ class Connected6Task(HTMLTask):
                         results[i], self._button_cb, arg=results[i]))
                 self._buttons[-1].show()
 
+    def _yes_no_cb(self, widget, arg):
+        if arg == 'yes':
+            self._task_master.current_task += 1
+            self._task_master.write_task_data('current_task',
+                                             self._task_master.current_task)
+        self._task_master.task_master()
+
     def after_button_press(self):
-        self._task_master.write_task_data(SCHOOL_UID, self._entry.get_text())
+        school = self._entry.get_text()
+        self._task_master.write_task_data(SCHOOL_UID, school)
+        _logger.debug(self._override)
+        if school in self._schools:
+            return True
+        else:
+            # Confirm that it is OK to use a school not in the list.
+            self._task_master.task_button.hide()
+            self._graphics.add_text(_('Your school does not appear in our '
+                                      'list of schools in Australia. '
+                                      'OK to continue?'))
+            self._graphics.add_yes_no_buttons(self._yes_no_cb)
+            return False
 
     def get_graphics(self, page=0):
         self._entries = []

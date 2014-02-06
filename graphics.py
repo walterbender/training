@@ -220,6 +220,7 @@ class Graphics(Gtk.ScrolledWindow):
         nobutton.show()
         self._attach_center(grid)
         grid.show()
+        return [yesbutton, nobutton]
 
     def add_radio_buttons(self, button_icons, colors=None):
         alignment = Gtk.Alignment.new(0.5, 0.5, 0, 0)

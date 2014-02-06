@@ -4,6 +4,7 @@ NEWS
 * Better handling of insert/remove USB (no restart required)
 * Fixed badge icon colors
 * Added school auto-completion
+* Added confirmation for schools not on our list
 
 1.37
 * Merged Paul's videos for Views and Toolbars sections

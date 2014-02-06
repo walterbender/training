@@ -51,7 +51,7 @@ class TaskMaster(Gtk.Grid):
         self._graphics = None
         self._summary = None
         self._page = 0
-        self._task_button = None
+        self.task_button = None
         self._first_time = True
         self._accumulated_time = 0
         self._yes_task = None
@@ -108,10 +108,10 @@ class TaskMaster(Gtk.Grid):
         yes_next_no_grid.attach(self._yes_button, 0, 0, 1, 1)
         self._yes_button.hide()
 
-        self._task_button = Gtk.Button(_('Next'))
-        self._task_button.connect('clicked', self._task_button_cb)
-        yes_next_no_grid.attach(self._task_button, 1, 0, 1, 1)
-        self._task_button.show()
+        self.task_button = Gtk.Button(_('Next'))
+        self.task_button.connect('clicked', self._task_button_cb)
+        yes_next_no_grid.attach(self.task_button, 1, 0, 1, 1)
+        self.task_button.show()
 
         self._no_button = Gtk.Button(_('No'))
         self._no_button.connect('clicked', self._jump_to_task_cb, 'no')
@@ -193,10 +193,10 @@ class TaskMaster(Gtk.Grid):
             advance to the next task. '''
         self.button_was_pressed = True
         section, task_index = self.get_section_index()
-        self._task_list[section]['tasks'][task_index].after_button_press()
-        self.current_task += 1
-        self.write_task_data('current_task', self.current_task)
-        self.task_master()
+        if self._task_list[section]['tasks'][task_index].after_button_press():
+            self.current_task += 1
+            self.write_task_data('current_task', self.current_task)
+            self.task_master()
 
     def _my_turn_button_cb(self, button):
         ''' Take me to the Home Page. '''
@@ -268,8 +268,8 @@ class TaskMaster(Gtk.Grid):
     def _test(self, test, task_data, uid):
         ''' Is the task complete? '''
         if test(task_data):
-            if self._task_button is not None:
-                self._task_button.set_sensitive(True)
+            if self.task_button is not None:
+                self.task_button.set_sensitive(True)
             if not 'completed' in task_data or not task_data['completed']:
                 task_data = self.read_task_data(uid)
                 task_data['end_time'] = int(time.time() + 0.5)
@@ -277,8 +277,8 @@ class TaskMaster(Gtk.Grid):
                 self._update_accumutaled_time(task_data)
             self.write_task_data(uid, task_data)
         else:
-            if self._task_button is not None:
-                self._task_button.set_sensitive(False)
+            if self.task_button is not None:
+                self.task_button.set_sensitive(False)
             if not 'completed' in task_data or not task_data['completed']:
                 self._update_accumutaled_time(task_data)
             self.write_task_data(uid, task_data)
@@ -370,8 +370,8 @@ class TaskMaster(Gtk.Grid):
         if self._graphics is not None:
             self._graphics.destroy()
             # self._graphics = None
-        if hasattr(self, '_task_button') and self._task_button is not None:
-            self._task_button.hide()
+        if hasattr(self, '_task_button') and self.task_button is not None:
+            self.task_button.hide()
 
     def _load_graphics(self):
         ''' Load the graphics for a task and define the task button '''
@@ -403,13 +403,13 @@ class TaskMaster(Gtk.Grid):
         self._yes_task, self._no_task = \
             self._task_list[section]['tasks'][task_index].get_yes_no_tasks()
         if self._yes_task is not None and self._no_task is not None:
-            self._task_button.hide()
+            self.task_button.hide()
             self._yes_button.show()
             self._no_button.show()
-        elif self._task_button is not None:
-            self._task_button.set_label(label)
-            self._task_button.set_sensitive(False)
-            self._task_button.show()
+        elif self.task_button is not None:
+            self.task_button.set_label(label)
+            self.task_button.set_sensitive(False)
+            self.task_button.show()
             self._yes_button.hide()
             self._no_button.hide()
 
@@ -431,15 +431,15 @@ class TaskMaster(Gtk.Grid):
         if self._graphics is not None:
             self._graphics.destroy()
         if hasattr(self, 'task_button'):
-            self._task_button.destroy()
-        self._graphics, self._task_button = \
+            self.task_button.destroy()
+        self._graphics, self.task_button = \
             self._task_list[section]['tasks'][task_index].get_graphics(
                 page=self._page)
         self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
         self._graphics.show()
-        if self._task_button is not None:
-            self._task_button.set_sensitive(test(self._task_data))
-            self._task_button.show()
+        if self.task_button is not None:
+            self.task_button.set_sensitive(test(self._task_data))
+            self.task_button.show()
 
     def _prev_page_cb(self, button):
         if self._page > 0:
