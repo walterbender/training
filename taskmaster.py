@@ -180,7 +180,7 @@ class TaskMaster(Gtk.Grid):
             self._graphics = Graphics()
             url = os.path.join(self.get_bundle_path(), 'html-content',
                                'completed.html')
-            self._graphics.add_uri('file://' + url + '?NAME=' + \
+            self._graphics.add_uri('file://' + url + '?NAME=' +
                                    checks.get_safe_text(
                                        self.read_task_data(NAME_UID)))
             self._graphics.set_zoom_level(0.667)
@@ -294,7 +294,7 @@ class TaskMaster(Gtk.Grid):
             uid = self._yes_task
         else:
             uid = self._no_task
-        self.current_task = self.uid_to_task_number(uid)       
+        self.current_task = self.uid_to_task_number(uid)
         section, task_index = self.get_section_index()
         self.write_task_data('current_task', self.current_task)
         self.task_master()
@@ -432,13 +432,12 @@ class TaskMaster(Gtk.Grid):
             self._graphics.destroy()
         if hasattr(self, 'task_button'):
             self.task_button.destroy()
-        self._graphics, self.task_button = \
-            self._task_list[section]['tasks'][task_index].get_graphics(
-                page=self._page)
+        task = self._task_list[section]['tasks'][task_index]
+        self._graphics, self.task_button = task.get_graphics(page=self._page)
         self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
         self._graphics.show()
         if self.task_button is not None:
-            self.task_button.set_sensitive(test(self._task_data))
+            self.task_button.set_sensitive(task.test(self._task_data))
             self.task_button.show()
 
     def _prev_page_cb(self, button):
@@ -496,9 +495,9 @@ class TaskMaster(Gtk.Grid):
             _logger.error('Bad section number %d' % (section))
             return self._task_list[0]['tasks'][0].uid
         elif task_index < 0 or \
-             task_index > len(self._task_list[section]['tasks']) - 1:
-            _logger.error('Bad task number %d:%d' % (section, task_index))
-            return self._task_list[0]['tasks'][0].uid
+            task_index > len(self._task_list[section]['tasks']) - 1:
+                _logger.error('Bad task number %d:%d' % (section, task_index))
+                return self._task_list[0]['tasks'][0].uid
         else:
             return self._task_list[section]['tasks'][task_index].uid
 
@@ -573,7 +572,6 @@ class TaskMaster(Gtk.Grid):
 
         uid_data = None
         usb_read_failed = False
-        sugar_read_failed = False
         data = {}
 
         if os.path.exists(usb_data_path):
@@ -603,13 +601,11 @@ class TaskMaster(Gtk.Grid):
                 except Exception, e:
                     _logger.error('Could not read from %s: %s' %
                                   (sugar_data_path, e))
-                    sugar_read_failed = True
                 if len(json_data) > 0:
                     try:
                         data = json.loads(json_data)
                     except ValueError, e:
                         _logger.error('Cannot load training data: %s' % e)
-                        sugar_read_failed = True
 
         if uid is None:
             return data
@@ -791,11 +787,12 @@ class TaskMaster(Gtk.Grid):
 
         # Set button sensitivity True for completed tasks and current task
         if task_index < tasks_in_section:
-            for task in range(tasks_in_section - 1):
-                if self._task_list[section_index]['tasks'][task].is_completed():
-                    self._progress_bar.set_button_sensitive(task, True)
+            for task_index in range(tasks_in_section - 1):
+                task = self._task_list[section_index]['tasks'][task_index]
+                if task.is_completed():
+                    self._progress_bar.set_button_sensitive(task_index, True)
                 else:
-                    self._progress_bar.set_button_sensitive(task, False)
+                    self._progress_bar.set_button_sensitive(task_index, False)
             # Current task (last task in section has no button)
             if task_index < tasks_in_section - 1:
                 self._progress_bar.set_button_sensitive(task_index, True)
@@ -811,8 +808,8 @@ class TaskMaster(Gtk.Grid):
             self._progress_bar.next_task_button.set_sensitive(False)
 
         completion_percentage = int(
-                 (self._get_number_of_completed_collectables() * 100.)
-                 / self._get_number_of_collectables())
+            (self._get_number_of_completed_collectables() * 100.)
+            / self._get_number_of_collectables())
         self.activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',

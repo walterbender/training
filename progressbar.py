@@ -14,7 +14,6 @@ import logging
 _logger = logging.getLogger('training-activity-progressbar')
 
 from gi.repository import Gtk
-from gi.repository import Gdk
 
 from sugar3.graphics import style
 
@@ -32,7 +31,7 @@ class ProgressBar(Gtk.Grid):
 
         self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
-        self.set_border_width(0) # style.DEFAULT_SPACING * 2)
+        self.set_border_width(0)  # style.DEFAULT_SPACING * 2)
         self.set_column_homogeneous(True)
 
         alignment1 = Gtk.Alignment.new(
@@ -53,7 +52,7 @@ class ProgressBar(Gtk.Grid):
         grid = Gtk.Grid()
         grid.set_row_spacing(0)  # style.DEFAULT_SPACING)
         grid.set_column_spacing(style.DEFAULT_SPACING)
-        grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
+        grid.set_border_width(0)  # style.DEFAULT_SPACING * 2)
         grid.set_size_request(-1, _HEIGHT)
         grid.attach(self.prev_task_button, 0, 0, 1, 1)
         self.prev_task_button.show()
@@ -64,9 +63,9 @@ class ProgressBar(Gtk.Grid):
         alignment3 = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
         grid = Gtk.Grid()
-        grid.set_row_spacing(0) # style.DEFAULT_SPACING)
+        grid.set_row_spacing(0)  # style.DEFAULT_SPACING)
         grid.set_column_spacing(style.DEFAULT_SPACING)
-        grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
+        grid.set_border_width(0)  # style.DEFAULT_SPACING * 2)
         grid.set_size_request(-1, _HEIGHT)
         self._progress_buttons = []
         for i, button_data in enumerate(progress_button_data):
@@ -92,7 +91,7 @@ class ProgressBar(Gtk.Grid):
         grid = Gtk.Grid()
         grid.set_row_spacing(0)  # style.DEFAULT_SPACING)
         grid.set_column_spacing(style.DEFAULT_SPACING)
-        grid.set_border_width(0) # style.DEFAULT_SPACING * 2)
+        grid.set_border_width(0)  # style.DEFAULT_SPACING * 2)
         grid.set_size_request(-1, _HEIGHT)
         grid.attach(self.next_task_button, 0, 0, 1, 1)
         self.next_task_button.show()

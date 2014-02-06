@@ -30,7 +30,6 @@ from gi.repository import GObject
 from sugar3 import env
 from sugar3.datastore import datastore
 from sugar3 import profile
-from sugar3.graphics.objectchooser import FILTER_TYPE_ACTIVITY
 from sugar3.graphics.xocolor import XoColor
 
 from jarabe.model import shell
@@ -62,7 +61,7 @@ _MINIMUM_SPACE = 1024 * 1024 * 10
 _DBUS_SERVICE = 'org.sugarlabs.SugarServices'
 _DBUS_SHELL_IFACE = 'org.sugarlabs.SugarServices'
 _DBUS_PATH = '/org/sugarlabs/SugarServices'
- 
+
 volume_monitor = None
 battery_model = None
 proxy = None
@@ -78,7 +77,7 @@ def reboot():
             _logger.error('ERROR rebooting Sugar (proxy): %s' % e)
             _vte_reboot()
     try:
-        dbus.Interface(proxy, _DBUS_SERVICE).Reboot() 
+        dbus.Interface(proxy, _DBUS_SERVICE).Reboot()
     except Exception, e:
         _logger.error('ERROR rebooting Sugar: %s' % e)
         _vte_reboot()
@@ -98,6 +97,7 @@ def _vte_reboot():
             None)
         _logger.error('VTE %s %s' % (str(success_), str(pid)))
 
+
 def get_webservice_paths():
     global proxy
     if proxy is None:
@@ -105,7 +105,7 @@ def get_webservice_paths():
         proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
 
     try:
-        paths = dbus.Interface(proxy, _DBUS_SERVICE).GetWebServiceModulePaths() 
+        paths = dbus.Interface(proxy, _DBUS_SERVICE).GetWebServiceModulePaths()
         _logger.debug(paths)
         return json.loads(paths)
 
@@ -137,8 +137,9 @@ def unexpected_training_data_files(path, name):
 
 def is_full(path, required=_MINIMUM_SPACE):
     ''' Make sure we have some room to write our data '''
-    stat = os.statvfs(path)
-    free_space = stat[statvfs.F_BSIZE] * stat[statvfs.F_BAVAIL]
+    volume_status = os.statvfs(path)
+    free_space = volume_status[statvfs.F_BSIZE] * \
+                 volume_status[statvfs.F_BAVAIL]
     _logger.debug('free space: %d MB' % int(free_space / (1024 * 1024)))
     if free_space < required:
         _logger.error('free space: %d MB' % int(free_space / (1024 * 1024)))
@@ -646,8 +647,9 @@ def get_pdf():
 
 
 def get_odt():
-    dsobjects, nobjects = datastore.find({'mime_type':
-        ['application/vnd.oasis.opendocument.text']})
+    dsobjects, nobjects = datastore.find(
+        {'mime_type':
+         ['application/vnd.oasis.opendocument.text']})
     paths = []
     for dsobject in dsobjects:
         paths.append(dsobject.file_path)
@@ -659,10 +661,8 @@ def get_speak_settings(activity):
     try:
         configuration = json.loads(file(file_path, 'r').read())
         status = json.loads(configuration['status'])
-    except Exception, e:
-        # This is due to the fact that the Speak activity has not yet written
-        # out its data.
-        # _logger.error('Could not read json data from Speak activity: %s' % e)
+    except Exception:
+        # Ignore: Speak activity has not yet written out its data.
         return None
     return status
 
@@ -836,12 +836,12 @@ class Completer(object):
     def complete(self, text, state):
         if state == 0:  # on first trigger, build possible matches
             if text:  # cache matches (entries that start with entered text)
-                self.matches = [s for s in self.options 
+                self.matches = [s for s in self.options
                                 if s and s.startswith(text)]
             else:  # no text entered, all matches possible
                 self.matches = self.options[:]
 
-        try: 
+        try:
             return self.matches
         except IndexError:
             return None

@@ -12,7 +12,6 @@
 
 import dbus
 import os
-from shutil import copy
 import json
 import subprocess
 from ConfigParser import ConfigParser
@@ -208,12 +207,12 @@ class TrainingActivity(activity.Activity):
         if len(volume['files']) == 0:
             volume['uid'] = 'training-data-%s' % \
                             checks.format_volume_name(volume['basename'])
-            _logger.debug('No training data found. Using UID %s' % 
+            _logger.debug('No training data found. Using UID %s' %
                           volume['uid'])
             return True
         elif len(volume['files']) == 1:
             volume['uid'] = 'training-data-%s' % volume['files'][0][-9:]
-            _logger.debug('Training data found. Using UID %s' % 
+            _logger.debug('Training data found. Using UID %s' %
                           volume['uid'])
             return True
         else:
@@ -337,16 +336,16 @@ class TrainingActivity(activity.Activity):
             # Copy incompleted tasks from one to two
             for key in data_one:
                 if isinstance(data_one[key], dict) and \
-                   (not 'completed' in data_one[key] or \
-                   not data_one[key]['completed']):
-                    data_two[key] = data_one[key]
+                   (not 'completed' in data_one[key] or
+                    not data_one[key]['completed']):
+                        data_two[key] = data_one[key]
 
             # Copy incompleted tasks from two to one
             for key in data_two:
                 if isinstance(data_two[key], dict) and \
-                   (not 'completed' in data_two[key] or \
-                   not data_two[key]['completed']):
-                    data_one[key] = data_two[key]
+                   (not 'completed' in data_two[key] or
+                    not data_two[key]['completed']):
+                        data_one[key] = data_two[key]
 
             # Copy name, email_address, current_task...
             for key in data_one:
@@ -413,7 +412,7 @@ class TrainingActivity(activity.Activity):
         if message is None:
             graphics.add_uri('file://' + url)
         else:
-            graphics.add_uri('file://' + url + '?MSG=' + \
+            graphics.add_uri('file://' + url + '?MSG=' +
                              checks.get_safe_text(message))
         graphics.set_zoom_level(0.667)
         center_in_panel.add(graphics)
@@ -428,7 +427,7 @@ class TrainingActivity(activity.Activity):
         info_path = os.path.join(self.bundle_path, 'activity', 'activity.info')
         try:
             info_file = open(info_path, 'r')
-        except:
+        except Exception, e:
             _logger.error('Could not open %s: %s' % (info_path, e))
             return 'unknown'
 
@@ -476,7 +475,7 @@ class TrainingActivity(activity.Activity):
         if name is not None:
             bundle_name = activity.get_bundle_name()
             self.metadata['title'] = _('%(name)s %(bundle)s Activity') % \
-                                     {'name': name, 'bundle': bundle_name}
+                {'name': name, 'bundle': bundle_name}
 
     def _setup_toolbars(self):
         ''' Setup the toolbars. '''
@@ -602,11 +601,10 @@ class TrainingActivity(activity.Activity):
         else:
             self._copy_entry = None
 
-        self._copy_button.set_sensitive(
-            webkit is not None or text_entry is not None)
+        self._copy_button.set_sensitive(webkit is not None or
+                                        text_entry is not None)
 
     def _copy_cb(self, button):
-        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         if self._copy_entry is not None:
             self._copy_entry.copy_clipboard()
         elif self._webkit is not None:
@@ -701,7 +699,7 @@ class TrainingActivity(activity.Activity):
 
     def _load_extension(self):
         extensions_path = os.path.join(os.path.expanduser('~'), '.sugar',
-                                      'default', 'extensions')
+                                       'default', 'extensions')
         webservice_path = os.path.join(extensions_path, 'webservice')
         sugarservices_path = os.path.join(self.bundle_path, 'sugarservices')
         init_path = os.path.join(self.bundle_path, 'sugarservices',

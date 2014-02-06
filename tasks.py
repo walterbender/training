@@ -334,7 +334,7 @@ class BadgeTask(HTMLTask):
         self._title = _("Congratulations!\nYou’ve earned another badge!")
         self._uri = 'Welcome/welcome7.html'
 
-    def _report_progress(self): 
+    def _report_progress(self):
         _logger.debug('reporting...')
         reporter = Reporter(self._task_master.activity)
         reporter.report([self._task_master.read_task_data()])
@@ -398,7 +398,7 @@ class Welcome2Task(Task):
                            self._uri)
 
         graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url, height=self._height)
+        graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
         if target is not None:
             self._entry = graphics.add_entry(text=target)
@@ -476,7 +476,7 @@ class Welcome4Task(HTMLTask):
                            self._uri)
 
         graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url, height=self._height)
+        graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
         if email is not None:
             self._entry = graphics.add_entry(text=email)
@@ -537,7 +537,7 @@ class Welcome5Task(HTMLTask):
 
         graphics = Graphics()
         self._entries.append(graphics.add_entry(text=email))
-        webkit = graphics.add_uri('file://' + url, height=400)
+        graphics.add_uri('file://' + url, height=400)
         graphics.set_zoom_level(self._zoom_level)
         if email is None:  # Should never happen
             email = ''
@@ -685,6 +685,7 @@ class Toolbar6Task(HTMLTask):
             return not checks.is_expanded(
                 self._task_master.activity.view_toolbar_button)
 
+
 class Toolbar7Task(HTMLTask):
 
     def __init__(self, task_master):
@@ -820,7 +821,7 @@ class Connected5Task(HTMLTask):
                             checks.get_safe_text(email)))
 
         graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url, height=400)
+        graphics.add_uri('file://' + url, height=400)
         graphics.set_zoom_level(self._zoom_level)
         self._entries.append(graphics.add_entry(text=name))
         self._entries.append(graphics.add_entry(text=email))
@@ -887,7 +888,7 @@ class Connected6Task(HTMLTask):
         if arg == 'yes':
             self._task_master.current_task += 1
             self._task_master.write_task_data('current_task',
-                                             self._task_master.current_task)
+                                              self._task_master.current_task)
         self._task_master.task_master()
 
     def after_button_press(self):
@@ -911,7 +912,7 @@ class Connected6Task(HTMLTask):
                            self._uri)
 
         self._graphics = Graphics()
-        webkit = self._graphics.add_uri('file://' + url, height=self._height)
+        self._graphics.add_uri('file://' + url, height=self._height)
         self._graphics.set_zoom_level(self._zoom_level)
         if target is not None:
             self._entry = self._graphics.add_entry(text=target)
@@ -1053,7 +1054,7 @@ class Activities5Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.AbiWordActivity',
-                                    task_data['start_time'] - _HOUR):
+                                     task_data['start_time'] - _HOUR):
             return False
         # We need the clipboard text for the Speak task
         # if not checks.is_clipboard_text_available():
@@ -1098,7 +1099,7 @@ class Activities7Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('vu.lux.olpc.Speak',
-                                    task_data['start_time'] - _HOUR):
+                                     task_data['start_time'] - _HOUR):
             return False
         # Has any setting changed?
         status = checks.get_speak_settings(
@@ -1222,7 +1223,7 @@ class Journal5Task(HTMLTask):
         if not checks.get_starred_count() > task_data['data']:
             return False
         if not checks.saw_new_launch('org.sugarlabs.PortfolioActivity',
-                                    task_data['start_time'] - _HOUR):
+                                     task_data['start_time'] - _HOUR):
             return False
         paths = checks.get_pdf()
         return len(paths) > 0 and \
@@ -1679,7 +1680,7 @@ class Turtle3Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time'] - _HOUR):
+                                     task_data['start_time'] - _HOUR):
             return False
         activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1726,7 +1727,7 @@ class Turtle3aTask(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time'] - _HOUR):
+                                     task_data['start_time'] - _HOUR):
             return False
         activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1767,7 +1768,7 @@ class Turtle5Task(HTMLTask):
 
     def test(self, task_data):
         if not checks.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time'] - _HOUR):
+                                     task_data['start_time'] - _HOUR):
             return False
         activity = checks.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1893,7 +1894,7 @@ class Physics2Task(HTMLTask):
 
     def test(self, task_data):
         return checks.saw_new_launch('org.laptop.physics',
-                                    task_data['start_time'] - _HOUR)
+                                     task_data['start_time'] - _HOUR)
 
     def get_my_turn(self):
         return True
@@ -2045,6 +2046,7 @@ class ClipboardTask(Task):
             return True
         return False
 '''
+
 
 class XO1Task(HTMLTask):
 
