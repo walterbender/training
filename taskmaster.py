@@ -379,20 +379,18 @@ class TaskMaster(Gtk.Grid):
         ''' Load the graphics for a task and define the task button '''
         section, task_index = self.get_section_index()
 
-        self._task_list[section]['tasks'][task_index].set_font_size(
-            self.activity.font_size)
-        self._task_list[section]['tasks'][task_index].set_zoom_level(
-            self.activity.zoom_level)
+        task = self._task_list[section]['tasks'][task_index]
+        task.set_font_size(self.activity.font_size)
+        task.set_zoom_level(self.activity.zoom_level)
 
         if self._graphics is not None:
             self._graphics.destroy()
-        self._graphics, label = \
-            self._task_list[section]['tasks'][task_index].get_graphics()
+        self._graphics, label = task.get_graphics()
 
         self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
         self._graphics.show()
 
-        if self._task_list[section]['tasks'][task_index].get_page_count() > 1:
+        if task.get_page_count() > 1:
             self._prev_page_button.show()
             self._prev_page_button.set_sensitive(False)
             self._next_page_button.show()
@@ -402,8 +400,7 @@ class TaskMaster(Gtk.Grid):
             self._prev_page_button.hide()
             self._next_page_button.hide()
 
-        self._yes_task, self._no_task = \
-            self._task_list[section]['tasks'][task_index].get_yes_no_tasks()
+        self._yes_task, self._no_task = task.get_yes_no_tasks()
         if self._yes_task is not None and self._no_task is not None:
             self.task_button.hide()
             self._yes_button.show()
@@ -415,17 +412,19 @@ class TaskMaster(Gtk.Grid):
             self._yes_button.hide()
             self._no_button.hide()
 
-        if self._task_list[section]['tasks'][task_index].get_refresh():
+        if task.get_refresh():
             self._refresh_button.show()
         else:
             self._refresh_button.hide()
 
-        if self._task_list[section]['tasks'][task_index].get_my_turn():
+        if task.get_my_turn():
             self._my_turn_button.show()
         else:
             self._my_turn_button.hide()
 
         self._update_progress()
+
+        task.grab_focus()
 
     def _show_page(self):
         ''' Some tasks have multiple pages '''

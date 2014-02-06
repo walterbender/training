@@ -219,6 +219,9 @@ class Task():
         ''' The test to determine if task is completed '''
         raise NotImplementedError
 
+    def grab_focus(self):
+        return
+
     def after_button_press(self):
         ''' Anything special to do after the task is completed? '''
         return True
@@ -399,12 +402,15 @@ class Welcome2Task(Task):
             self._entry = graphics.add_entry(text=target)
         else:
             self._entry = graphics.add_entry()
-        self._entry.grab_focus()
 
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)
 
         return graphics, self._prompt
+
+    def grab_focus(self):
+        self._entry.set_can_focus(True)
+        self._entry.grab_focus()
 
 
 class Welcome3Task(HTMLTask):
@@ -474,12 +480,15 @@ class Welcome4Task(HTMLTask):
             self._entry = graphics.add_entry(text=email)
         else:
             self._entry = graphics.add_entry()
-        self._entry.grab_focus()
 
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)
 
         return graphics, self._prompt
+
+    def grab_focus(self):
+        self._entry.set_can_focus(True)
+        self._entry.grab_focus()
 
 
 class Welcome5Task(HTMLTask):
@@ -532,7 +541,6 @@ class Welcome5Task(HTMLTask):
         if email is None:  # Should never happen
             email = ''
         self._entries.append(graphics.add_entry())
-        self._entries[-1].grab_focus()
 
         # Paste to second entry
         self._task_master.activity.set_copy_widget(text_entry=self._entries[0])
@@ -540,6 +548,10 @@ class Welcome5Task(HTMLTask):
             text_entry=self._entries[-1])
 
         return graphics, self._prompt
+
+    def grab_focus(self):
+        self._entries[-1].set_can_focus(True)
+        self._entries[-1].grab_focus()
 
 
 class Welcome6Task(HTMLTask):
@@ -918,12 +930,15 @@ class Connected6Task(HTMLTask):
         else:
             self._entry = self._graphics.add_entry()
         self._entry.connect('key_press_event', self._entry_cb)
-        self._entry.grab_focus()
 
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)
 
         return self._graphics, self._prompt
+
+    def grab_focus(self):
+        self._entry.set_can_focus(True)
+        self._entry.grab_focus()
 
 
 class Connected7Task(HTMLTask):
@@ -2112,6 +2127,10 @@ class XO4Task(HTMLTask):
                 return True
             else:
                 return False
+
+    def grab_focus(self):
+        self._task_master.set_can_focus(True)
+        self._task_master.grab_focus()
 
 
 class XO5Task(HTMLTask):

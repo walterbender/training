@@ -1,5 +1,8 @@
 NEWS
 
+1.40
+* Fixed grab focus code
+
 1.39
 * Suspend power management while running the activity
 * Fixed problem with set_active on Battery buttons
