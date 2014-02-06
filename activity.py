@@ -293,8 +293,9 @@ class TrainingActivity(activity.Activity):
                     # FIX ME: We need to resolve this, but for right now, punt.
                     alert = ConfirmationAlert()
                     alert.props.title = _('Data mismatch')
-                    alert.props.msg = _('Are you %s or %s?' %
-                                        (usb_email, sugar_email))
+                    alert.props.msg = _('Are you %(usb)s or %s(sugar)?' %
+                                        {'usb': usb_email,
+                                         'sugar': sugar_email})
                     alert.connect('response', self._close_alert_cb)
                     self.add_alert(alert)
                     self._load_intro_graphics(message=alert.props.msg)
@@ -474,10 +475,8 @@ class TrainingActivity(activity.Activity):
         name = self._task_master.read_task_data(NAME_UID)
         if name is not None:
             bundle_name = activity.get_bundle_name()
-            if self.metadata['title'] != _('%s %s Activity') % (name,
-                                                                bundle_name):
-                self.metadata['title'] = _('%s %s Activity') % (name,
-                                                                bundle_name)
+            self.metadata['title'] = _('%(name)s %(bundle)s Activity') % \
+                                     {'name': name, 'bundle': bundle_name}
 
     def _setup_toolbars(self):
         ''' Setup the toolbars. '''
