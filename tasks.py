@@ -74,7 +74,6 @@ def get_tasks(task_master):
                    Connected2Task(task_master),
                    Connected3Task(task_master),
                    Connected4Task(task_master),
-                   # Connected5Task(task_master),
                    Connected6Task(task_master),
                    Connected7Task(task_master),
                    Connected8Task(task_master)]},
@@ -378,9 +377,6 @@ class Welcome2Task(Task):
         return True
 
     def test(self, task_data):
-        if self._entry is None:
-            _logger.error('missing entry')
-            return False
         if len(self._entry.get_text()) == 0:
             return False
         else:
@@ -392,7 +388,6 @@ class Welcome2Task(Task):
         return True
 
     def get_graphics(self, page=0):
-        self._entry = None
         target = self._get_user_name()
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
@@ -404,6 +399,7 @@ class Welcome2Task(Task):
             self._entry = graphics.add_entry(text=target)
         else:
             self._entry = graphics.add_entry()
+        self._entry.grab_focus()
 
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)
@@ -451,9 +447,6 @@ class Welcome4Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        if self._entry is None:
-            _logger.error('missing entry')
-            return False
         entry = self._entry.get_text()
         if len(entry) == 0:
             return False
@@ -470,7 +463,6 @@ class Welcome4Task(HTMLTask):
         return True
 
     def get_graphics(self, page=0):
-        self._entry = []
         email = self._task_master.read_task_data(EMAIL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
@@ -482,6 +474,7 @@ class Welcome4Task(HTMLTask):
             self._entry = graphics.add_entry(text=email)
         else:
             self._entry = graphics.add_entry()
+        self._entry.grab_focus()
 
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)
@@ -508,9 +501,6 @@ class Welcome5Task(HTMLTask):
         return [_ENTER_EMAIL_TASK]
 
     def test(self, task_data):
-        if len(self._entries) < 2:
-            _logger.error('missing entry')
-            return False
         entry0 = self._entries[0].get_text()
         entry1 = self._entries[1].get_text()
         if len(entry0) == 0 or len(entry1) == 0:
@@ -542,6 +532,8 @@ class Welcome5Task(HTMLTask):
         if email is None:  # Should never happen
             email = ''
         self._entries.append(graphics.add_entry())
+        self._entries[-1].grab_focus()
+
         # Paste to second entry
         self._task_master.activity.set_copy_widget(text_entry=self._entries[0])
         self._task_master.activity.set_paste_widget(
@@ -780,6 +772,7 @@ class Connected4Task(HTMLTask):
         return True
 
 
+'''
 class Connected5Task(HTMLTask):
 
     def __init__(self, task_master):
@@ -796,9 +789,6 @@ class Connected5Task(HTMLTask):
         return [_ENTER_NAME_TASK, _VALIDATE_EMAIL_TASK]
 
     def test(self, task_data):
-        if len(self._entries) < 2:
-            _logger.error('missing entry')
-            return False
         entry0 = self._entries[0].get_text()
         entry1 = self._entries[1].get_text()
         if len(entry0) == 0 or len(entry1) == 0:
@@ -840,6 +830,7 @@ class Connected5Task(HTMLTask):
             text_entry=self._entries[1])
 
         return graphics, self._prompt
+'''
 
 
 class Connected6Task(HTMLTask):
@@ -915,7 +906,6 @@ class Connected6Task(HTMLTask):
             return False
 
     def get_graphics(self, page=0):
-        self._entries = []
         target = self._task_master.read_task_data(SCHOOL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
@@ -928,6 +918,7 @@ class Connected6Task(HTMLTask):
         else:
             self._entry = self._graphics.add_entry()
         self._entry.connect('key_press_event', self._entry_cb)
+        self._entry.grab_focus()
 
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)
