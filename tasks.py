@@ -1338,7 +1338,6 @@ class Frame3Task(HTMLTask):
                                              colors=checks.get_colors())
         for i, button in enumerate(buttons):
             button.connect('clicked', self._battery_button_callback, i)
-            button.set_active(False)
 
         self._task_master.activity.set_copy_widget(webkit=webkit)
         self._task_master.activity.set_paste_widget()
