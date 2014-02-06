@@ -50,6 +50,7 @@ from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
 from checkprogress import CheckProgress
 import checks
+from power import get_power_manager
 
 import logging
 _logger = logging.getLogger('training-activity')
@@ -121,6 +122,7 @@ class TrainingActivity(activity.Activity):
         '''
 
     def _launcher(self):
+        get_power_manager().inhibit_suspend()
         path = self._check_for_USB_data()
         if path is None:
             self._launch_task_master()
@@ -129,6 +131,10 @@ class TrainingActivity(activity.Activity):
             # Flash a welcome back screen
             self._load_intro_graphics(file_name='welcome-back.html')
             GObject.timeout_add(1500, self._launch_task_master)
+
+    def can_close(self):
+        get_power_manager().restore_suspend()
+        return True
 
     def check_volume_data(self):
         # Before we begin (and before each task),
