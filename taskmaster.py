@@ -45,13 +45,14 @@ class TaskMaster(Gtk.Grid):
         self.current_task = None
         self.activity = activity
         self.keyname = None
+        self.task_button = None
+        self.progress_checked = False
 
         self._name = None
         self._email = None
         self._graphics = None
         self._summary = None
         self._page = 0
-        self.task_button = None
         self._first_time = True
         self._accumulated_time = 0
         self._yes_task = None
@@ -344,6 +345,7 @@ class TaskMaster(Gtk.Grid):
             self._summary.destroy()
         self._summary = summary
         self._graphics_grid.attach(self._summary, 1, 0, 1, 15)
+        self.progress_checked = True  # Needed for check progress summary task
         summary.show()
 
     def destroy_summary(self):

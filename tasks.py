@@ -555,8 +555,17 @@ class Welcome6Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Sections')
-        self.uid = 'welcome-6-task'
+        self.uid = 'check-progress-task'
         self._uri = 'Welcome/welcome6.html'
+
+    def get_requires(self):
+        return [_VALIDATE_EMAIL_TASK]
+
+    def is_collectable(self):
+        return True
+
+    def test(self, task_data):
+        return self._task_master.progress_checked
 
 
 class Welcome7Task(BadgeTask):
@@ -1018,9 +1027,8 @@ class Activities3Task(HTMLTask):
                                      task_data['start_time'] - _HOUR):
             return False
         paths = checks.get_jpg()
-        return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > \
-            task_data['start_time'] - _HOUR
+        return len(paths) > 0 and (checks.get_modified_time(paths[0]) >
+                                   task_data['start_time'] - _HOUR)
 
 
 class Activities4Task(HTMLTask):
@@ -1226,9 +1234,8 @@ class Journal5Task(HTMLTask):
                                      task_data['start_time'] - _HOUR):
             return False
         paths = checks.get_pdf()
-        return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > \
-            task_data['start_time'] - _HOUR
+        return len(paths) > 0 and (checks.get_modified_time(paths[0]) >
+                                   task_data['start_time'] - _HOUR)
 
 
 class Journal6Task(HTMLTask):
@@ -1263,9 +1270,9 @@ class Journal7Task(HTMLTask):
     def test(self, task_data):
         paths = checks.look_for_file_type(
             self._task_master.activity.volume_data[0]['usb_path'], '.pdf')
-        return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > \
-            task_data['start_time'] - _HOUR
+        _logger.debug(paths)
+        return len(paths) > 0 and (checks.get_modified_time(paths[0]) >
+                                   task_data['start_time'] - _HOUR)
 
 
 class Journal8Task(HTMLTask):
@@ -1858,9 +1865,8 @@ class Turtle9Task(HTMLTask):
             if not checks.find_string(path, 'journal'):
                 return False
         paths = checks.get_png()
-        return len(paths) > 0 and \
-            checks.get_modified_time(paths[0]) > \
-            task_data['start_time'] - _HOUR
+        return len(paths) > 0 and (checks.get_modified_time(paths[0]) >
+                                   task_data['start_time'] - _HOUR)
 
     def get_my_turn(self):
         return True
