@@ -16,6 +16,7 @@ import re
 from gettext import gettext as _
 
 from gi.repository import GObject
+from gi.repository import Gdk
 
 from sugar3.datastore import datastore
 
@@ -818,20 +819,48 @@ class Connected6Task(HTMLTask):
         self._name = _('Enter School Name')  # Connected Six
         self.uid = 'enter-school-name-task'  # 'connected-6-task'
         self._entry = None
-        self._height = 400
+        self._buttons = []
+        self._completer = None
+        self._grpahics = None
+        self._height = 300
         self._uri = 'Connected/connected6.html'
 
     def is_collectable(self):
         return True
 
     def test(self, task_data):
-        if self._entry is None:
-            _logger.error('missing entry')
-            return False
+        if self._completer is None:
+            f = open(os.path.join(self._task_master.activity.bundle_path,
+                                  'schools.txt'), 'r')
+            schools = f.read().split('\n')
+            f.close()
+            self._completer = checks.Completer(schools)
+
         if len(self._entry.get_text()) == 0:
             return False
         else:
             return True
+
+    def _button_cb(self, widget, text):
+        self._entry.set_text(text)
+        for button in self._buttons:
+            button.destroy()
+
+    def _entry_cb(self, widget, event):
+        results = self._completer.complete(
+            widget.get_text() + Gdk.keyval_name(event.keyval), 0)
+        if len(results) == 1:
+            widget.set_text(results[0])
+            for button in self._buttons:
+                button.destroy()
+        elif len(results) < 6:
+            for button in self._buttons:
+                button.destroy()
+            for i in range(len(results)):
+                self._buttons.append(
+                    self._graphics.add_button(
+                        results[i], self._button_cb, arg=results[i]))
+                self._buttons[-1].show()
 
     def after_button_press(self):
         self._task_master.write_task_data(SCHOOL_UID, self._entry.get_text())
@@ -842,18 +871,19 @@ class Connected6Task(HTMLTask):
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
-        graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url, height=self._height)
-        graphics.set_zoom_level(self._zoom_level)
+        self._graphics = Graphics()
+        webkit = self._graphics.add_uri('file://' + url, height=self._height)
+        self._graphics.set_zoom_level(self._zoom_level)
         if target is not None:
-            self._entry = graphics.add_entry(text=target)
+            self._entry = self._graphics.add_entry(text=target)
         else:
-            self._entry = graphics.add_entry()
+            self._entry = self._graphics.add_entry()
+        self._entry.connect('key_press_event', self._entry_cb)
 
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)
 
-        return graphics, self._prompt
+        return self._graphics, self._prompt
 
 
 class Connected7Task(HTMLTask):
