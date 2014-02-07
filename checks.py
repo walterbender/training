@@ -17,6 +17,7 @@ import dbus
 import stat
 import statvfs
 import glob
+import urllib
 from random import uniform
 
 from gi.repository import Vte
@@ -164,7 +165,7 @@ def is_landscape():
 
 
 def get_safe_text(text):
-    return GLib.markup_escape_text(text)
+    return urllib.pathname2url(text.encode('ascii', 'xmlcharrefreplace'))
 
 
 def get_battery_level():
