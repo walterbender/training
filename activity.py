@@ -298,7 +298,7 @@ class TrainingActivity(activity.Activity):
                     # FIX ME: We need to resolve this, but for right now, punt.
                     alert = ConfirmationAlert()
                     alert.props.title = _('Data mismatch')
-                    alert.props.msg = _('Are you %(usb)s or %s(sugar)?' %
+                    alert.props.msg = _('Are you %(usb)s or %(sugar)s?' %
                                         {'usb': usb_email,
                                          'sugar': sugar_email})
                     alert.connect('response', self._close_alert_cb)
