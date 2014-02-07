@@ -837,7 +837,7 @@ class Completer(object):
         if state == 0:  # on first trigger, build possible matches
             if text:  # cache matches (entries that start with entered text)
                 self.matches = [s for s in self.options
-                                if s and s.startswith(text)]
+                                if s and s.lower().startswith(text.lower())]
             else:  # no text entered, all matches possible
                 self.matches = self.options[:]
 
