@@ -1,6 +1,7 @@
 NEWS
 
 1.41
+* Added Paul's new videos, copy edits
 * Fixed problem with repeated skip_if_completed tasks
 * Major code cleanup
 

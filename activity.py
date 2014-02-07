@@ -545,7 +545,8 @@ class TrainingActivity(activity.Activity):
                                           self._help_cb, tooltip=_('help'),
                                           accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)
-        if not _HELP_AVAILABLE:
+        # Hide help until we have some help
+        if True:  # not _HELP_AVAILABLE:
             self.help_button.hide()
 
         button_factory('check-progress',
