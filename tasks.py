@@ -852,7 +852,7 @@ class Connected6Task(HTMLTask):
         self._name = _('Enter School Name')
         self.uid = _ENTER_SCHOOL_TASK
         self._uri = 'Connected/connected6.html'
-        self._height = 200
+        self._height = 60
         self._graphics = None
         self._entry = None
         self._buttons = []
