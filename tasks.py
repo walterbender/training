@@ -1239,8 +1239,13 @@ class Journal5Task(HTMLTask):
                                      task_data['start_time'] - _HOUR):
             return False
         paths = checks.get_pdf()
-        return len(paths) > 0 and (checks.get_modified_time(paths[0]) >
-                                   task_data['start_time'] - _HOUR)
+        if len(paths) == 0:
+            return False
+        for path in paths:
+            if checks.get_modified_time(path) > \
+               task_data['start_time'] - _HOUR:
+                return True
+        return False
 
 
 class Journal6Task(HTMLTask):
