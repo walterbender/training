@@ -2294,13 +2294,15 @@ class Assessment3Task(BadgeTask):
             self._section_index = 11
         else:
             self._section_index = 10
+        self._prompt = _('All done!')
 
     def test(self, task_data):
         # If we arrive here and _ASSESSMENT_DOCUMENT_TASK is not
         # complete, then the user chose not to do that task, so we
         # need to mark that task as not collectable.
         task = self._task_master.uid_to_task(_ASSESSMENT_DOCUMENT_TASK)
-        task.collectable = False
-        self._task_master.update_completion_percentage()
+        if not task.is_completed:
+            task.collectable = False
+            self._task_master.update_completion_percentage()
 
         return self._task_master.button_was_pressed
