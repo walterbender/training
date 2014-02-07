@@ -60,6 +60,21 @@ _MINIMUM_SPACE = 1024 * 1024 * 10  # 10MB is very conservative
 _SUGARSERVICES_VERSION = 4
 
 
+def _check_gconf_settings():
+    from gi.repository import GConf
+
+    client = GConf.Client.get_default()
+    url = client.get_string('/desktop/sugar/services/training/url')
+    if url is None:
+        client.set_string(
+            '/desktop/sugar/services/training/url',
+            'https://harvest.one-education.org:8888/training/report')
+    api_key = client.get_string('/desktop/sugar/services/training/api_key')
+    if api_key is None:
+        client.set_string('/desktop/sugar/services/training/api_key',
+                          'training')
+
+
 class TrainingActivity(activity.Activity):
     ''' A series of training exercises '''
     transfer_started_signal = GObject.Signal('started', arg_types=([]))
@@ -90,6 +105,8 @@ class TrainingActivity(activity.Activity):
             self.font_size = 8
         self.zoom_level = self.font_size / float(len(FONT_SIZES))
         _logger.debug('zoom level is %f' % self.zoom_level)
+
+        _check_gconf_settings()  # For debugging purposes
 
         self._setup_toolbars()
         self.modify_bg(Gtk.StateType.NORMAL,
