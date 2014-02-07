@@ -851,7 +851,7 @@ class Connected6Task(HTMLTask):
         self._name = _('Enter School Name')
         self.uid = _ENTER_SCHOOL_TASK
         self._uri = 'Connected/connected6.html'
-        self._height = 300
+        self._height = 200
         self._graphics = None
         self._entry = None
         self._buttons = []
@@ -886,7 +886,7 @@ class Connected6Task(HTMLTask):
             widget.set_text(results[0])
             for button in self._buttons:
                 button.destroy()
-        elif len(results) < 6:
+        elif len(results) < 10:
             for button in self._buttons:
                 button.destroy()
             for i in range(len(results)):
