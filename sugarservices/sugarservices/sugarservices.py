@@ -21,42 +21,19 @@ import dbus
 import json
 import logging
 
-from jarabe import config
+
 from jarabe.model import shell
 from jarabe.model import session
 from jarabe.model import network
 from jarabe.journal import journalactivity
-from jarabe.webservice.accountsmanager import get_webaccount_services
 
-from sugar3 import env
 from sugar3.test import uitree
-
-_user_extensions_path = os.path.join(env.get_profile_path(), 'extensions')
 
 _DBUS_SERVICE = 'org.sugarlabs.SugarServices'
 _DBUS_SHELL_IFACE = 'org.sugarlabs.SugarServices'
 _DBUS_PATH = '/org/sugarlabs/SugarServices'
 
-_VERSION = 5
-
-
-def _get_webservice_paths():
-    paths = []
-    for path in [os.path.join(_user_extensions_path, 'webservice'),
-                 os.path.join(config.ext_path, 'webservice')]:
-        if os.path.exists(path):
-            paths.append(path)
-    return paths
-
-
-def _get_webservice_module_paths():
-    webservice_module_paths = []
-    for webservice_path in _get_webservice_paths():
-        for path in os.listdir(webservice_path):
-            service_path = os.path.join(webservice_path, path)
-            if os.path.isdir(service_path):
-                webservice_module_paths.append(service_path)
-    return webservice_module_paths
+_VERSION = 6
 
 
 class SugarServices(dbus.service.Object):
@@ -97,16 +74,6 @@ class SugarServices(dbus.service.Object):
         except Exception, e:
             logging.error('Problem getting NetworkManager: %s' % e)
             return
-
-        '''
-        try:
-            self._webservices = get_webaccount_services()
-        except Exception, e:
-            logging.error('Problem getting Webservices: %s' % e)
-            return
-
-        logging.debug('Sugar Services launched...')
-        '''
 
     @dbus.service.method(_DBUS_SHELL_IFACE,
                          in_signature='', out_signature='i')
@@ -220,12 +187,6 @@ class SugarServices(dbus.service.Object):
     def NMStatus(self):
         for key in self._network._devices:
             return(str(self._network._devices[key].device_view.status))
-
-    @dbus.service.method(_DBUS_SHELL_IFACE,
-                         in_signature='', out_signature='s')
-    def GetWebServiceModulePaths(self):
-        paths = _get_webservice_module_paths()
-        return json.dumps(paths)
 
 
 class NetworkManagerObserver(object):

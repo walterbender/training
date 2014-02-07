@@ -29,14 +29,17 @@ from gi.repository import GConf
 from gi.repository import GObject
 
 from sugar3 import env
-from sugar3.datastore import datastore
 from sugar3 import profile
+from sugar3.datastore import datastore
 from sugar3.graphics.xocolor import XoColor
 
+from jarabe import config
 from jarabe.model import shell
 
 import logging
 _logger = logging.getLogger('training-activity-testutils')
+
+_user_extensions_path = os.path.join(env.get_profile_path(), 'extensions')
 
 _STATUS_CHARGING = 0
 _STATUS_DISCHARGING = 1
@@ -99,20 +102,73 @@ def _vte_reboot():
         _logger.error('VTE %s %s' % (str(success_), str(pid)))
 
 
-def get_webservice_paths():
-    global proxy
-    if proxy is None:
-        bus = dbus.SessionBus()
-        proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
+def _get_webservice_paths():
+    paths = []
+    for path in [os.path.join(_user_extensions_path, 'webservice'),
+                 os.path.join(config.ext_path, 'webservice')]:
+        if os.path.exists(path):
+            paths.append(path)
+    return paths
 
-    try:
-        paths = dbus.Interface(proxy, _DBUS_SERVICE).GetWebServiceModulePaths()
-        _logger.debug(paths)
-        return json.loads(paths)
 
-    except Exception, e:
-        _logger.error('ERROR getting sugarservice version: %s' % e)
-        return []
+def _get_webservice_module_paths():
+    webservice_module_paths = []
+    for webservice_path in _get_webservice_paths():
+        for path in os.listdir(webservice_path):
+            service_path = os.path.join(webservice_path, path)
+            if os.path.isdir(service_path):
+                webservice_module_paths.append(service_path)
+    return webservice_module_paths
+
+
+def _get_webaccount_paths():
+    paths = []
+    for path in [os.path.join(_user_extensions_path, 'cpsection',
+                              'webaccount', 'services'),
+                 os.path.join(config.ext_path, 'cpsection', 'webaccount',
+                              'services')]:
+        if os.path.exists(path):
+            paths.append(path)
+    return paths
+
+
+def get_webservice_names():
+    names = []
+    paths = _get_webservice_module_paths()
+    for path in paths:
+        names.append(os.path.basename(path))
+    return names
+
+
+def get_webservice_path(name):
+    paths = _get_webservice_module_paths()
+    for path in paths:
+        if os.path.basename(path) == name:
+            return path
+    return None
+
+
+def get_webservice_icon_path(name):
+    paths = _get_webservice_module_paths()
+    for path in paths:
+        if os.path.basename(path) == name:
+            icon_path = os.path.join(path, 'icons', name + '.svg')
+            if os.path.exists(icon_path):
+                return icon_path
+            else:
+                svgs = look_for_file_type(os.path.join(path, 'icons'), 'svg')
+                if len(svgs) > 0:
+                    return svgs[0]
+    return None
+
+
+def get_webaccount_path(name):
+    paths = _get_webaccount_paths()
+    for path in paths:
+        target = os.path.join(path, name)
+        if os.path.exists(target):
+            return target
+    return None
 
 
 def look_for_file_type(path, suffix):
