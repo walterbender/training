@@ -44,7 +44,8 @@ _TURTLE_SHOW_TASK = 'turtle-show-task'
 _PHYSICS_PLAY_TASK = 'physics-play-task'
 _PHYSICS_COLLABORATION_TASK = 'physics-collaboration-task'
 _XO_TABLET_TASK = 'xo-tablet-task'
-
+_ASSESSMENT_DOCUMENT_TASK = 'assessment-document-task'
+_ASSESSMENT_BADGE_TASK = 'assessment-badge-task'
 
 def get_tasks(task_master):
     task_list = [
@@ -577,7 +578,7 @@ class Welcome7Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Welcome Badge')
-        self.uid = 'welcome-7-task'
+        self.uid = 'welcome-badge-task'
         self._uri = 'Welcome/welcome7.html'
         self._title = _("Congratulations!\nYou’ve earned your first badge!")
         self._section_index = 0
@@ -734,7 +735,7 @@ class Toolbar9Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Toolbar Badge')
-        self.uid = 'toolbar-9-task'
+        self.uid = 'toolbar-badge-task'
         self._uri = 'Toolbar/toolbar9.html'
         self._section_index = 1
 
@@ -985,7 +986,7 @@ class Connected8Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Connected Badge')
-        self.uid = 'connected-8-task'
+        self.uid = 'connected-badge-task'
         self._uri = 'Connected/connected8.html'
         self._section_index = 2
 
@@ -1134,7 +1135,7 @@ class Activities8Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Activities Badge')
-        self.uid = 'activities-8-task'
+        self.uid = 'activities-badge-task'
         self._uri = 'Activities/activities8.html'
         self._section_index = 3
 
@@ -1286,7 +1287,7 @@ class Journal8Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Journal Badge')
-        self.uid = 'journal-8-task'
+        self.uid = 'journal-badge-task'
         self._uri = 'Journal/journal8.html'
         self._section_index = 4
 
@@ -1416,7 +1417,7 @@ class Frame8Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Frame Badge')
-        self.uid = 'frame-8-task'
+        self.uid = 'frame-badge-task'
         self._uri = 'Frame/frame8.html'
         self._section_index = 5
 
@@ -1559,7 +1560,7 @@ class Views8Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Views Badge')
-        self.uid = 'views-8-task'
+        self.uid = 'views-badge-task'
         self._uri = 'Views/views8.html'
         self._section_index = 6
 
@@ -1643,7 +1644,7 @@ class Settings6Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Settings')
-        self.uid = 'settings-6-task'
+        self.uid = 'settings-badge-task'
         self._uri = 'Settings/settings6.html'
         self._section_index = 7
 
@@ -1916,7 +1917,7 @@ class MoreActivities2Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('More Activities Badge')
-        self.uid = 'more-activities-2-task'
+        self.uid = 'more-activities-badge-task'
         self._uri = 'MoreActivities/moreactivities2.html'
         if checks.is_XO():
             self._section_index = 9
@@ -2016,7 +2017,7 @@ class Collaboration8Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Collaboration Badge')
-        self.uid = 'collaboration-8-task'
+        self.uid = 'collaboration-badge-task'
         self._uri = 'Collaboration/collaboration8.html'
         if checks.is_XO():
             self._section_index = 10
@@ -2200,7 +2201,7 @@ class XO8Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('XO Badge')
-        self.uid = 'xo-8-task'
+        self.uid = 'xo-badge-task'
         self._uri = 'XO/xo8.html'
         self._section_index = 10
 
@@ -2214,7 +2215,7 @@ class Assessment1Task(HTMLTask):
         self._result = None
 
     def get_yes_no_tasks(self):
-        return 'assessment-yes-task', 'assessment-no-task'
+        return _ASSESSMENT_DOCUMENT_TASK, _ASSESSMENT_BADGE_TASK
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
@@ -2237,7 +2238,7 @@ class Assessment2Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Assessment')
-        self.uid = 'assessment-yes-task'
+        self.uid = _ASSESSMENT_DOCUMENT_TASK
         self._uri = 'Assessment/assessment-yes.html'
 
     def get_requires(self):
@@ -2282,7 +2283,7 @@ class Assessment3Task(BadgeTask):
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Assessment Badge')
-        self.uid = 'assessment-no-task'
+        self.uid = _ASSESSMENT_BADGE_TASK
         self._uri = 'Assessment/assessment-no.html'
         self._height = 500
         if checks.is_XO():
