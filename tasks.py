@@ -334,7 +334,6 @@ class BadgeTask(HTMLTask):
         self._name = _('Badge Task')
         self.uid = 'badge-task'
         self._section_index = 0
-        self._title = _("Congratulations!\nYou’ve earned another badge!")
         self._uri = 'Welcome/welcome7.html'
 
     def _report_progress(self):
@@ -347,7 +346,7 @@ class BadgeTask(HTMLTask):
         if not 'badge' in task_data:
             task_data['badge'] = True
             self._task_master.activity.add_badge(
-                self._title,
+                self._name,
                 icon=self._task_master.get_section_icon(self._section_index))
             self._task_master.write_task_data(self.uid, task_data)
         self._report_progress()
@@ -580,7 +579,6 @@ class Welcome7Task(BadgeTask):
         self._name = _('Welcome Badge')
         self.uid = 'welcome-badge-task'
         self._uri = 'Welcome/welcome7.html'
-        self._title = _("Congratulations!\nYou’ve earned your first badge!")
         self._section_index = 0
 
     def get_graphics(self, page=0):

@@ -688,7 +688,9 @@ class TrainingActivity(activity.Activity):
             'message': msg
         }
 
-        icon_dir = os.path.join(self.bundle_path, 'icons')
+        # Use icons from html-content directory since default colors are
+        # intended for white background.
+        icon_dir = os.path.join(self.bundle_path, 'html-content', 'images')
         icon_path = os.path.join(icon_dir, icon + '.svg')
         try:
             subprocess.call(['cp', icon_path, sugar_icons])

@@ -1,5 +1,9 @@
 NEWS
 
+1.41
+* Fixed problem with repeated skip_if_completed tasks
+* Major code cleanup
+
 1.40
 * Fixed grab focus code
 
