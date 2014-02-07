@@ -1,11 +1,24 @@
 NEWS
 
 1.41
+* Fixed problem with webservice/journal-launch race condition
+  (w/tch and godiard)
+* Fixed PDF test
+* Ignoring case on school name match
+* Added more buttons to school name match (9)
+* Set proper completion percentage if user chooses to opt out of assessment
+* Fixed accented character encoding
+* Adding check for GConf setting while we are still testing:
+      gconftool-2 --set /desktop/sugar/services/training/url
+          "https://harvest.one-education.org:8888/training/report"
+	   --type=string
+      gconftool-2 --set /desktop/sugar/services/training/api_key "training"
+           --type=string`
+
+1.40
 * Added Paul's new videos, copy edits
 * Fixed problem with repeated skip_if_completed tasks
 * Major code cleanup
-
-1.40
 * Fixed grab focus code
 
 1.39
@@ -78,13 +91,6 @@ NEWS
 * Commented out reconfirmation of name, email in Connection section
 * Add modified-time tests
 * Pulled in Martin's reporting glue
-
-NOTE: The reporting mechanism needs some gconf settings:
-      gconftool-2 --set /desktop/sugar/services/training/url
-          "https://harvest.one-education.org:8888/training/report"
-	   --type=string
-      gconftool-2 --set /desktop/sugar/services/training/api_key "training"
-           --type=string
 
 1.33
 

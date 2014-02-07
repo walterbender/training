@@ -57,7 +57,7 @@ _logger = logging.getLogger('training-activity')
 
 
 _MINIMUM_SPACE = 1024 * 1024 * 10  # 10MB is very conservative
-_SUGARSERVICES_VERSION = 4
+_REQUIRES_SUGARSERVICES_VERSION = 5
 
 
 def _check_gconf_settings():
@@ -752,7 +752,8 @@ class TrainingActivity(activity.Activity):
         if not os.path.exists(os.path.join(webservice_path, 'sugarservices')):
             _logger.error('SugarServices webservice not found. Installing...')
             install = True
-        elif checks.get_sugarservices_version() < _SUGARSERVICES_VERSION:
+        elif checks.get_sugarservices_version() < \
+             _REQUIRES_SUGARSERVICES_VERSION:
             _logger.error('Found old SugarServices version. Installing...')
             install = True
 

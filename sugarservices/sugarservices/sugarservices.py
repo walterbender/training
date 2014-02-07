@@ -37,6 +37,8 @@ _DBUS_SERVICE = 'org.sugarlabs.SugarServices'
 _DBUS_SHELL_IFACE = 'org.sugarlabs.SugarServices'
 _DBUS_PATH = '/org/sugarlabs/SugarServices'
 
+_VERSION = 5
+
 
 def _get_webservice_paths():
     paths = []
@@ -67,7 +69,11 @@ class SugarServices(dbus.service.Object):
     '''
 
     def __init__(self):
-        self._version = 4
+        self._version = _VERSION
+        self._shell_model = None
+        self._session = None
+        self._journal = None
+        self._network = None
 
         bus = dbus.SessionBus()
         bus_name = dbus.service.BusName(_DBUS_SERVICE, bus=bus)
@@ -84,12 +90,6 @@ class SugarServices(dbus.service.Object):
             logging.debug('SUGARSERVICES GOT SESSION MANAGER')
         except Exception, e:
             logging.error('Problem getting session manager: %s' % e)
-
-        try:
-            self._journal = journalactivity.get_journal()
-            logging.debug('SUGARSERVICES GOT JOURNAL')
-        except Exception, e:
-            logging.error('Problem getting Journal: %s' % e)
 
         try:
             self._network = NetworkManagerObserver()
@@ -168,7 +168,17 @@ class SugarServices(dbus.service.Object):
                 return False
             if activity.is_journal():
                 break
-        journalactivity.get_journal().show_journal()
+
+        if self._journal is None:
+            try:
+                self._journal = journalactivity.get_journal()
+                logging.debug('SUGARSERVICES GOT JOURNAL')
+            except Exception, e:
+                logging.error('Problem getting Journal: %s' % e)
+
+        if self._journal is not None:
+            self._journal.show_journal()
+
         activity.set_active(True)
         return True
 
