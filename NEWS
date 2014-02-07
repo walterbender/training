@@ -1,6 +1,8 @@
 NEWS
 
 1.41
+* Lots of copy editing
+* Bump up icon size in copy from 40 -> 55
 * Fixed problem with webservice/journal-launch race condition
   (w/tch and godiard)
 * Fixed PDF test
