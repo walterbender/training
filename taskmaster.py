@@ -339,7 +339,7 @@ class TaskMaster(Gtk.Grid):
         requires = task.get_requires()
         for uid in requires:
             # Don't restrict search to current section
-            if not self._uid_to_task(uid, section=None).is_completed():
+            if not self.uid_to_task(uid, section=None).is_completed():
                 if switch_task:
                     _logger.debug('Task %s requires task %s... switching' %
                                   (task.uid, uid))
@@ -554,7 +554,7 @@ class TaskMaster(Gtk.Grid):
             count += len(section['tasks'])
         return count
 
-    def _uid_to_task(self, uid, section=None):
+    def uid_to_task(self, uid, section=None):
         if section:
             for task in section['tasks']:
                 if task.uid == uid:
@@ -831,6 +831,9 @@ class TaskMaster(Gtk.Grid):
         else:
             self._progress_bar.next_task_button.set_sensitive(False)
 
+        self.update_completion_percentage()
+
+    def update_completion_percentage(self):
         completion_percentage = int(
             (self._get_number_of_completed_collectables() * 100.)
             / self._get_number_of_collectables())

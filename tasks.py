@@ -2243,12 +2243,13 @@ class Assessment2Task(HTMLTask):
         self._name = _('Assessment')
         self.uid = _ASSESSMENT_DOCUMENT_TASK
         self._uri = 'Assessment/assessment-yes.html'
+        self.collectable = True
 
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK]
 
     def is_collectable(self):
-        return True
+        return self.collectable
 
     def test(self, task_data):
         if task_data['data'] is None:
@@ -2293,3 +2294,13 @@ class Assessment3Task(BadgeTask):
             self._section_index = 11
         else:
             self._section_index = 10
+
+    def test(self, task_data):
+        # If we arrive here and _ASSESSMENT_DOCUMENT_TASK is not
+        # complete, then the user chose not to do that task, so we
+        # need to mark that task as not collectable.
+        task = self._task_master.uid_to_task(_ASSESSMENT_DOCUMENT_TASK)
+        task.collectable = False
+        self._task_master.update_completion_percentage()
+
+        return self._task_master.button_was_pressed
