@@ -47,6 +47,7 @@ _XO_TABLET_TASK = 'xo-tablet-task'
 _ASSESSMENT_DOCUMENT_TASK = 'assessment-document-task'
 _ASSESSMENT_BADGE_TASK = 'assessment-badge-task'
 
+
 def get_tasks(task_master):
     task_list = [
         {'name': _('Welcome to One Academy'),
@@ -1068,7 +1069,7 @@ class Activities5Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.AbiWordActivity',
-                                     task_data['start_time'] - _HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         # We need the clipboard text for the Speak task
         # if not utils.is_clipboard_text_available():
@@ -1113,7 +1114,7 @@ class Activities7Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('vu.lux.olpc.Speak',
-                                     task_data['start_time'] - _HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         # Has any setting changed?
         status = utils.get_speak_settings(
@@ -1237,7 +1238,7 @@ class Journal5Task(HTMLTask):
         if not utils.get_starred_count() > task_data['data']:
             return False
         if not utils.saw_new_launch('org.sugarlabs.PortfolioActivity',
-                                     task_data['start_time'] - _HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         paths = utils.get_pdf()
         if len(paths) == 0:
@@ -1645,6 +1646,7 @@ class Settings5Task(HTMLTask):
 
 
 class Settings6Task(BadgeTask):
+
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Badge Settings')
@@ -1654,6 +1656,7 @@ class Settings6Task(BadgeTask):
 
 
 class MoreActivities1Task(HTMLTask):
+
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Learning About More Activities')
@@ -1698,7 +1701,7 @@ class Turtle3Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.TurtleArtActivity',
-                                     task_data['start_time'] - _HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         activity = utils.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1745,7 +1748,7 @@ class Turtle3aTask(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.TurtleArtActivity',
-                                     task_data['start_time'] - _HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         activity = utils.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1786,7 +1789,7 @@ class Turtle5Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.TurtleArtActivity',
-                                     task_data['start_time'] - _HOUR):
+                                    task_data['start_time'] - _HOUR):
             return False
         activity = utils.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1911,13 +1914,14 @@ class Physics2Task(HTMLTask):
 
     def test(self, task_data):
         return utils.saw_new_launch('org.laptop.physics',
-                                     task_data['start_time'] - _HOUR)
+                                    task_data['start_time'] - _HOUR)
 
     def get_my_turn(self):
         return True
 
 
 class MoreActivities2Task(BadgeTask):
+
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('More Activities Badge')
@@ -2211,6 +2215,7 @@ class XO8Task(BadgeTask):
 
 
 class Assessment1Task(HTMLTask):
+
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Assessment')
@@ -2239,6 +2244,7 @@ class Assessment1Task(HTMLTask):
 
 
 class Assessment2Task(HTMLTask):
+
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Assessment')
@@ -2285,6 +2291,7 @@ class Assessment2Task(HTMLTask):
 
 
 class Assessment3Task(BadgeTask):
+
     def __init__(self, task_master):
         BadgeTask.__init__(self, task_master)
         self._name = _('Assessment Badge')
