@@ -49,7 +49,7 @@ from toolbar_utils import separator_factory, label_factory, button_factory
 from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
 from checkprogress import CheckProgress
-import checks
+import utils
 from power import get_power_manager
 
 import logging
@@ -158,13 +158,13 @@ class TrainingActivity(activity.Activity):
         # we need to find any and all USB keys
         # and any and all training-data files on them.
 
-        _logger.debug(checks.get_volume_paths())
+        _logger.debug(utils.get_volume_paths())
         self.volume_data = []
-        for path in checks.get_volume_paths():
+        for path in utils.get_volume_paths():
             os.path.basename(path)
             self.volume_data.append(
                 {'basename': os.path.basename(path),
-                 'files': checks.look_for_training_data(path),
+                 'files': utils.look_for_training_data(path),
                  'sugar_path': os.path.join(self.get_activity_root(), 'data'),
                  'usb_path': path})
             _logger.debug(self.volume_data[-1])
@@ -198,8 +198,8 @@ class TrainingActivity(activity.Activity):
         volume = self.volume_data[0]
 
         # (3) At least 10MB of free space
-        if checks.is_full(volume['usb_path'],
-                          required=_MINIMUM_SPACE):
+        if utils.is_full(volume['usb_path'],
+                         required=_MINIMUM_SPACE):
             _logger.error('USB IS FULL')
             alert = ConfirmationAlert()
             alert.props.title = _('USB key is full')
@@ -210,7 +210,7 @@ class TrainingActivity(activity.Activity):
             return False
 
         # (4) File is read/write
-        if not checks.is_writeable(volume['usb_path']):
+        if not utils.is_writeable(volume['usb_path']):
             _logger.error('CANNOT WRITE TO USB')
             alert = ConfirmationAlert()
             alert.props.title = _('Cannot write to USB')
@@ -229,7 +229,7 @@ class TrainingActivity(activity.Activity):
         # (b) If there is one file with a valid UID, we use that UID;
         if len(volume['files']) == 0:
             volume['uid'] = 'training-data-%s' % \
-                            checks.format_volume_name(volume['basename'])
+                            utils.format_volume_name(volume['basename'])
             _logger.debug('No training data found. Using UID %s' %
                           volume['uid'])
             return True
@@ -436,7 +436,7 @@ class TrainingActivity(activity.Activity):
             graphics.add_uri('file://' + url)
         else:
             graphics.add_uri('file://' + url + '?MSG=' +
-                             checks.get_safe_text(message))
+                             utils.get_safe_text(message))
         graphics.set_zoom_level(0.667)
         center_in_panel.add(graphics)
         graphics.show()
@@ -752,7 +752,7 @@ class TrainingActivity(activity.Activity):
         if not os.path.exists(os.path.join(webservice_path, 'sugarservices')):
             _logger.error('SugarServices webservice not found. Installing...')
             install = True
-        elif checks.get_sugarservices_version() < \
+        elif utils.get_sugarservices_version() < \
              _REQUIRES_SUGARSERVICES_VERSION:
             _logger.error('Found old SugarServices version. Installing...')
             install = True
@@ -789,7 +789,7 @@ class TrainingActivity(activity.Activity):
         self.remove_alert(alert)
         if response_id is Gtk.ResponseType.OK:
             try:
-                checks.reboot()
+                utils.reboot()
             except Exception, e:
                 _logger.error('Cannot reboot: %s' % e)
 
