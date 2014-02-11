@@ -121,31 +121,20 @@ class TrainingActivity(activity.Activity):
         self._clipboard_text = ''
 
         if self._load_extension() and self.check_volume_data():
-            # We are resuming the activity or we are launching a new instance
-            # * Is there a data file to sync on the USB key?
-            # * Do we create a new data file on the USB key?
             self._launcher()
-        '''
-            # Could be a mismatch between the USB UID and the
-            # instance UID, in which case, we should go with
-            # the data on the USB.
-            usb_path = self._check_for_USB_data()
-            if usb_path is not None:
-                # Start this new instance with data from the USB
-                self._copy_data_from_USB()
-                self._load_intro_graphics(
-                    file_name='welcome-back.html')
-                GObject.timeout_add(1500, self._launch_task_master)
-        '''
 
     def _launcher(self):
         get_power_manager().inhibit_suspend()
+
+        # We are resuming the activity or we are launching a new instance?
+        # * Is there a data file to sync on the USB key?
+        # * Do we create a new data file on the USB key?
         path = self._check_for_USB_data()
         if path is None:
             self._launch_task_master()
         elif self._sync_data_from_USB(path):
             self._copy_data_from_USB()
-            # Flash a welcome back screen
+            # Flash a welcome back screen.
             self._load_intro_graphics(file_name='welcome-back.html')
             GObject.timeout_add(1500, self._launch_task_master)
 
