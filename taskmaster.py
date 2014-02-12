@@ -75,6 +75,9 @@ class TaskMaster(Gtk.Grid):
         self.generate_grid_elements()
 
     def generate_grid_elements(self):
+        if hasattr(self, '_summary') and self._summary is not None:
+            return
+
         if self._graphics_grid_alignment is not None:
             self._graphics_grid_alignment.destroy()
         if self._task_button_alignment is not None:

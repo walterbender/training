@@ -1,10 +1,15 @@
 NEWS
 
+1.45
+* Fixed problem with opening toolbars when progress summary is visible
+
 1.44
+* Name change: Learn Sugar is much nicer than Training
 * So far unsuccessful at getting grid to resize when toolbars are open
 * Don't skip the rename task if the user wants to rename
 * Update URL, key for reporting training data
 * Merge Paul's updated content (1024x768 video)
+* More copy edits
 
 gconftool-2 --set /desktop/sugar/services/training/api_key 
  "SbCeK4nH8dpQJsHNn9djza9g" --type=string

@@ -151,13 +151,14 @@ def get_tasks(task_master):
                    Turtle1Task(task_master),
                    Turtle2Task(task_master),
                    Turtle3Task(task_master),
-                   Turtle2aTask(task_master),
-                   Turtle3aTask(task_master),
                    Turtle4Task(task_master),
                    Turtle5Task(task_master),
                    Turtle6Task(task_master),
                    Turtle7Task(task_master),
                    Turtle8Task(task_master),
+                   Turtle9Task(task_master),
+                   Turtle10Task(task_master),
+                   Turtle11Task(task_master),
                    MoreActivities2Task(task_master)]})
     task_list.append(
         {'name': _('Getting to Know Collaboration'),
@@ -1693,9 +1694,6 @@ class Turtle3Task(HTMLTask):
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK]
 
-    # def is_collectable(self):
-    #     return True
-
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.TurtleArtActivity',
                                     task_data['start_time'] - _HOUR):
@@ -1717,31 +1715,28 @@ class Turtle3Task(HTMLTask):
         return True
 
 
-class Turtle2aTask(HTMLTask):
+class Turtle4Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Square')
-        self.uid = 'turtle-2a-task'
-        self._uri = 'MoreActivities/turtle2a.html'
+        self.uid = 'turtle-4-task'
+        self._uri = 'MoreActivities/turtle4.html'
 
 
-class Turtle3aTask(HTMLTask):
+class Turtle5Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Square (Video)')
-        self.uid = 'turtle-3a-task'
-        self._uri = 'MoreActivities/turtle3a.html'
+        self.uid = 'turtle-5-task'
+        self._uri = 'MoreActivities/turtle5.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK, _TURTLE_SQUARE_TASK]
-
-    # def is_collectable(self):
-    #     return True
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.TurtleArtActivity',
@@ -1758,31 +1753,28 @@ class Turtle3aTask(HTMLTask):
         return True
 
 
-class Turtle4Task(HTMLTask):
+class Turtle6Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Pen')
-        self.uid = 'turtle-4-task'
-        self._uri = 'MoreActivities/turtle4.html'
+        self.uid = 'turtle-6-task'
+        self._uri = 'MoreActivities/turtle6.html'
 
 
-class Turtle5Task(HTMLTask):
+class Turtle7Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Pen')
         self.uid = 'turtle-pen-task'
-        self._uri = 'MoreActivities/turtle5.html'
+        self._uri = 'MoreActivities/turtle7.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK, _TURTLE_SQUARE_TASK]
-
-    # def is_collectable(self):
-    #     return True
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.TurtleArtActivity',
@@ -1802,31 +1794,28 @@ class Turtle5Task(HTMLTask):
         return True
 
 
-class Turtle6Task(HTMLTask):
+class Turtle8Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Show Text')
-        self.uid = 'turtle-6-task'
-        self._uri = 'MoreActivities/turtle6.html'
+        self.uid = 'turtle-8-task'
+        self._uri = 'MoreActivities/turtle8.html'
 
 
-class Turtle7Task(HTMLTask):
+class Turtle9Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Show Text')
         self.uid = _TURTLE_SHOW_TASK
-        self._uri = 'MoreActivities/turtle7.html'
+        self._uri = 'MoreActivities/turtle9.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK, _TURTLE_SQUARE_TASK]
-
-    # def is_collectable(self):
-    #     return True
 
     def test(self, task_data):
         activity = utils.get_most_recent_instance(
@@ -1842,31 +1831,28 @@ class Turtle7Task(HTMLTask):
         return True
 
 
-class Turtle8Task(HTMLTask):
+class Turtle10Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Turtle Show Image')
-        self.uid = 'turtle-8-task'
-        self._uri = 'MoreActivities/turtle8.html'
+        self.uid = 'turtle-10-task'
+        self._uri = 'MoreActivities/turtle10.html'
 
 
-class Turtle9Task(HTMLTask):
+class Turtle11Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Turtle Show Image (Video)')
+        self._name = _('Turtle Show Image')
         self.uid = 'turtle-journal-task'
-        self._uri = 'MoreActivities/turtle9.html'
+        self._uri = 'MoreActivities/turtle11.html'
 
     def get_refresh(self):
         return True
 
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK, _TURTLE_SHOW_TASK]
-
-    # def is_collectable(self):
-    #     return True
 
     def test(self, task_data):
         activity = utils.get_most_recent_instance(
