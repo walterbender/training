@@ -38,12 +38,15 @@ class TaskMaster(Gtk.Grid):
     def __init__(self, activity):
         ''' Initialize the task list '''
         Gtk.Grid.__init__(self)
+        self.activity = activity
+
+        self.calc_size_request()
+
         self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
 
         self.button_was_pressed = True
         self.current_task = None
-        self.activity = activity
         self.keyname = None
         self.task_button = None
         self.progress_checked = False
@@ -65,16 +68,30 @@ class TaskMaster(Gtk.Grid):
         if self.current_task is None:
             self.current_task = 0
 
+        self._graphics_grid_alignment = None
+        self._task_button_alignment = None
+        self._progress_bar_alignment = None
+
+        self.generate_grid_elements()
+
+    def generate_grid_elements(self):
+        if self._graphics_grid_alignment is not None:
+            self._graphics_grid_alignment.destroy()
+        if self._task_button_alignment is not None:
+            self._task_button_alignment.destroy()
+        if self._progress_bar_alignment is not None:
+            self._progress_bar_alignment.destroy()
+
         self._graphics_grid = Gtk.Grid()
         self._graphics_grid.set_row_spacing(style.DEFAULT_SPACING)
         self._graphics_grid.set_column_spacing(style.DEFAULT_SPACING)
 
-        graphics_grid_alignment = Gtk.Alignment.new(
+        self._graphics_grid_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        graphics_grid_alignment.add(self._graphics_grid)
+        self._graphics_grid_alignment.add(self._graphics_grid)
         self._graphics_grid.show()
-        self.attach(graphics_grid_alignment, 0, 0, 1, 1)
-        graphics_grid_alignment.show()
+        self.attach(self._graphics_grid_alignment, 0, 0, 1, 1)
+        self._graphics_grid_alignment.show()
 
         self._prev_page_button = ToolButton('go-left-page')
         self._prev_page_button.connect('clicked', self._prev_page_cb)
@@ -142,6 +159,17 @@ class TaskMaster(Gtk.Grid):
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
         self.attach(self._progress_bar_alignment, 0, 2, 1, 1)
         self._progress_bar_alignment.show()
+
+    def calc_size_request(self):
+        width = Gdk.Screen.width()
+        height = Gdk.Screen.height() - style.GRID_CELL_SIZE
+        if self.activity.activity_button.is_expanded():
+            height -= style.GRID_CELL_SIZE
+        elif self.activity.edit_toolbar_button.is_expanded():
+            height -= style.GRID_CELL_SIZE
+        elif self.activity.view_toolbar_button.is_expanded():
+            height -= style.GRID_CELL_SIZE
+        self.set_size_request(width, height)
 
     def keypress_cb(self, widget, event):
         self.keyname = Gdk.keyval_name(event.keyval)

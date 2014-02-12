@@ -1,5 +1,16 @@
 NEWS
 
+1.44
+* So far unsuccessful at getting grid to resize when toolbars are open
+* Don't skip the rename task if the user wants to rename
+* Update URL, key for reporting training data
+* Merge Paul's updated content (1024x768 video)
+
+gconftool-2 --set /desktop/sugar/services/training/api_key 
+ "SbCeK4nH8dpQJsHNn9djza9g" --type=string
+gconftool-2 --set /desktop/sugar/services/training/url
+ "https://training.one-education.org/training/report" --type=string
+
 1.43
 * Merged new content from Paul
 * New artwork for Frame 1
@@ -21,12 +32,7 @@ NEWS
 * Added more buttons to school name match (9)
 * Set proper completion percentage if user chooses to opt out of assessment
 * Fixed accented character encoding
-* Adding check for GConf setting while we are still testing:
-      gconftool-2 --set /desktop/sugar/services/training/url
-          "https://harvest.one-education.org:8888/training/report"
-	   --type=string
-      gconftool-2 --set /desktop/sugar/services/training/api_key "training"
-           --type=string`
+* Adding check for GConf setting while we are still testing.
 
 1.40
 * Added Paul's new videos, copy edits

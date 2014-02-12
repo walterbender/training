@@ -1605,9 +1605,6 @@ class Settings3Task(HTMLTask):
     def get_refresh(self):
         return True
 
-    def skip_if_completed(self):
-        return True
-
     def get_my_turn(self):
         return True
 

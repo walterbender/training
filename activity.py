@@ -68,11 +68,11 @@ def _check_gconf_settings():
     if url is None:
         client.set_string(
             '/desktop/sugar/services/training/url',
-            'https://harvest.one-education.org:8888/training/report')
+            'https://training.one-education.org/training/report ')
     api_key = client.get_string('/desktop/sugar/services/training/api_key')
     if api_key is None:
         client.set_string('/desktop/sugar/services/training/api_key',
-                          'training')
+                          'SbCeK4nH8dpQJsHNn9djza9g')
 
 
 class TrainingActivity(activity.Activity):
@@ -435,6 +435,32 @@ class TrainingActivity(activity.Activity):
     def _configure_cb(self, event):
         self._task_master.reload_graphics()
 
+    def _resize_canvas(self, widget):
+        # When a toolbar is expanded or collapsed, resize the canvas
+        # to ensure that the progress bar is still visible.
+        if hasattr(self, '_task_master'):
+            center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
+            width = Gdk.Screen.width()
+            height = Gdk.Screen.height() - style.GRID_CELL_SIZE
+            if self.activity_button.is_expanded():
+                height -= style.GRID_CELL_SIZE
+            elif self.edit_toolbar_button.is_expanded():
+                height -= style.GRID_CELL_SIZE
+            elif self.view_toolbar_button.is_expanded():
+                height -= style.GRID_CELL_SIZE
+            _logger.debug('CENTER IN PANEL %d %d' % (width, height))
+            center_in_panel.set_size_request(width, height)
+            self._task_master.reparent(center_in_panel)
+
+            self._task_master.calc_size_request()
+            self._task_master.generate_grid_elements()
+            self._task_master.reload_graphics()
+            self._task_master.show()
+
+            self.set_canvas(center_in_panel)
+            center_in_panel.show()
+        return True
+
     def get_activity_version(self):
         info_path = os.path.join(self.bundle_path, 'activity', 'activity.info')
         try:
@@ -496,6 +522,7 @@ class TrainingActivity(activity.Activity):
         toolbox = ToolbarBox()
 
         self.activity_button = ActivityToolbarButton(self)
+        self.activity_button.connect('clicked', self._resize_canvas)
         toolbox.toolbar.insert(self.activity_button, 0)
         self.activity_button.show()
 
@@ -508,6 +535,7 @@ class TrainingActivity(activity.Activity):
             page=view_toolbar,
             label=_('View'),
             icon_name='toolbar-view')
+        self.view_toolbar_button.connect('clicked', self._resize_canvas)
         toolbox.toolbar.insert(self.view_toolbar_button, 1)
         view_toolbar.show()
         self.view_toolbar_button.show()
@@ -532,6 +560,7 @@ class TrainingActivity(activity.Activity):
             page=edit_toolbar,
             label=_('Edit'),
             icon_name='toolbar-edit')
+        self.edit_toolbar_button.connect('clicked', self._resize_canvas)
         toolbox.toolbar.insert(self.edit_toolbar_button, 1)
         edit_toolbar.show()
         self.edit_toolbar_button.show()
