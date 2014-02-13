@@ -1,6 +1,16 @@
 @charset "utf-8";
+
+@font-face { 
+ font-family: abc123; 
+ src: url(/fonts/abc123.ttf); 
+} 
+p { 
+ font-family: abc123; 
+ 
+} 
+
 .titlecontent {
-	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-family: abc123;
 	font-size: 36px;
 	font-style: normal;
 	font-weight: normal;
@@ -12,13 +22,13 @@
 	margin-left: auto;
 }
 .heading {
-	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-family: abc123-bold;
 	font-size: 48px;
 	font-style: normal;
 	font-weight: normal;
 }
 .content {
-	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-family: abc123;
 	font-size: 36px;
 	font-style: normal;
 	font-weight: normal;
