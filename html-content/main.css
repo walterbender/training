@@ -14,10 +14,11 @@ p {
 	font-size: 36px;
 	font-style: normal;
 	font-weight: normal;
+	line-height: 60px;
 	color: #000000;
 	text-align: center;
 	height: auto;
-	width: 1000px;
+	width: 1200px;
 	margin-right: auto;
 	margin-left: auto;
 }
@@ -32,10 +33,11 @@ p {
 	font-size: 36px;
 	font-style: normal;
 	font-weight: normal;
+	line-height: 60px;
 	color: #000000;
 	text-align: left;
 	height: auto;
-	width: 1000px;
+	width: 1200px;
 	margin-right: auto;
 	margin-left: auto;
 }
