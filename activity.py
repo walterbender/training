@@ -399,6 +399,9 @@ class TrainingActivity(activity.Activity):
 
         self._task_master = TaskMaster(self)
 
+        # Now that we have the tasks, we can build the progress toolbar.
+        self._build_progress_toolbar()
+
         center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
         center_in_panel.add(self._task_master)
         self._task_master.show()
@@ -519,16 +522,16 @@ class TrainingActivity(activity.Activity):
         ''' Setup the toolbars. '''
         self.max_participants = 1  # No sharing
 
-        toolbox = ToolbarBox()
+        self._toolbox = ToolbarBox()
 
         self.activity_button = ActivityToolbarButton(self)
         self.activity_button.connect('clicked', self._resize_canvas)
-        toolbox.toolbar.insert(self.activity_button, 0)
+        self._toolbox.toolbar.insert(self.activity_button, 0)
         self.activity_button.show()
 
-        self.set_toolbar_box(toolbox)
-        toolbox.show()
-        self.toolbar = toolbox.toolbar
+        self.set_toolbar_box(self._toolbox)
+        self._toolbox.show()
+        self.toolbar = self._toolbox.toolbar
 
         view_toolbar = Gtk.Toolbar()
         self.view_toolbar_button = ToolbarButton(
@@ -536,7 +539,7 @@ class TrainingActivity(activity.Activity):
             label=_('View'),
             icon_name='toolbar-view')
         self.view_toolbar_button.connect('clicked', self._resize_canvas)
-        toolbox.toolbar.insert(self.view_toolbar_button, 1)
+        self._toolbox.toolbar.insert(self.view_toolbar_button, 1)
         view_toolbar.show()
         self.view_toolbar_button.show()
 
@@ -561,7 +564,7 @@ class TrainingActivity(activity.Activity):
             label=_('Edit'),
             icon_name='toolbar-edit')
         self.edit_toolbar_button.connect('clicked', self._resize_canvas)
-        toolbox.toolbar.insert(self.edit_toolbar_button, 1)
+        self._toolbox.toolbar.insert(self.edit_toolbar_button, 1)
         edit_toolbar.show()
         self.edit_toolbar_button.show()
 
@@ -576,7 +579,7 @@ class TrainingActivity(activity.Activity):
         self._paste_button.set_sensitive(False)
 
         self.help_button = button_factory('toolbar-help',
-                                          toolbox.toolbar,
+                                          self._toolbox.toolbar,
                                           self._help_cb, tooltip=_('help'),
                                           accelerator=_('<Ctrl>H'))
         self.help_button.set_sensitive(False)
@@ -584,26 +587,51 @@ class TrainingActivity(activity.Activity):
         if True:  # not _HELP_AVAILABLE:
             self.help_button.hide()
 
+        '''
         button_factory('check-progress',
-                       toolbox.toolbar,
+                       self._toolbox.toolbar,
                        self._check_progress_cb,
                        tooltip=_('Check progress'))
+        '''
 
         self.transfer_button = button_factory(
             'transfer',
-            toolbox.toolbar,
+            self._toolbox.toolbar,
             self._transfer_cb,
             tooltip=_('Training data upload status'))
         self.transfer_button.hide()
 
-        self.progress_label = label_factory(toolbox.toolbar, '', width=300)
+        self.progress_label = label_factory(self._toolbox.toolbar, '',
+                                            width=300)
         self.progress_label.set_use_markup(True)
 
-        separator_factory(toolbox.toolbar, True, False)
+        separator_factory(self._toolbox.toolbar, True, False)
         stop_button = StopButton(self)
         stop_button.props.accelerator = '<Ctrl>q'
-        toolbox.toolbar.insert(stop_button, -1)
+        self._toolbox.toolbar.insert(stop_button, -1)
         stop_button.show()
+
+    def _build_progress_toolbar(self):
+        progress_toolbar = Gtk.Toolbar()
+        self.progress_toolbar_button = ToolbarButton(
+            page=progress_toolbar,
+            label=_('Check progress'),
+            icon_name='check-progress')
+        self.progress_toolbar_button.connect('clicked', self._resize_canvas)
+        self._toolbox.toolbar.insert(self.progress_toolbar_button, 3)
+        progress_toolbar.show()
+        self.progress_toolbar_button.show()
+
+        for i in range(self._task_master.get_number_of_sections()):
+            icon = self._task_master.get_section_icon(i)
+            name = self._task_master.get_section_name(i)
+            _logger.debug('%s %s' % (icon, name))
+            button = button_factory(icon,
+                                    progress_toolbar,
+                                    self._check_progress_cb,
+                                    cb_arg=i,
+                                    tooltip=name)
+            button.show()
 
     def _transfer_cb(self, button):
         ''' Hide the button to dismiss notification '''
