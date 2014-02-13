@@ -39,7 +39,7 @@ class Graphics(Gtk.ScrolledWindow):
 
         offset = style.GRID_CELL_SIZE
         if width is None:
-            width = Gdk.Screen.width() - offset * 2
+            width = Gdk.Screen.width()  # - offset * 2
         if height is None:
             height = Gdk.Screen.height() - offset * 3
         self.set_size_request(width, height)
