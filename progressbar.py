@@ -140,7 +140,7 @@ class ProgressBar(Gtk.Grid):
                 button.set_sensitive(flag)
                 button.set_label('★')
             else:
-                button.set_label(str(b + 1))
+                button.set_label('%x' % (b + 1))
 
     def hide_prev_next_task_buttons(self):
         self.prev_task_button.hide()
