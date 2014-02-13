@@ -162,7 +162,7 @@ def get_tasks(task_master):
                    MoreActivities2Task(task_master)]})
     task_list.append(
         {'name': _('Getting to Know Collaboration'),
-         'icon': 'badge-views',
+         'icon': 'badge-collaboration',
          'tasks': [Collaboration1Task(task_master),
                    Collaboration2Task(task_master),
                    Physics1Task(task_master),
