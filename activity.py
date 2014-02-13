@@ -66,14 +66,12 @@ def _check_gconf_settings():
 
     client = GConf.Client.get_default()
     url = client.get_string('/desktop/sugar/services/training/url')
-    if url is None:
-        client.set_string(
-            '/desktop/sugar/services/training/url',
-            'https://training.one-education.org/training/report ')
+    client.set_string(
+        '/desktop/sugar/services/training/url',
+        'https://training.one-education.org/training/report ')
     api_key = client.get_string('/desktop/sugar/services/training/api_key')
-    if api_key is None:
-        client.set_string('/desktop/sugar/services/training/api_key',
-                          'SbCeK4nH8dpQJsHNn9djza9g')
+    client.set_string('/desktop/sugar/services/training/api_key',
+                      'SbCeK4nH8dpQJsHNn9djza9g')
 
 
 class TrainingActivity(activity.Activity):
