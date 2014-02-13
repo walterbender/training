@@ -35,7 +35,8 @@ class Graphics(Gtk.ScrolledWindow):
     def __init__(self, width=None, height=None):
         Gtk.ScrolledWindow.__init__(self)
 
-        self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
+
         offset = style.GRID_CELL_SIZE
         if width is None:
             width = Gdk.Screen.width() - offset * 2

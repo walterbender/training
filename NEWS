@@ -1,5 +1,9 @@
 NEWS
 
+1.47
+* Resize graphics when toolbars open/close to keep progress bar always visible
+* Failed experiment with hotlinks in graphics
+
 1.46
 * ABC font (from Paul)
 * Refactored sharing video (from Paul)

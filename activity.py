@@ -393,19 +393,67 @@ class TrainingActivity(activity.Activity):
         else:
             _logger.error('No data found on USB')
 
+    def toolbar_expanded(self):
+        if self.activity_button.is_expanded():
+            return True
+        elif self.edit_toolbar_button.is_expanded():
+            return True
+        elif self.view_toolbar_button.is_expanded():
+            return True
+        elif hasattr(self, 'progress_toolbar_button') and \
+             self.progress_toolbar_button.is_expanded():
+            return True
+
     def _launch_task_master(self):
         self.check_progress = None
 
+        # We need a box whose size will change when the toolbars are expanded
+        self.fixed = Gtk.Fixed()
+        width = Gdk.Screen.width()
+        height = Gdk.Screen.height()
+        self.fixed.set_size_request(width, height - style.GRID_CELL_SIZE)
+        self.set_canvas(self.fixed)
+        self.fixed.show()
+
+        self.progress_area = Gtk.Alignment.new(0.5, 0, 0, 0)
+        if self.toolbar_expanded():
+            self.fixed.put(self.progress_area, 0,
+                           height - 3 * style.GRID_CELL_SIZE)
+        else:
+            self.fixed.put(self.progress_area, 0,
+                           height - 2 * style.GRID_CELL_SIZE)
+        self.progress_area.show()
+
+        self.button_area = Gtk.Alignment.new(0.5, 0, 0, 0)
+        if self.toolbar_expanded():
+            self.fixed.put(self.button_area, 0,
+                           height - 4 * style.GRID_CELL_SIZE)
+        else:
+            self.fixed.put(self.button_area, 0,
+                           height - 3 * style.GRID_CELL_SIZE)
+        self.button_area.show()
+
+        self._scrolled_window = Gtk.ScrolledWindow()
+        self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
+                                        Gtk.PolicyType.AUTOMATIC)
+        if self.toolbar_expanded():
+            self._scrolled_window.set_size_request(
+                width, height - 4 * style.GRID_CELL_SIZE)
+        else:
+            self._scrolled_window.set_size_request(
+                width, height - 3 * style.GRID_CELL_SIZE)
+
+        self.graphics_area = Gtk.Alignment.new(0.5, 0, 0, 0)
+        self._scrolled_window.add(self.graphics_area)
+        self.graphics_area.show()
+        self.fixed.put(self._scrolled_window, 0, 0)
+        self._scrolled_window.show()
+
         self._task_master = TaskMaster(self)
+        self._task_master.show()
 
         # Now that we have the tasks, we can build the progress toolbar.
         self._build_progress_toolbar()
-
-        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
-        center_in_panel.add(self._task_master)
-        self._task_master.show()
-        self.set_canvas(center_in_panel)
-        center_in_panel.show()
 
         Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
 
@@ -441,26 +489,25 @@ class TrainingActivity(activity.Activity):
         # When a toolbar is expanded or collapsed, resize the canvas
         # to ensure that the progress bar is still visible.
         if hasattr(self, '_task_master'):
-            center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
             width = Gdk.Screen.width()
-            height = Gdk.Screen.height() - style.GRID_CELL_SIZE
-            if self.activity_button.is_expanded():
-                height -= style.GRID_CELL_SIZE
-            elif self.edit_toolbar_button.is_expanded():
-                height -= style.GRID_CELL_SIZE
-            elif self.view_toolbar_button.is_expanded():
-                height -= style.GRID_CELL_SIZE
-            _logger.debug('CENTER IN PANEL %d %d' % (width, height))
-            center_in_panel.set_size_request(width, height)
-            self._task_master.reparent(center_in_panel)
+            height = Gdk.Screen.height()
 
-            self._task_master.calc_size_request()
-            self._task_master.generate_grid_elements()
-            self._task_master.reload_graphics()
-            self._task_master.show()
+            if self.toolbar_expanded():
+                self._scrolled_window.set_size_request(
+                    width, height - 4 * style.GRID_CELL_SIZE)
+                self.fixed.put(self.progress_area, 0,
+                               height - 3 * style.GRID_CELL_SIZE)
+                self.fixed.put(self.button_area, 0,
+                               height - 4 * style.GRID_CELL_SIZE)
+            else:
+                self._scrolled_window.set_size_request(
+                    width, height - 3 * style.GRID_CELL_SIZE)
+                self.fixed.put(self.progress_area, 0,
+                               height - 2 * style.GRID_CELL_SIZE)
+                self.fixed.put(self.button_area, 0,
+                               height - 3 * style.GRID_CELL_SIZE)
+            self._scrolled_window.show()
 
-            self.set_canvas(center_in_panel)
-            center_in_panel.show()
         return True
 
     def get_activity_version(self):

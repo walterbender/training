@@ -40,8 +40,6 @@ class TaskMaster(Gtk.Grid):
         Gtk.Grid.__init__(self)
         self.activity = activity
 
-        self.calc_size_request()
-
         self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
 
@@ -72,12 +70,6 @@ class TaskMaster(Gtk.Grid):
         self._task_button_alignment = None
         self._progress_bar_alignment = None
 
-        self.generate_grid_elements()
-
-    def generate_grid_elements(self):
-        if hasattr(self, '_summary') and self._summary is not None:
-            return
-
         if self._graphics_grid_alignment is not None:
             self._graphics_grid_alignment.destroy()
         if self._task_button_alignment is not None:
@@ -103,8 +95,12 @@ class TaskMaster(Gtk.Grid):
         self._next_page_button.connect('clicked', self._next_page_cb)
         self._graphics_grid.attach(self._next_page_button, 2, 7, 1, 1)
 
+        self.activity.graphics_area.add(self)
+
         self._task_button_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
+        self._task_button_alignment.set_size_request(Gdk.Screen.width(), -1)
+
         grid = Gtk.Grid()
         grid.set_row_spacing(style.DEFAULT_SPACING)
         grid.set_column_spacing(style.DEFAULT_SPACING)
@@ -154,28 +150,17 @@ class TaskMaster(Gtk.Grid):
 
         self._task_button_alignment.add(grid)
         grid.show()
-        self.attach(self._task_button_alignment, 0, 1, 1, 1)
+
+        self.activity.button_area.add(self._task_button_alignment)
         self._task_button_alignment.show()
 
         self._progress_bar = None
         self._progress_bar_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        self.attach(self._progress_bar_alignment, 0, 2, 1, 1)
-        self._progress_bar_alignment.show()
+        self._progress_bar_alignment.set_size_request(Gdk.Screen.width(), -1)
 
-    def calc_size_request(self):
-        width = Gdk.Screen.width()
-        height = Gdk.Screen.height() - style.GRID_CELL_SIZE
-        if self.activity.activity_button.is_expanded():
-            height -= style.GRID_CELL_SIZE
-        elif self.activity.edit_toolbar_button.is_expanded():
-            height -= style.GRID_CELL_SIZE
-        elif self.activity.view_toolbar_button.is_expanded():
-            height -= style.GRID_CELL_SIZE
-        elif hasattr(self.activity, 'progress_toolbar_button') and \
-             self.activity.progress_toolbar_button.is_expanded():
-            height -= style.GRID_CELL_SIZE
-        self.set_size_request(width, height)
+        self.activity.progress_area.add(self._progress_bar_alignment)
+        self._progress_bar_alignment.show()
 
     def keypress_cb(self, widget, event):
         self.keyname = Gdk.keyval_name(event.keyval)
