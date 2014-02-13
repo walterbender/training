@@ -345,6 +345,9 @@ class BadgeTask(HTMLTask):
         reporter.report([self._task_master.read_task_data()])
 
     def after_button_press(self):
+        self._task_master.activity.mark_section_as_complete(
+            self._section_index)
+
         task_data = self._task_master.read_task_data(self.uid)
         if not 'badge' in task_data:
             task_data['badge'] = True
@@ -352,6 +355,7 @@ class BadgeTask(HTMLTask):
                 self._name,
                 icon=self._task_master.get_section_icon(self._section_index))
             self._task_master.write_task_data(self.uid, task_data)
+
         self._report_progress()
         return True
 
@@ -564,6 +568,7 @@ class Welcome6Task(HTMLTask):
         self._name = _('Sections')
         self.uid = 'check-progress-task'
         self._uri = 'Welcome/welcome6.html'
+        self._goals = []
 
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK]
@@ -572,7 +577,14 @@ class Welcome6Task(HTMLTask):
         return True
 
     def test(self, task_data):
-        return self._task_master.progress_checked
+        if len(self._goals) == 0:
+            if utils.is_expanded(
+                    self._task_master.activity.progress_toolbar_button):
+                self._goals.append(True)
+        else:
+            return not utils.is_expanded(
+                self._task_master.activity.progress_toolbar_button)
+        # return self._task_master.progress_checked
 
 
 class Welcome7Task(BadgeTask):

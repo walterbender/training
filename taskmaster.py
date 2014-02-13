@@ -172,6 +172,9 @@ class TaskMaster(Gtk.Grid):
             height -= style.GRID_CELL_SIZE
         elif self.activity.view_toolbar_button.is_expanded():
             height -= style.GRID_CELL_SIZE
+        elif hasattr(self.activity, 'progress_toolbar_button') and \
+             self.activity.progress_toolbar_button.is_expanded():
+            height -= style.GRID_CELL_SIZE
         self.set_size_request(width, height)
 
     def keypress_cb(self, widget, event):
@@ -871,5 +874,5 @@ class TaskMaster(Gtk.Grid):
         self.activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
-             _('Overall: %d%%' % (completion_percentage))))
+             _('Completed: %d%%' % (completion_percentage))))
         self.write_task_data(COMPLETION_PERCENTAGE, completion_percentage)

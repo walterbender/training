@@ -1,5 +1,11 @@
 NEWS
 
+1.46
+* ABC font (from Paul)
+* Refactored sharing video (from Paul)
+* Experiment with new progress-toolbar approach
+* Overall -> Completed
+
 1.45
 * Fixed problem with opening toolbars when progress summary is visible
 

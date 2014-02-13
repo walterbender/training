@@ -45,7 +45,8 @@ COMPLETION_PERCENTAGE = 'completion_percentage'
 TRAINING_DATA_EMAIL = 'training_data_email'
 TRAINING_DATA_FULLNAME = 'training_data_fullname'
 
-from toolbar_utils import separator_factory, label_factory, button_factory
+from toolbar_utils import (separator_factory, label_factory, button_factory,
+                           radio_factory)
 from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
 from checkprogress import CheckProgress
@@ -622,16 +623,44 @@ class TrainingActivity(activity.Activity):
         progress_toolbar.show()
         self.progress_toolbar_button.show()
 
-        for i in range(self._task_master.get_number_of_sections()):
-            icon = self._task_master.get_section_icon(i)
-            name = self._task_master.get_section_name(i)
-            _logger.debug('%s %s' % (icon, name))
-            button = button_factory(icon,
-                                    progress_toolbar,
-                                    self._check_progress_cb,
-                                    cb_arg=i,
-                                    tooltip=name)
-            button.show()
+        self._progress_buttons = []
+        progress = self._task_master.get_completed_sections()
+
+        for section in range(self._task_master.get_number_of_sections()):
+            icon = self._task_master.get_section_icon(section)
+            if section in progress:
+                icon = icon + '-white'
+            else:
+                icon = icon + '-grey'
+
+            name = self._task_master.get_section_name(section)
+
+            if section == 0:
+                group = None
+            else:
+                group = self._progress_buttons[0]
+
+            self._progress_buttons.append(
+                radio_factory(icon,
+                              progress_toolbar,
+                              self._jump_to_section_cb,
+                              cb_arg=section,
+                              tooltip=name,
+                              group=group))
+            self._progress_buttons[section].show()
+
+        self._radio_buttons_live = False
+        section, task = self._task_master._get_section_and_task_index()
+        self._progress_buttons[section].set_active(True)
+        self._radio_buttons_live = True
+
+    def mark_section_as_complete(self, section):
+        icon = self._task_master.get_section_icon(section) + '-white'
+        self._progress_buttons[section].set_icon_name(icon)
+        if section < self._task_master.get_number_of_sections() - 1:
+            self._radio_buttons_live = False
+            self._progress_buttons[section + 1].set_active(True)
+            self._radio_buttons_live = True
 
     def _transfer_cb(self, button):
         ''' Hide the button to dismiss notification '''
@@ -725,9 +754,15 @@ class TrainingActivity(activity.Activity):
         self._set_zoom_buttons_sensitivity()
         self._task_master.reload_graphics()
 
-    def _check_progress_cb(self, button):
-        self.check_progress = CheckProgress(self._task_master)
-        self._task_master.load_progress_summary(self.check_progress)
+    def _jump_to_section_cb(self, button, section):
+        # def _check_progress_cb(self, button, section):
+        # self.check_progress = CheckProgress(self._task_master)
+        # self._task_master.load_progress_summary(self.check_progress)
+        if self._radio_buttons_live:
+            uid = self._task_master.section_and_task_to_uid(section)
+            self._task_master.current_task = \
+                self._task_master.uid_to_task_number(uid)
+            self._task_master.reload_graphics()
 
     def _help_cb(self, button):
         title, help_file = self._task_master.get_help_info()
