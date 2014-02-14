@@ -489,8 +489,6 @@ class TrainingActivity(activity.Activity):
 
     def _configure_cb(self, event):
         self._fixed.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
-        self._scrolled_window.set_size_request(
-            Gdk.Screen.width(), Gdk.Screen.height() - dy1)
         self._resize_canvas(None)
         self._task_master.reload_graphics()
 
