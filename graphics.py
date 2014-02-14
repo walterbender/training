@@ -29,30 +29,25 @@ FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'large',
               'xx-large']
 
 
-class Graphics(Gtk.ScrolledWindow):
+class Graphics(Gtk.Alignment):
     ''' An aligned grid in a scrolling window '''
 
     def __init__(self, width=None, height=None):
-        Gtk.ScrolledWindow.__init__(self)
+        Gtk.Alignment.__init__(self)
 
-        self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
-
-        offset = style.GRID_CELL_SIZE
         if width is None:
-            width = Gdk.Screen.width()  # - offset * 2
+            width = Gdk.Screen.width() - style.GRID_CELL_SIZE
         if height is None:
-            height = Gdk.Screen.height() - offset * 3
+            height = Gdk.Screen.height() - style.GRID_CELL_SIZE * 3
         self.set_size_request(width, height)
 
-        alignment = Gtk.Alignment.new(0.5, 0.5, 0, 0)
-        self.add_with_viewport(alignment)
-        alignment.show()
+        self.set(0.5, 0, 0, 0)
 
         self._grid = Gtk.Grid()
         self._grid.set_row_spacing(style.DEFAULT_SPACING)
         self._grid.set_column_spacing(style.DEFAULT_SPACING)
         self._grid.set_border_width(style.DEFAULT_SPACING * 2)
-        alignment.add(self._grid)
+        self.add(self._grid)
         self._grid.show()
 
         self._row = 0
@@ -157,7 +152,7 @@ class Graphics(Gtk.ScrolledWindow):
 
     def add_uri(self, uri, height=610):
         self._web_view = WebKit.WebView()
-        width = 800
+        width = Gdk.Screen.width() - style.GRID_CELL_SIZE
         height = int(height * Gdk.Screen.height() / 900.)
         self._web_view.set_size_request(width, height)
         self._web_view.set_full_content_zoom(True)

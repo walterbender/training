@@ -1,5 +1,9 @@
 NEWS
 
+1.48
+* Fixed scrollbar issue
+* Proper resize when entering fullscreen mode
+
 1.47
 * Resize graphics when toolbars open/close to keep progress bar always visible
 * Failed experiment with hotlinks in graphics

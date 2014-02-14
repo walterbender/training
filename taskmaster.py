@@ -33,15 +33,14 @@ from activity import (TRAINING_DATA_UID, NAME_UID, EMAIL_UID,
                       VERSION_NUMBER, COMPLETION_PERCENTAGE)
 
 
-class TaskMaster(Gtk.Grid):
+class TaskMaster(Gtk.Alignment):
 
     def __init__(self, activity):
         ''' Initialize the task list '''
-        Gtk.Grid.__init__(self)
+        Gtk.Alignment.__init__(self)
         self.activity = activity
 
-        self.set_row_spacing(style.DEFAULT_SPACING)
-        self.set_column_spacing(style.DEFAULT_SPACING)
+        self.set_size_request(Gdk.Screen.width() - style.GRID_CELL_SIZE, -1)
 
         self.button_was_pressed = True
         self.current_task = None
@@ -53,7 +52,6 @@ class TaskMaster(Gtk.Grid):
         self._email = None
         self._graphics = None
         self._summary = None
-        self._page = 0
         self._first_time = True
         self._accumulated_time = 0
         self._yes_task = None
@@ -66,40 +64,20 @@ class TaskMaster(Gtk.Grid):
         if self.current_task is None:
             self.current_task = 0
 
-        self._graphics_grid_alignment = None
-        self._task_button_alignment = None
-        self._progress_bar_alignment = None
-
-        if self._graphics_grid_alignment is not None:
-            self._graphics_grid_alignment.destroy()
-        if self._task_button_alignment is not None:
-            self._task_button_alignment.destroy()
-        if self._progress_bar_alignment is not None:
-            self._progress_bar_alignment.destroy()
-
         self._graphics_grid = Gtk.Grid()
         self._graphics_grid.set_row_spacing(style.DEFAULT_SPACING)
         self._graphics_grid.set_column_spacing(style.DEFAULT_SPACING)
 
-        self._graphics_grid_alignment = Gtk.Alignment.new(
-            xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        self._graphics_grid_alignment.add(self._graphics_grid)
+        self.set(xalign=0.5, yalign=0, xscale=0, yscale=0)
+        self.add(self._graphics_grid)
         self._graphics_grid.show()
-        self.attach(self._graphics_grid_alignment, 0, 0, 1, 1)
-        self._graphics_grid_alignment.show()
 
-        self._prev_page_button = ToolButton('go-left-page')
-        self._prev_page_button.connect('clicked', self._prev_page_cb)
-        self._graphics_grid.attach(self._prev_page_button, 0, 7, 1, 1)
-        self._next_page_button = ToolButton('go-right-page')
-        self._next_page_button.connect('clicked', self._next_page_cb)
-        self._graphics_grid.attach(self._next_page_button, 2, 7, 1, 1)
-
-        self.activity.graphics_area.add(self)
+        self.activity.load_graphics_area(self)
 
         self._task_button_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        self._task_button_alignment.set_size_request(Gdk.Screen.width(), -1)
+        self._task_button_alignment.set_size_request(
+            Gdk.Screen.width() - style.GRID_CELL_SIZE, -1)
 
         grid = Gtk.Grid()
         grid.set_row_spacing(style.DEFAULT_SPACING)
@@ -151,15 +129,16 @@ class TaskMaster(Gtk.Grid):
         self._task_button_alignment.add(grid)
         grid.show()
 
-        self.activity.button_area.add(self._task_button_alignment)
+        self.activity.load_button_area(self._task_button_alignment)
         self._task_button_alignment.show()
 
         self._progress_bar = None
         self._progress_bar_alignment = Gtk.Alignment.new(
             xalign=0.5, yalign=0.5, xscale=0, yscale=0)
-        self._progress_bar_alignment.set_size_request(Gdk.Screen.width(), -1)
+        self._progress_bar_alignment.set_size_request(
+            Gdk.Screen.width() - style.GRID_CELL_SIZE, -1)
 
-        self.activity.progress_area.add(self._progress_bar_alignment)
+        self.activity.load_progress_area(self._progress_bar_alignment)
         self._progress_bar_alignment.show()
 
     def keypress_cb(self, widget, event):
@@ -210,7 +189,7 @@ class TaskMaster(Gtk.Grid):
                                    utils.get_safe_text(
                                        self.read_task_data(NAME_UID)))
             self._graphics.set_zoom_level(0.667)
-            self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
+            self._graphics_grid.attach(self._graphics, 0, 0, 1, 1)
             self._graphics.show()
             self.activity.complete = True
 
@@ -237,7 +216,7 @@ class TaskMaster(Gtk.Grid):
         task = self._task_list[section_index]['tasks'][task_index]
 
         self._graphics, label = task.get_graphics()
-        self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
+        self._graphics_grid.attach(self._graphics, 0, 0, 1, 1)
         self._graphics.show()
 
     def get_help_info(self):
@@ -371,12 +350,10 @@ class TaskMaster(Gtk.Grid):
         self._destroy_graphics()
         if self._progress_bar is not None:
             self._progress_bar.hide()
-        self._prev_page_button.hide()
-        self._next_page_button.hide()
         if hasattr(self, '_summary') and self._summary is not None:
             self._summary.destroy()
         self._summary = summary
-        self._graphics_grid.attach(self._summary, 1, 0, 1, 15)
+        self._graphics_grid.attach(self._summary, 0, 0, 1, 1)
         self.progress_checked = True  # Needed for check progress summary task
         summary.show()
 
@@ -419,18 +396,8 @@ class TaskMaster(Gtk.Grid):
             self._graphics.destroy()
         self._graphics, label = task.get_graphics()
 
-        self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
+        self._graphics_grid.attach(self._graphics, 0, 0, 1, 1)
         self._graphics.show()
-
-        if task.get_page_count() > 1:
-            self._prev_page_button.show()
-            self._prev_page_button.set_sensitive(False)
-            self._next_page_button.show()
-            self._next_page_button.set_sensitive(True)
-            self._page = 0
-        else:
-            self._prev_page_button.hide()
-            self._next_page_button.hide()
 
         self._yes_task, self._no_task = task.get_yes_no_tasks()
         if self._yes_task is not None and self._no_task is not None:
@@ -457,45 +424,6 @@ class TaskMaster(Gtk.Grid):
         self._update_progress()
 
         task.grab_focus()
-
-    def _show_page(self):
-        ''' Some tasks have multiple pages '''
-        if self._graphics is not None:
-            self._graphics.destroy()
-        if hasattr(self, 'task_button'):
-            self.task_button.destroy()
-
-        section_index, task_index = self._get_section_and_task_index()
-        task = self._task_list[section_index]['tasks'][task_index]
-        self._graphics, self.task_button = task.get_graphics(page=self._page)
-        self._graphics_grid.attach(self._graphics, 1, 0, 1, 15)
-        self._graphics.show()
-
-        if self.task_button is not None:
-            self.task_button.set_sensitive(task.test(self._task_data))
-            self.task_button.show()
-
-    def _prev_page_cb(self, button):
-        if self._page > 0:
-            self._page -= 1
-        if self._page == 0:
-            self._prev_page_button.set_sensitive(False)
-        self._next_page_button.set_sensitive(True)
-        self._show_page()
-
-    def _next_page_cb(self, button):
-        section_index, task_index = self._get_section_and_task_index()
-        task = self._task_list[section_index]['tasks'][task_index]
-
-        count = task.get_page_count()
-        if self._page < count - 1:
-            self._page += 1
-
-        if self._page == count - 1:
-            self._next_page_button.set_sensitive(False)
-        self._prev_page_button.set_sensitive(True)
-
-        self._show_page()
 
     def get_bundle_path(self):
         return self.activity.bundle_path

@@ -194,7 +194,6 @@ class Task():
         self._zoom_level = 1.0
         self._pause_between_checks = 1000
         self._requires = []
-        self._page_count = 1
         self._prompt = _('Next')
 
     def get_yes_no_tasks(self):
@@ -281,10 +280,7 @@ class Task():
         ''' Is there help associated with this task? '''
         return (None, None)  # title, url (from Help.activity)
 
-    def get_page_count(self):
-        return self._page_count
-
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         ''' Graphics to present with the task '''
         self._task_master.activity.set_copy_widget()
         self._task_master.activity.set_paste_widget()
@@ -316,7 +312,7 @@ class HTMLTask(Task):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
@@ -397,7 +393,7 @@ class Welcome2Task(Task):
         self._task_master.activity.update_activity_title()
         return True
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         target = self._get_user_name()
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
@@ -428,7 +424,7 @@ class Welcome3Task(HTMLTask):
         self.uid = 'welcome-3-task'
         self._uri = 'Welcome/welcome3.html'
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         name = self._get_user_name().split()[0]
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s' %
@@ -475,7 +471,7 @@ class Welcome4Task(HTMLTask):
         self._task_master.write_task_data(EMAIL_UID, self._entry.get_text())
         return True
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         email = self._task_master.read_task_data(EMAIL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
@@ -535,7 +531,7 @@ class Welcome5Task(HTMLTask):
                                           self._entries[1].get_text())
         return True
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         self._entries = []
         email = self._task_master.read_task_data(EMAIL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
@@ -596,7 +592,7 @@ class Welcome7Task(BadgeTask):
         self._uri = 'Welcome/welcome7.html'
         self._section_index = 0
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         name = self._get_user_name().split()[0]
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s' %
@@ -831,7 +827,7 @@ class Connected5Task(HTMLTask):
                                           self._entries[1].get_text())
         return True
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         self._entries = []
         name = self._task_master.read_task_data(NAME_UID)
         if name is None:  # Should never happen
@@ -931,7 +927,7 @@ class Connected6Task(HTMLTask):
             self._graphics.add_yes_no_buttons(self._yes_no_cb)
             return False
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         target = self._task_master.read_task_data(SCHOOL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
@@ -966,7 +962,7 @@ class Connected7Task(HTMLTask):
     def get_requires(self):
         return [_ENTER_NAME_TASK, _VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK]
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         self._entries = []
         name = self._task_master.read_task_data(NAME_UID)
         if name is None:  # Should never happen
@@ -1358,7 +1354,7 @@ class Frame3Task(HTMLTask):
     def _battery_button_callback(self, widget, i):
         self._battery_level = i * 20
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
@@ -2040,7 +2036,7 @@ class ClipboardTask(Task):
         self._prompt = _('Next')
         self._height = 500
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
@@ -2224,7 +2220,7 @@ class Assessment1Task(HTMLTask):
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
-    def get_graphics(self, page=0):
+    def get_graphics(self):
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
