@@ -489,6 +489,12 @@ class TrainingActivity(activity.Activity):
 
     def _configure_cb(self, event):
         self._fixed.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
+        if Gdk.Screen.width() > Gdk.Screen.height():
+            self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
+                                             Gtk.PolicyType.AUTOMATIC)
+        else:
+            self._scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                             Gtk.PolicyType.AUTOMATIC)
         self._resize_canvas(None)
         self._task_master.reload_graphics()
 
