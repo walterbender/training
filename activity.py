@@ -418,10 +418,12 @@ class TrainingActivity(activity.Activity):
         dy2 = 2 * style.GRID_CELL_SIZE
 
         self._progress_area = Gtk.Alignment.new(0.5, 0, 0, 0)
+        self._progress_area.set_size_request(Gdk.Screen.width(), -1)
         self._fixed.put(self._progress_area, 0, Gdk.Screen.height() - dy2)
         self._progress_area.show()
 
         self._button_area = Gtk.Alignment.new(0.5, 0, 0, 0)
+        self._button_area.set_size_request(Gdk.Screen.width(), -1)
         self._fixed.put(self._button_area, 0, Gdk.Screen.height() - dy1)
         self._button_area.show()
 
