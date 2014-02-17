@@ -175,10 +175,16 @@ class TaskMaster(Gtk.Alignment):
                     break
 
             # Check to make sure all the requirements at met
-            if not self._requirements_are_met(section_index, task_index):
+            i = 0
+            while not self._requirements_are_met(section_index, task_index):
                 _logger.debug('Switching to a required task %d' %
                               self.current_task)
                 section_index, task_index = self._get_section_and_task_index()
+                i += 1
+                if i > 10:
+                    # Shouldn't happen but we want to avoid infinite loops
+                    _logger.error('Breaking out of required task loop')
+
             self._first_time = True
             self._run_task(section_index, task_index)
         else:
