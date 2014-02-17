@@ -447,9 +447,14 @@ class TaskMaster(Gtk.Alignment):
         progress = []
         for section_index, section in enumerate(self._task_list):
             section_completed = True
-            for task in section['tasks']:
-                if task.is_collectable() and not task.is_completed():
-                    section_completed = False
+            if self._get_number_of_collectables_in_section(section_index) == 0:
+                for task in section['tasks']:
+                    if self.read_task_data(task.uid) is None:
+                        section_completed = False
+            else:
+                for task in section['tasks']:
+                    if task.is_collectable() and not task.is_completed():
+                        section_completed = False
             if section_completed:
                 progress.append(section_index)
         return progress

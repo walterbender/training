@@ -1061,7 +1061,7 @@ class Activities5Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Insert a Picture into a Write Document (Video)')
-        self.uid = 'write-save-task'  # 'activities-5-task'
+        self.uid = _WRITE_SAVE_TASK
         self._uri = 'Activities/activities5.html'
 
     def get_requires(self):
@@ -1710,13 +1710,14 @@ class Turtle3Task(HTMLTask):
             'org.laptop.TurtleArtActivity')
         if activity is not None:
             path = activity.file_path
-            if not utils.find_string(path, 'left') and \
-               not utils.find_string(path, 'right'):
-                return False
-            if not utils.find_string(path, 'forward') and \
-               not utils.find_string(path, 'back'):
-                return False
-            return True
+            if os.path.exists(path):
+                if not utils.find_string(path, 'left') and \
+                   not utils.find_string(path, 'right'):
+                    return False
+                if not utils.find_string(path, 'forward') and \
+                   not utils.find_string(path, 'back'):
+                    return False
+                return True
         return False
 
     def get_my_turn(self):
@@ -1869,9 +1870,11 @@ class Turtle11Task(HTMLTask):
             path = activity.file_path
             if not utils.find_string(path, 'journal'):
                 return False
-        paths = utils.get_png()
-        return len(paths) > 0 and (utils.get_modified_time(paths[0]) >
-                                   task_data['start_time'] - _HOUR)
+        return True
+        # Check to see if they saved the image to the Journal
+        # paths = utils.get_png()
+        # return len(paths) > 0 and (utils.get_modified_time(paths[0]) >
+        # task_data['start_time'] - _HOUR)
 
     def get_my_turn(self):
         return True

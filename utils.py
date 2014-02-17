@@ -773,7 +773,7 @@ def find_string(path, string):
     try:
         fd = open(path, 'r')
     except Exception as e:
-        _logger.error('Could not open file at %s: %s' % (path, e))
+        # _logger.error('Could not open file at %s: %s' % (path, e))
         return False
     for line in fd:
         if string in line:

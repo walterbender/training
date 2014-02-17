@@ -1,8 +1,13 @@
 NEWS
 
+1.49
+* Fix alignment of progress bar and buttons
+
 1.48
 * Fixed scrollbar issue
 * Proper resize when entering fullscreen mode
+* Adjusted web content to better fill XO screen
+* Added some new artwork
 
 1.47
 * Resize graphics when toolbars open/close to keep progress bar always visible
