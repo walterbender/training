@@ -2,6 +2,9 @@ NEWS
 
 1.49
 * Fix alignment of progress bar and buttons
+* Fixed problem with awarding of badges for optional tasks
+* Adjusted tests in Turtle Tasks
+* Removed some Journal spam
 
 1.48
 * Fixed scrollbar issue
