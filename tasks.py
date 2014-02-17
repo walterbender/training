@@ -1204,8 +1204,9 @@ class Journal3Task(HTMLTask):
                not 'description' in activity.metadata:
                 return False
             return \
-                not task_data['data'] == activity.metadata['description'] \
-                and int(activity.metadata['keep']) == 1
+                not task_data['data'] == activity.metadata['description']
+                # 'starred' is no longer part of task
+                # and int(activity.metadata['keep']) == 1
 
 
 class Journal4Task(HTMLTask):
