@@ -30,13 +30,11 @@ from sugar3.graphics.toolbarbox import ToolbarButton
 from sugar3.graphics.alert import ConfirmationAlert
 from sugar3.graphics import style
 
-'''
 try:
-    from jarabe.view.viewhelp import ViewHelp
-    _HELP_AVAILABLE = True
+    from jarabe.webservice import account
+    WEBSERVICES_AVAILABLE = True
 except:
-    _HELP_AVAILABLE = False
-'''
+    WEBSERVICES_AVAILABLE = False
 
 NAME_UID = 'name'
 EMAIL_UID = 'email_address'
@@ -865,6 +863,11 @@ class TrainingActivity(activity.Activity):
             self.metadata['comments'] = json.dumps([badge])
 
     def _load_extension(self):
+        if not WEBSERVICES_AVAILABLE:
+            _logger.error('Webservices not available on this version of Sugar')
+            self._webservice_alert(_('Sugar upgrade required.'))
+            return False
+
         extensions_path = os.path.join(os.path.expanduser('~'), '.sugar',
                                        'default', 'extensions')
         webservice_path = os.path.join(extensions_path, 'webservice')
@@ -877,17 +880,23 @@ class TrainingActivity(activity.Activity):
                 subprocess.call(['mkdir', extensions_path])
             except OSError, e:
                 _logger.error('Could not mkdir %s, %s' % (extensions_path, e))
+                self._webservice_alert(_('System error.'))
+                return False
 
         if not os.path.exists(webservice_path):
             try:
                 subprocess.call(['mkdir', webservice_path])
             except OSError, e:
                 _logger.error('Could not mkdir %s, %s' % (webservice_path, e))
+                self._webservice_alert(_('System error.'))
+                return False
             try:
                 subprocess.call(['cp', init_path, webservice_path])
             except OSError, e:
                 _logger.error('Could not cp %s to %s, %s' %
                               (init_path, webservice_path, e))
+                self._webservice_alert(_('System error.'))
+                return False
 
         install = False
         if not os.path.exists(os.path.join(webservice_path, 'sugarservices')):
@@ -905,6 +914,8 @@ class TrainingActivity(activity.Activity):
             except OSError, e:
                 _logger.error('Could not copy %s to %s, %s' %
                               (sugarservices_path, webservice_path, e))
+                self._webservice_alert(_('System error.'))
+                return False
 
             alert = ConfirmationAlert()
             alert.props.title = _('Restart required')
@@ -917,6 +928,17 @@ class TrainingActivity(activity.Activity):
             self._load_intro_graphics(message=_('Sugar restart required.'))
 
         return not install
+
+    def _webservice_alert(self, message):
+        alert = ConfirmationAlert()
+        alert.props.title = message
+        alert.props.msg = _('We are unable to install some software on your '
+                            'system.\nSugar must be upgraded before this '
+                            'activity can be run.')
+
+        alert.connect('response', self._close_alert_cb)
+        self.add_alert(alert)
+        self._load_intro_graphics(message=message)
 
     def _remove_alert_cb(self, alert, response_id):
         self.remove_alert(alert)

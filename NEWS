@@ -1,5 +1,8 @@
 NEWS
 
+1.53
+* Add test for Sugar webservices
+
 1.52
 * Careful edit of Assessment document
 * First pass at help panel
