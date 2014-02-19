@@ -118,7 +118,7 @@ class TrainingActivity(activity.Activity):
         self._copy_entry = None
         self._paste_entry = None
         self._webkit = None
-        self._help_palette = None
+        self.help_palette = None
         self._clipboard_text = ''
 
         if self._load_extension() and self.check_volume_data():
@@ -448,10 +448,10 @@ class TrainingActivity(activity.Activity):
         # help panel.
         self._build_progress_toolbar()
         self._help_panel = HelpPanel(self._task_master)
-        self._help_palette = self.help_button.get_palette()
-        self._help_palette.set_content(self._help_panel)
+        self.help_palette = self._help_button.get_palette()
+        self.help_palette.set_content(self._help_panel)
         self._help_panel.show()
-        self.help_button.set_sensitive(True)
+        self._help_button.set_sensitive(True)
 
         Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
         self._toolbox.connect('hide', self._resize_hide_cb)
@@ -642,11 +642,11 @@ class TrainingActivity(activity.Activity):
                                             accelerator='<Ctrl>V')
         self._paste_button.set_sensitive(False)
 
-        self.help_button = button_factory('toolbar-help',
-                                          self._toolbox.toolbar,
-                                          self._help_cb, tooltip=_('help'),
-                                          accelerator=_('<Ctrl>H'))
-        self.help_button.set_sensitive(False)
+        self._help_button = button_factory('toolbar-help',
+                                           self._toolbox.toolbar,
+                                           self._help_cb, tooltip=_('help'),
+                                           accelerator=_('<Ctrl>H'))
+        self._help_button.set_sensitive(False)
 
         '''
         button_factory('check-progress',
@@ -710,7 +710,7 @@ class TrainingActivity(activity.Activity):
             self._progress_buttons[section].show()
 
         self._radio_buttons_live = False
-        section, task = self._task_master._get_section_and_task_index()
+        section, task = self._task_master.get_section_and_task_index()
         self._progress_buttons[section].set_active(True)
         self._radio_buttons_live = True
 
@@ -839,13 +839,13 @@ class TrainingActivity(activity.Activity):
             _logger.error('Could not read NM status: %s' % (e))
             self._help_panel.set_connected(False)
 
-        if self._help_palette:
-            if not self._help_palette.is_up():
-                self._help_palette.popup(
+        if self.help_palette:
+            if not self.help_palette.is_up():
+                self.help_palette.popup(
                     immediate=True,
-                    state=self._help_palette.SECONDARY)
+                    state=self.help_palette.SECONDARY)
             else:
-                self._help_palette.popdown(immediate=True)
+                self.help_palette.popdown(immediate=True)
             return
 
     def add_badge(self, msg, icon="training-trophy", name="One Academy"):

@@ -1505,9 +1505,6 @@ class Views5Task(HTMLTask):
         else:
             return len(utils.get_favorites()) > task_data['data']
 
-    def get_help_info(self):
-        return ('Home', 'home_view.html')
-
 
 class Views6Task(HTMLTask):
 
@@ -1537,9 +1534,6 @@ class Views6Task(HTMLTask):
             return False
         else:
             return len(utils.get_favorites()) < task_data['data']
-
-    def get_help_info(self):
-        return ('Home', 'home_view.html')
 
 
 class Views7Task(HTMLTask):

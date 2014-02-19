@@ -160,7 +160,7 @@ class TaskMaster(Gtk.Alignment):
         self._destroy_graphics()
         self.activity.button_was_pressed = False
         if self.current_task < self._get_number_of_tasks():
-            section_index, task_index = self._get_section_and_task_index()
+            section_index, task_index = self.get_section_and_task_index()
 
             # Do we skip this task?
             task = self._task_list[section_index]['tasks'][task_index]
@@ -179,7 +179,7 @@ class TaskMaster(Gtk.Alignment):
             while not self._requirements_are_met(section_index, task_index):
                 _logger.debug('Switching to a required task %d' %
                               self.current_task)
-                section_index, task_index = self._get_section_and_task_index()
+                section_index, task_index = self.get_section_and_task_index()
                 i += 1
                 if i > 10:
                     # Shouldn't happen but we want to avoid infinite loops
@@ -203,7 +203,7 @@ class TaskMaster(Gtk.Alignment):
         ''' The button at the bottom of the page for each task: used to
             advance to the next task. '''
         self.button_was_pressed = True
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
         if task.after_button_press():
             self.current_task += 1
@@ -218,7 +218,7 @@ class TaskMaster(Gtk.Alignment):
         ''' Refresh the current page's graphics '''
         self._graphics.destroy()
 
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
 
         self._graphics, label = task.get_graphics()
@@ -230,7 +230,7 @@ class TaskMaster(Gtk.Alignment):
         if self.current_task is None:
             return (None, None)
         else:
-            section_index, task_index = self._get_section_and_task_index()
+            section_index, task_index = self.get_section_and_task_index()
             task = self._task_list[section_index]['tasks'][task_index]
             return task.get_help_info()
 
@@ -244,9 +244,9 @@ class TaskMaster(Gtk.Alignment):
             '''
             title, help_file = task.get_help_info()
             if title is None or help_file is None:
-                self.activity.help_button.set_sensitive(False)
+                self.activity._help_button.set_sensitive(False)
             else:
-                self.activity.help_button.set_sensitive(True)
+                self.activity._help_button.set_sensitive(True)
             '''
             # In order to calculate accumulated time, we need to monitor
             # our start time.
@@ -297,12 +297,12 @@ class TaskMaster(Gtk.Alignment):
             if not 'completed' in task_data or not task_data['completed']:
                 self._update_accumutaled_time(task_data)
             self.write_task_data(uid, task_data)
-            section_index, task_index = self._get_section_and_task_index()
+            section_index, task_index = self.get_section_and_task_index()
             self._run_task(section_index, task_index)
 
     def _jump_to_task_cb(self, widget, flag):
         ''' Jump to task associated with uid '''
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
 
         self.button_was_pressed = True
@@ -314,7 +314,7 @@ class TaskMaster(Gtk.Alignment):
             uid = self._no_task
         self.current_task = self.uid_to_task_number(uid)
 
-        # section_index, task_index = self._get_section_and_task_index()
+        # section_index, task_index = self.get_section_and_task_index()
         self.write_task_data('current_task', self.current_task)
         self.task_master()
 
@@ -379,7 +379,7 @@ class TaskMaster(Gtk.Alignment):
         self._destroy_graphics()
         self._load_graphics()
         self._progress_bar.show()
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
         self._test(task.test, self._task_data, self._uid)
 
@@ -393,7 +393,7 @@ class TaskMaster(Gtk.Alignment):
 
     def _load_graphics(self):
         ''' Load the graphics for a task and define the task button '''
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
 
         task.set_font_size(self.activity.font_size)
@@ -482,7 +482,7 @@ class TaskMaster(Gtk.Alignment):
         _logger.error('UID %s not found' % uid)
         return 0
 
-    def _get_section_and_task_index(self):
+    def get_section_and_task_index(self):
         count = 0
         for section_index, section in enumerate(self._task_list):
             for task_index in range(len(section['tasks'])):
@@ -674,7 +674,7 @@ class TaskMaster(Gtk.Alignment):
                           (sugar_data_path, e))
 
     def _prev_task_button_cb(self, button):
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         if task_index == 0:
             return
         i = task_index
@@ -684,11 +684,10 @@ class TaskMaster(Gtk.Alignment):
                                           switch_task=False):
                 self.current_task -= (task_index - i)
                 break
-        # section_index, task_index = self._get_section_and_task_index()
         self.task_master()
 
     def _next_task_button_cb(self, button):
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         tasks_in_section = self._get_number_of_tasks_in_section(section_index)
         if task_index > tasks_in_section - 1:
             return
@@ -699,11 +698,10 @@ class TaskMaster(Gtk.Alignment):
                 self.current_task += (i - task_index)
                 break
             i += 1
-        # section_index, task_index = self._get_section_and_task_index()
         self.task_master()
 
     def _look_for_next_task(self):
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         tasks_in_section = self._get_number_of_tasks_in_section(section_index)
         if task_index > tasks_in_section - 1:
             return False
@@ -716,12 +714,12 @@ class TaskMaster(Gtk.Alignment):
         return False
 
     def _progress_button_cb(self, button, i):
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         self.current_task += (i - task_index)
         self.task_master()
 
     def _update_progress(self):
-        section_index, task_index = self._get_section_and_task_index()
+        section_index, task_index = self.get_section_and_task_index()
         if section_index < 0:  # We haven't started yet
             return
 
