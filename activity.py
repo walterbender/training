@@ -118,6 +118,7 @@ class TrainingActivity(activity.Activity):
         self._copy_entry = None
         self._paste_entry = None
         self._webkit = None
+        self._help_palette = None
         self._clipboard_text = ''
 
         if self._load_extension() and self.check_volume_data():
@@ -447,6 +448,10 @@ class TrainingActivity(activity.Activity):
         # help panel.
         self._build_progress_toolbar()
         self._help_panel = HelpPanel(self._task_master)
+        self._help_palette = self.help_button.get_palette()
+        self._help_palette.set_content(self._help_panel)
+        self._help_panel.show()
+        self.help_button.set_sensitive(True)
 
         Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
         self._toolbox.connect('hide', self._resize_hide_cb)
@@ -641,7 +646,7 @@ class TrainingActivity(activity.Activity):
                                           self._toolbox.toolbar,
                                           self._help_cb, tooltip=_('help'),
                                           accelerator=_('<Ctrl>H'))
-        self.help_button.set_sensitive(True)
+        self.help_button.set_sensitive(False)
 
         '''
         button_factory('check-progress',
@@ -827,9 +832,21 @@ class TrainingActivity(activity.Activity):
         # if title is not None and help_file is not None:
         #     self.viewhelp = ViewHelp(title, help_file, self.window_xid)
         #     self.viewhelp.show()
-        self._help_palette = self.help_button.get_palette()
-        self._help_palette.set_content(self._help_panel)
-        self._help_panel.show()
+        try:
+            self._help_panel.set_connected(
+                utils.nm_status() == 'network-wireless-connected')
+        except Exception, e:
+            _logger.error('Could not read NM status: %s' % (e))
+            self._help_panel.set_connected(False)
+
+        if self._help_palette:
+            if not self._help_palette.is_up():
+                self._help_palette.popup(
+                    immediate=True,
+                    state=self._help_palette.SECONDARY)
+            else:
+                self._help_palette.popdown(immediate=True)
+            return
 
     def add_badge(self, msg, icon="training-trophy", name="One Academy"):
         sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')

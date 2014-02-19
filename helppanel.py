@@ -51,26 +51,27 @@ class HelpPanel(Gtk.Grid):
         alignment.show()
 
         alignment = Gtk.Alignment.new(0., 0.5, 0., 0.)
-        info_label = Gtk.Label()
-        info_label.set_use_markup(True)
-        info_label.set_justify(Gtk.Justification.LEFT)
-        info_label.set_markup(
+        self._info_label = Gtk.Label()
+        self._info_label.set_use_markup(True)
+        self._info_label.set_justify(Gtk.Justification.LEFT)
+        self._info_label.set_markup(
             '<span foreground="%s" size="large">%s</span>' %
             (style.COLOR_WHITE.get_html(), _('Or use the form below:')))
-        alignment.add(info_label)
-        info_label.show()
+        alignment.add(self._info_label)
+        self._info_label.show()
         self.attach(alignment, 0, 4, 4, 1)
         alignment.show()
 
-        feedback_button = Gtk.RadioButton(label=_('Feedback'))
-        self.attach(feedback_button, 0, 5, 1, 1)
-        feedback_button.connect('clicked', self._feedback_button_cb)
-        feedback_button.show()
+        self._feedback_button = Gtk.RadioButton(label=_('Feedback'))
+        self.attach(self._feedback_button, 0, 5, 1, 1)
+        self._feedback_button.connect('clicked', self._feedback_button_cb)
+        self._feedback_button.show()
 
-        help_button = Gtk.RadioButton(label=_('Help'), group=feedback_button)
-        self.attach(help_button, 1, 5, 1, 1)
-        help_button.connect('clicked', self._help_button_cb)
-        help_button.show()
+        self._help_button = Gtk.RadioButton(label=_('Help'),
+                                            group=self._feedback_button)
+        self.attach(self._help_button, 1, 5, 1, 1)
+        self._help_button.connect('clicked', self._help_button_cb)
+        self._help_button.show()
 
         self._entry = Gtk.TextView()
         self._entry.set_wrap_mode(Gtk.WrapMode.WORD)
@@ -85,10 +86,24 @@ class HelpPanel(Gtk.Grid):
         self.attach(self._check_button, 0, 10, 2, 1)
         self._check_button.show()
 
-        send_button = Gtk.Button(_('Send'))
-        self.attach(send_button, 3, 10, 1, 1)
-        send_button.connect('clicked', self._send_button_cb)
-        send_button.show()
+        self._send_button = Gtk.Button(_('Send'))
+        self.attach(self._send_button, 3, 10, 1, 1)
+        self._send_button.connect('clicked', self._send_button_cb)
+        self._send_button.show()
+
+    def set_connected(self, connected):
+        if connected:
+            self._info_label.set_markup(
+                '<span foreground="%s" size="large">%s</span>' %
+                (style.COLOR_WHITE.get_html(), _('Or use the form below:')))
+            self._send_button.set_sensitive(True)
+        else:
+            self._info_label.set_markup(
+                '<span foreground="%s" size="large">%s</span>' %
+                (style.COLOR_WHITE.get_html(),
+                 _('You must be connected to the Internet to use '
+                   'the form below.')))
+            self._send_button.set_sensitive(False)
 
     def _feedback_button_cb(self, widget=None):
         self._mode = 'feedback'
