@@ -24,6 +24,7 @@ from gi.repository import GObject
 
 from sugar3.graphics import style
 
+from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
 import utils
 
 
@@ -85,7 +86,7 @@ class HelpPanel(Gtk.Grid):
         self._entry.show()
 
         self._check_button = Gtk.CheckButton(label=_('Include screenshot?'))
-        self._check_button.set_mode(True)
+        self._check_button.set_active(True)
         self.attach(self._check_button, 0, 10, 2, 1)
         self._check_button.show()
 
@@ -106,7 +107,7 @@ class HelpPanel(Gtk.Grid):
                 (style.COLOR_WHITE.get_html(),
                  _('You must be connected to the Internet to use '
                    'the form below.')))
-            self._send_button.set_sensitive(False)
+            self._send_button.set_sensitive(True)  # False)
 
     def _feedback_button_cb(self, widget=None):
         self._mode = 'feedback'
@@ -115,25 +116,37 @@ class HelpPanel(Gtk.Grid):
         self._mode = 'help'
 
     def _send_button_cb(self, widget=None):
+        self._task_master.activity.help_palette.popdown(immediate=True)
+        # idle_add was not sufficient... adding a delay
+        GObject.timeout_add(2000, self._take_screen_shot_and_send)
+
+    def _take_screen_shot_and_send(self):
+        # These should always exist.
         bounds = self._text_buffer.get_bounds()
         text = self._text_buffer.get_text(bounds[0], bounds[1], True)
-
-        screen_shot = self._check_button.get_mode()
-        self._screenshot_file_path = ''
-        if screen_shot:
-            self._task_master.activity.help_palette.popdown(immediate=True)
-            # idle_add was not sufficient... adding a delay
-            GObject.timeout_add(2000, self._take_screen_shot)
-
         log_file_path = utils.get_log_file('org.sugarlabs.Training')
-
         section_index, task_index = \
             self._task_master.get_section_and_task_index()
 
-        logging.debug('SEND: %s: (%d:%d) %s (screenshot: %s) (log: %s)' %
-                      (self._mode, section_index, task_index,
-                       text, self._screenshot_file_path, str(log_file_path)))
-        # DO SOMETHING HERE
+        data = {'ticket': self._mode, 'section': section_index,
+                'task': task_index, 'entry': text, 'log': log_file_path}
 
-    def _take_screen_shot(self):
-        self._screenshot_file_path = utils.take_screen_shot()
+        # But any of these could be None.
+        email = self._task_master.read_task_data(EMAIL_UID)
+        if email is not None:
+            data['email'] = email
+
+        name = self._task_master.read_task_data(NAME_UID)
+        if name is not None:
+            data['name'] = name
+
+        school = self._task_master.read_task_data(SCHOOL_UID)
+        if school is not None:
+            data['school'] = school
+
+        logging.debug(self._check_button.get_mode())
+        if self._check_button.get_active():
+            data['screenshot'] = utils.take_screen_shot()
+
+        # HAND THE DATA OFF HERE TO ZENDESK
+        logging.debug(data)
