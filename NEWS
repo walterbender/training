@@ -1,7 +1,8 @@
 NEWS
 
 1.53
-* Add test for Sugar webservices
+* Added test for Sugar webservices (required to run the activity)
+* Check for connectivity in help panel
 
 1.52
 * Careful edit of Assessment document
