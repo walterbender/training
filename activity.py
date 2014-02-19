@@ -30,11 +30,13 @@ from sugar3.graphics.toolbarbox import ToolbarButton
 from sugar3.graphics.alert import ConfirmationAlert
 from sugar3.graphics import style
 
+'''
 try:
     from jarabe.view.viewhelp import ViewHelp
     _HELP_AVAILABLE = True
 except:
     _HELP_AVAILABLE = False
+'''
 
 NAME_UID = 'name'
 EMAIL_UID = 'email_address'
@@ -50,6 +52,7 @@ from toolbar_utils import (separator_factory, label_factory, button_factory,
 from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
 from checkprogress import CheckProgress
+from helppanel import HelpPanel
 import utils
 from power import get_power_manager
 
@@ -442,8 +445,10 @@ class TrainingActivity(activity.Activity):
         self._task_master = TaskMaster(self)
         self._task_master.show()
 
-        # Now that we have the tasks, we can build the progress toolbar.
+        # Now that we have the tasks, we can build the progress toolbar and
+        # help panel.
         self._build_progress_toolbar()
+        self._help_panel = HelpPanel(self._task_master)
 
         Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
         self._toolbox.connect('hide', self._resize_hide_cb)
@@ -638,10 +643,7 @@ class TrainingActivity(activity.Activity):
                                           self._toolbox.toolbar,
                                           self._help_cb, tooltip=_('help'),
                                           accelerator=_('<Ctrl>H'))
-        self.help_button.set_sensitive(False)
-        # Hide help until we have some help
-        if True:  # not _HELP_AVAILABLE:
-            self.help_button.hide()
+        self.help_button.set_sensitive(True)
 
         '''
         button_factory('check-progress',
@@ -820,13 +822,16 @@ class TrainingActivity(activity.Activity):
             self._task_master.reload_graphics()
 
     def _help_cb(self, button):
-        title, help_file = self._task_master.get_help_info()
-        _logger.debug('%s: %s' % (title, help_file))
-        if not hasattr(self, 'window_xid'):
-            self.window_xid = self.get_window().get_xid()
-        if title is not None and help_file is not None:
-            self.viewhelp = ViewHelp(title, help_file, self.window_xid)
-            self.viewhelp.show()
+        # title, help_file = self._task_master.get_help_info()
+        # _logger.debug('%s: %s' % (title, help_file))
+        # if not hasattr(self, 'window_xid'):
+        #    self.window_xid = self.get_window().get_xid()
+        # if title is not None and help_file is not None:
+        #     self.viewhelp = ViewHelp(title, help_file, self.window_xid)
+        #     self.viewhelp.show()
+        self._help_palette = self.help_button.get_palette()
+        self._help_palette.set_content(self._help_panel)
+        self._help_panel.show()
 
     def add_badge(self, msg, icon="training-trophy", name="One Academy"):
         sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')

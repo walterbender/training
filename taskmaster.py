@@ -241,12 +241,13 @@ class TaskMaster(Gtk.Alignment):
         task = self._task_list[section_index]['tasks'][task_index]
         if self._first_time:
             self._uid = task.uid
+            '''
             title, help_file = task.get_help_info()
             if title is None or help_file is None:
                 self.activity.help_button.set_sensitive(False)
             else:
                 self.activity.help_button.set_sensitive(True)
-
+            '''
             # In order to calculate accumulated time, we need to monitor
             # our start time.
             self._start_time = time.time()
