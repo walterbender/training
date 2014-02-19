@@ -73,6 +73,16 @@ battery_model = None
 proxy = None
 
 
+def get_log_file(bundle_id):
+    log_dir = os.path.join(env.get_profile_path(), 'logs')
+    log_files = glob.glob(os.path.join(log_dir, '%s*.log' % bundle_id))
+    if len(log_files) > 0:
+        sorted_log_files = sorted(log_files)
+        return sorted_log_files[-1]
+    else:
+        return None
+
+
 def take_screen_shot():
     tmp_dir = os.path.join(env.get_profile_path(), 'data')
     fd, file_path = tempfile.mkstemp(dir=tmp_dir, suffix='.png')

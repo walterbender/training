@@ -125,12 +125,14 @@ class HelpPanel(Gtk.Grid):
             # idle_add was not sufficient... adding a delay
             GObject.timeout_add(2000, self._take_screen_shot)
 
+        log_file_path = utils.get_log_file('org.sugarlabs.Training')
+
         section_index, task_index = \
             self._task_master._get_section_and_task_index()
 
-        logging.debug('SEND: %s: (%d:%d) %s (screenshot: %s)' %
+        logging.debug('SEND: %s: (%d:%d) %s (screenshot: %s) (log: %s)' %
                       (self._mode, section_index, task_index,
-                       text, self._screenshot_file_path))
+                       text, self._screenshot_file_path, str(log_file_path)))
         # DO SOMETHING HERE
 
     def _take_screen_shot(self):

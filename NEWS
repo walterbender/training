@@ -2,6 +2,7 @@ NEWS
 
 1.54
 * Added logic for taking screenshot
+* Added logic for grabbing log file
 
 1.53
 * Added test for Sugar webservices (required to run the activity)
