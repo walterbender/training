@@ -49,7 +49,7 @@ from toolbar_utils import (separator_factory, label_factory, button_factory,
                            radio_factory)
 from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
-from checkprogress import CheckProgress
+# from checkprogress import CheckProgress
 from helppanel import HelpPanel
 import utils
 from power import get_power_manager
@@ -66,11 +66,11 @@ def _check_gconf_settings():
     from gi.repository import GConf
 
     client = GConf.Client.get_default()
-    url = client.get_string('/desktop/sugar/services/training/url')
+    # url = client.get_string('/desktop/sugar/services/training/url')
     client.set_string(
         '/desktop/sugar/services/training/url',
         'https://training.one-education.org/training/report ')
-    api_key = client.get_string('/desktop/sugar/services/training/api_key')
+    # api_key = client.get_string('/desktop/sugar/services/training/api_key')
     client.set_string('/desktop/sugar/services/training/api_key',
                       'SbCeK4nH8dpQJsHNn9djza9g')
 
