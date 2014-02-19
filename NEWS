@@ -1,5 +1,8 @@
 NEWS
 
+1.54
+* Added logic for taking screenshot
+
 1.53
 * Added test for Sugar webservices (required to run the activity)
 * Check for connectivity in help panel

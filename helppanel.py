@@ -20,8 +20,11 @@ import logging
 from gettext import gettext as _
 
 from gi.repository import Gtk
+from gi.repository import GObject
 
 from sugar3.graphics import style
+
+import utils
 
 
 class HelpPanel(Gtk.Grid):
@@ -114,11 +117,21 @@ class HelpPanel(Gtk.Grid):
     def _send_button_cb(self, widget=None):
         bounds = self._text_buffer.get_bounds()
         text = self._text_buffer.get_text(bounds[0], bounds[1], True)
+
         screen_shot = self._check_button.get_mode()
+        self._screenshot_file_path = ''
+        if screen_shot:
+            self._task_master.activity._help_palette.popdown(immediate=True)
+            # idle_add was not sufficient... adding a delay
+            GObject.timeout_add(2000, self._take_screen_shot)
+
         section_index, task_index = \
             self._task_master._get_section_and_task_index()
 
-        logging.debug('SEND: %s: (%d:%d) %s (screenshot %s)' %
+        logging.debug('SEND: %s: (%d:%d) %s (screenshot: %s)' %
                       (self._mode, section_index, task_index,
-                      text, str(screen_shot)))
+                       text, self._screenshot_file_path))
         # DO SOMETHING HERE
+
+    def _take_screen_shot(self):
+        self._screenshot_file_path = utils.take_screen_shot()

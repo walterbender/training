@@ -19,6 +19,8 @@ import statvfs
 import glob
 import urllib
 from random import uniform
+import tempfile
+import cairo
 
 from gi.repository import Vte
 from gi.repository import Gio
@@ -69,6 +71,24 @@ _DBUS_PATH = '/org/sugarlabs/SugarServices'
 volume_monitor = None
 battery_model = None
 proxy = None
+
+
+def take_screen_shot():
+    tmp_dir = os.path.join(env.get_profile_path(), 'data')
+    fd, file_path = tempfile.mkstemp(dir=tmp_dir, suffix='.png')
+    os.close(fd)
+
+    window = Gdk.get_default_root_window()
+    width, height = window.get_width(), window.get_height()
+
+    screenshot_surface = Gdk.Window.create_similar_surface(
+        window, cairo.CONTENT_COLOR, width, height)
+
+    cr = cairo.Context(screenshot_surface)
+    Gdk.cairo_set_source_window(cr, window, 0, 0)
+    cr.paint()
+    screenshot_surface.write_to_png(file_path)
+    return file_path
 
 
 def reboot():
