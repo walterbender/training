@@ -115,11 +115,12 @@ class TrainingActivity(activity.Activity):
         self.bundle_path = activity.get_bundle_path()
         self.volume_data = []
 
+        self.help_palette = None
         self._copy_entry = None
         self._paste_entry = None
         self._webkit = None
-        self.help_palette = None
         self._clipboard_text = ''
+        self._fixed = None
 
         if self._load_extension() and self.check_volume_data():
             self._launcher()
@@ -407,63 +408,71 @@ class TrainingActivity(activity.Activity):
             return True
 
     def _launch_task_master(self):
-        self.check_progress = None
+        # self.check_progress = None
 
-        # We need a box whose size will change when the toolbars are expanded
-        self._fixed = Gtk.Fixed()
-        self._fixed.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
+        # Most things need only be done once
+        if self._fixed is None:
+            self._fixed = Gtk.Fixed()
+            self._fixed.set_size_request(Gdk.Screen.width(),
+                                         Gdk.Screen.height())
+            # self.set_canvas(self._fixed)
+            # self._fixed.show()
+
+            # Offsets from the bottom of the screen
+            dy1 = 3 * style.GRID_CELL_SIZE
+            dy2 = 2 * style.GRID_CELL_SIZE
+
+            self._progress_area = Gtk.Alignment.new(0.5, 0, 0, 0)
+            self._progress_area.set_size_request(Gdk.Screen.width(), -1)
+            self._fixed.put(self._progress_area, 0, Gdk.Screen.height() - dy2)
+            self._progress_area.show()
+
+            self._button_area = Gtk.Alignment.new(0.5, 0, 0, 0)
+            self._button_area.set_size_request(Gdk.Screen.width(), -1)
+            self._fixed.put(self._button_area, 0, Gdk.Screen.height() - dy1)
+            self._button_area.show()
+
+            self._scrolled_window = Gtk.ScrolledWindow()
+            self._scrolled_window.set_size_request(
+                Gdk.Screen.width(), Gdk.Screen.height() - dy1)
+            self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
+                                             Gtk.PolicyType.AUTOMATIC)
+
+            self._graphics_area = Gtk.Alignment.new(0.5, 0, 0, 0)
+            self._scrolled_window.add_with_viewport(self._graphics_area)
+            self._graphics_area.show()
+            self._fixed.put(self._scrolled_window, 0, 0)
+            self._scrolled_window.show()
+
+            self._task_master = TaskMaster(self)
+            self._task_master.show()
+
+            # Now that we have the tasks, we can build the progress toolbar and
+            # help panel.
+            self._build_progress_toolbar()
+
+            self._help_panel = HelpPanel(self._task_master)
+            self.help_palette = self._help_button.get_palette()
+            self.help_palette.set_content(self._help_panel)
+            self._help_panel.show()
+            self._help_button.set_sensitive(True)
+
+            Gdk.Screen.get_default().connect('size-changed',
+                                             self._configure_cb)
+            self._toolbox.connect('hide', self._resize_hide_cb)
+            self._toolbox.connect('show', self._resize_show_cb)
+
+            self._task_master.set_events(Gdk.EventMask.KEY_PRESS_MASK)
+            self._task_master.connect('key_press_event',
+                                      self._task_master.keypress_cb)
+            self._task_master.set_can_focus(True)
+            self._task_master.grab_focus()
+
         self.set_canvas(self._fixed)
         self._fixed.show()
 
-        # Offsets from the bottom of the screen
-        dy1 = 3 * style.GRID_CELL_SIZE
-        dy2 = 2 * style.GRID_CELL_SIZE
-
-        self._progress_area = Gtk.Alignment.new(0.5, 0, 0, 0)
-        self._progress_area.set_size_request(Gdk.Screen.width(), -1)
-        self._fixed.put(self._progress_area, 0, Gdk.Screen.height() - dy2)
-        self._progress_area.show()
-
-        self._button_area = Gtk.Alignment.new(0.5, 0, 0, 0)
-        self._button_area.set_size_request(Gdk.Screen.width(), -1)
-        self._fixed.put(self._button_area, 0, Gdk.Screen.height() - dy1)
-        self._button_area.show()
-
-        self._scrolled_window = Gtk.ScrolledWindow()
-        self._scrolled_window.set_size_request(
-            Gdk.Screen.width(), Gdk.Screen.height() - dy1)
-        self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
-                                         Gtk.PolicyType.AUTOMATIC)
-
-        self._graphics_area = Gtk.Alignment.new(0.5, 0, 0, 0)
-        self._scrolled_window.add_with_viewport(self._graphics_area)
-        self._graphics_area.show()
-        self._fixed.put(self._scrolled_window, 0, 0)
-        self._scrolled_window.show()
-
-        self._task_master = TaskMaster(self)
-        self._task_master.show()
-
-        # Now that we have the tasks, we can build the progress toolbar and
-        # help panel.
-        self._build_progress_toolbar()
-        self._help_panel = HelpPanel(self._task_master)
-        self.help_palette = self._help_button.get_palette()
-        self.help_palette.set_content(self._help_panel)
-        self._help_panel.show()
-        self._help_button.set_sensitive(True)
-
-        Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
-        self._toolbox.connect('hide', self._resize_hide_cb)
-        self._toolbox.connect('show', self._resize_show_cb)
-
-        self._task_master.set_events(Gdk.EventMask.KEY_PRESS_MASK)
-        self._task_master.connect('key_press_event',
-                                  self._task_master.keypress_cb)
-        self._task_master.set_can_focus(True)
-        self._task_master.grab_focus()
-
         self.completed = False
+        self._update_completed_sections()
         self._task_master.task_master()
 
     def load_graphics_area(self, widget):
@@ -716,8 +725,26 @@ class TrainingActivity(activity.Activity):
             self._progress_buttons[section].show()
 
         self._radio_buttons_live = False
-        section, task = self._task_master.get_section_and_task_index()
-        self._progress_buttons[section].set_active(True)
+        section_index, task_index = \
+            self._task_master.get_section_and_task_index()
+        self._progress_buttons[section_index].set_active(True)
+        self._radio_buttons_live = True
+
+    def _update_completed_sections(self):
+        progress = self._task_master.get_completed_sections()
+
+        for section in range(self._task_master.get_number_of_sections()):
+            icon = self._task_master.get_section_icon(section)
+            if section in progress:
+                icon = icon + '-white'
+            else:
+                icon = icon + '-grey'
+            self._progress_buttons[section].set_icon_name(icon)
+
+        self._radio_buttons_live = False
+        section_index, task_index = \
+            self._task_master.get_section_and_task_index()
+        self._progress_buttons[section_index].set_active(True)
         self._radio_buttons_live = True
 
     def mark_section_as_complete(self, section):
