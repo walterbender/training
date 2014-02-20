@@ -435,9 +435,7 @@ class TrainingActivity(activity.Activity):
             self._scrolled_window = Gtk.ScrolledWindow()
             self._scrolled_window.set_size_request(
                 Gdk.Screen.width(), Gdk.Screen.height() - dy1)
-            self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
-                                             Gtk.PolicyType.AUTOMATIC)
-
+            self._set_scroll_policy()
             self._graphics_area = Gtk.Alignment.new(0.5, 0, 0, 0)
             self._scrolled_window.add_with_viewport(self._graphics_area)
             self._graphics_area.show()
@@ -508,12 +506,7 @@ class TrainingActivity(activity.Activity):
 
     def _configure_cb(self, event):
         self._fixed.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
-        if Gdk.Screen.width() > Gdk.Screen.height():
-            self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
-                                             Gtk.PolicyType.AUTOMATIC)
-        else:
-            self._scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC,
-                                             Gtk.PolicyType.AUTOMATIC)
+        self._set_scroll_policy()
         self._resize_canvas(None)
         self._task_master.reload_graphics()
 
@@ -832,6 +825,17 @@ class TrainingActivity(activity.Activity):
             self._zoom_out.set_sensitive(True)
         else:
             self._zoom_out.set_sensitive(False)
+
+        if hasattr(self, '_scrolled_window'):
+            self._set_scroll_policy()
+
+    def _set_scroll_policy(self):
+        if Gdk.Screen.width() < Gdk.Screen.height() or self.zoom_level > 0.667:
+            self._scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                             Gtk.PolicyType.AUTOMATIC)
+        else:
+            self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
+                                             Gtk.PolicyType.AUTOMATIC)
 
     def _zoom_eq_cb(self, button):
         self.font_size = 8
