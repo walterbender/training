@@ -49,7 +49,6 @@ TRAINING_DATA_FULLNAME = 'training_data_fullname'
 
 from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
-# from checkprogress import CheckProgress
 from helppanel import HelpPanel
 import utils
 from power import get_power_manager
@@ -414,15 +413,11 @@ class TrainingActivity(activity.Activity):
             return True
 
     def _launch_task_master(self):
-        # self.check_progress = None
-
         # Most things need only be done once
         if self._fixed is None:
             self._fixed = Gtk.Fixed()
             self._fixed.set_size_request(Gdk.Screen.width(),
                                          Gdk.Screen.height())
-            # self.set_canvas(self._fixed)
-            # self._fixed.show()
 
             # Offsets from the bottom of the screen
             dy1 = 3 * style.GRID_CELL_SIZE
