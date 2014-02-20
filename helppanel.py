@@ -144,11 +144,13 @@ class HelpPanel(Gtk.Grid):
 
     def _feedback_button_cb(self, widget=None):
         self._mode = 'feedback'
+        # Necessary because of a bug with Sugar radiobuttons on palettes
         self._feedback_button.set_icon_name('edit-description')
         self._help_button.set_icon_name('toolbar-help-gray')
 
     def _help_button_cb(self, widget=None):
         self._mode = 'help'
+        # Necessary because of a bug with Sugar radiobuttons on palettes
         self._feedback_button.set_icon_name('edit-description-gray')
         self._help_button.set_icon_name('toolbar-help')
 
