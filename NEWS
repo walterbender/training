@@ -7,6 +7,7 @@ NEWS
 * Added size reset button (AD-22)
 * Don't create multiple progress toolbars (AD-23)
 * Added horizontal scrollbar when needed (AD-21)
+* Refactor radio buttons on help toolbar
 
 1.53
 * Added test for Sugar webservices (required to run the activity)

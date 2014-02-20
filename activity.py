@@ -694,16 +694,16 @@ class TrainingActivity(activity.Activity):
         self._progress_buttons = []
         progress = self._task_master.get_completed_sections()
 
-        for section in range(self._task_master.get_number_of_sections()):
-            icon = self._task_master.get_section_icon(section)
-            if section in progress:
+        for section_index in range(self._task_master.get_number_of_sections()):
+            icon = self._task_master.get_section_icon(section_index)
+            if section_index in progress:
                 icon = icon + '-white'
             else:
                 icon = icon + '-grey'
 
-            name = self._task_master.get_section_name(section)
+            name = self._task_master.get_section_name(section_index)
 
-            if section == 0:
+            if section_index == 0:
                 group = None
             else:
                 group = self._progress_buttons[0]
@@ -712,10 +712,10 @@ class TrainingActivity(activity.Activity):
                 radio_factory(icon,
                               progress_toolbar,
                               self._jump_to_section_cb,
-                              cb_arg=section,
+                              cb_arg=section_index,
                               tooltip=name,
                               group=group))
-            self._progress_buttons[section].show()
+            self._progress_buttons[section_index].show()
 
         self._radio_buttons_live = False
         section_index, task_index = \

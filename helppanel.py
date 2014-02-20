@@ -30,6 +30,9 @@ import utils
 
 from soupdesk import Attachment, Ticket, ZendeskError
 
+_FEEDBACK_TICKET = _('Feedback Ticket')
+_HELP_TICKET = _('Help Ticket')
+
 
 class HelpPanel(Gtk.Grid):
 
@@ -41,7 +44,7 @@ class HelpPanel(Gtk.Grid):
         self.set_border_width(style.DEFAULT_SPACING)
 
         self._task_master = task_master
-        self._mode = 'feedback'
+        self._mode = _FEEDBACK_TICKET
 
         alignment = Gtk.Alignment.new(0., 0.5, 0., 0.)
         phone_label = Gtk.Label()
@@ -145,13 +148,13 @@ class HelpPanel(Gtk.Grid):
             self._send_button.set_sensitive(True)  # False)
 
     def _feedback_button_cb(self, widget=None):
-        self._mode = 'feedback'
+        self._mode = _FEEDBACK_TICKET
         # Necessary because of a bug with Sugar radiobuttons on palettes
         self._feedback_button.set_icon_name('edit-description')
         self._help_button.set_icon_name('toolbar-help-gray')
 
     def _help_button_cb(self, widget=None):
-        self._mode = 'help'
+        self._mode = _HELP_TICKET
         # Necessary because of a bug with Sugar radiobuttons on palettes
         self._feedback_button.set_icon_name('edit-description-gray')
         self._help_button.set_icon_name('toolbar-help')
@@ -174,8 +177,8 @@ class HelpPanel(Gtk.Grid):
 
         subject = data['ticket']
         body = data['entry']
-        body += '\n\nsection %s' % data['section']
-        body += '\ntask %s' % data['task']
+        body += '\n\nsection: %s' % data['section']
+        body += '\ntask: %s' % str(data['task'])
 
         if 'school' in data:
             body += '\nschool %s' % data['school']
@@ -190,31 +193,36 @@ class HelpPanel(Gtk.Grid):
         log_file_path = utils.get_log_file('org.sugarlabs.Training')
         section_index, task_index = \
             self._task_master.get_section_and_task_index()
+        section_name = self._task_master.get_section_name(section_index)
 
-        data = {'ticket': self._mode, 'section': section_index,
+        data = {'ticket': self._mode, 'section': section_name,
                 'task': task_index, 'entry': text, 'log': log_file_path}
 
         # But any of these could be None.
         email = self._task_master.read_task_data(EMAIL_UID)
         if email is not None:
             data['email'] = email
+        else:
+            data['email'] = 'anonymous@email.com'
 
         name = self._task_master.read_task_data(NAME_UID)
         if name is not None:
             data['name'] = name
+        else:
+            data['name'] = 'anonymous'
 
         school = self._task_master.read_task_data(SCHOOL_UID)
         if school is not None:
             data['school'] = school
 
-        logging.debug(self._check_button.get_mode())
         if self._check_button.get_active():
             data['screenshot'] = utils.take_screen_shot()
 
         try:
             self._do_send(data)
-        except ZendeskError as error:
-            logging.debug(error)
+        except ZendeskError as e:
+            logging.error('Could not upload %s to zendesk: %s' %
+                          (data['ticket'], e))
             self._task_master.activity.transfer_failed_signal.emit()
         else:
             self._task_master.activity.transfer_completed_signal.emit()
