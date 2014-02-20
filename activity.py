@@ -611,15 +611,21 @@ class TrainingActivity(activity.Activity):
                        self._fullscreen_cb, tooltip=_('Fullscreen'),
                        accelerator='<Alt>Return')
 
-        self._zoom_in = button_factory('zoom-in',  # 'resize+',
+        self._zoom_in = button_factory('zoom-in',
                                        view_toolbar,
                                        self._zoom_in_cb,
-                                       tooltip=_('Increase font size'))
+                                       tooltip=_('Increase size'))
 
-        self._zoom_out = button_factory('zoom-out',  # 'resize-',
+        self._zoom_out = button_factory('zoom-out',
                                         view_toolbar,
                                         self._zoom_out_cb,
-                                        tooltip=_('Decrease font size'))
+                                        tooltip=_('Decrease size'))
+
+        self._zoom_eq = button_factory('zoom-original',
+                                       view_toolbar,
+                                       self._zoom_eq_cb,
+                                       tooltip=_('Restore original size'))
+
         self._set_zoom_buttons_sensitivity()
 
         edit_toolbar = Gtk.Toolbar()
@@ -799,6 +805,12 @@ class TrainingActivity(activity.Activity):
             self._zoom_out.set_sensitive(True)
         else:
             self._zoom_out.set_sensitive(False)
+
+    def _zoom_eq_cb(self, button):
+        self.font_size = 8
+        self.zoom_level = 0.667
+        self._set_zoom_buttons_sensitivity()
+        self._task_master.reload_graphics()
 
     def _zoom_in_cb(self, button):
         if self.font_size < len(FONT_SIZES) - 1:
