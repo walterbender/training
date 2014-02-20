@@ -27,6 +27,8 @@ from sugar3.graphics import style
 from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
 import utils
 
+from soupdesk import Attachment, Ticket, ZendeskError
+
 
 class HelpPanel(Gtk.Grid):
 
@@ -120,6 +122,28 @@ class HelpPanel(Gtk.Grid):
         # idle_add was not sufficient... adding a delay
         GObject.timeout_add(2000, self._take_screen_shot_and_send)
 
+    def _do_send(self, data):
+        uploads = []
+        if 'screenshot' in data:
+            attachment = Attachment()
+            attachment.create(data['screenshot'], 'shot.png', 'image/png')
+            uploads.append(attachment.token())
+        if 'log' in data:
+            attachment = Attachment()
+            attachment.create(data['log'], 'log.txt', 'text/plain')
+            uploads.append(attachment.token())
+
+        subject = data['ticket']
+        body = data['entry']
+        body += '\n\nsection %s' % data['section']
+        body += '\ntask %s' % data['task']
+
+        if 'school' in data:
+            body += '\nschool %s' % data['school']
+
+        ticket = Ticket()
+        ticket.create(data['name'], data['email'], subject, body, uploads)
+
     def _take_screen_shot_and_send(self):
         # These should always exist.
         bounds = self._text_buffer.get_bounds()
@@ -148,5 +172,12 @@ class HelpPanel(Gtk.Grid):
         if self._check_button.get_active():
             data['screenshot'] = utils.take_screen_shot()
 
-        # HAND THE DATA OFF HERE TO ZENDESK
+        try:
+            self._do_send(data)
+        except ZendeskError as error:
+            logging.debug(error)
+            self._task_master.activity.transfer_failed_signal.emit()
+        else:
+            self._task_master.activity.transfer_completed_signal.emit()
+
         logging.debug(data)
