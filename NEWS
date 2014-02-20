@@ -8,6 +8,7 @@ NEWS
 * Don't create multiple progress toolbars (AD-23)
 * Added horizontal scrollbar when needed (AD-21)
 * Refactor radio buttons on help toolbar
+* Integrate Martin's zendesk reporter into Help Panel
 
 1.53
 * Added test for Sugar webservices (required to run the activity)

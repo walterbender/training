@@ -66,13 +66,19 @@ def _check_gconf_settings():
     from gi.repository import GConf
 
     client = GConf.Client.get_default()
-    # url = client.get_string('/desktop/sugar/services/training/url')
+
+    # Training server
     client.set_string(
         '/desktop/sugar/services/training/url',
         'https://training.one-education.org/training/report ')
-    # api_key = client.get_string('/desktop/sugar/services/training/api_key')
     client.set_string('/desktop/sugar/services/training/api_key',
                       'SbCeK4nH8dpQJsHNn9djza9g')
+
+    # Zendesk
+    client.set_string('/desktop/sugar/services/zendesk/url',
+                      'https://oneedu1392860248.zendesk.com')
+    client.set_string('/desktop/sugar/services/zendesk/token',
+                      'eG8tc3VwcG9ydEBsYXB0b3Aub3JnLmF1L3Rva2VuOjdHRkV5STF2MFNRVzJyYmdFVXFFUWRpOE1Cc1I0NGdHVURhTWg2QWU=')
 
 
 class TrainingActivity(activity.Activity):
