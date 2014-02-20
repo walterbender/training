@@ -23,6 +23,7 @@ from gi.repository import Gtk
 from gi.repository import GObject
 
 from sugar3.graphics import style
+from sugar3.graphics.radiotoolbutton import RadioToolButton
 
 from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
 import utils
@@ -35,7 +36,6 @@ class HelpPanel(Gtk.Grid):
         self.set_row_spacing(style.DEFAULT_SPACING)
         self.set_column_spacing(style.DEFAULT_SPACING)
         self.set_column_homogeneous(True)
-        # self.set_row_homogeneous(True)
         self.set_border_width(style.DEFAULT_SPACING)
 
         self._task_master = task_master
@@ -66,16 +66,49 @@ class HelpPanel(Gtk.Grid):
         self.attach(alignment, 0, 4, 4, 1)
         alignment.show()
 
-        self._feedback_button = Gtk.RadioButton(label=_('Feedback'))
-        self.attach(self._feedback_button, 0, 5, 1, 1)
+        grid = Gtk.Grid()
+        self._feedback_button = RadioToolButton(group=None)
+        self._feedback_button.set_icon_name('edit-description')
         self._feedback_button.connect('clicked', self._feedback_button_cb)
+        grid.attach(self._feedback_button, 0, 0, 1, 1)
         self._feedback_button.show()
 
-        self._help_button = Gtk.RadioButton(label=_('Help'),
-                                            group=self._feedback_button)
-        self.attach(self._help_button, 1, 5, 1, 1)
+        label = Gtk.Label()
+        label.set_use_markup(True)
+        label.set_justify(Gtk.Justification.LEFT)
+        label.set_markup('<span foreground="%s" size="large">%s</span>' %
+                         (style.COLOR_WHITE.get_html(), _('Send feedback')))
+        grid.attach(label, 1, 0, 1, 1)
+        label.show()
+
+        alignment = Gtk.Alignment.new(0., 0.5, 0., 0.)
+        alignment.add(grid)
+        grid.show()
+        self.attach(alignment, 0, 5, 2, 1)
+        alignment.show()
+
+        grid = Gtk.Grid()
+        self._help_button = RadioToolButton(group=self._feedback_button)
+        self._help_button.set_icon_name('toolbar-help-gray')
         self._help_button.connect('clicked', self._help_button_cb)
+        grid.attach(self._help_button, 0, 0, 1, 1)
         self._help_button.show()
+
+        label = Gtk.Label()
+        label.set_use_markup(True)
+        label.set_justify(Gtk.Justification.LEFT)
+        label.set_markup('<span foreground="%s" size="large">%s</span>' %
+                         (style.COLOR_WHITE.get_html(), _('Ask for help')))
+        grid.attach(label, 1, 0, 1, 1)
+        label.show()
+
+        alignment = Gtk.Alignment.new(0., 0.5, 0., 0.)
+        alignment.add(grid)
+        grid.show()
+        self.attach(alignment, 2, 5, 2, 1)
+        alignment.show()
+
+        self._feedback_button.set_active(True)
 
         self._entry = Gtk.TextView()
         self._entry.set_wrap_mode(Gtk.WrapMode.WORD)
@@ -111,9 +144,13 @@ class HelpPanel(Gtk.Grid):
 
     def _feedback_button_cb(self, widget=None):
         self._mode = 'feedback'
+        self._feedback_button.set_icon_name('edit-description')
+        self._help_button.set_icon_name('toolbar-help-gray')
 
     def _help_button_cb(self, widget=None):
         self._mode = 'help'
+        self._feedback_button.set_icon_name('edit-description-gray')
+        self._help_button.set_icon_name('toolbar-help')
 
     def _send_button_cb(self, widget=None):
         self._task_master.activity.help_palette.popdown(immediate=True)

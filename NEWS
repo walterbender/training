@@ -3,6 +3,10 @@ NEWS
 1.54
 * Added logic for taking screenshot
 * Added logic for grabbing log file
+* Report email, full name, school, section, task as part of help-panel feedback
+* Added size reset button (AD-22)
+* Don't create multiple progress toolbars (AD-23)
+* Added horizontal scrollbar when needed (AD-21)
 
 1.53
 * Added test for Sugar webservices (required to run the activity)
