@@ -145,7 +145,7 @@ class HelpPanel(Gtk.Grid):
                 (style.COLOR_WHITE.get_html(),
                  _('You must be connected to the Internet to use '
                    'the form below.')))
-            self._send_button.set_sensitive(True)  # False)
+            self._send_button.set_sensitive(False)
 
     def _feedback_button_cb(self, widget=None):
         self._mode = _FEEDBACK_TICKET

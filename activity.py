@@ -25,6 +25,8 @@ from gi.repository import GObject
 from sugar3.activity import activity
 from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ActivityToolbarButton
+from sugar3.graphics.radiotoolbutton import RadioToolButton
+from sugar3.graphics.toolbutton import ToolButton
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics.toolbarbox import ToolbarButton
 from sugar3.graphics.alert import ConfirmationAlert
@@ -45,8 +47,6 @@ COMPLETION_PERCENTAGE = 'completion_percentage'
 TRAINING_DATA_EMAIL = 'training_data_email'
 TRAINING_DATA_FULLNAME = 'training_data_fullname'
 
-from toolbar_utils import (separator_factory, label_factory, button_factory,
-                           radio_factory)
 from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
 # from checkprogress import CheckProgress
@@ -615,24 +615,30 @@ class TrainingActivity(activity.Activity):
         view_toolbar.show()
         self.view_toolbar_button.show()
 
-        button_factory('view-fullscreen', view_toolbar,
-                       self._fullscreen_cb, tooltip=_('Fullscreen'),
-                       accelerator='<Alt>Return')
+        button = ToolButton('view-fullscreen')
+        button.set_tooltip(_('Fullscreen'))
+        button.props.accelerator = '<Alt>Return'
+        view_toolbar.insert(button, -1)
+        button.show()
+        button.connect('clicked', self._fullscreen_cb)
 
-        self._zoom_in = button_factory('zoom-in',
-                                       view_toolbar,
-                                       self._zoom_in_cb,
-                                       tooltip=_('Increase size'))
+        self._zoom_in = ToolButton('zoom-in')
+        self._zoom_in.set_tooltip(_('Increase size'))
+        view_toolbar.insert(self._zoom_in, -1)
+        self._zoom_in.show()
+        self._zoom_in.connect('clicked', self._zoom_in_cb)
 
-        self._zoom_out = button_factory('zoom-out',
-                                        view_toolbar,
-                                        self._zoom_out_cb,
-                                        tooltip=_('Decrease size'))
+        self._zoom_out = ToolButton('zoom-out')
+        self._zoom_out.set_tooltip(_('Decrease size'))
+        view_toolbar.insert(self._zoom_out, -1)
+        self._zoom_out.show()
+        self._zoom_out.connect('clicked', self._zoom_out_cb)
 
-        self._zoom_eq = button_factory('zoom-original',
-                                       view_toolbar,
-                                       self._zoom_eq_cb,
-                                       tooltip=_('Restore original size'))
+        self._zoom_eq = ToolButton('zoom-original')
+        self._zoom_eq.set_tooltip(_('Restore original size'))
+        view_toolbar.insert(self._zoom_eq, -1)
+        self._zoom_eq.show()
+        self._zoom_eq.connect('clicked', self._zoom_eq_cb)
 
         self._set_zoom_buttons_sensitivity()
 
@@ -646,41 +652,46 @@ class TrainingActivity(activity.Activity):
         edit_toolbar.show()
         self.edit_toolbar_button.show()
 
-        self._copy_button = button_factory('edit-copy', edit_toolbar,
-                                           self._copy_cb, tooltip=_('Copy'),
-                                           accelerator='<Ctrl>C')
+        self._copy_button = ToolButton('edit-copy')
+        self._copy_button.set_tooltip(_('Copy'))
+        self._copy_button.props.accelerator = '<Ctrl>C'
+        edit_toolbar.insert(self._copy_button, -1)
+        self._copy_button.show()
+        self._copy_button.connect('clicked', self._copy_cb)
         self._copy_button.set_sensitive(False)
 
-        self._paste_button = button_factory('edit-paste', edit_toolbar,
-                                            self._paste_cb, tooltip=_('Paste'),
-                                            accelerator='<Ctrl>V')
+        self._paste_button = ToolButton('edit-paste')
+        self._paste_button.set_tooltip(_('Paste'))
+        self._paste_button.props.accelerator = '<Ctrl>V'
+        edit_toolbar.insert(self._paste_button, -1)
+        self._paste_button.show()
+        self._paste_button.connect('clicked', self._paste_cb)
         self._paste_button.set_sensitive(False)
 
-        self._help_button = button_factory('toolbar-help',
-                                           self._toolbox.toolbar,
-                                           self._help_cb, tooltip=_('help'),
-                                           accelerator=_('<Ctrl>H'))
+        self._help_button = ToolButton('toolbar-help')
+        self._help_button.set_tooltip(_('Help'))
+        self._help_button.props.accelerator = '<Ctrl>H'
+        self._toolbox.toolbar.insert(self._help_button, -1)
+        self._help_button.show()
+        self._help_button.connect('clicked', self._help_cb)
         self._help_button.set_sensitive(False)
 
-        '''
-        button_factory('check-progress',
-                       self._toolbox.toolbar,
-                       self._check_progress_cb,
-                       tooltip=_('Check progress'))
-        '''
-
-        self.transfer_button = button_factory(
-            'transfer',
-            self._toolbox.toolbar,
-            self._transfer_cb,
-            tooltip=_('Training data upload status'))
+        self.transfer_button = ToolButton('transfer')
+        self.transfer_button.set_tooltip(_('Training data upload status'))
+        self._toolbox.toolbar.insert(self.transfer_button, -1)
+        self.transfer_button.connect('clicked', self._transfer_cb)
         self.transfer_button.hide()
 
-        self.progress_label = label_factory(self._toolbox.toolbar, '',
-                                            width=300)
+        self.progress_label = Gtk.Label()
+        self.progress_label.set_line_wrap(True)
+        self.progress_label.set_size_request(300, -1)
         self.progress_label.set_use_markup(True)
 
-        separator_factory(self._toolbox.toolbar, True, False)
+        separator = Gtk.SeparatorToolItem()
+        separator.props.draw = False
+        separator.set_expand(True)
+        self._toolbox.toolbar.insert(separator, -1)
+
         stop_button = StopButton(self)
         stop_button.props.accelerator = '<Ctrl>q'
         self._toolbox.toolbar.insert(stop_button, -1)
@@ -714,14 +725,14 @@ class TrainingActivity(activity.Activity):
             else:
                 group = self._progress_buttons[0]
 
-            self._progress_buttons.append(
-                radio_factory(icon,
-                              progress_toolbar,
-                              self._jump_to_section_cb,
-                              cb_arg=section_index,
-                              tooltip=name,
-                              group=group))
-            self._progress_buttons[section_index].show()
+            self._progress_buttons.append(RadioToolButton(group=group))
+            self._progress_buttons[-1].set_icon_name(icon)
+            self._progress_buttons[-1].set_tooltip(name)
+            progress_toolbar.insert(self._progress_buttons[-1], -1)
+            self._progress_buttons[-1].show()
+            self._progress_buttons[-1].connect('clicked', 
+                                               self._jump_to_section_cb,
+                                               section_index)
 
         self._radio_buttons_live = False
         section_index, task_index = \
@@ -864,9 +875,6 @@ class TrainingActivity(activity.Activity):
         self._task_master.reload_graphics()
 
     def _jump_to_section_cb(self, button, section):
-        # def _check_progress_cb(self, button, section):
-        # self.check_progress = CheckProgress(self._task_master)
-        # self._task_master.load_progress_summary(self.check_progress)
         if self._radio_buttons_live:
             uid = self._task_master.section_and_task_to_uid(section)
             self._task_master.current_task = \
