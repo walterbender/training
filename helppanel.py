@@ -27,7 +27,7 @@ from sugar3.graphics.radiotoolbutton import RadioToolButton
 from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
 import utils
 
-from soupdesk import Attachment, Ticket, ZendeskError
+from soupdesk import Attachment, Ticket, FieldHelper, ZendeskError
 
 import logging
 _logger = logging.getLogger('training-activity-help')
@@ -183,12 +183,14 @@ class HelpPanel(Gtk.Grid):
 
     def _do_send(self, data):
         subject = data['ticket']
-
         body = data['body']
-        body += '\n\nsection: %s' % data['section']
-        body += '\ntask: %s' % str(data['task'])
-        if data['school'] is not None:
-            body += '\nschool: %s' % data['school']
+
+        helper = FieldHelper()
+        fields = []
+        fields.append(helper.get_field(0, data['section']))
+        fields.append(helper.get_field(1, data['task']))
+        if data['school']:
+            fields.append(helper.get_field(2, data['school']))
 
         uploads = []
         if 'screenshot' in data:
@@ -201,7 +203,8 @@ class HelpPanel(Gtk.Grid):
             uploads.append(attachment.token())
 
         ticket = Ticket()
-        ticket.create(subject, body, uploads, data['name'], data['email'])
+        ticket.create(subject, body, uploads,
+                      data['name'], data['email'], fields)
 
     def _take_screen_shot_and_send(self):
         bounds = self._text_buffer.get_bounds()
