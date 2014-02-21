@@ -200,6 +200,7 @@ class HelpPanel(Gtk.Grid):
             uploads.append(attachment.token())
 
         # We can't send the name w/o email.
+        # http://developer.zendesk.com/documentation/rest_api/tickets.html
         name = None
         email = None
         if 'name' in data and 'email' in data:
