@@ -663,6 +663,16 @@ class TrainingActivity(activity.Activity):
         self._paste_button.connect('clicked', self._paste_cb)
         self._paste_button.set_sensitive(False)
 
+        self._progress_toolbar = Gtk.Toolbar()
+        self.progress_toolbar_button = ToolbarButton(
+            page=self._progress_toolbar,
+            label=_('Check progress'),
+            icon_name='check-progress')
+        self.progress_toolbar_button.connect('clicked', self._resize_canvas)
+        self._toolbox.toolbar.insert(self.progress_toolbar_button, -1)
+        self._progress_toolbar.show()
+        self.progress_toolbar_button.show()
+
         self._help_button = ToolButton('toolbar-help')
         self._help_button.set_tooltip(_('Help'))
         self._help_button.props.accelerator = '<Ctrl>H'
@@ -686,6 +696,7 @@ class TrainingActivity(activity.Activity):
         separator.props.draw = False
         separator.set_expand(True)
         self._toolbox.toolbar.insert(separator, -1)
+        separator.show()
 
         stop_button = StopButton(self)
         stop_button.props.accelerator = '<Ctrl>q'
@@ -693,16 +704,6 @@ class TrainingActivity(activity.Activity):
         stop_button.show()
 
     def _build_progress_toolbar(self):
-        progress_toolbar = Gtk.Toolbar()
-        self.progress_toolbar_button = ToolbarButton(
-            page=progress_toolbar,
-            label=_('Check progress'),
-            icon_name='check-progress')
-        self.progress_toolbar_button.connect('clicked', self._resize_canvas)
-        self._toolbox.toolbar.insert(self.progress_toolbar_button, 3)
-        progress_toolbar.show()
-        self.progress_toolbar_button.show()
-
         self._progress_buttons = []
         progress = self._task_master.get_completed_sections()
 
@@ -723,11 +724,10 @@ class TrainingActivity(activity.Activity):
             self._progress_buttons.append(RadioToolButton(group=group))
             self._progress_buttons[-1].set_icon_name(icon)
             self._progress_buttons[-1].set_tooltip(name)
-            progress_toolbar.insert(self._progress_buttons[-1], -1)
+            self._progress_toolbar.insert(self._progress_buttons[-1], -1)
             self._progress_buttons[-1].show()
-            self._progress_buttons[-1].connect('clicked', 
-                                               self._jump_to_section_cb,
-                                               section_index)
+            self._progress_buttons[-1].connect(
+                'clicked', self._jump_to_section_cb, section_index)
 
         self._radio_buttons_live = False
         section_index, task_index = \

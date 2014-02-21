@@ -32,6 +32,10 @@ from soupdesk import Attachment, Ticket, ZendeskError
 
 _FEEDBACK_TICKET = _('Feedback Ticket')
 _HELP_TICKET = _('Help Ticket')
+_ACTIVE_TEXT = _('Type your question or comment here...')
+_INACTIVE_TEXT = _('You must be online to use this form. If you are having '
+                   'trouble connecting, please contact us via the phone '
+                   'number or email address above.')
 
 
 class HelpPanel(Gtk.Grid):
@@ -119,9 +123,10 @@ class HelpPanel(Gtk.Grid):
         self._entry.set_wrap_mode(Gtk.WrapMode.WORD)
         self._entry.set_size_request(-1, style.GRID_CELL_SIZE * 2)
         self._text_buffer = self._entry.get_buffer()
-        self._text_buffer.set_text(_('Type question here...'))
+        self._text_buffer.set_text(_ACTIVE_TEXT)
         self.attach(self._entry, 0, 6, 4, 4)
         self._entry.show()
+        self._entry.connect('focus-in-event', self._text_focus_in_cb)
 
         self._check_button = Gtk.CheckButton(label=_('Include screenshot?'))
         self._check_button.set_active(True)
@@ -133,18 +138,27 @@ class HelpPanel(Gtk.Grid):
         self._send_button.connect('clicked', self._send_button_cb)
         self._send_button.show()
 
+    def _text_focus_in_cb(self, widget=None, event=None):
+        bounds = self._text_buffer.get_bounds()
+        text = self._text_buffer.get_text(bounds[0], bounds[1], True)
+        if text == _ACTIVE_TEXT:
+            self._text_buffer.set_text('')
+
     def set_connected(self, connected):
         if connected:
-            self._info_label.set_markup(
-                '<span foreground="%s" size="large">%s</span>' %
-                (style.COLOR_WHITE.get_html(), _('Or use the form below:')))
+            bounds = self._text_buffer.get_bounds()
+            text = self._text_buffer.get_text(bounds[0], bounds[1], True)
+            if text == _INACTIVE_TEXT:
+                self._text_buffer.set_text(_ACTIVE_TEXT)
+            self._text_view.set_sensitive(True)
             self._send_button.set_sensitive(True)
         else:
-            self._info_label.set_markup(
-                '<span foreground="%s" size="large">%s</span>' %
-                (style.COLOR_WHITE.get_html(),
-                 _('You must be connected to the Internet to use '
-                   'the form below.')))
+            bounds = self._text_buffer.get_bounds()
+            text = self._text_buffer.get_text(bounds[0], bounds[1], True)
+            if text == _ACTIVE_TEXT:
+                self._text_buffer.set_text(_INACTIVE_TEXT)
+            self._text_buffer.set_text(_INACTIVE_TEXT)
+            self._text_view.set_sensitive(False)
             self._send_button.set_sensitive(False)
 
     def _feedback_button_cb(self, widget=None):
