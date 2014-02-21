@@ -683,6 +683,7 @@ class TrainingActivity(activity.Activity):
         self._help_button.show()
         self._help_button.connect('clicked', self._help_cb)
         self._help_button.set_sensitive(False)
+        self._help_button.palette_invoker.props.lock_palette = True
 
         self.transfer_button = ToolButton('transfer')
         self.transfer_button.set_tooltip(_('Training data upload status'))
@@ -896,9 +897,7 @@ class TrainingActivity(activity.Activity):
 
         if self.help_palette:
             # FIXME: is_up() is always returning False, so we
-            # "debounce" using help_panel_visible. This means that
-            # when the palette is closed by "leave-notify" we get out
-            # of sync.
+            # "debounce" using help_panel_visible.
             if not self.help_palette.is_up() and not self.help_panel_visible:
                 self.help_palette.popup(
                     immediate=True, state=self.help_palette.SECONDARY)
