@@ -165,6 +165,14 @@ class HelpPanel(Gtk.Grid):
         GObject.timeout_add(2000, self._take_screen_shot_and_send)
 
     def _do_send(self, data):
+        subject = data['ticket']
+        body = data['entry']
+        body += '\n\nsection: %s' % data['section']
+        body += '\ntask: %s' % str(data['task'])
+
+        if 'school' in data:
+            body += '\nschool: %s' % data['school']
+
         uploads = []
         if 'screenshot' in data:
             attachment = Attachment()
@@ -175,16 +183,14 @@ class HelpPanel(Gtk.Grid):
             attachment.create(data['log'], 'log.txt', 'text/plain')
             uploads.append(attachment.token())
 
-        subject = data['ticket']
-        body = data['entry']
-        body += '\n\nsection: %s' % data['section']
-        body += '\ntask: %s' % str(data['task'])
-
-        if 'school' in data:
-            body += '\nschool %s' % data['school']
+        name = None
+        email = None
+        if 'name' in data and 'email' in data:
+            name = data['name']
+            email = data['email']
 
         ticket = Ticket()
-        ticket.create(data['name'], data['email'], subject, body, uploads)
+        ticket.create(subject, body, uploads, name, email)
 
     def _take_screen_shot_and_send(self):
         # These should always exist.
@@ -202,14 +208,10 @@ class HelpPanel(Gtk.Grid):
         email = self._task_master.read_task_data(EMAIL_UID)
         if email is not None:
             data['email'] = email
-        else:
-            data['email'] = 'anonymous@email.com'
 
         name = self._task_master.read_task_data(NAME_UID)
         if name is not None:
             data['name'] = name
-        else:
-            data['name'] = 'anonymous'
 
         school = self._task_master.read_task_data(SCHOOL_UID)
         if school is not None:
