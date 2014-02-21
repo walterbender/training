@@ -22,6 +22,8 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 
+from gi.repository import SugarExt
+
 from sugar3.activity import activity
 from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ActivityToolbarButton
@@ -77,7 +79,11 @@ def _check_gconf_settings():
     client.set_string('/desktop/sugar/services/zendesk/url',
                       'https://oneedu1392860248.zendesk.com')
     client.set_string('/desktop/sugar/services/zendesk/token',
-                      'eG8tc3VwcG9ydEBsYXB0b3Aub3JnLmF1L3Rva2VuOjdHRkV5STF2MFNRVzJyYmdFVXFFUWRpOE1Cc1I0NGdHVURhTWg2QWU=')
+                      'eG8tc3VwcG9ydEBsYXB0b3Aub3JnLmF1L3Rva2VuOjdHRkV5'
+                      'STF2MFNRVzJyYmdFVXFFUWRpOE1Cc1I0NGdHVURhTWg2QWU=')
+    SugarExt.gconf_client_set_string_list(
+        client, '/desktop/sugar/services/zendesk/fields',
+        ['21765610', '21605694', '21765620'])
 
 
 class TrainingActivity(activity.Activity):

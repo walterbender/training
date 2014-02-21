@@ -3,6 +3,7 @@ NEWS
 1.55
 * Code cleanup
 * Improvements to help panel suggested by Paul
+* Added new keys from Martin for help panel customization
 
 1.54
 * Added logic for taking screenshot
