@@ -19,6 +19,25 @@ class ZendeskError(Exception):
     pass
 
 
+class FieldHelper(object):
+
+    IDS = '/desktop/sugar/services/zendesk/fields'
+
+    def __init__(self):
+        # FIXME #3926 GConf get_list is missing
+        client = GConf.Client.get_default()
+        raw = client.get(self.IDS)
+        if not raw:
+            raise ZendeskError('soupdesk is missing fields')
+        self._ids = [int(e.get_string()) for e in raw.get_list()]
+
+    def get_field(self, index, value):
+        field = {}
+        field['id'] = self._ids[index]
+        field['value'] = value
+        return field
+
+
 class Request(object):
 
     URL = '/desktop/sugar/services/zendesk/url'
@@ -64,7 +83,7 @@ class Ticket(Request):
     def _endpoint(self):
         return '%s%s' % (self._url, self.RESOURCE)
 
-    def create(self, subject, body, uploads, name, email):
+    def create(self, subject, body, uploads, name, email, fields):
         ticket = {}
         ticket['subject'] = subject
         ticket['comment'] = {}
@@ -75,6 +94,8 @@ class Ticket(Request):
             ticket['requester'] = {}
             ticket['requester']['name'] = name
             ticket['requester']['email'] = email
+        if fields:
+            ticket['custom_fields'] = fields
         data = json.dumps({'ticket': ticket})
         self._request('POST', self._endpoint(), data, self.CONTENT)
 
