@@ -64,18 +64,17 @@ class Ticket(Request):
     def _endpoint(self):
         return '%s%s' % (self._url, self.RESOURCE)
 
-    def create(self, name, email, subject, body, uploads):
+    def create(self, subject, body, uploads, name, email):
         ticket = {}
-        ticket['requester'] = {}
-        ticket['requester']['name'] = name
-        ticket['requester']['email'] = email
         ticket['subject'] = subject
         ticket['comment'] = {}
         ticket['comment']['body'] = body
-
         if uploads:
             ticket['comment']['uploads'] = uploads
-
+        if name and email:
+            ticket['requester'] = {}
+            ticket['requester']['name'] = name
+            ticket['requester']['email'] = email
         data = json.dumps({'ticket': ticket})
         self._request('POST', self._endpoint(), data, self.CONTENT)
 
