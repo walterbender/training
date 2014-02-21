@@ -121,14 +121,14 @@ class HelpPanel(Gtk.Grid):
 
         self._feedback_button.set_active(True)
 
-        self._entry = Gtk.TextView()
-        self._entry.set_wrap_mode(Gtk.WrapMode.WORD)
-        self._entry.set_size_request(-1, style.GRID_CELL_SIZE * 2)
-        self._text_buffer = self._entry.get_buffer()
+        self._text_view = Gtk.TextView()
+        self._text_view.set_wrap_mode(Gtk.WrapMode.WORD)
+        self._text_view.set_size_request(-1, style.GRID_CELL_SIZE * 2)
+        self._text_buffer = self._text_view.get_buffer()
         self._text_buffer.set_text(_ACTIVE_TEXT)
-        self.attach(self._entry, 0, 6, 4, 4)
-        self._entry.show()
-        self._entry.connect('focus-in-event', self._text_focus_in_cb)
+        self.attach(self._text_view, 0, 6, 4, 4)
+        self._text_view.show()
+        self._text_view.connect('focus-in-event', self._text_focus_in_cb)
 
         self._check_button = Gtk.CheckButton(label=_('Include screenshot?'))
         self._check_button.set_active(True)
@@ -140,7 +140,7 @@ class HelpPanel(Gtk.Grid):
         self._send_button.connect('clicked', self._send_button_cb)
         self._send_button.show()
 
-    def _text_focus_in_cb(self, widget=None, event=None):
+    def _text_focus_in_cb(self, widget, event):
         bounds = self._text_buffer.get_bounds()
         text = self._text_buffer.get_text(bounds[0], bounds[1], True)
         if text == _ACTIVE_TEXT:
@@ -177,16 +177,17 @@ class HelpPanel(Gtk.Grid):
 
     def _send_button_cb(self, widget=None):
         self._task_master.activity.help_palette.popdown(immediate=True)
+        self._task_master.activity.help_panel_visible = False
         # idle_add was not sufficient... adding a delay
         GObject.timeout_add(2000, self._take_screen_shot_and_send)
 
     def _do_send(self, data):
         subject = data['ticket']
-        body = data['entry']
+
+        body = data['body']
         body += '\n\nsection: %s' % data['section']
         body += '\ntask: %s' % str(data['task'])
-
-        if 'school' in data:
+        if data['school'] is not None:
             body += '\nschool: %s' % data['school']
 
         uploads = []
@@ -199,41 +200,28 @@ class HelpPanel(Gtk.Grid):
             attachment.create(data['log'], 'log.txt', 'text/plain')
             uploads.append(attachment.token())
 
-        # We can't send the name w/o email.
-        # http://developer.zendesk.com/documentation/rest_api/tickets.html
-        name = None
-        email = None
-        if 'name' in data and 'email' in data:
-            name = data['name']
-            email = data['email']
-
         ticket = Ticket()
-        ticket.create(subject, body, uploads, name, email)
+        ticket.create(subject, body, uploads, data['name'], data['email'])
 
     def _take_screen_shot_and_send(self):
-        # These should always exist.
         bounds = self._text_buffer.get_bounds()
         text = self._text_buffer.get_text(bounds[0], bounds[1], True)
         log_file_path = utils.get_log_file('org.sugarlabs.Training')
         section_index, task_index = \
             self._task_master.get_section_and_task_index()
         section_name = self._task_master.get_section_name(section_index)
+        name = self._task_master.read_task_data(NAME_UID)
+        email = self._task_master.read_task_data(EMAIL_UID)
+        school = self._task_master.read_task_data(SCHOOL_UID)
+
+        # We cannot send name w/o email
+        # http://developer.zendesk.com/documentation/rest_api/tickets.html
+        if email is None:
+            name = None
 
         data = {'ticket': self._mode, 'section': section_name,
-                'task': task_index, 'entry': text, 'log': log_file_path}
-
-        # But any of these could be None.
-        email = self._task_master.read_task_data(EMAIL_UID)
-        if email is not None:
-            data['email'] = email
-
-        name = self._task_master.read_task_data(NAME_UID)
-        if name is not None:
-            data['name'] = name
-
-        school = self._task_master.read_task_data(SCHOOL_UID)
-        if school is not None:
-            data['school'] = school
+                'task': task_index, 'body': text, 'log': log_file_path,
+                'name': name, 'email': email, 'school': school}
 
         if self._check_button.get_active():
             data['screenshot'] = utils.take_screen_shot()

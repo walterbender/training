@@ -91,7 +91,7 @@ class TrainingActivity(activity.Activity):
         ''' Initialize the toolbars and the game board '''
         try:
             super(TrainingActivity, self).__init__(handle)
-        except dbus.exceptions.DBusException, e:
+        except dbus.exceptions.DBusException as e:
             _logger.error(str(e))
 
         self.connect('realize', self.__realize_cb)
@@ -121,6 +121,7 @@ class TrainingActivity(activity.Activity):
         self.volume_data = []
 
         self.help_palette = None
+        self.help_panel_visible = False
         self._copy_entry = None
         self._paste_entry = None
         self._webkit = None
@@ -266,7 +267,7 @@ class TrainingActivity(activity.Activity):
                 if len(json_data) > 0:
                     try:
                         usb_data = json.loads(json_data)
-                    except ValueError, e:
+                    except ValueError as e:
                         _logger.error('Cannot load USB data: %s' % e)
             else:
                 _logger.error('Cannot find USB data: %s' % usb_data_path)
@@ -282,7 +283,7 @@ class TrainingActivity(activity.Activity):
                 if len(json_data) > 0:
                     try:
                         sugar_data = json.loads(json_data)
-                    except ValueError, e:
+                    except ValueError as e:
                         _logger.error('Cannot load Sugar data: %s' % e)
             else:
                 _logger.error('Cannot find Sugar data: %s' % sugar_data_path)
@@ -395,7 +396,7 @@ class TrainingActivity(activity.Activity):
             try:
                 subprocess.call(['cp', usb_path,
                                  self.volume_data[0]['sugar_path']])
-            except OSError, e:
+            except OSError as e:
                 _logger.error('Could not copy %s to %s: %s' % (
                     usb_path, self.volume_data[0]['sugar_path'], e))
         else:
@@ -528,14 +529,16 @@ class TrainingActivity(activity.Activity):
 
             self._scrolled_window.set_size_request(
                 Gdk.Screen.width(), Gdk.Screen.height() - dy1)
-            self._fixed.put(self._progress_area, 0, Gdk.Screen.height() - dy2)
-            self._fixed.put(self._button_area, 0, Gdk.Screen.height() - dy1)
+            self._fixed.move(self._progress_area, 0, Gdk.Screen.height() - dy2)
+            self._fixed.move(self._button_area, 0, Gdk.Screen.height() - dy1)
+
+        self.help_panel_visible = False
 
     def get_activity_version(self):
         info_path = os.path.join(self.bundle_path, 'activity', 'activity.info')
         try:
             info_file = open(info_path, 'r')
-        except Exception, e:
+        except Exception as e:
             _logger.error('Could not open %s: %s' % (info_path, e))
             return 'unknown'
 
@@ -887,25 +890,29 @@ class TrainingActivity(activity.Activity):
         try:
             self._help_panel.set_connected(
                 utils.nm_status() == 'network-wireless-connected')
-        except Exception, e:
+        except Exception as e:
             _logger.error('Could not read NM status: %s' % (e))
             self._help_panel.set_connected(False)
 
         if self.help_palette:
-            if not self.help_palette.is_up():
+            # FIXME: is_up() is always returning False, so we
+            # "debounce" using help_panel_visible. This means that
+            # when the palette is closed by "leave-notify" we get out
+            # of sync.
+            if not self.help_palette.is_up() and not self.help_panel_visible:
                 self.help_palette.popup(
-                    immediate=True,
-                    state=self.help_palette.SECONDARY)
+                    immediate=True, state=self.help_palette.SECONDARY)
+                self.help_panel_visible = True
             else:
                 self.help_palette.popdown(immediate=True)
-            return
+                self.help_panel_visible = False
 
     def add_badge(self, msg, icon="training-trophy", name="One Academy"):
         sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')
         if not os.path.exists(sugar_icons):
             try:
                 subprocess.call(['mkdir', sugar_icons])
-            except OSError, e:
+            except OSError as e:
                 _logger.error('Could not mkdir %s, %s' % (sugar_icons, e))
 
         badge = {
@@ -920,7 +927,7 @@ class TrainingActivity(activity.Activity):
         icon_path = os.path.join(icon_dir, icon + '.svg')
         try:
             subprocess.call(['cp', icon_path, sugar_icons])
-        except OSError, e:
+        except OSError as e:
             _logger.error('Could not copy %s to %s, %s' %
                           (icon_path, sugar_icons, e))
 
@@ -947,7 +954,7 @@ class TrainingActivity(activity.Activity):
         if not os.path.exists(extensions_path):
             try:
                 subprocess.call(['mkdir', extensions_path])
-            except OSError, e:
+            except OSError as e:
                 _logger.error('Could not mkdir %s, %s' % (extensions_path, e))
                 self._webservice_alert(_('System error.'))
                 return False
@@ -955,13 +962,13 @@ class TrainingActivity(activity.Activity):
         if not os.path.exists(webservice_path):
             try:
                 subprocess.call(['mkdir', webservice_path])
-            except OSError, e:
+            except OSError as e:
                 _logger.error('Could not mkdir %s, %s' % (webservice_path, e))
                 self._webservice_alert(_('System error.'))
                 return False
             try:
                 subprocess.call(['cp', init_path, webservice_path])
-            except OSError, e:
+            except OSError as e:
                 _logger.error('Could not cp %s to %s, %s' %
                               (init_path, webservice_path, e))
                 self._webservice_alert(_('System error.'))
@@ -980,7 +987,7 @@ class TrainingActivity(activity.Activity):
             try:
                 subprocess.call(['cp', '-r', sugarservices_path,
                                  webservice_path])
-            except OSError, e:
+            except OSError as e:
                 _logger.error('Could not copy %s to %s, %s' %
                               (sugarservices_path, webservice_path, e))
                 self._webservice_alert(_('System error.'))
@@ -1022,7 +1029,7 @@ class TrainingActivity(activity.Activity):
         if response_id is Gtk.ResponseType.OK:
             try:
                 utils.reboot()
-            except Exception, e:
+            except Exception as e:
                 _logger.error('Cannot reboot: %s' % e)
 
     def _mount_added_cb(self, volume_monitor, device):
