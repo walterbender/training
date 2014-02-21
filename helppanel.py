@@ -16,7 +16,6 @@
 # along with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-import logging
 from gettext import gettext as _
 
 from gi.repository import Gtk
@@ -29,6 +28,9 @@ from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
 import utils
 
 from soupdesk import Attachment, Ticket, ZendeskError
+
+import logging
+_logger = logging.getLogger('training-activity-help')
 
 _FEEDBACK_TICKET = _('Feedback Ticket')
 _HELP_TICKET = _('Help Ticket')
@@ -197,6 +199,7 @@ class HelpPanel(Gtk.Grid):
             attachment.create(data['log'], 'log.txt', 'text/plain')
             uploads.append(attachment.token())
 
+        # We can't send the name w/o email.
         name = None
         email = None
         if 'name' in data and 'email' in data:
@@ -237,7 +240,7 @@ class HelpPanel(Gtk.Grid):
         try:
             self._do_send(data)
         except ZendeskError as e:
-            logging.error('Could not upload %s to zendesk: %s' %
+            _logger.error('Could not upload %s to zendesk: %s' %
                           (data['ticket'], e))
             self._task_master.activity.transfer_failed_signal.emit()
         else:
