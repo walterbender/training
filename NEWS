@@ -1,5 +1,9 @@
 NEWS
 
+1.56
+* Finetuning behavior of send button
+* Added busy cursor
+
 1.55
 * Code cleanup
 * Improvements to help panel suggested by Paul

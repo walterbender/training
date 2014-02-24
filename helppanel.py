@@ -178,6 +178,7 @@ class HelpPanel(Gtk.Grid):
     def _send_button_cb(self, widget=None):
         self._task_master.activity.help_palette.popdown(immediate=True)
         self._task_master.activity.help_panel_visible = False
+        self._task_master.activity.busy_cursor()
         GObject.idle_add(self._prepare_send_data)
 
     def _prepare_send_data(self):
@@ -245,3 +246,5 @@ class HelpPanel(Gtk.Grid):
             self._task_master.activity.transfer_failed_signal.emit()
         else:
             self._task_master.activity.transfer_completed_signal.emit()
+
+        self._task_master.activity.reset_cursor()

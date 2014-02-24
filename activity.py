@@ -156,6 +156,14 @@ class TrainingActivity(activity.Activity):
         get_power_manager().restore_suspend()
         return True
 
+    def busy_cursor(self):
+        self._old_cursor = self.get_window().get_cursor()
+        self.get_window().set_cursor(Gdk.Cursor.new(Gdk.CursorType.WATCH))
+
+    def reset_cursor(self):
+        if hasattr(self, '_old_cursor'):
+            self.get_window().set_cursor(self._old_cursor)
+
     def check_volume_data(self):
         # Before we begin (and before each task),
         # we need to find any and all USB keys
@@ -911,6 +919,7 @@ class TrainingActivity(activity.Activity):
             else:
                 self.help_palette.popdown(immediate=True)
                 self.help_panel_visible = False
+                self._help_button.set_expanded(False)
 
     def add_badge(self, msg, icon="training-trophy", name="One Academy"):
         sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')
