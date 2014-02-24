@@ -178,8 +178,33 @@ class HelpPanel(Gtk.Grid):
     def _send_button_cb(self, widget=None):
         self._task_master.activity.help_palette.popdown(immediate=True)
         self._task_master.activity.help_panel_visible = False
-        # idle_add was not sufficient... adding a delay
-        GObject.timeout_add(2000, self._take_screen_shot_and_send)
+        GObject.idle_add(self._prepare_send_data)
+
+    def _prepare_send_data(self):
+        bounds = self._text_buffer.get_bounds()
+        text = self._text_buffer.get_text(bounds[0], bounds[1], True)
+        log_file_path = utils.get_log_file('org.sugarlabs.Training')
+        section_index, task_index = \
+            self._task_master.get_section_and_task_index()
+        section_name = self._task_master.get_section_name(section_index)
+        name = self._task_master.read_task_data(NAME_UID)
+        email = self._task_master.read_task_data(EMAIL_UID)
+        school = self._task_master.read_task_data(SCHOOL_UID)
+
+        # We cannot send name w/o email
+        # http://developer.zendesk.com/documentation/rest_api/tickets.html
+        if email is None:
+            name = None
+
+        self._data = {'ticket': self._mode, 'section': section_name,
+                      'task': task_index, 'body': text, 'log': log_file_path,
+                      'name': name, 'email': email, 'school': school}
+        
+        if self._check_button.get_active():
+            # idle_add is not sufficient... waiting for graphics to refresh
+            GObject.timeout_add(2000, self._take_screen_shot_and_send)
+        else:
+            self._send_data()
 
     def _do_send(self, data):
         subject = data['ticket']
@@ -207,35 +232,16 @@ class HelpPanel(Gtk.Grid):
                       data['name'], data['email'], fields)
 
     def _take_screen_shot_and_send(self):
-        bounds = self._text_buffer.get_bounds()
-        text = self._text_buffer.get_text(bounds[0], bounds[1], True)
-        log_file_path = utils.get_log_file('org.sugarlabs.Training')
-        section_index, task_index = \
-            self._task_master.get_section_and_task_index()
-        section_name = self._task_master.get_section_name(section_index)
-        name = self._task_master.read_task_data(NAME_UID)
-        email = self._task_master.read_task_data(EMAIL_UID)
-        school = self._task_master.read_task_data(SCHOOL_UID)
+        self._data['screenshot'] = utils.take_screen_shot()
+        self._send_data()
 
-        # We cannot send name w/o email
-        # http://developer.zendesk.com/documentation/rest_api/tickets.html
-        if email is None:
-            name = None
-
-        data = {'ticket': self._mode, 'section': section_name,
-                'task': task_index, 'body': text, 'log': log_file_path,
-                'name': name, 'email': email, 'school': school}
-
-        if self._check_button.get_active():
-            data['screenshot'] = utils.take_screen_shot()
-
+    def _send_data(self):
+        logging.debug(self._data)
         try:
-            self._do_send(data)
+            self._do_send(self._data)
         except ZendeskError as e:
             _logger.error('Could not upload %s to zendesk: %s' %
                           (data['ticket'], e))
             self._task_master.activity.transfer_failed_signal.emit()
         else:
             self._task_master.activity.transfer_completed_signal.emit()
-
-        logging.debug(data)
