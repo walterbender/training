@@ -2007,6 +2007,9 @@ class Collaboration6Task(HTMLTask):
         self.uid = 'collaboration-6-task'
         self._uri = 'Collaboration/collaboration6.html'
 
+    def get_my_turn(self):
+        return True
+
     def get_refresh(self):
         return True
 
