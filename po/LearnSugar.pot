@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-18 15:49-0500\n"
+"POT-Creation-Date: 2014-02-25 13:12-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,138 +25,192 @@ msgstr ""
 msgid "a series of Sugar \"How-to\" exercises from One Academy"
 msgstr ""
 
-#: checkprogress.py:60 checkprogress.py:86
-msgid "Progress Summary"
+#: helppanel.py:35
+msgid "Feedback Ticket"
 msgstr ""
 
-#: activity.py:164
+#: helppanel.py:36
+msgid "Help Ticket"
+msgstr ""
+
+#: helppanel.py:37
+msgid "Type your question or comment here..."
+msgstr ""
+
+#: helppanel.py:38
+msgid ""
+"You must be online to use this form. If you are having trouble connecting, "
+"please contact us via the phone number or email address above."
+msgstr ""
+
+#: helppanel.py:61
+msgid ""
+"Call: 1-800 ONE EDU\n"
+"Email: info@one-education.org"
+msgstr ""
+
+#: helppanel.py:74
+msgid "Or use the form below:"
+msgstr ""
+
+#: helppanel.py:91
+msgid "Send feedback"
+msgstr ""
+
+#: helppanel.py:112
+msgid "Ask for help"
+msgstr ""
+
+#: helppanel.py:133
+msgid "Include screenshot?"
+msgstr ""
+
+#: helppanel.py:138
+msgid "Send"
+msgstr ""
+
+#: activity.py:187
 msgid "USB key required"
 msgstr ""
 
-#: activity.py:165
+#: activity.py:188
 msgid "You must insert a USB key before launching this activity."
 msgstr ""
 
-#: activity.py:176
+#: activity.py:199
 msgid "Multiple USB keys found"
 msgstr ""
 
-#: activity.py:177
+#: activity.py:200
 msgid ""
 "Only one USB key must be inserted while running this program.\n"
 "Please remove any additional USB keys before launching this activity."
 msgstr ""
 
-#: activity.py:193
+#: activity.py:216
 msgid "USB key is full"
 msgstr ""
 
-#: activity.py:194
+#: activity.py:217
 msgid "No room on USB"
 msgstr ""
 
-#: activity.py:204
+#: activity.py:227
 msgid "Cannot write to USB"
 msgstr ""
 
-#: activity.py:205
+#: activity.py:228
 msgid "USB key seems to be read-only."
 msgstr ""
 
-#: activity.py:232
+#: activity.py:255
 msgid "Multiple training-data files found."
 msgstr ""
 
-#: activity.py:233
+#: activity.py:256
 msgid "There can only be one set of training data per USB key."
 msgstr ""
 
-#: activity.py:305
+#: activity.py:328
 msgid "Data mismatch"
 msgstr ""
 
-#: activity.py:306
+#: activity.py:329
 #, python-format
 msgid "Are you %(usb)s or %(sugar)s?"
 msgstr ""
 
-#: activity.py:574
+#: activity.py:602
 #, python-format
 msgid "%(name)s %(bundle)s Activity"
 msgstr ""
 
-#: activity.py:595
+#: activity.py:623
 msgid "View"
 msgstr ""
 
-#: activity.py:603
+#: activity.py:631
 msgid "Fullscreen"
 msgstr ""
 
-#: activity.py:609
-msgid "Increase font size"
+#: activity.py:638
+msgid "Increase size"
 msgstr ""
 
-#: activity.py:614
-msgid "Decrease font size"
+#: activity.py:644
+msgid "Decrease size"
 msgstr ""
 
-#: activity.py:620
+#: activity.py:650
+msgid "Restore original size"
+msgstr ""
+
+#: activity.py:660
 msgid "Edit"
 msgstr ""
 
-#: activity.py:628
+#: activity.py:668
 msgid "Copy"
 msgstr ""
 
-#: activity.py:633
+#: activity.py:676
 msgid "Paste"
 msgstr ""
 
-#: activity.py:639
-msgid "help"
-msgstr ""
-
-#: activity.py:640
-msgid "<Ctrl>H"
-msgstr ""
-
-#: activity.py:657 activity.py:722
-msgid "Training data upload status"
-msgstr ""
-
-#: activity.py:674
+#: activity.py:686
 msgid "Check progress"
 msgstr ""
 
-#: activity.py:727
+#: activity.py:694
+msgid "Help"
+msgstr ""
+
+#: activity.py:703 activity.py:783
+msgid "Training data upload status"
+msgstr ""
+
+#: activity.py:788
 msgid "Data transfer started"
 msgstr ""
 
-#: activity.py:731
+#: activity.py:792
 msgid "Data transfer progressing"
 msgstr ""
 
-#: activity.py:736
+#: activity.py:797
 msgid "Data transfer completed"
 msgstr ""
 
-#: activity.py:741
+#: activity.py:802
 msgid "Data transfer failed"
 msgstr ""
 
-#: activity.py:905
+#: activity.py:958
+msgid "Sugar upgrade required."
+msgstr ""
+
+#: activity.py:973 activity.py:981 activity.py:988 activity.py:1007
+msgid "System error."
+msgstr ""
+
+#: activity.py:1011
 msgid "Restart required"
 msgstr ""
 
-#: activity.py:906
+#: activity.py:1012
 msgid ""
 "We needed to install some software on your system.\n"
 "Sugar must be restarted before sugarservices can commence."
 msgstr ""
 
-#: activity.py:912
+#: activity.py:1018
 msgid "Sugar restart required."
+msgstr ""
+
+#: activity.py:1025
+msgid ""
+"We are unable to install some software on your system.\n"
+"Sugar must be upgraded before this activity can be run."
 msgstr ""
 
 #: taskmaster.py:87
@@ -167,7 +221,7 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: taskmaster.py:106 tasks.py:197 tasks.py:287
+#: taskmaster.py:106 tasks.py:199 tasks.py:289
 msgid "Next"
 msgstr ""
 
@@ -179,7 +233,7 @@ msgstr ""
 msgid "My Turn"
 msgstr ""
 
-#: taskmaster.py:801
+#: taskmaster.py:800
 #, python-format
 msgid "Completed: %d%%"
 msgstr ""
@@ -192,23 +246,23 @@ msgstr ""
 msgid "Getting to Know the Toolbar"
 msgstr ""
 
-#: tasks.py:73 tasks.py:756 tasks.py:1944
+#: tasks.py:73 tasks.py:758 tasks.py:1952
 msgid "Getting Connected"
 msgstr ""
 
-#: tasks.py:83 tasks.py:1007
+#: tasks.py:83 tasks.py:1009
 msgid "Getting to Know Sugar Activities"
 msgstr ""
 
-#: tasks.py:93 tasks.py:1314
+#: tasks.py:93 tasks.py:1318
 msgid "Getting to Know the Frame"
 msgstr ""
 
-#: tasks.py:103 tasks.py:1444
+#: tasks.py:103 tasks.py:1448
 msgid "Getting to Know the Views"
 msgstr ""
 
-#: tasks.py:113 tasks.py:1156
+#: tasks.py:113 tasks.py:1158
 msgid "Getting to Know the Journal"
 msgstr ""
 
@@ -216,360 +270,360 @@ msgstr ""
 msgid "Getting to Know Settings"
 msgstr ""
 
-#: tasks.py:135 tasks.py:2071
+#: tasks.py:135 tasks.py:2082
 msgid "Learning More About the XO"
 msgstr ""
 
-#: tasks.py:148
+#: tasks.py:150
 msgid "Getting to Know more Activities"
 msgstr ""
 
-#: tasks.py:164
+#: tasks.py:166
 msgid "Getting to Know Collaboration"
 msgstr ""
 
-#: tasks.py:177 tasks.py:2216 tasks.py:2245 tasks.py:2258
+#: tasks.py:179 tasks.py:2227 tasks.py:2256 tasks.py:2269
 msgid "Assessment"
 msgstr ""
 
-#: tasks.py:234
+#: tasks.py:236
 msgid "Success!"
 msgstr ""
 
-#: tasks.py:238
+#: tasks.py:240
 msgid "Keep trying"
 msgstr ""
 
-#: tasks.py:333
+#: tasks.py:335
 msgid "Badge Task"
 msgstr ""
 
-#: tasks.py:366
+#: tasks.py:368
 msgid "Welcome"
 msgstr ""
 
-#: tasks.py:369
+#: tasks.py:371
 msgid "Let's go!"
 msgstr ""
 
-#: tasks.py:376
+#: tasks.py:378
 msgid "Enter Your Name"
 msgstr ""
 
-#: tasks.py:423
+#: tasks.py:425
 msgid "Greetings"
 msgstr ""
 
-#: tasks.py:446
+#: tasks.py:448
 msgid "Enter Your Email"
 msgstr ""
 
-#: tasks.py:501
+#: tasks.py:503
 msgid "Validate Email"
 msgstr ""
 
-#: tasks.py:564
+#: tasks.py:566
 msgid "Sections"
 msgstr ""
 
-#: tasks.py:590
+#: tasks.py:592
 msgid "Welcome Badge"
 msgstr ""
 
-#: tasks.py:614
+#: tasks.py:616
 msgid "Introduction to the Toolbar"
 msgstr ""
 
-#: tasks.py:623
+#: tasks.py:625
 msgid "Stopping an Activity"
 msgstr ""
 
-#: tasks.py:632
+#: tasks.py:634
 msgid "Stopping an Activity (Video)"
 msgstr ""
 
-#: tasks.py:667
+#: tasks.py:669
 msgid "More re Toolbars"
 msgstr ""
 
-#: tasks.py:676
+#: tasks.py:678
 msgid "Using the View Menu"
 msgstr ""
 
-#: tasks.py:685
+#: tasks.py:687
 msgid "Trying Full Screen"
 msgstr ""
 
-#: tasks.py:716
+#: tasks.py:718
 msgid "The Activity Toolbar"
 msgstr ""
 
-#: tasks.py:725
+#: tasks.py:727
 msgid "Enter a Description"
 msgstr ""
 
-#: tasks.py:746
+#: tasks.py:748
 msgid "Toolbar Badge"
 msgstr ""
 
-#: tasks.py:765
+#: tasks.py:767
 msgid "The Network View"
 msgstr ""
 
-#: tasks.py:774
+#: tasks.py:776
 msgid "Connecting to a WiFi Network"
 msgstr ""
 
-#: tasks.py:783
+#: tasks.py:785
 msgid "Connecting to a WiFi Network (Video)"
 msgstr ""
 
-#: tasks.py:862
+#: tasks.py:864
 msgid "Enter School Name"
 msgstr ""
 
-#: tasks.py:924
+#: tasks.py:926
 msgid ""
 "Your school does not appear in our list of schools in Australia. OK to "
 "continue?"
 msgstr ""
 
-#: tasks.py:958
+#: tasks.py:960
 msgid "Connected"
 msgstr ""
 
-#: tasks.py:997
+#: tasks.py:999
 msgid "Connected Badge"
 msgstr ""
 
-#: tasks.py:1016
+#: tasks.py:1018
 msgid "Take a Picture with Record"
 msgstr ""
 
-#: tasks.py:1025
+#: tasks.py:1027
 msgid "Take a Picture with Record (Video)"
 msgstr ""
 
-#: tasks.py:1054
+#: tasks.py:1056
 msgid "Insert a Picture into a Write Document"
 msgstr ""
 
-#: tasks.py:1063
+#: tasks.py:1065
 msgid "Insert a Picture into a Write Document (Video)"
 msgstr ""
 
-#: tasks.py:1099
+#: tasks.py:1101
 msgid "Make Speak Talk to You"
 msgstr ""
 
-#: tasks.py:1108
+#: tasks.py:1110
 msgid "Make Speak Talk to You (Video)"
 msgstr ""
 
-#: tasks.py:1146
+#: tasks.py:1148
 msgid "Activities Badge"
 msgstr ""
 
-#: tasks.py:1165
+#: tasks.py:1167
 msgid "Viewing the Journal"
 msgstr ""
 
-#: tasks.py:1174
+#: tasks.py:1176
 msgid "Viewing the Journal (Video)"
 msgstr ""
 
-#: tasks.py:1216
+#: tasks.py:1218
 msgid "Introducing the Portfolio"
 msgstr ""
 
-#: tasks.py:1225
+#: tasks.py:1227
 msgid "Using the Portfolio (Video)"
 msgstr ""
 
-#: tasks.py:1267
+#: tasks.py:1269
 msgid "Copy your Presentation to USB"
 msgstr ""
 
-#: tasks.py:1276
+#: tasks.py:1278
 msgid "Copy your Presentation to USB (Video)"
 msgstr ""
 
-#: tasks.py:1304
+#: tasks.py:1308
 msgid "Journal Badge"
 msgstr ""
 
-#: tasks.py:1323
+#: tasks.py:1327
 msgid "Three Ways to Open the Frame"
 msgstr ""
 
-#: tasks.py:1334
+#: tasks.py:1338
 msgid "Checking the Battery"
 msgstr ""
 
-#: tasks.py:1382
+#: tasks.py:1386
 msgid "Changing the Volume"
 msgstr ""
 
-#: tasks.py:1405
+#: tasks.py:1409
 msgid "Using the Frame to Read Text"
 msgstr ""
 
-#: tasks.py:1416
+#: tasks.py:1420
 msgid "Bottom of the Frame Recap"
 msgstr ""
 
-#: tasks.py:1425
+#: tasks.py:1429
 msgid "Top of the Frame Recap"
 msgstr ""
 
-#: tasks.py:1434
+#: tasks.py:1438
 msgid "Frame Badge"
 msgstr ""
 
-#: tasks.py:1453
+#: tasks.py:1457
 msgid "The Four Views of Sugar"
 msgstr ""
 
-#: tasks.py:1462
+#: tasks.py:1466
 msgid "The Views of Sugar (Video)"
 msgstr ""
 
-#: tasks.py:1474
+#: tasks.py:1478
 msgid "Adding a Favourite to the Home View"
 msgstr ""
 
-#: tasks.py:1483
+#: tasks.py:1487
 msgid "Adding a Favourite to the Home View (Video)"
 msgstr ""
 
-#: tasks.py:1516
+#: tasks.py:1517
 msgid "Removing a Favourite from the Home View"
 msgstr ""
 
-#: tasks.py:1549
+#: tasks.py:1547
 msgid "Switch Between the Four Views"
 msgstr ""
 
-#: tasks.py:1577
+#: tasks.py:1575
 msgid "Views Badge"
 msgstr ""
 
-#: tasks.py:1587
+#: tasks.py:1585
 msgid "Exploring the Sugar Settings"
 msgstr ""
 
-#: tasks.py:1596
+#: tasks.py:1594
 msgid "Changing the XO Nickname and Colours"
 msgstr ""
 
-#: tasks.py:1605
+#: tasks.py:1603
 msgid "Changing the XO Nickname and Colours (Video)"
 msgstr ""
 
-#: tasks.py:1641
+#: tasks.py:1639
 msgid "Important Settings"
 msgstr ""
 
-#: tasks.py:1650
+#: tasks.py:1648
 msgid "Other Settings"
 msgstr ""
 
-#: tasks.py:1659
+#: tasks.py:1657 tasks.py:1667
 msgid "Badge Settings"
 msgstr ""
 
-#: tasks.py:1669
+#: tasks.py:1677
 msgid "Learning About More Activities"
 msgstr ""
 
-#: tasks.py:1678
+#: tasks.py:1686
 msgid "Turtle Blocks Introduction"
 msgstr ""
 
-#: tasks.py:1687 tasks.py:1732
+#: tasks.py:1695 tasks.py:1740
 msgid "Turtle Square"
 msgstr ""
 
-#: tasks.py:1696 tasks.py:1741
+#: tasks.py:1704 tasks.py:1749
 msgid "Turtle Square (Video)"
 msgstr ""
 
-#: tasks.py:1770 tasks.py:1779
+#: tasks.py:1778 tasks.py:1787
 msgid "Turtle Pen"
 msgstr ""
 
-#: tasks.py:1811 tasks.py:1820
+#: tasks.py:1819 tasks.py:1828
 msgid "Turtle Show Text"
 msgstr ""
 
-#: tasks.py:1848 tasks.py:1857
+#: tasks.py:1856 tasks.py:1865
 msgid "Turtle Show Image"
 msgstr ""
 
-#: tasks.py:1888
+#: tasks.py:1896
 msgid "Physics Play"
 msgstr ""
 
-#: tasks.py:1897
+#: tasks.py:1905
 msgid "Physics Play (Video)"
 msgstr ""
 
-#: tasks.py:1922
+#: tasks.py:1930
 msgid "More Activities Badge"
 msgstr ""
 
-#: tasks.py:1935
+#: tasks.py:1943
 msgid "Introduction to Collaboration"
 msgstr ""
 
-#: tasks.py:1953
+#: tasks.py:1961
 msgid "Collaborating with Physics"
 msgstr ""
 
-#: tasks.py:1962
+#: tasks.py:1970
 msgid "Collaborating with Physics (Video)"
 msgstr ""
 
-#: tasks.py:1989 tasks.py:1998 tasks.py:2013
+#: tasks.py:1997 tasks.py:2006 tasks.py:2024
 msgid "Collaboration"
 msgstr ""
 
-#: tasks.py:2022
+#: tasks.py:2033
 msgid "Collaboration Badge"
 msgstr ""
 
-#: tasks.py:2080
+#: tasks.py:2091
 msgid "Switch to Tablet Mode"
 msgstr ""
 
-#: tasks.py:2089
+#: tasks.py:2100
 msgid "Switch to Tablet Mode (Video)"
 msgstr ""
 
-#: tasks.py:2110
+#: tasks.py:2121
 msgid "Play with the Gamepad Keys"
 msgstr ""
 
-#: tasks.py:2144
+#: tasks.py:2155
 msgid "Switch Back to Laptop Mode"
 msgstr ""
 
-#: tasks.py:2153
+#: tasks.py:2164
 msgid "Switch Back to Laptop Mode (Video)"
 msgstr ""
 
-#: tasks.py:2174
+#: tasks.py:2185
 msgid "Change the Screen Orientation"
 msgstr ""
 
-#: tasks.py:2206
+#: tasks.py:2217
 msgid "XO Badge"
 msgstr ""
 
-#: tasks.py:2292
+#: tasks.py:2303
 msgid "Assessment Badge"
 msgstr ""
 
-#: tasks.py:2300
+#: tasks.py:2311
 msgid "All done!"
 msgstr ""

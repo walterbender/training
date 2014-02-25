@@ -4,6 +4,8 @@ NEWS
 * Lots of copy edits in response to feedback from Claudia and Laura
 * Fixed bug with section indexing
 * Fixed bug with PDF task test
+* Added missing icon in settings GNOME task
+* Fixed some icon sizes
 
 1.56
 * Finetuning behavior of send button
