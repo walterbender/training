@@ -126,11 +126,11 @@ def get_tasks(task_master):
                    Settings2Task(task_master),
                    Settings3Task(task_master),
                    Settings4Task(task_master),
-                   Settings5Task(task_master),
-                   Settings6Task(task_master)]},
+                   Settings5Task(task_master)]},
     ]
 
     if utils.is_XO():
+        task_list[-1]['tasks'].append(Settings6Task(task_master))
         task_list.append(
             {'name': _('Learning More About the XO'),
              'icon': 'badge-xo',
@@ -143,6 +143,8 @@ def get_tasks(task_master):
                        XO7Task(task_master),
                        XO8Task(task_master)]},
         )
+    else:
+        task_list[-1]['tasks'].append(Settings7Task(task_master))
 
     task_list.append(
         {'name': _('Getting to Know more Activities'),
@@ -1658,6 +1660,16 @@ class Settings6Task(BadgeTask):
         self._section_index = 7
 
 
+class Settings7Task(BadgeTask):
+
+    def __init__(self, task_master):
+        BadgeTask.__init__(self, task_master)
+        self._name = _('Badge Settings')
+        self.uid = 'settings-badge-task'
+        self._uri = 'Settings/settings7.html'
+        self._section_index = 7
+
+
 class MoreActivities1Task(HTMLTask):
 
     def __init__(self, task_master):
@@ -2202,7 +2214,7 @@ class XO8Task(BadgeTask):
         self._name = _('XO Badge')
         self.uid = 'xo-badge-task'
         self._uri = 'XO/xo8.html'
-        self._section_index = 10
+        self._section_index = 8
 
 
 class Assessment1Task(HTMLTask):
