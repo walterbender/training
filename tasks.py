@@ -1292,9 +1292,11 @@ class Journal7Task(HTMLTask):
     def test(self, task_data):
         paths = utils.look_for_file_type(
             self._task_master.activity.volume_data[0]['usb_path'], '.pdf')
-        _logger.debug(paths)
-        return len(paths) > 0 and (utils.get_modified_time(paths[0]) >
-                                   task_data['start_time'] - _HOUR)
+        for path in paths:
+            if utils.get_modified_time(path) > \
+               task_data['start_time'] - _HOUR:
+                return True
+        return False
 
 
 class Journal8Task(HTMLTask):
