@@ -2,8 +2,17 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>One Academy</title>
+<title>Getting Connected</title>
 <link href="../main.css" rel="stylesheet" type="text/css">
+<script language="javascript" type="text/javascript">
+<!--
+function popitup(url) {
+	newwindow=window.open(url,'name','height=200,width=150,left=100,top=200');
+	if (window.focus) {newwindow.focus()}
+	return false;
+}
+// -->
+</script>
 </head>
 
 <body>
@@ -19,7 +28,7 @@
     <li>Press Connect!</li>
     <li>The network might ask for a key (password) to be entered &ndash; if you know it, enter it now and press OK!</li>
     <li>You should now be connected;</li>
-    <li>If you're not connected, there may be a proxy issue. Visit http://academy.one-education.org/proxies to learn more.</li>
+    <li>If you're not connected, there may be a <a href="proxy.html" onclick="return popitup('proxy.html')">proxy issue</a>. Visit http://academy.one-education.org/proxies to learn more.</li>
   </ol>
 </div>
 </body>
