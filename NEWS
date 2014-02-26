@@ -1,5 +1,8 @@
 NEWS
 
+1.58
+* Added visual feedback to gamepad task
+
 1.57
 * Lots of copy edits in response to feedback from Claudia and Laura
 * Fixed bug with section indexing
