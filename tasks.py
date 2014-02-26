@@ -16,6 +16,7 @@ import re
 from gettext import gettext as _
 
 from gi.repository import GObject
+from gi.repository import Gtk
 from gi.repository import Gdk
 
 from sugar3.datastore import datastore
@@ -2121,6 +2122,47 @@ class XO4Task(HTMLTask):
         self._name = _('Play with the Gamepad Keys')
         self.uid = 'xo-gamepad-task'
         self._uri = 'XO/xo4.html'
+        self._height = 400
+        self._boxes = None
+        self._LEFT_OFF = os.path.join(self._task_master.get_bundle_path(),
+                                      'html-content', 'images',
+                                      'gamepad-left-off.svg')
+        self._LEFT_UP = os.path.join(self._task_master.get_bundle_path(),
+                                     'html-content', 'images',
+                                     'gamepad-left-up.svg')
+        self._LEFT_RIGHT = os.path.join(self._task_master.get_bundle_path(),
+                                        'html-content', 'images',
+                                        'gamepad-left-right.svg')
+        self._LEFT_DOWN = os.path.join(self._task_master.get_bundle_path(),
+                                       'html-content', 'images',
+                                       'gamepad-left-down.svg')
+        self._LEFT_LEFT = os.path.join(self._task_master.get_bundle_path(),
+                                       'html-content', 'images',
+                                       'gamepad-left-left.svg')
+        self._RIGHT_OFF = os.path.join(self._task_master.get_bundle_path(),
+                                       'html-content', 'images',
+                                       'gamepad-right-off.svg')
+        self._RIGHT_CHECK = os.path.join(self._task_master.get_bundle_path(),
+                                         'html-content', 'images',
+                                         'gamepad-right-check.svg')
+        self._RIGHT_CIRCLE = os.path.join(self._task_master.get_bundle_path(),
+                                          'html-content', 'images',
+                                          'gamepad-right-circle.svg')
+        self._RIGHT_SQUARE = os.path.join(self._task_master.get_bundle_path(),
+                                          'html-content', 'images',
+                                          'gamepad-right-square.svg')
+        self._RIGHT_X = os.path.join(self._task_master.get_bundle_path(),
+                                     'html-content', 'images',
+                                     'gamepad-right-x.svg')
+
+        self._LEFT_KEYMAP = {'KP_Up': self._LEFT_UP,
+                             'KP_Down': self._LEFT_DOWN,
+                             'KP_Left': self._LEFT_LEFT,
+                             'KP_Right': self._LEFT_RIGHT}
+        self._RIGHT_KEYMAP = {'KP_Page_Up': self._RIGHT_CIRCLE,
+                              'KP_Page_Down': self._RIGHT_X,
+                              'KP_Home': self._RIGHT_SQUARE,
+                              'KP_End': self._RIGHT_CHECK}
 
     def is_collectable(self):
         return True
@@ -2129,19 +2171,56 @@ class XO4Task(HTMLTask):
         return [_VALIDATE_EMAIL_TASK]
 
     def test(self, task_data):
+        self._task_master.grab_focus()
+
         if task_data['data'] is None:
-            self._task_master.grab_focus()
             self._task_master.keyname = None
             task_data['data'] = ' '
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
+            if self._task_master.keyname is not None:
+                _logger.debug(self._task_master.keyname)
             if utils.is_game_key(self._task_master.keyname):
                 task_data['data'] = self._task_master.keyname
                 self._task_master.write_task_data(self.uid, task_data)
+
+                if self._task_master.keyname in self._LEFT_KEYMAP:
+                    image = Gtk.Image.new_from_file(
+                        self._LEFT_KEYMAP[self._task_master.keyname])
+                else:
+                    image = Gtk.Image.new_from_file(self._LEFT_OFF)
+                self._boxes[0].get_children()[0].destroy()
+                self._boxes[0].add(image)
+                image.show()
+
+                if self._task_master.keyname in self._RIGHT_KEYMAP:
+                    image = Gtk.Image.new_from_file(
+                        self._RIGHT_KEYMAP[self._task_master.keyname])
+                else:
+                    image = Gtk.Image.new_from_file(self._RIGHT_OFF)
+                self._boxes[1].get_children()[0].destroy()
+                self._boxes[1].add(image)
+                image.show()
+
+            if self._task_master.keyname == 'KP_End':
                 return True
             else:
                 return False
+
+    def get_graphics(self):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri)
+
+        graphics = Graphics()
+        webkit = graphics.add_uri('file://' + url, height=self._height)
+        graphics.set_zoom_level(self._zoom_level)
+        self._boxes = graphics.add_two_images(self._LEFT_OFF, self._RIGHT_OFF)
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
+
+        return graphics, self._prompt
 
     def grab_focus(self):
         self._task_master.set_can_focus(True)

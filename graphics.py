@@ -174,13 +174,24 @@ class Graphics(Gtk.Alignment):
         entry.show()
         return entry
 
-    def add_image(self, image, width=None, height=None):
-        if False:  # width is not None and height is not None:
-            image = Gtk.Image.new_from_file_at_size(image, width, height)
-        else:
-            image = Gtk.Image.new_from_file(image)
+    def add_image(self, image):
+        image = Gtk.Image.new_from_file(image)
         self._attach(image)
         image.show()
+
+    def add_two_images(self, left_image, right_image):
+        image_boxes = [Gtk.Alignment.new(0.5, 0, 0, 0),
+                       Gtk.Alignment.new(0.5, 0, 0, 0)]
+        left = Gtk.Image.new_from_file(left_image)
+        right = Gtk.Image.new_from_file(right_image)
+        image_boxes[0].add(left)
+        left.show()
+        image_boxes[1].add(right)
+        right.show()
+        self._attach_two(image_boxes[0], image_boxes[1])
+        image_boxes[0].show()
+        image_boxes[1].show()
+        return image_boxes
 
     def add_button(self, button_label, callback, arg=None, button_icon=None):
         if button_icon is not None:
