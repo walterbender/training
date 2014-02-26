@@ -180,18 +180,20 @@ class Graphics(Gtk.Alignment):
         image.show()
 
     def add_two_images(self, left_image, right_image):
-        image_boxes = [Gtk.Alignment.new(0.5, 0, 0, 0),
-                       Gtk.Alignment.new(0.5, 0, 0, 0)]
+        alignments = [Gtk.Alignment.new(0, 0, 0, 0),
+                      Gtk.Alignment.new(1.0, 0, 0, 0)]
         left = Gtk.Image.new_from_file(left_image)
         right = Gtk.Image.new_from_file(right_image)
-        image_boxes[0].add(left)
+        alignments[0].add(left)
         left.show()
-        image_boxes[1].add(right)
+        alignments[1].add(right)
         right.show()
-        self._attach_two(image_boxes[0], image_boxes[1])
-        image_boxes[0].show()
-        image_boxes[1].show()
-        return image_boxes
+        self._grid.attach(alignments[0], 0, self._row, 2, 1)
+        alignments[0].show()
+        self._grid.attach(alignments[1], 3, self._row, 2, 1)
+        alignments[1].show()
+        self._row += 1
+        return alignments
 
     def add_button(self, button_label, callback, arg=None, button_icon=None):
         if button_icon is not None:
