@@ -1015,7 +1015,7 @@ class TrainingActivity(activity.Activity):
 
             alert.connect('response', self._reboot_alert_cb)
             self.add_alert(alert)
-            self._load_intro_graphics(message=_('Sugar restart required.'))
+            self._load_intro_graphics(file_name='restart.html')
 
         return not install
 
