@@ -381,11 +381,17 @@ class Welcome2Task(Task):
         self._uri = 'Welcome/welcome2.html'
         self._entry = None
         self._height = 400
+        self._task_data = None
 
     def is_collectable(self):
         return True
 
+    def _enter_entered(self, widget):
+        self._task_master.enter_entered(self._task_data, self.uid)
+
     def test(self, task_data):
+        self._task_data = task_data
+
         if len(self._entry.get_text()) == 0:
             return False
         else:
@@ -409,6 +415,7 @@ class Welcome2Task(Task):
         else:
             self._entry = graphics.add_entry()
 
+        self._entry.connect('activate', self._enter_entered)
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)
 
@@ -451,6 +458,7 @@ class Welcome4Task(HTMLTask):
         self._uri = 'Welcome/welcome4.html'
         self._entry = None
         self._height = 400
+        self._task_data = None
 
     def get_requires(self):
         return [_ENTER_NAME_TASK]
@@ -458,7 +466,16 @@ class Welcome4Task(HTMLTask):
     def skip_if_completed(self):
         return True
 
+    def _enter_entered(self, widget):
+        if self._is_valid_email_entry():
+            self._task_master.enter_entered(self._task_data, self.uid)
+
     def test(self, task_data):
+        if self._task_data is None:
+            self._task_data = task_data
+        return self._is_valid_email_entry()
+
+    def _is_valid_email_entry(self):
         entry = self._entry.get_text()
         if len(entry) == 0:
             return False
@@ -487,6 +504,7 @@ class Welcome4Task(HTMLTask):
         else:
             self._entry = graphics.add_entry()
 
+        self._entry.connect('activate', self._enter_entered)
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)
 
@@ -505,6 +523,7 @@ class Welcome5Task(HTMLTask):
         self.uid = _VALIDATE_EMAIL_TASK
         self._uri = 'Welcome/welcome5.html'
         self._entries = []
+        self._task_data = None
 
     def is_collectable(self):
         return True
@@ -515,7 +534,16 @@ class Welcome5Task(HTMLTask):
     def get_requires(self):
         return [_ENTER_EMAIL_TASK]
 
+    def _enter_entered(self, widget):
+        if self._is_valid_email_entry():
+            self._task_master.enter_entered(self._task_data, self.uid)
+
     def test(self, task_data):
+        if self._task_data is None:
+            self._task_data = task_data
+        return self._is_valid_email_entry()
+
+    def _is_valid_email_entry(self):
         entry0 = self._entries[0].get_text()
         entry1 = self._entries[1].get_text()
         if len(entry0) == 0 or len(entry1) == 0:
@@ -548,6 +576,8 @@ class Welcome5Task(HTMLTask):
             email = ''
         self._entries.append(graphics.add_entry())
 
+        self._entries[0].connect('activate', self._enter_entered)
+        self._entries[1].connect('activate', self._enter_entered)
         # Paste to second entry
         self._task_master.activity.set_copy_widget(text_entry=self._entries[0])
         self._task_master.activity.set_paste_widget(
@@ -871,11 +901,21 @@ class Connected6Task(HTMLTask):
         self._buttons = []
         self._schools = []
         self._completer = None
+        self._task_data = None
 
     def is_collectable(self):
         return True
 
+    def _enter_entered(self, widget):
+        if self._is_valid_school_entry():
+            self._task_master.enter_entered(self._task_data, self.uid)
+
     def test(self, task_data):
+        if self._task_data is None:
+            self._task_data = task_data
+        return self._is_valid_school_entry()
+
+    def _is_valid_school_entry(self):
         if self._completer is None:
             f = open(os.path.join(self._task_master.activity.bundle_path,
                                   'schools.txt'), 'r')
@@ -942,7 +982,9 @@ class Connected6Task(HTMLTask):
             self._entry = self._graphics.add_entry(text=target)
         else:
             self._entry = self._graphics.add_entry()
+
         self._entry.connect('key_press_event', self._entry_cb)
+        self._entry.connect('activate', self._enter_entered)
 
         self._task_master.activity.set_copy_widget(text_entry=self._entry)
         self._task_master.activity.set_paste_widget(text_entry=self._entry)

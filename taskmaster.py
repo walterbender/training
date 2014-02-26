@@ -199,6 +199,22 @@ class TaskMaster(Gtk.Alignment):
             self._graphics.show()
             self.activity.complete = True
 
+    def enter_entered(self, task_data, uid):
+        ''' Enter was entered in a text entry '''
+        if not 'completed' in task_data or not task_data['completed']:
+            task_data = self.read_task_data(uid)
+            task_data['end_time'] = int(time.time() + 0.5)
+            task_data['completed'] = True
+            self._update_accumutaled_time(task_data)
+        self.write_task_data(uid, task_data)
+        self.button_was_pressed = True
+        section_index, task_index = self.get_section_and_task_index()
+        task = self._task_list[section_index]['tasks'][task_index]
+        if task.after_button_press():
+            self.current_task += 1
+            self.write_task_data('current_task', self.current_task)
+            self.task_master()
+
     def _task_button_cb(self, button):
         ''' The button at the bottom of the page for each task: used to
             advance to the next task. '''
