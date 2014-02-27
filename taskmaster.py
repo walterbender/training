@@ -118,11 +118,21 @@ class TaskMaster(Gtk.Alignment):
         grid.attach(mid, 1, 0, 1, 1)
         mid.show()
 
+        right_grid = Gtk.Grid()
+
         self._my_turn_button = Gtk.Button(_('My Turn'))
         self._my_turn_button.connect('clicked', self._my_turn_button_cb)
-        right = Gtk.Alignment.new(xalign=1.0, yalign=0.5, xscale=0, yscale=0)
-        right.add(self._my_turn_button)
+        right_grid.attach(self._my_turn_button, 0, 0, 1, 1)
         self._my_turn_button.hide()
+
+        self._skip_button = Gtk.Button(_('Skip this section'))
+        self._skip_button.connect('clicked', self._skip_button_cb)
+        right_grid.attach(self._skip_button, 1, 0, 1, 1)
+        self._skip_button.hide()
+
+        right = Gtk.Alignment.new(xalign=1.0, yalign=0.5, xscale=0, yscale=0)
+        right.add(right_grid)
+        right_grid.show()
         grid.attach(right, 2, 0, 1, 1)
         right.show()
 
@@ -229,6 +239,17 @@ class TaskMaster(Gtk.Alignment):
     def _my_turn_button_cb(self, button):
         ''' Take me to the Home Page. '''
         utils.goto_home_view()
+
+    def _skip_button_cb(self, button):
+        ''' Jump to next section '''
+        section_index, task_index = self.get_section_and_task_index()
+        section_index += 1
+        if section_index < self.get_number_of_sections():
+            task = self._task_list[section_index]['tasks'][0]
+            self.current_task = self.uid_to_task_number(task.uid)
+            self.task_master()
+        else:
+            _logger.error('Trying to skip past last section.')
 
     def _refresh_button_cb(self, button):
         ''' Refresh the current page's graphics '''
@@ -443,6 +464,11 @@ class TaskMaster(Gtk.Alignment):
             self._my_turn_button.show()
         else:
             self._my_turn_button.hide()
+
+        if task.get_skip():
+            self._skip_button.show()
+        else:
+            self._skip_button.hide()
 
         self._update_progress()
 

@@ -81,9 +81,12 @@ def _check_gconf_settings():
     client.set_string('/desktop/sugar/services/zendesk/token',
                       'eG8tc3VwcG9ydEBsYXB0b3Aub3JnLmF1L3Rva2VuOjdHRkV5'
                       'STF2MFNRVzJyYmdFVXFFUWRpOE1Cc1I0NGdHVURhTWg2QWU=')
-    SugarExt.gconf_client_set_string_list(
-        client, '/desktop/sugar/services/zendesk/fields',
-        ['21765610', '21605694', '21765620'])
+    try:
+        SugarExt.gconf_client_set_string_list(
+            client, '/desktop/sugar/services/zendesk/fields',
+            ['21765610', '21605694', '21765620'])
+    except Exception as e:
+        _logger.error('Could not set zendesk fields: %s' % e)
 
 
 class TrainingActivity(activity.Activity):

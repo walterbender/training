@@ -248,6 +248,10 @@ class Task():
         ''' Does the task need a my turn button to goto home view? '''
         return False
 
+    def get_skip(self):
+        ''' Does the task need a skip button to goto the next section? '''
+        return False
+
     def get_data(self):
         ''' Any data needed for the test '''
         return None
@@ -790,6 +794,8 @@ class Connected1Task(HTMLTask):
         self.uid = 'connected-1-task'
         self._uri = 'Connected/connected1.html'
 
+    def get_skip(self):
+        return True
 
 class Connected2Task(HTMLTask):
 
@@ -1721,6 +1727,9 @@ class MoreActivities1Task(HTMLTask):
         self.uid = 'more-activities-1-task'
         self._uri = 'MoreActivities/moreactivities1.html'
 
+    def get_skip(self):
+        return True
+
 
 class Turtle1Task(HTMLTask):
 
@@ -1986,6 +1995,9 @@ class Collaboration1Task(HTMLTask):
         self._name = _('Introduction to Collaboration')
         self.uid = 'collaboration-1-task'
         self._uri = 'Collaboration/collaboration1.html'
+
+    def get_skip(self):
+        return True
 
 
 class Collaboration2Task(HTMLTask):
