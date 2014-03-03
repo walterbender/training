@@ -712,6 +712,11 @@ class TrainingActivity(activity.Activity):
         self.progress_label.set_line_wrap(True)
         self.progress_label.set_size_request(300, -1)
         self.progress_label.set_use_markup(True)
+        toolitem = Gtk.ToolItem()
+        toolitem.add(self.progress_label)
+        self.progress_label.show()
+        self._toolbox.toolbar.insert(toolitem, -1)
+        toolitem.show()
 
         separator = Gtk.SeparatorToolItem()
         separator.props.draw = False
@@ -890,12 +895,17 @@ class TrainingActivity(activity.Activity):
         self._set_zoom_buttons_sensitivity()
         self._task_master.reload_graphics()
 
-    def _jump_to_section_cb(self, button, section):
+    def _jump_to_section_cb(self, button, section_index):
         if self._radio_buttons_live:
-            uid = self._task_master.section_and_task_to_uid(section)
-            self._task_master.current_task = \
-                self._task_master.uid_to_task_number(uid)
-            self._task_master.reload_graphics()
+            if self._task_master.requirements_are_met(section_index, 0):
+                uid = self._task_master.section_and_task_to_uid(section_index)
+                self._task_master.current_task = \
+                    self._task_master.uid_to_task_number(uid)
+                self._task_master.reload_graphics()
+            else:
+                section_index, task_index = \
+                    self._task_master.get_section_and_task_index()
+                self._progress_buttons[section_index].set_active(True)
 
     def _help_cb(self, button):
         # title, help_file = self._task_master.get_help_info()

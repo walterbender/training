@@ -186,7 +186,7 @@ class TaskMaster(Gtk.Alignment):
 
             # Check to make sure all the requirements at met
             i = 0
-            while not self._requirements_are_met(section_index, task_index):
+            while not self.requirements_are_met(section_index, task_index):
                 _logger.debug('Switching to a required task %d' %
                               self.current_task)
                 section_index, task_index = self.get_section_and_task_index()
@@ -371,11 +371,9 @@ class TaskMaster(Gtk.Alignment):
                 #                section_requirements))
                 section['tasks'][last].set_requires(section_requirements)
         self._task_list[-1]['tasks'][-1].set_requires(all_requirements)
-        # _logger.debug('setting requirements for %s to %r' %
-        #             (self._task_list[-1]['tasks'][-1].uid, all_requirements))
 
-    def _requirements_are_met(self, section_index, task_index,
-                              switch_task=True):
+    def requirements_are_met(self, section_index, task_index,
+                             switch_task=True):
         ''' Check to make sure all the requirements at met '''
         task = self._task_list[section_index]['tasks'][task_index]
         requires = task.get_requires()
@@ -722,8 +720,8 @@ class TaskMaster(Gtk.Alignment):
         i = task_index
         while(i > 0):
             i -= 1
-            if self._requirements_are_met(section_index, i,
-                                          switch_task=False):
+            if self.requirements_are_met(section_index, i,
+                                         switch_task=False):
                 self.current_task -= (task_index - i)
                 break
         self.task_master()
@@ -735,8 +733,8 @@ class TaskMaster(Gtk.Alignment):
             return
         i = task_index + 1
         while(i < tasks_in_section - 1):
-            if self._requirements_are_met(section_index, i,
-                                          switch_task=False):
+            if self.requirements_are_met(section_index, i,
+                                         switch_task=False):
                 self.current_task += (i - task_index)
                 break
             i += 1
@@ -749,8 +747,8 @@ class TaskMaster(Gtk.Alignment):
             return False
         i = task_index + 1
         while(i < tasks_in_section - 1):
-            if self._requirements_are_met(section_index, i,
-                                          switch_task=False):
+            if self.requirements_are_met(section_index, i,
+                                         switch_task=False):
                 return True
             i += 1
         return False

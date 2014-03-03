@@ -2,6 +2,10 @@ NEWS
 
 1.59
 * Added skip button
+* Added new badge artwork
+* Fixed problem with premature jumping to final section
+* Close app when finished
+* Copy edits
 
 1.58
 * Added visual feedback to gamepad task
