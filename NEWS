@@ -4,6 +4,9 @@ NEWS
 * Only notify data transfer if connected task completed
 * Added explanation of notifications 
 * Moved Frame and Views sections before Connected Section
+* Made copy edits associated with the change in section order
+* Added explanation of selecting text as a hyperlink in toolbar task 5
+* Added explanation of Start new at the end of the Activities section
 
 1.59
 * Added skip button

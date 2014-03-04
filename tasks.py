@@ -120,7 +120,8 @@ def get_tasks(task_master):
                    Activities5Task(task_master),
                    Activities6Task(task_master),
                    Activities7Task(task_master),
-                   Activities8Task(task_master, 5)]},
+                   Activities8Task(task_master),
+                   Activities9Task(task_master, 5)]},
         {'name': _('Getting to Know the Journal'),
          'icon': 'badge-journal',
          'tasks': [Journal1Task(task_master),
@@ -1212,13 +1213,22 @@ class Activities7Task(HTMLTask):
         return False
 
 
-class Activities8Task(BadgeTask):
+class Activities8Task(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Start New')
+        self.uid = 'activities-8-task'
+        self._uri = 'Activities/activities8.html'
+
+
+class Activities9Task(BadgeTask):
 
     def __init__(self, task_master, section_index):
         BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Activities Badge')
         self.uid = _ACTIVITIES_BADGE_TASK
-        self._uri = 'Activities/activities8.html'
+        self._uri = 'Activities/activities9.html'
 
 
 class Journal1Task(HTMLTask):
