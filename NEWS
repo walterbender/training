@@ -1,5 +1,10 @@
 NEWS
 
+1.60
+* Only notify data transfer if connected task completed
+* Added explanation of notifications 
+* Moved Frame and Views sections before Connected Section
+
 1.59
 * Added skip button
 * Added new badge artwork

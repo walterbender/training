@@ -49,6 +49,7 @@ COMPLETION_PERCENTAGE = 'completion_percentage'
 TRAINING_DATA_EMAIL = 'training_data_email'
 TRAINING_DATA_FULLNAME = 'training_data_fullname'
 
+from tasks import GET_CONNECTED_TASK
 from taskmaster import TaskMaster
 from graphics import Graphics, FONT_SIZES
 from helppanel import HelpPanel
@@ -136,6 +137,7 @@ class TrainingActivity(activity.Activity):
         self._webkit = None
         self._clipboard_text = ''
         self._fixed = None
+        self._notify_transfer_status = False
 
         if self._load_extension() and self.check_volume_data():
             self._launcher()
@@ -490,6 +492,7 @@ class TrainingActivity(activity.Activity):
 
         self.completed = False
         self._update_completed_sections()
+        self._check_connected_task_status()
         self._task_master.task_master()
 
     def load_graphics_area(self, widget):
@@ -761,6 +764,11 @@ class TrainingActivity(activity.Activity):
         self._progress_buttons[section_index].set_active(True)
         self._radio_buttons_live = True
 
+    def _check_connected_task_status(self):
+        ''' We only want to turn on notifications if we expect connectivity '''
+        task = self._task_master.uid_to_task(GET_CONNECTED_TASK)
+        self.set_notify_transfer_status(task.is_completed())
+
     def _update_completed_sections(self):
         progress = self._task_master.get_completed_sections()
 
@@ -786,29 +794,37 @@ class TrainingActivity(activity.Activity):
             self._progress_buttons[section + 1].set_active(True)
             self._radio_buttons_live = True
 
+    def set_notify_transfer_status(self, state):
+        _logger.debug('Setting transfer status to %s' % (str(state)))
+        self._notify_transfer_status = state
+
+    def _update_transfer_button(self, icon_name, tooltip):
+        self.transfer_button.set_icon_name(icon_name)
+        self.transfer_button.set_tooltip(tooltip)
+        if self._notify_transfer_status:
+            self.transfer_button.show()
+        else:
+            self.transfer_button.hide()
+
     def _transfer_cb(self, button):
         ''' Hide the button to dismiss notification '''
         self.transfer_button.set_tooltip(_('Training data upload status'))
         self.transfer_button.hide()
 
     def __transfer_started_cb(self, widget):
-        self.transfer_button.set_icon_name('transfer')
-        self.transfer_button.set_tooltip(_('Data transfer started'))
-        self.transfer_button.show()
+        self._update_transfer_button('transfer', _('Data transfer started'))
 
     def __transfer_progressed_cb(self, widget):
-        self.transfer_button.set_tooltip(_('Data transfer progressing'))
-        self.transfer_button.show()
+        self._update_transfer_button('transfer',
+                                     _('Data transfer progressing'))
 
     def __transfer_completed_cb(self, widget):
-        self.transfer_button.set_icon_name('transfer-complete')
-        self.transfer_button.set_tooltip(_('Data transfer completed'))
-        self.transfer_button.show()
+        self._update_transfer_button('transfer-complete',
+                                     _('Data transfer completed'))
 
     def __transfer_failed_cb(self, widget):
-        self.transfer_button.set_icon_name('transfer-failed')
-        self.transfer_button.set_tooltip(_('Data transfer failed'))
-        self.transfer_button.show()
+        self._update_transfer_button('transfer-failed',
+                                     _('Data transfer failed'))
 
     def __realize_cb(self, window):
         self.window_xid = window.get_window().get_xid()

@@ -56,7 +56,7 @@ _XO_TABLET_TASK = 'xo-tablet-task'
 _XO_BADGE_TASK = 'xo-badge-task'
 _ASSESSMENT_DOCUMENT_TASK = 'assessment-document-task'
 _ASSESSMENT_BADGE_TASK = 'assessment-badge-task'
-
+GET_CONNECTED_TASK = 'get-connected-task'
 
 def get_tasks(task_master):
     task_list = [
@@ -68,7 +68,7 @@ def get_tasks(task_master):
                    Welcome4Task(task_master),
                    Welcome5Task(task_master),
                    Welcome6Task(task_master),
-                   Welcome7Task(task_master)]},
+                   Welcome7Task(task_master, 0)]},
         {'name': _('Getting to Know the Toolbar'),
          'icon': 'badge-toolbar',
          'tasks': [Toolbar1Task(task_master),
@@ -79,27 +79,7 @@ def get_tasks(task_master):
                    Toolbar6Task(task_master),
                    Toolbar7Task(task_master),
                    Toolbar8Task(task_master),
-                   Toolbar9Task(task_master)]},
-        {'name': _('Getting Connected'),
-         'icon': 'badge-connected',
-         'tasks': [Connected1Task(task_master),
-                   Connected2Task(task_master),
-                   Connected3Task(task_master),
-                   Connected4Task(task_master),
-                   # Connected5Task(task_master),
-                   Connected6Task(task_master),
-                   # Connected7Task(task_master),
-                   Connected8Task(task_master)]},
-        {'name': _('Getting to Know Sugar Activities'),
-         'icon': 'badge-activities',
-         'tasks': [Activities1Task(task_master),
-                   Activities2Task(task_master),
-                   Activities3Task(task_master),
-                   Activities4Task(task_master),
-                   Activities5Task(task_master),
-                   Activities6Task(task_master),
-                   Activities7Task(task_master),
-                   Activities8Task(task_master)]},
+                   Toolbar9Task(task_master, 1)]},
         {'name': _('Getting to Know the Frame'),
          'icon': 'badge-frame',
          'tasks': [Frame1Task(task_master),
@@ -109,7 +89,7 @@ def get_tasks(task_master):
                    Frame5Task(task_master),
                    Frame6Task(task_master),
                    Frame7Task(task_master),
-                   Frame8Task(task_master)]},
+                   Frame8Task(task_master, 2)]},
         {'name': _('Getting to Know the Views'),
          'icon': 'badge-views',
          'tasks': [Views1Task(task_master),
@@ -119,7 +99,28 @@ def get_tasks(task_master):
                    Views5Task(task_master),
                    Views6Task(task_master),
                    Views7Task(task_master),
-                   Views8Task(task_master)]},
+                   Views8Task(task_master, 3)]},
+        {'name': _('Getting Connected'),
+         'icon': 'badge-connected',
+         'tasks': [Connected1Task(task_master),
+                   Connected2Task(task_master),
+                   Connected3Task(task_master),
+                   Connected4Task(task_master),
+                   # Connected5Task(task_master),
+                   Connected6Task(task_master),
+                   # Connected7Task(task_master),
+                   Connected8Task(task_master),
+                   Connected9Task(task_master, 4)]},
+        {'name': _('Getting to Know Sugar Activities'),
+         'icon': 'badge-activities',
+         'tasks': [Activities1Task(task_master),
+                   Activities2Task(task_master),
+                   Activities3Task(task_master),
+                   Activities4Task(task_master),
+                   Activities5Task(task_master),
+                   Activities6Task(task_master),
+                   Activities7Task(task_master),
+                   Activities8Task(task_master, 5)]},
         {'name': _('Getting to Know the Journal'),
          'icon': 'badge-journal',
          'tasks': [Journal1Task(task_master),
@@ -129,7 +130,7 @@ def get_tasks(task_master):
                    Journal5Task(task_master),
                    Journal6Task(task_master),
                    Journal7Task(task_master),
-                   Journal8Task(task_master)]},
+                   Journal8Task(task_master, 6)]},
         {'name': _('Getting to Know Settings'),
          'icon': 'badge-settings',
          'tasks': [Settings1Task(task_master),
@@ -140,7 +141,7 @@ def get_tasks(task_master):
     ]
 
     if utils.is_XO():
-        task_list[-1]['tasks'].append(Settings6Task(task_master))
+        task_list[-1]['tasks'].append(Settings6Task(task_master, 7))
         task_list.append(
             {'name': _('Learning More About the XO'),
              'icon': 'badge-xo',
@@ -151,10 +152,12 @@ def get_tasks(task_master):
                        XO5Task(task_master),
                        XO6Task(task_master),
                        XO7Task(task_master),
-                       XO8Task(task_master)]},
+                       XO8Task(task_master, 8)]},
         )
+        section_counter = 9
     else:
-        task_list[-1]['tasks'].append(Settings7Task(task_master))
+        task_list[-1]['tasks'].append(Settings7Task(task_master, 7))
+        section_counter = 8
 
     task_list.append(
         {'name': _('Getting to Know more Activities'),
@@ -171,7 +174,7 @@ def get_tasks(task_master):
                    Turtle9Task(task_master),
                    Turtle10Task(task_master),
                    Turtle11Task(task_master),
-                   MoreActivities2Task(task_master)]})
+                   MoreActivities2Task(task_master, section_counter)]})
     task_list.append(
         {'name': _('Getting to Know Collaboration'),
          'icon': 'badge-collaboration',
@@ -184,13 +187,13 @@ def get_tasks(task_master):
                    Collaboration5Task(task_master),
                    Collaboration6Task(task_master),
                    Collaboration7Task(task_master),
-                   Collaboration8Task(task_master)]})
+                   Collaboration8Task(task_master, section_counter + 1)]})
     task_list.append(
         {'name': _('Assessment'),
          'icon': 'badge',
          'tasks': [Assessment1Task(task_master),
                    Assessment2Task(task_master),
-                   Assessment3Task(task_master)]})
+                   Assessment3Task(task_master, section_counter + 2)]})
 
     return task_list
 
@@ -344,11 +347,11 @@ class HTMLTask(Task):
 
 class BadgeTask(HTMLTask):
 
-    def __init__(self, task_master):
+    def __init__(self, task_master, section_index):
         HTMLTask.__init__(self, task_master)
         self._name = _('Badge Task')
         self.uid = 'badge-task'
-        self._section_index = 0
+        self._section_index = section_index
         self._uri = 'Welcome/welcome7.html'
 
     def _report_progress(self):
@@ -631,12 +634,11 @@ class Welcome6Task(HTMLTask):
 
 class Welcome7Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Welcome Badge')
         self.uid = _WELCOME_BADGE_TASK
         self._uri = 'Welcome/welcome7.html'
-        self._section_index = 0
 
     def get_graphics(self):
         name = self._get_user_name().split()[0]
@@ -787,12 +789,11 @@ class Toolbar8Task(HTMLTask):
 
 class Toolbar9Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Toolbar Badge')
         self.uid = _TOOLBAR_BADGE_TASK
         self._uri = 'Toolbar/toolbar9.html'
-        self._section_index = 1
 
 
 class Connected1Task(HTMLTask):
@@ -803,8 +804,6 @@ class Connected1Task(HTMLTask):
         self.uid = 'connected-1-task'
         self._uri = 'Connected/connected1.html'
 
-    def get_skip(self):
-        return True
 
 class Connected2Task(HTMLTask):
 
@@ -829,11 +828,17 @@ class Connected4Task(HTMLTask):
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Connecting to a WiFi Network (Video)')
-        self.uid = 'connected-4-task'
+        self.uid = GET_CONNECTED_TASK
         self._uri = 'Connected/connected4.html'
+
+    def get_skip(self):
+        return True
 
     def get_refresh(self):
         return True
+
+    def after_button_press(self):
+        self._task_master.activity.set_notify_transfer_status(True)
 
     def test(self, task_data):
         return utils.nm_status() == 'network-wireless-connected'
@@ -1050,14 +1055,22 @@ class Connected7Task(HTMLTask):
         return graphics, self._prompt
 
 
-class Connected8Task(BadgeTask):
+class Connected8Task(HTMLTask):
 
     def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Notifications')
+        self.uid = 'connected-8-task'
+        self._uri = 'Connected/connected8.html'
+
+
+class Connected9Task(BadgeTask):
+
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Connected Badge')
         self.uid = _CONNECTED_BADGE_TASK
-        self._uri = 'Connected/connected8.html'
-        self._section_index = 2
+        self._uri = 'Connected/connected9.html'
 
 
 class Activities1Task(HTMLTask):
@@ -1201,12 +1214,11 @@ class Activities7Task(HTMLTask):
 
 class Activities8Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Activities Badge')
         self.uid = _ACTIVITIES_BADGE_TASK
         self._uri = 'Activities/activities8.html'
-        self._section_index = 3
 
 
 class Journal1Task(HTMLTask):
@@ -1359,14 +1371,13 @@ class Journal7Task(HTMLTask):
         return False
 
 
-class Journal8Task(HTMLTask):
+class Journal8Task(BadgeTask):
 
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Journal Badge')
         self.uid = _JOURNAL_BADGE_TASK
         self._uri = 'Journal/journal8.html'
-        self._section_index = 4
 
 
 class Frame1Task(HTMLTask):
@@ -1491,12 +1502,11 @@ class Frame7Task(HTMLTask):
 
 class Frame8Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Frame Badge')
         self.uid = _FRAME_BADGE_TASK
         self._uri = 'Frame/frame8.html'
-        self._section_index = 5
 
 
 class Views1Task(HTMLTask):
@@ -1626,14 +1636,13 @@ class Views7Task(HTMLTask):
         return len(self._views) > 2
 
 
-class Views8Task(HTMLTask):
+class Views8Task(BadgeTask):
 
-    def __init__(self, task_master):
-        HTMLTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Views Badge')
         self.uid = _VIEWS_BADGE_TASK
         self._uri = 'Views/views8.html'
-        self._section_index = 6
 
 
 class Settings1Task(HTMLTask):
@@ -1712,22 +1721,20 @@ class Settings5Task(HTMLTask):
 
 class Settings6Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Badge Settings')
         self.uid = _SETTINGS_BADGE_TASK
         self._uri = 'Settings/settings6.html'
-        self._section_index = 7
 
 
 class Settings7Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Badge Settings')
         self.uid = _SETTINGS_BADGE_TASK
         self._uri = 'Settings/settings7.html'
-        self._section_index = 7
 
 
 class MoreActivities1Task(HTMLTask):
@@ -1988,15 +1995,11 @@ class Physics2Task(HTMLTask):
 
 class MoreActivities2Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('More Activities Badge')
         self.uid = 'more-activities-badge-task'
         self._uri = 'MoreActivities/moreactivities2.html'
-        if utils.is_XO():
-            self._section_index = 9
-        else:
-            self._section_index = 8
 
 
 class Collaboration1Task(HTMLTask):
@@ -2094,15 +2097,11 @@ class Collaboration7Task(HTMLTask):
 
 class Collaboration8Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Collaboration Badge')
         self.uid = 'collaboration-badge-task'
         self._uri = 'Collaboration/collaboration8.html'
-        if utils.is_XO():
-            self._section_index = 10
-        else:
-            self._section_index = 9
 
 
 '''
@@ -2356,12 +2355,11 @@ class XO7Task(HTMLTask):
 
 class XO8Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('XO Badge')
         self.uid = _XO_BADGE_TASK
         self._uri = 'XO/xo8.html'
-        self._section_index = 8
 
 
 class Assessment1Task(HTMLTask):
@@ -2451,16 +2449,12 @@ class Assessment2Task(HTMLTask):
 
 class Assessment3Task(BadgeTask):
 
-    def __init__(self, task_master):
-        BadgeTask.__init__(self, task_master)
+    def __init__(self, task_master, section_index):
+        BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Assessment Badge')
         self.uid = _ASSESSMENT_BADGE_TASK
         self._uri = 'Assessment/assessment-no.html'
         self._height = 500
-        if utils.is_XO():
-            self._section_index = 11
-        else:
-            self._section_index = 10
         self._prompt = _('Finish!')
 
     def after_button_press(self):

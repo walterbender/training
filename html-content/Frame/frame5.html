@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <title>Getting to Know the Frame</title>
 <link href="../main.css" rel="stylesheet" type="text/css">
+<script language="javascript" type="text/javascript">
+<!--
+function popitup(url) {
+	newwindow=window.open(url,'name','height=200,width=150,left=100,top=200');
+	if (window.focus) {newwindow.focus()}
+	return false;
+}
+// -->
+</script>
 </head>
 
 <body>
@@ -12,7 +21,7 @@
     <p>Using the Frame to Read Text</p>
   </div>
   <p>By using the Speech tool <img src="../images/microphone.svg" width="55" height="55" alt=""/> that lives on the Frame, you can have Sugar read out any selected text to you.</p>
-  <p>Try selecting any text on this page, then open the Frame and press the Speech tool, followed by &quot;Say selected text.&quot;  </p>
+  <p>Try <a href="select-text.html" onclick="return popitup('select-text.html')">selecting any text</a> on this page, then open the Frame and press the Speech tool, followed by &quot;Say selected text.&quot;  </p>
   <p>When text has been read aloud, hit Next.</p>
 </div>
 </body>
