@@ -3,6 +3,9 @@ NEWS
 1.61
 * Change color of Next Button
 * Make email match case-insensitive
+* Use chapter instead of section
+* More clarity around why we need email
+* Copy edits
 
 1.60
 * Only notify data transfer if connected task completed
