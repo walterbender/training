@@ -91,7 +91,7 @@ class TaskMaster(Gtk.Alignment):
         grid.set_column_spacing(style.DEFAULT_SPACING)
         grid.set_column_homogeneous(True)
 
-        self._refresh_button = Gtk.Button(_('Refresh'))
+        self._refresh_button = Gtk.Button(_('Refresh'), name='refresh-button')
         self._refresh_button.connect('clicked', self._refresh_button_cb)
         left = Gtk.Alignment.new(xalign=0, yalign=0.5, xscale=0, yscale=0)
         left.add(self._refresh_button)
@@ -105,7 +105,7 @@ class TaskMaster(Gtk.Alignment):
         yes_next_no_grid.set_column_spacing(style.DEFAULT_SPACING)
         yes_next_no_grid.set_column_homogeneous(True)
 
-        self._yes_button = Gtk.Button(_('Yes'))
+        self._yes_button = Gtk.Button(_('Yes'), name='next-button')
         self._yes_button.connect('clicked', self._jump_to_task_cb, 'yes')
         yes_next_no_grid.attach(self._yes_button, 0, 0, 1, 1)
         self._yes_button.hide()
@@ -115,7 +115,7 @@ class TaskMaster(Gtk.Alignment):
         yes_next_no_grid.attach(self.task_button, 1, 0, 1, 1)
         self.task_button.show()
 
-        self._no_button = Gtk.Button(_('No'))
+        self._no_button = Gtk.Button(_('No'), name='next-button')
         self._no_button.connect('clicked', self._jump_to_task_cb, 'no')
         yes_next_no_grid.attach(self._no_button, 2, 0, 1, 1)
         self._no_button.hide()
@@ -127,12 +127,13 @@ class TaskMaster(Gtk.Alignment):
 
         right_grid = Gtk.Grid()
 
-        self._my_turn_button = Gtk.Button(_('My Turn'))
+        self._my_turn_button = Gtk.Button(_('My Turn'), name='my-turn-button')
         self._my_turn_button.connect('clicked', self._my_turn_button_cb)
         right_grid.attach(self._my_turn_button, 0, 0, 1, 1)
         self._my_turn_button.hide()
 
-        self._skip_button = Gtk.Button(_('Skip this section'))
+        self._skip_button = Gtk.Button(_('Skip this section'),
+                                       name='my-turn-button')
         self._skip_button.connect('clicked', self._skip_button_cb)
         right_grid.attach(self._skip_button, 1, 0, 1, 1)
         self._skip_button.hide()
