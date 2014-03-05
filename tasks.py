@@ -565,7 +565,7 @@ class Welcome5Task(HTMLTask):
         entry1 = self._entries[1].get_text()
         if len(entry0) == 0 or len(entry1) == 0:
             return False
-        if entry0 != entry1:
+        if entry0.lower() != entry1.lower():
             return False
         realname, email_address = email.utils.parseaddr(entry0)
         if email_address == '':
@@ -611,7 +611,7 @@ class Welcome6Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Sections')
+        self._name = _('Chapters')
         self.uid = 'check-progress-task'
         self._uri = 'Welcome/welcome6.html'
         self._goals = []

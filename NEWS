@@ -2,7 +2,7 @@ NEWS
 
 1.61
 * Change color of Next Button
-
+* Make email match case-insensitive
 
 1.60
 * Only notify data transfer if connected task completed
