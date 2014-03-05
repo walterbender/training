@@ -244,8 +244,9 @@ class TaskMaster(Gtk.Alignment):
             self.task_master()
 
     def _my_turn_button_cb(self, button):
-        ''' Take me to the Home Page. '''
+        ''' Take me to the Home Page and select favorites view. '''
         utils.goto_home_view()
+        utils.select_favorites_view()
 
     def _skip_button_cb(self, button):
         ''' Jump to next section '''

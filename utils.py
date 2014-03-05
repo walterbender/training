@@ -792,11 +792,15 @@ def click_uitree_node(name):
 
 
 def select_list_view():
-    click_uitree_node('List view')
+    # FIXME: hangs interface
+    # click_uitree_node('List view')
+    _logger.error('select_list_view is broken')
 
 
 def select_favorites_view():
-    click_uitree_node('Favorites view')
+    # FIXME: hangs interface
+    # click_uitree_node('Favorites view')
+    _logger.error('select_favorites_view is broken')
 
 
 def find_string(path, string):
