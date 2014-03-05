@@ -42,6 +42,13 @@ class TaskMaster(Gtk.Alignment):
 
         self.set_size_request(Gdk.Screen.width() - style.GRID_CELL_SIZE, -1)
 
+        cssProvider = Gtk.CssProvider()
+        cssProvider.load_from_path('style.css')
+        screen = Gdk.Screen.get_default()
+        styleContext = Gtk.StyleContext()
+        styleContext.add_provider_for_screen(screen, cssProvider,
+                                             Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
         self.button_was_pressed = True
         self.current_task = None
         self.keyname = None
@@ -103,7 +110,7 @@ class TaskMaster(Gtk.Alignment):
         yes_next_no_grid.attach(self._yes_button, 0, 0, 1, 1)
         self._yes_button.hide()
 
-        self.task_button = Gtk.Button(_('Next'))
+        self.task_button = Gtk.Button(_('Next'), name='next-button')
         self.task_button.connect('clicked', self._task_button_cb)
         yes_next_no_grid.attach(self.task_button, 1, 0, 1, 1)
         self.task_button.show()

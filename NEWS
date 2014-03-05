@@ -1,5 +1,9 @@
 NEWS
 
+1.61
+* Change color of Next Button
+
+
 1.60
 * Only notify data transfer if connected task completed
 * Added explanation of notifications 

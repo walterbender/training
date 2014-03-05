@@ -1,0 +1,10 @@
+GtkButton#next-button {
+    background-color: green;
+    background: green;
+}
+
+GtkButton#next-button:insensitive {
+    background-color: white;
+    background: white;
+}
+
