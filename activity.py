@@ -151,7 +151,7 @@ class TrainingActivity(activity.Activity):
         path = self._check_for_USB_data()
         if path is None:
             self._launch_task_master()
-        elif self._sync_data_from_USB(path):
+        elif self.sync_data_from_USB(path):
             self._copy_data_from_USB()
             # Flash a welcome back screen.
             self._load_intro_graphics(file_name='welcome-back.html')
@@ -273,7 +273,7 @@ class TrainingActivity(activity.Activity):
         else:
             return None
 
-    def _sync_data_from_USB(self, usb_data_path=None):
+    def sync_data_from_USB(self, usb_data_path=None):
         # We need to sync up file on USB with file on disk,
         # but only if the email addresses match. Otherwise,
         # raise an error.

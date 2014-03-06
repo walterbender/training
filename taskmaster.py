@@ -64,6 +64,8 @@ class TaskMaster(Gtk.Alignment):
         self._no_task = None
         self._task_list = tasks.get_tasks(self)
         self._task_data = None
+        self._sugar_data_path = None
+        self._resync_required = False
         self._assign_required()
 
         self.current_task = self.read_task_data('current_task')
@@ -344,17 +346,21 @@ class TaskMaster(Gtk.Alignment):
     def _test(self, test, task_data, uid):
         ''' Is the task complete? '''
         # We may have gotten here by jumping, so task_data may be None
-        if task_data is None:
-            self._init_task_data(task)
+        if task_data is None:        
+            task_data = self.read_task_data(uid)
+            if task_data is None:
+                task = self.uid_to_task(uid)
+                self._init_task_data(task)
+                task_data = self._task_data
+
         if test(task_data):
-            if self.task_button is not None:
-                self.task_button.set_sensitive(True)
             if not 'completed' in task_data or not task_data['completed']:
-                task_data = self.read_task_data(uid)
                 task_data['end_time'] = int(time.time() + 0.5)
                 task_data['completed'] = True
                 self._update_accumutaled_time(task_data)
             self.write_task_data(uid, task_data)
+            if self.task_button is not None:
+                self.task_button.set_sensitive(True)
         else:
             if self.task_button is not None:
                 self.task_button.set_sensitive(False)
@@ -604,26 +610,30 @@ class TaskMaster(Gtk.Alignment):
         return count
 
     def read_task_data(self, uid=None):
-        if len(self.activity.volume_data) == 0:
-            _logger.error('No USB device found... cannot save results.')
-            if uid is None:
-                return {}
-            return None
-        elif len(self.activity.volume_data) > 1:
-            _logger.error('Multiple USB devices found... making best guess.')
-
-        usb_data_path = os.path.join(
-            self.activity.volume_data[0]['usb_path'],
-            self.activity.volume_data[0]['uid'])
-        sugar_data_path = os.path.join(
-            self.activity.volume_data[0]['sugar_path'],
-            self.activity.volume_data[0]['uid'])
-
+        usb_data_path = None
+        sugar_data_path = self._sugar_data_path
         uid_data = None
         usb_read_failed = False
         data = {}
 
-        if os.path.exists(usb_data_path):
+        if len(self.activity.volume_data) == 0:
+            _logger.error('No USB device found... trying to read from Sugar.')
+            usb_read_failed = True
+        else:
+            usb_data_path = os.path.join(
+                self.activity.volume_data[0]['usb_path'],
+                self.activity.volume_data[0]['uid'])
+            sugar_data_path = os.path.join(
+                self.activity.volume_data[0]['sugar_path'],
+                self.activity.volume_data[0]['uid'])
+
+        if usb_data_path is not None and os.path.exists(usb_data_path):
+            if self._resync_required:
+                # Last time, we couldn't read, so let's make sure the data
+                # sets are in sync.
+                _logger.error('Resyncing data sets')
+                self.activity.sync_data_from_USB(usb_data_path)
+                self._resync_required = False
             try:
                 fd = open(usb_data_path, 'r')
                 json_data = fd.read()
@@ -641,7 +651,10 @@ class TaskMaster(Gtk.Alignment):
                 usb_read_failed = True
 
         # If for some reason USB read fails, try reading from Sugar
-        if usb_read_failed:
+        if usb_read_failed and sugar_data_path is not None:
+            _logger.error('read_task_data: Resync required')
+            self._resync_required = True
+
             if os.path.exists(sugar_data_path):
                 try:
                     fd = open(sugar_data_path, 'r')
@@ -664,25 +677,25 @@ class TaskMaster(Gtk.Alignment):
         return uid_data
 
     def write_task_data(self, uid, uid_data):
-        if len(self.activity.volume_data) == 0:
-            _logger.error('No USB device found... cannot save results.')
-            return
-        elif len(self.activity.volume_data) > 1:
-            _logger.error('Multiple USB devices found... making best guess.')
-
-        sugar_data_path = os.path.join(
-            self.activity.volume_data[0]['sugar_path'],
-            self.activity.volume_data[0]['uid'])
-        usb_data_path = os.path.join(
-            self.activity.volume_data[0]['usb_path'],
-            self.activity.volume_data[0]['uid'])
-
-        # Read before write
+        usb_data_path = None
+        sugar_data_path = self._sugar_data_path
         usb_read_failed = False
         sugar_read_failed = False
         data = {}
 
-        if os.path.exists(usb_data_path):
+        if len(self.activity.volume_data) == 0:
+            _logger.error('No USB device found... cannot save results.')
+            usb_read_failed = True
+        else:
+            sugar_data_path = os.path.join(
+                self.activity.volume_data[0]['sugar_path'],
+                self.activity.volume_data[0]['uid'])
+            usb_data_path = os.path.join(
+                self.activity.volume_data[0]['usb_path'],
+                self.activity.volume_data[0]['uid'])
+
+        # Read before write
+        if not usb_read_failed and os.path.exists(usb_data_path):
             try:
                 fd = open(usb_data_path, 'r')
                 json_data = fd.read()
@@ -700,7 +713,7 @@ class TaskMaster(Gtk.Alignment):
                     usb_read_failed = True
 
         # If for some reason USB read fails, try reading from Sugar
-        if usb_read_failed:
+        if usb_read_failed and sugar_data_path is not None:
             if os.path.exists(sugar_data_path):
                 try:
                     fd = open(sugar_data_path, 'r')
@@ -736,16 +749,22 @@ class TaskMaster(Gtk.Alignment):
                 fd.write(json_data)
                 fd.close()
             except Exception, e:
-                _logger.error('Could not write to %s: %s' %
+                _logger.error('Could not write to USB %s: %s' %
                               (usb_data_path, e))
+                _logger.error('write_task_data: Resync required')
+                self._resync_required = True
 
         # ... save shadow copy in Sugar
         try:
             fd = open(sugar_data_path, 'w')
             fd.write(json_data)
             fd.close()
+
+            if usb_read_failed:
+                _logger.error('write_task_data: Resync required')
+                self._resync_required = True
         except Exception, e:
-            _logger.error('Could not write to %s: %s' %
+            _logger.error('Could not write to Sugar %s: %s' %
                           (sugar_data_path, e))
 
     def _prev_task_button_cb(self, button):
