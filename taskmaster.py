@@ -592,6 +592,14 @@ class TaskMaster(Gtk.Alignment):
         return count
 
     def read_task_data(self, uid=None):
+        if len(self.activity.volume_data) == 0:
+            _logger.error('No USB device found... cannot save results.')
+            if uid is None:
+                return {}
+            return None
+        elif len(self.activity.volume_data) > 1:
+            _logger.error('Multiple USB devices found... making best guess.')
+
         usb_data_path = os.path.join(
             self.activity.volume_data[0]['usb_path'],
             self.activity.volume_data[0]['uid'])
@@ -644,6 +652,12 @@ class TaskMaster(Gtk.Alignment):
         return uid_data
 
     def write_task_data(self, uid, uid_data):
+        if len(self.activity.volume_data) == 0:
+            _logger.error('No USB device found... cannot save results.')
+            return
+        elif len(self.activity.volume_data) > 1:
+            _logger.error('Multiple USB devices found... making best guess.')
+
         sugar_data_path = os.path.join(
             self.activity.volume_data[0]['sugar_path'],
             self.activity.volume_data[0]['uid'])
