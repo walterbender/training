@@ -840,6 +840,7 @@ class Connected4Task(HTMLTask):
 
     def after_button_press(self):
         self._task_master.activity.set_notify_transfer_status(True)
+        return True
 
     def test(self, task_data):
         return utils.nm_status() == 'network-wireless-connected'
@@ -2469,6 +2470,7 @@ class Assessment3Task(BadgeTask):
 
     def after_button_press(self):
         self._task_master.activity.close()
+        return True
 
     def test(self, task_data):
         # If we arrive here and _ASSESSMENT_DOCUMENT_TASK is not
