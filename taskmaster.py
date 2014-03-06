@@ -256,8 +256,14 @@ class TaskMaster(Gtk.Alignment):
         section_index, task_index = self.get_section_and_task_index()
         section_index += 1
 
-        # Don't skip to last section
-        if section_index >= self.get_number_of_sections() - 1:
+        # Don't skip off the end
+        if section_index == self.get_number_of_sections():
+            section_index = 0
+            task_index = 0
+
+        # Don't skip to last section unless all requirements are met
+        if section_index == self.get_number_of_sections() - 1 and \
+           not self.requirements_are_met(section_index, 0, switch_task=False):
             section_index = 0
             task_index = 0
 
@@ -381,6 +387,7 @@ class TaskMaster(Gtk.Alignment):
         self.current_task = self.uid_to_task_number(uid)
 
         self.write_task_data('current_task', self.current_task)
+        self.activity.progress_buttons[section_index].set_active(True)
         self.task_master()
 
     def _assign_required(self):
@@ -412,6 +419,10 @@ class TaskMaster(Gtk.Alignment):
                     _logger.debug('Task %s requires task %s... switching' %
                                   (task.uid, uid))
                     self.current_task = self.uid_to_task_number(uid)
+                    section_index, task_index = \
+                        self.get_section_and_task_index()
+                    self.activity.progress_buttons[section_index].set_active(
+                        True)
                 return False
         return True
 

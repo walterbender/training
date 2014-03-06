@@ -2,6 +2,9 @@ NEWS
 
 1.62
 * Fixed blank-screeen problem with email task when training data is corrupted
+* Cut back on number of writes to USB
+* Fixed problem with skipping to last section
+* Set proper progress button when skipping sections
 
 1.61
 * Merged Paul's edits
