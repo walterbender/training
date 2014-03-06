@@ -1,6 +1,10 @@
 NEWS
 
+1.62
+* Fixed blank-screeen problem with email task when training data is corrupted
+
 1.61
+* Merged Paul's edits
 * More robust checks around USB read and write
 * Fixed regression in collaboration task post-check
 * Changed color of Next Button, et al.

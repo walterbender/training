@@ -586,7 +586,12 @@ class Welcome5Task(HTMLTask):
                            self._uri)
 
         graphics = Graphics()
-        self._entries.append(graphics.add_entry(text=email))
+        if email is None:
+            # This should not happen except if data file is corrupted
+            self._entries.append(graphics.add_entry(text=''))
+            _logger.error('email was missing in Task %s' % self.uid)
+        else:
+            self._entries.append(graphics.add_entry(text=email))
         graphics.add_uri('file://' + url, height=400)
         graphics.set_zoom_level(self._zoom_level)
         if email is None:  # Should never happen
