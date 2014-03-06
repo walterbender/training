@@ -1,6 +1,6 @@
 GtkButton#next-button {
-    background-color: green;
-    background: green;
+    background-color: #80BA27;
+    background: #80BA27;
 }
 
 GtkButton#next-button:insensitive {
@@ -9,8 +9,8 @@ GtkButton#next-button:insensitive {
 }
 
 GtkButton#my-turn-button {
-    background-color: green;
-    background: green;
+    background-color: #E71E6C;
+    background: #E71E6C;
 }
 
 GtkButton#my-turn-button:insensitive {
@@ -19,8 +19,8 @@ GtkButton#my-turn-button:insensitive {
 }
 
 GtkButton#refresh-button {
-    background-color: green;
-    background: green;
+    background-color: #F18F00;
+    background: #F18F00;
 }
 
 GtkButton#refresh-button:insensitive {
