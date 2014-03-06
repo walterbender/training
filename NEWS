@@ -1,9 +1,11 @@
 NEWS
 
 1.61
-* Change color of Next Button
-* Make email match case-insensitive
-* Use chapter instead of section
+* More robust checks around USB read and write
+* Fixed regression in collaboration task post-check
+* Changed color of Next Button, et al.
+* Made email match case-insensitive
+* Used chapter instead of section
 * More clarity around why we need email
 * Copy edits
 

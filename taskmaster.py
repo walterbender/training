@@ -445,7 +445,8 @@ class TaskMaster(Gtk.Alignment):
 
         if self._graphics is not None:
             self._graphics.destroy()
-        self._graphics, label = task.get_graphics()
+        graphics, label = task.get_graphics()
+        self._graphics = graphics
 
         self._graphics_grid.attach(self._graphics, 0, 0, 1, 1)
         self._graphics.show()
