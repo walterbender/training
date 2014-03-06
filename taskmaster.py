@@ -206,7 +206,10 @@ class TaskMaster(Gtk.Alignment):
             self._first_time = True
             self._run_task(section_index, task_index)
         else:
-            self._graphics = Graphics()
+            if self._graphics is not None:
+                self._graphics.destroy()
+            graphics = Graphics()
+            self._graphics = graphics
             url = os.path.join(self.get_bundle_path(), 'html-content',
                                'completed.html')
             self._graphics.add_uri('file://' + url + '?NAME=' +
@@ -425,6 +428,7 @@ class TaskMaster(Gtk.Alignment):
         self._progress_bar.show()
         section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
+        self._uid = self.section_and_task_to_uid(section_index, task_index)
         self._test(task.test, self._task_data, self._uid)
 
     def _destroy_graphics(self):
