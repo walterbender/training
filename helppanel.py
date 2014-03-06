@@ -242,7 +242,7 @@ class HelpPanel(Gtk.Grid):
             self._do_send(self._data)
         except ZendeskError as e:
             _logger.error('Could not upload %s to zendesk: %s' %
-                          (data['ticket'], e))
+                          (self._data['ticket'], e))
             self._task_master.activity.transfer_failed_signal.emit()
         else:
             self._task_master.activity.transfer_completed_signal.emit()
