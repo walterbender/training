@@ -589,6 +589,7 @@ class TrainingActivity(activity.Activity):
             if hasattr(self, '_task_master'):
                 self._task_master.write_task_data(
                     'current_task', self._task_master.current_task)
+                self._task_master.write_current_task_data()
                 self.update_activity_title()
                 email = self._task_master.read_task_data(EMAIL_UID)
                 if email is None:
@@ -733,7 +734,7 @@ class TrainingActivity(activity.Activity):
         stop_button.show()
 
     def _build_progress_toolbar(self):
-        self._progress_buttons = []
+        self.progress_buttons = []
         progress = self._task_master.get_completed_sections()
 
         for section_index in range(self._task_master.get_number_of_sections()):
@@ -748,20 +749,20 @@ class TrainingActivity(activity.Activity):
             if section_index == 0:
                 group = None
             else:
-                group = self._progress_buttons[0]
+                group = self.progress_buttons[0]
 
-            self._progress_buttons.append(RadioToolButton(group=group))
-            self._progress_buttons[-1].set_icon_name(icon)
-            self._progress_buttons[-1].set_tooltip(name)
-            self._progress_toolbar.insert(self._progress_buttons[-1], -1)
-            self._progress_buttons[-1].show()
-            self._progress_buttons[-1].connect(
+            self.progress_buttons.append(RadioToolButton(group=group))
+            self.progress_buttons[-1].set_icon_name(icon)
+            self.progress_buttons[-1].set_tooltip(name)
+            self._progress_toolbar.insert(self.progress_buttons[-1], -1)
+            self.progress_buttons[-1].show()
+            self.progress_buttons[-1].connect(
                 'clicked', self._jump_to_section_cb, section_index)
 
         self._radio_buttons_live = False
         section_index, task_index = \
             self._task_master.get_section_and_task_index()
-        self._progress_buttons[section_index].set_active(True)
+        self.progress_buttons[section_index].set_active(True)
         self._radio_buttons_live = True
 
     def _check_connected_task_status(self):
@@ -778,20 +779,20 @@ class TrainingActivity(activity.Activity):
                 icon = icon + '-white'
             else:
                 icon = icon + '-grey'
-            self._progress_buttons[section].set_icon_name(icon)
+            self.progress_buttons[section].set_icon_name(icon)
 
         self._radio_buttons_live = False
         section_index, task_index = \
             self._task_master.get_section_and_task_index()
-        self._progress_buttons[section_index].set_active(True)
+        self.progress_buttons[section_index].set_active(True)
         self._radio_buttons_live = True
 
     def mark_section_as_complete(self, section):
         icon = self._task_master.get_section_icon(section) + '-white'
-        self._progress_buttons[section].set_icon_name(icon)
+        self.progress_buttons[section].set_icon_name(icon)
         if section < self._task_master.get_number_of_sections() - 1:
             self._radio_buttons_live = False
-            self._progress_buttons[section + 1].set_active(True)
+            self.progress_buttons[section + 1].set_active(True)
             self._radio_buttons_live = True
 
     def set_notify_transfer_status(self, state):
@@ -921,7 +922,7 @@ class TrainingActivity(activity.Activity):
             else:
                 section_index, task_index = \
                     self._task_master.get_section_and_task_index()
-                self._progress_buttons[section_index].set_active(True)
+                self.progress_buttons[section_index].set_active(True)
 
     def _help_cb(self, button):
         # title, help_file = self._task_master.get_help_info()

@@ -58,7 +58,6 @@ class TaskMaster(Gtk.Alignment):
         self._name = None
         self._email = None
         self._graphics = None
-        self._summary = None
         self._first_time = True
         self._accumulated_time = 0
         self._yes_task = None
@@ -170,10 +169,6 @@ class TaskMaster(Gtk.Alignment):
             _logger.debug('Check volume data failed')
             # return
 
-        # If we are displaying the task summary, do nothing
-        if self._summary is not None:
-            return
-
         _logger.debug('Running task %d' % (self.current_task))
         self._destroy_graphics()
         self.activity.button_was_pressed = False
@@ -184,13 +179,11 @@ class TaskMaster(Gtk.Alignment):
             task = self._task_list[section_index]['tasks'][task_index]
             while(task.is_completed() and task.skip_if_completed()):
                 _logger.debug('Skipping task %d' % task_index)
-                self.current_task += 1  # Assume there is a next task
-                task_index += 1
+                self.current_task += 1
+                if self.current_task == self._get_number_of_tasks():
+                    self.current_task = 0
+                section_index, task_index = self.get_section_and_task_index()
                 task = self._task_list[section_index]['tasks'][task_index]
-                # Shouldn't happen, but just in case
-                if task_index == \
-                   self._get_number_of_tasks_in_section(section_index) - 1:
-                    break
 
             # Check to make sure all the requirements at met
             i = 0
@@ -201,7 +194,7 @@ class TaskMaster(Gtk.Alignment):
                 i += 1
                 if i > 10:
                     # Shouldn't happen but we want to avoid infinite loops
-                    _logger.error('Breaking out of required task loop')
+                    _logger.error('Breaking out of required task loop.')
 
             self._first_time = True
             self._run_task(section_index, task_index)
@@ -249,19 +242,29 @@ class TaskMaster(Gtk.Alignment):
 
     def _my_turn_button_cb(self, button):
         ''' Take me to the Home Page and select favorites view. '''
+        # First, make sure current task data is saved.
+        self.write_current_task_data()
+
         utils.goto_home_view()
         utils.select_favorites_view()
 
     def _skip_button_cb(self, button):
         ''' Jump to next section '''
+        # First, make sure current task data is saved.
+        self.write_current_task_data()
+
         section_index, task_index = self.get_section_and_task_index()
         section_index += 1
-        if section_index < self.get_number_of_sections():
-            task = self._task_list[section_index]['tasks'][0]
-            self.current_task = self.uid_to_task_number(task.uid)
-            self.task_master()
-        else:
-            _logger.error('Trying to skip past last section.')
+
+        # Don't skip to last section
+        if section_index >= self.get_number_of_sections() - 1:
+            section_index = 0
+            task_index = 0
+
+        task = self._task_list[section_index]['tasks'][0]
+        self.current_task = self.uid_to_task_number(task.uid)
+        self.activity.progress_buttons[section_index].set_active(True)
+        self.task_master()
 
     def _refresh_button_cb(self, button):
         ''' Refresh the current page's graphics '''
@@ -306,14 +309,7 @@ class TaskMaster(Gtk.Alignment):
 
             self._task_data = self.read_task_data(self._uid)
             if self._task_data is None:
-                self._task_data = {}
-                self._task_data['start_time'] = int(self._start_time + 0.5)
-                self._task_data['accumulated_time'] = 0
-                self._task_data['completed'] = False
-                self._task_data['task'] = task.get_name()
-                self._task_data['data'] = task.get_data()
-                self._task_data['collectable'] = task.is_collectable()
-                self.write_task_data(self._uid, self._task_data)
+                self._init_task_data(task)
             elif 'completed' in self._task_data and \
                  self._task_data['completed']:
                 _logger.debug('Revisiting a completed task')
@@ -323,6 +319,16 @@ class TaskMaster(Gtk.Alignment):
         GObject.timeout_add(task.get_pause_time(), self._test, task.test,
                             self._task_data, self._uid)
 
+    def _init_task_data(self, task):
+        self._task_data = {}
+        self._task_data['start_time'] = int(self._start_time + 0.5)
+        self._task_data['accumulated_time'] = 0
+        self._task_data['completed'] = False
+        self._task_data['task'] = task.get_name()
+        self._task_data['data'] = task.get_data()
+        self._task_data['collectable'] = task.is_collectable()
+        self.write_task_data(self._uid, self._task_data)
+
     def _update_accumutaled_time(self, task_data):
         end_time = time.time()
         self._accumulated_time += end_time - self._start_time
@@ -331,6 +337,9 @@ class TaskMaster(Gtk.Alignment):
 
     def _test(self, test, task_data, uid):
         ''' Is the task complete? '''
+        # We may have gotten here by jumping, so task_data may be None
+        if task_data is None:
+            self._init_task_data(task)
         if test(task_data):
             if self.task_button is not None:
                 self.task_button.set_sensitive(True)
@@ -345,12 +354,20 @@ class TaskMaster(Gtk.Alignment):
                 self.task_button.set_sensitive(False)
             if not 'completed' in task_data or not task_data['completed']:
                 self._update_accumutaled_time(task_data)
-            self.write_task_data(uid, task_data)
+            # Don't save data at each test
+            # self.write_task_data(uid, task_data)
             section_index, task_index = self.get_section_and_task_index()
             self._run_task(section_index, task_index)
 
+    def write_current_task_data(self):
+        if self._uid is not None:
+            self.write_task_data(self._uid, self._task_data)
+
     def _jump_to_task_cb(self, widget, flag):
         ''' Jump to task associated with uid '''
+        # First, make sure current task data is saved.
+        self.write_current_task_data()
+
         section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
 
@@ -363,7 +380,6 @@ class TaskMaster(Gtk.Alignment):
             uid = self._no_task
         self.current_task = self.uid_to_task_number(uid)
 
-        # section_index, task_index = self.get_section_and_task_index()
         self.write_task_data('current_task', self.current_task)
         self.task_master()
 
@@ -399,30 +415,9 @@ class TaskMaster(Gtk.Alignment):
                 return False
         return True
 
-    def load_progress_summary(self, summary):
-        ''' Interrupt the flow of tasks by showing progress summary '''
-        self._destroy_graphics()
-        if self._progress_bar is not None:
-            self._progress_bar.hide()
-        if hasattr(self, '_summary') and self._summary is not None:
-            self._summary.destroy()
-        self._summary = summary
-        self._graphics_grid.attach(self._summary, 0, 0, 1, 1)
-        self.progress_checked = True  # Needed for check progress summary task
-        summary.show()
-
-    def destroy_summary(self):
-        ''' Back to tasks '''
-        if hasattr(self, '_summary') and self._summary is not None:
-            self._summary.destroy()
-        self._summary = None
-        self.reload_graphics()
-
     def reload_graphics(self):
         ''' When changing font size and zoom level, we regenerate the task
            graphic. '''
-        if self._summary is not None:
-            return
         self._destroy_graphics()
         self._load_graphics()
         self._progress_bar.show()
@@ -435,7 +430,8 @@ class TaskMaster(Gtk.Alignment):
         ''' Destroy the graphics from the previous task '''
         if self._graphics is not None:
             self._graphics.destroy()
-            # self._graphics = None
+            # FIXME
+            self._graphics = None
         if hasattr(self, '_task_button') and self.task_button is not None:
             self.task_button.hide()
 
