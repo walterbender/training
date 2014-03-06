@@ -201,8 +201,7 @@ class TaskMaster(Gtk.Alignment):
             self._first_time = True
             self._run_task(section_index, task_index)
         else:
-            if self._graphics is not None:
-                self._graphics.destroy()
+            self._destroy_graphics()
             graphics = Graphics()
             self._graphics = graphics
             url = os.path.join(self.get_bundle_path(), 'html-content',
@@ -213,6 +212,7 @@ class TaskMaster(Gtk.Alignment):
             self._graphics.set_zoom_level(0.667)
             self._graphics_grid.attach(self._graphics, 0, 0, 1, 1)
             self._graphics.show()
+            # self.task_button.show()
             self.activity.complete = True
 
     def enter_entered(self, task_data, uid):
@@ -276,7 +276,7 @@ class TaskMaster(Gtk.Alignment):
 
     def _refresh_button_cb(self, button):
         ''' Refresh the current page's graphics '''
-        self._graphics.destroy()
+        self._destroy_graphics()
 
         section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
@@ -284,6 +284,7 @@ class TaskMaster(Gtk.Alignment):
         self._graphics, label = task.get_graphics()
         self._graphics_grid.attach(self._graphics, 0, 0, 1, 1)
         self._graphics.show()
+        # self.task_button.show()
 
     def get_help_info(self):
         ''' Uses help from the Help activity '''
@@ -407,9 +408,6 @@ class TaskMaster(Gtk.Alignment):
                     all_requirements.append(task.uid)
             last = len(section['tasks']) - 1
             if section['tasks'][last].uid[0:5] == 'badge':
-                # _logger.debug('setting requirements for %s to %r' %
-                #               (section['tasks'][last].uid,
-                #                section_requirements))
                 section['tasks'][last].set_requires(section_requirements)
         self._task_list[-1]['tasks'][-1].set_requires(all_requirements)
 
@@ -447,10 +445,7 @@ class TaskMaster(Gtk.Alignment):
         ''' Destroy the graphics from the previous task '''
         if self._graphics is not None:
             self._graphics.destroy()
-            # FIXME
             self._graphics = None
-        if hasattr(self, '_task_button') and self.task_button is not None:
-            self.task_button.hide()
 
     def _load_graphics(self):
         ''' Load the graphics for a task and define the task button '''
