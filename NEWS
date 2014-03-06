@@ -5,6 +5,7 @@ NEWS
 * Cut back on number of writes to USB
 * Fixed problem with skipping to last section
 * Set proper progress button when skipping sections
+* Added more checks on USB status; more automated syncing when write fails
 
 1.61
 * Merged Paul's edits
