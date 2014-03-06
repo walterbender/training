@@ -7,6 +7,7 @@ NEWS
 * Made email match case-insensitive
 * Used chapter instead of section
 * More clarity around why we need email
+* Fixed typo in help panel
 * Copy edits
 
 1.60
