@@ -9,10 +9,10 @@ p {
  
 } 
 
-a:link {color:#000000; font-weight: bold; text-decoration:none;}
-a:visited {color:#000000; font-weight: bold; text-decoration:none;}
-a:hover {color:#000000; font-weight: bold; text-decoration:none;}
-a:active {color:#000000; font-weight: bold; text-decoration:none;}
+a:link {color:#E71E6C; font-weight: bold; text-decoration:none;}
+a:visited {color:#E71E6C; font-weight: bold; text-decoration:none;}
+a:hover {color:#80BA27; font-weight: bold; text-decoration:none;}
+a:active {color:#80BA27; font-weight: bold; text-decoration:none;}
 
 .titlecontent {
 	font-family: abc123;
