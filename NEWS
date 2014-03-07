@@ -1,10 +1,12 @@
 NEWS
 
 1.63
-* Insert Richard/Laura latest edits
-* Numerous copy edits to Assessment doc
-* Fixed bug when exiting after reopening a completed session
-* Added new zendesk info
+* Inserted Richard/Laura latest edits
+* Made numerous copy edits to Assessment doc
+* Fixed a bug when exiting after reopening a completed session (reported
+  by Niraj)
+* Added new zendesk info (as per Martin and Matthew)
+* Switched to .doc from .odt for assessment document
 
 1.62
 * Fixed blank-screeen problem with email task when training data is corrupted
