@@ -1,5 +1,11 @@
 NEWS
 
+1.63
+* Insert Richard/Laura latest edits
+* Numerous copy edits to Assessment doc
+* Fixed bug when exiting after reopening a completed session
+* Added new zendesk info
+
 1.62
 * Fixed blank-screeen problem with email task when training data is corrupted
 * Cut back on number of writes to USB
