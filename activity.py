@@ -78,14 +78,14 @@ def _check_gconf_settings():
 
     # Zendesk
     client.set_string('/desktop/sugar/services/zendesk/url',
-                      'https://oneedu1392860248.zendesk.com')
+                      'https://oneedu.zendesk.com')
     client.set_string('/desktop/sugar/services/zendesk/token',
-                      'eG8tc3VwcG9ydEBsYXB0b3Aub3JnLmF1L3Rva2VuOjdHRkV5'
-                      'STF2MFNRVzJyYmdFVXFFUWRpOE1Cc1I0NGdHVURhTWg2QWU=')
+                      'eG8tc3VwcG9ydEBsYXB0b3Aub3JnLmF1L3Rva2VuOlZTaWM4'
+                      'TThZbjZBRTJkMWxYNkFGbFhkZzUxSjlJSHFUQ01DYzNjOHY=')
     try:
         SugarExt.gconf_client_set_string_list(
             client, '/desktop/sugar/services/zendesk/fields',
-            ['21765610', '21605694', '21765620'])
+            ['21891880', '21729904', '21729914'])
     except Exception as e:
         _logger.error('Could not set zendesk fields: %s' % e)
 
