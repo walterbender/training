@@ -66,6 +66,8 @@ class TaskMaster(Gtk.Alignment):
         self._task_data = None
         self._sugar_data_path = None
         self._resync_required = False
+        self._uid = None
+
         self._assign_required()
 
         self.current_task = self.read_task_data('current_task')
@@ -212,7 +214,7 @@ class TaskMaster(Gtk.Alignment):
             self._graphics.set_zoom_level(0.667)
             self._graphics_grid.attach(self._graphics, 0, 0, 1, 1)
             self._graphics.show()
-            # self.task_button.show()
+            self.task_button.set_label(_('Exit'))
             self.activity.complete = True
 
     def enter_entered(self, task_data, uid):
