@@ -58,6 +58,12 @@ _ASSESSMENT_DOCUMENT_TASK = 'assessment-document-task'
 _ASSESSMENT_BADGE_TASK = 'assessment-badge-task'
 GET_CONNECTED_TASK = 'get-connected-task'
 
+# _ASSESSMENT_MIME_TYPE = 'application/vnd.oasis.opendocument.text'
+# _ASSESSMENT_SUFFIX = '.odt'
+_ASSESSMENT_MIME_TYPE = 'application/msword'
+_ASSESSMENT_SUFFIX = '.doc'
+
+
 def get_tasks(task_master):
     task_list = [
         {'name': _('Welcome to One Academy'),
@@ -2420,7 +2426,7 @@ class Assessment2Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
-        self._name = _('Assessment')
+        self._name = _('Assessment Document')
         self.uid = _ASSESSMENT_DOCUMENT_TASK
         self._uri = 'Assessment/assessment-yes.html'
         self.collectable = True
@@ -2439,16 +2445,16 @@ class Assessment2Task(HTMLTask):
             dsobject = datastore.create()
             if dsobject is not None:
                 _logger.debug('creating Assessment entry in Journal')
-                dsobject.metadata['title'] = task_data['data'] + '.odt'
+                dsobject.metadata['title'] = \
+                    task_data['data'] + _ASSESSMENT_SUFFIX
                 dsobject.metadata['icon-color'] = \
                     utils.get_colors().to_string()
                 dsobject.metadata['tags'] = \
                     self._task_master.activity.volume_data[0]['uid']
-                dsobject.metadata['mime_type'] = \
-                    'application/vnd.oasis.opendocument.text'
+                dsobject.metadata['mime_type'] = _ASSESSMENT_MIME_TYPE
                 dsobject.set_file_path(
                     os.path.join(self._task_master.activity.bundle_path,
-                                 'Assessment.odt'))
+                                 'Assessment' + _ASSESSMENT_SUFFIX))
                 datastore.write(dsobject)
                 dsobject.destroy()
             return False
@@ -2457,10 +2463,10 @@ class Assessment2Task(HTMLTask):
             # FIX ME: What if they changed the name???
             _logger.debug(os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
-                task_data['data'] + '.odt'))
+                task_data['data'] + _ASSESSMENT_SUFFIX))
             return os.path.exists(os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
-                task_data['data'] + '.odt'))
+                task_data['data'] + _ASSESSMENT_SUFFIX))
 
 
 class Assessment3Task(BadgeTask):
