@@ -67,6 +67,8 @@ class TaskMaster(Gtk.Alignment):
         self._sugar_data_path = None
         self._resync_required = False
         self._uid = None
+        self._start_time = time.time()
+        self._accumulated_time = 0
 
         self._assign_required()
 
@@ -311,11 +313,6 @@ class TaskMaster(Gtk.Alignment):
             else:
                 self.activity._help_button.set_sensitive(True)
             '''
-            # In order to calculate accumulated time, we need to monitor
-            # our start time.
-            self._start_time = time.time()
-            self._accumulated_time = 0
-
             self._load_graphics()
 
             self._task_data = self.read_task_data(self._uid)
@@ -331,6 +328,11 @@ class TaskMaster(Gtk.Alignment):
                             self._task_data, self._uid)
 
     def _init_task_data(self, task):
+        # In order to calculate accumulated time, we need to monitor
+        # our start time.
+        self._start_time = time.time()
+        self._accumulated_time = 0
+
         self._task_data = {}
         self._task_data['start_time'] = int(self._start_time + 0.5)
         self._task_data['accumulated_time'] = 0

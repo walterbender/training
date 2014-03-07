@@ -2461,12 +2461,25 @@ class Assessment2Task(HTMLTask):
         else:
             # Look for the assessment document on the USB stick
             # FIX ME: What if they changed the name???
-            _logger.debug(os.path.join(
-                self._task_master.activity.volume_data[0]['usb_path'],
-                task_data['data'] + _ASSESSMENT_SUFFIX))
             return os.path.exists(os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
                 task_data['data'] + _ASSESSMENT_SUFFIX))
+
+    def get_graphics(self):
+        name = utils.get_safe_text('"%s %s%s"' % (_('Assessment'),
+                                                  self._get_user_name(),
+                                                  _ASSESSMENT_SUFFIX))
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           '%s?NAME=%s' % (self._uri, name))
+                            
+        graphics = Graphics()
+        webkit = graphics.add_uri('file://' + url, height=self._height)
+        graphics.set_zoom_level(self._zoom_level)
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
+
+        return graphics, self._prompt
 
 
 class Assessment3Task(BadgeTask):
