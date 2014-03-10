@@ -1,6 +1,7 @@
 NEWS
 
 1.64
+* Remove gconf settings
 * Check for webservice in /usr/share/sugar
 * Use XLS for Assessment and add Instructions PDF
 

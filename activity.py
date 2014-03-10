@@ -122,7 +122,7 @@ class TrainingActivity(activity.Activity):
         self.zoom_level = self.font_size / float(len(FONT_SIZES))
         _logger.debug('zoom level is %f' % self.zoom_level)
 
-        _check_gconf_settings()  # For debugging purposes
+        # _check_gconf_settings()  # For debugging purposes
 
         self._setup_toolbars()
         self.modify_bg(Gtk.StateType.NORMAL,
