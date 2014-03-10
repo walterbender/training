@@ -1063,7 +1063,7 @@ class TrainingActivity(activity.Activity):
         self.add_alert(alert)
         self._load_intro_graphics(file_name='restart.html')
 
-        return True
+        return False
 
     def _webservice_alert(self, message):
         alert = ConfirmationAlert()
