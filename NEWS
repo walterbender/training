@@ -1,5 +1,9 @@
 NEWS
 
+1.64
+* Check for webservice in /usr/share/sugar
+* Use XLS for Assessment and add Instructions PDF
+
 1.63
 * Inserted Richard/Laura latest edits
 * Made numerous copy edits to Assessment doc

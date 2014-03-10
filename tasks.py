@@ -60,8 +60,12 @@ GET_CONNECTED_TASK = 'get-connected-task'
 
 # _ASSESSMENT_MIME_TYPE = 'application/vnd.oasis.opendocument.text'
 # _ASSESSMENT_SUFFIX = '.odt'
-_ASSESSMENT_MIME_TYPE = 'application/msword'
-_ASSESSMENT_SUFFIX = '.doc'
+# _ASSESSMENT_MIME_TYPE = \
+#    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+# _ASSESSMENT_SUFFIX = '.doc'
+_ASSESSMENT_MIME_TYPE = \
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+_ASSESSMENT_SUFFIX = '.xls'
 
 
 def get_tasks(task_master):
@@ -2439,14 +2443,17 @@ class Assessment2Task(HTMLTask):
 
     def test(self, task_data):
         if task_data['data'] is None:
-            task_data['data'] = _('Assessment') + ' ' + self._get_user_name()
+            task_data['data'] = utils.get_safe_text(
+                '"%s-%s%s"' % (_('Assessment'),
+                               self._get_user_name(),
+                               _ASSESSMENT_SUFFIX))
             self._task_master.write_task_data(self.uid, task_data)
+
             # Create the assessment document in the Journal
             dsobject = datastore.create()
             if dsobject is not None:
                 _logger.debug('creating Assessment entry in Journal')
-                dsobject.metadata['title'] = \
-                    task_data['data'] + _ASSESSMENT_SUFFIX
+                dsobject.metadata['title'] = task_data['data']
                 dsobject.metadata['icon-color'] = \
                     utils.get_colors().to_string()
                 dsobject.metadata['tags'] = \
@@ -2455,6 +2462,22 @@ class Assessment2Task(HTMLTask):
                 dsobject.set_file_path(
                     os.path.join(self._task_master.activity.bundle_path,
                                  'Assessment' + _ASSESSMENT_SUFFIX))
+                datastore.write(dsobject)
+                dsobject.destroy()
+
+            # Create the assessment instructions document in the Journal
+            dsobject = datastore.create()
+            if dsobject is not None:
+                _logger.debug('creating Assessment entry in Journal')
+                dsobject.metadata['title'] = _('Assessment-Instructions.pdf')
+                dsobject.metadata['icon-color'] = \
+                    utils.get_colors().to_string()
+                dsobject.metadata['tags'] = \
+                    self._task_master.activity.volume_data[0]['uid']
+                dsobject.metadata['mime_type'] = 'application/pdf'
+                dsobject.set_file_path(
+                    os.path.join(self._task_master.activity.bundle_path,
+                                 'Assessment-Instructions.pdf')
                 datastore.write(dsobject)
                 dsobject.destroy()
             return False
@@ -2466,7 +2489,7 @@ class Assessment2Task(HTMLTask):
                 task_data['data'] + _ASSESSMENT_SUFFIX))
 
     def get_graphics(self):
-        name = utils.get_safe_text('"%s %s%s"' % (_('Assessment'),
+        name = utils.get_safe_text('"%s-%s%s"' % (_('Assessment'),
                                                   self._get_user_name(),
                                                   _ASSESSMENT_SUFFIX))
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
