@@ -60,11 +60,9 @@ GET_CONNECTED_TASK = 'get-connected-task'
 
 # _ASSESSMENT_MIME_TYPE = 'application/vnd.oasis.opendocument.text'
 # _ASSESSMENT_SUFFIX = '.odt'
-# _ASSESSMENT_MIME_TYPE = \
-#    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+# _ASSESSMENT_MIME_TYPE = 'application/msword'
 # _ASSESSMENT_SUFFIX = '.doc'
-_ASSESSMENT_MIME_TYPE = \
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+_ASSESSMENT_MIME_TYPE = 'application/vnd.ms-excel'
 _ASSESSMENT_SUFFIX = '.xls'
 
 
@@ -2442,11 +2440,11 @@ class Assessment2Task(HTMLTask):
         return self.collectable
 
     def test(self, task_data):
-        if task_data['data'] is None:
-            task_data['data'] = utils.get_safe_text(
-                '"%s-%s%s"' % (_('Assessment'),
-                               self._get_user_name(),
-                               _ASSESSMENT_SUFFIX))
+        if not 'data' in task_data or task_data['data'] is None:
+            task_data['data'] = '%s-%s%s' % (
+                _('Assessment'),
+                self._get_user_name().replace(' ', '-'),
+                _ASSESSMENT_SUFFIX)
             self._task_master.write_task_data(self.uid, task_data)
 
             # Create the assessment document in the Journal
@@ -2477,16 +2475,19 @@ class Assessment2Task(HTMLTask):
                 dsobject.metadata['mime_type'] = 'application/pdf'
                 dsobject.set_file_path(
                     os.path.join(self._task_master.activity.bundle_path,
-                                 'Assessment-Instructions.pdf')
+                                 'Assessment-Instructions.pdf'))
                 datastore.write(dsobject)
                 dsobject.destroy()
             return False
         else:
             # Look for the assessment document on the USB stick
             # FIX ME: What if they changed the name???
+            # FIX ME: File copied to USB has .xlw extension
             return os.path.exists(os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
-                task_data['data'] + _ASSESSMENT_SUFFIX))
+                task_data['data'])) or os.path.exists(os.path.join(
+                    self._task_master.activity.volume_data[0]['usb_path'],
+                    task_data['data'] + '.xlw'))
 
     def get_graphics(self):
         name = utils.get_safe_text('"%s-%s%s"' % (_('Assessment'),
