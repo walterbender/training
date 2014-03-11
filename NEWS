@@ -1,5 +1,9 @@
 NEWS
 
+2
+* Updated Assessment Documents from Paul
+* First Release
+
 1.64
 * Remove gconf settings
 * Check for webservice in /usr/share/sugar
