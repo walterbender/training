@@ -24,7 +24,7 @@ from sugar3.datastore import datastore
 import logging
 _logger = logging.getLogger('training-activity-tasks')
 
-from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
+from activity import NAME_UID, EMAIL_UID, SCHOOL_UID, ROLE_UID
 from graphics import Graphics, FONT_SIZES
 import utils
 from reporter import Reporter
@@ -38,6 +38,7 @@ _VALIDATE_EMAIL_TASK = 'validate-email-task'
 _WELCOME_BADGE_TASK = 'welcome-badge-task'
 _TOOLBAR_BADGE_TASK = 'toolbar-badge-task'
 _ENTER_SCHOOL_TASK = 'enter-school-task'
+_ENTER_ROLE_TASK = 'enter-role-task'
 _CONNECTED_BADGE_TASK = 'connected-badge-task'
 _RECORD_SAVE_TASK = 'record-save-task'
 _WRITE_SAVE_TASK = 'write-save-task'
@@ -64,6 +65,23 @@ GET_CONNECTED_TASK = 'get-connected-task'
 # _ASSESSMENT_SUFFIX = '.doc'
 _ASSESSMENT_MIME_TYPE = 'application/vnd.ms-excel'
 _ASSESSMENT_SUFFIX = '.xls'
+
+_ROLES = {
+    'Teacher': [_('Teacher'), True],
+    'Principal': [_('Principal'), True],
+    'ICT Coordinator': [_('ICT Coordinator'), True],
+    'Assistant Teacher': [_('Assistant Teacher'), True],
+    'Assistant Principal': [_('Assistant Principal'), True],
+    'Volunteer': [_('Volunteer'), False],
+    'Employee': [_('Employee'), True],
+    'Ex-Principal': [_('Ex-Principal'), True],
+    'Program Stakeholder': [_('Program Stakeholder'), True],
+    'Regional Coordinator': [_('Regional Coordinator'), True],
+    'School Administrator': [_('School Administrator'), False],
+    'Sponsor/Donor': [_('Sponsor/Donor'), False],
+    'Curriculum Coach': [_('Curriculum Coach'), True],
+    'Pre Service Teachers': [_('Pre Service Teacher'), True],
+    'International': [_('International'), False]}
 
 
 def get_tasks(task_master):
@@ -116,6 +134,7 @@ def get_tasks(task_master):
                    Connected4Task(task_master),
                    # Connected5Task(task_master),
                    Connected6Task(task_master),
+                   Connected6aTask(task_master),
                    # Connected7Task(task_master),
                    Connected8Task(task_master),
                    Connected9Task(task_master, 4)]},
@@ -1031,6 +1050,63 @@ class Connected6Task(HTMLTask):
         self._entry.grab_focus()
 
 
+class Connected6aTask(HTMLTask):
+
+    def __init__(self, task_master):
+        HTMLTask.__init__(self, task_master)
+        self._name = _('Enter Roll')
+        self.uid = _ENTER_ROLE_TASK
+        self._uri = 'Connected/connected6a.html'
+        self._height = 60
+        self._graphics = None
+        self._role = None
+        self._buttons = None
+        self._task_data = None
+
+    def is_collectable(self):
+        return True
+
+    def after_button_press(self):
+        self._task_master.write_task_data(ROLE_UID, self._role)
+        return True
+
+    def _role_button_callback(self, widget, roll):
+        for button in self._buttons:
+            button.set_sensitive(not button == widget)
+        self._role = 'None'
+        for key in _ROLES.keys():
+            if _ROLES[key][0] == roll:
+                self._role = key
+                _logger.debug(self._role)
+                break
+
+    def test(self, task_data):
+        if self._task_data is None:
+            self._task_data = task_data
+        return not self._role is None
+
+    def get_graphics(self):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri)
+
+        graphics = Graphics()
+        webkit = graphics.add_uri('file://' + url, height=self._height)
+        graphics.set_zoom_level(self._zoom_level)
+        roles = []
+        for key in sorted(_ROLES.keys()):
+            roles.append(_ROLES[key][0])
+        roles.append(_('None of the above'))
+
+        self._buttons = graphics.add_list_buttons(roles)
+        for i, button in enumerate(self._buttons):
+            button.connect('clicked', self._role_button_callback, roles[i])
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
+
+        return graphics, self._prompt
+
+'''
 class Connected7Task(HTMLTask):
 
     def __init__(self, task_master):
@@ -1040,7 +1116,8 @@ class Connected7Task(HTMLTask):
         self._uri = 'Connected/connected7.html'
 
     def get_requires(self):
-        return [_ENTER_NAME_TASK, _VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK]
+        return [_ENTER_NAME_TASK, _VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK,
+                _ENTER_ROLE_TASK]
 
     def get_graphics(self):
         self._entries = []
@@ -1053,12 +1130,16 @@ class Connected7Task(HTMLTask):
         school = self._task_master.read_task_data(SCHOOL_UID)
         if school is None:  # Should never happen
             school = ''
+        role = self._task_master.read_task_data(ROLE_UID)
+        if role is None:  # Should never happen
+            role = ''
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
-                           '%s?NAME=%s&EMAIL=%s&SCHOOL=%s' %
+                           '%s?NAME=%s&EMAIL=%s&SCHOOL=%s&ROLE=%s' %
                            (self._uri,
                             utils.get_safe_text(name),
                             utils.get_safe_text(email),
-                            utils.get_safe_text(school)))
+                            utils.get_safe_text(school),
+                            utils.get_safe_text(role)))
 
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url, height=400)
@@ -1068,7 +1149,7 @@ class Connected7Task(HTMLTask):
         self._task_master.activity.set_paste_widget()
 
         return graphics, self._prompt
-
+'''
 
 class Connected8Task(HTMLTask):
 

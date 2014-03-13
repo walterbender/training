@@ -1,3 +1,19 @@
+GtkButton#select-button {
+    background-color: #808080;
+    background: #808080;
+}
+
+GtkButton#select-button:active {
+    background-color:  #F18F00;
+    background: #F18F00;
+}
+
+GtkButton#select-button:insensitive {
+    background-color: white;
+    background: white;
+    color: black;
+}
+
 GtkButton#next-button {
     background-color: #80BA27;
     background: #80BA27;

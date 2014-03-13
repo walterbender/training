@@ -239,11 +239,6 @@ class Graphics(Gtk.Alignment):
         grid.set_border_width(style.DEFAULT_SPACING * 2)
         buttons = []
         for i, button_icon in enumerate(button_icons):
-            if i == 0:
-                group = None
-            else:
-                group = buttons[0]
-
             if colors is not None:
                 icon = Icon(pixel_size=style.STANDARD_ICON_SIZE,
                             icon_name=button_icon,
@@ -255,8 +250,40 @@ class Graphics(Gtk.Alignment):
 
             buttons.append(Gtk.Button())
             buttons[i].set_image(icon)
+            icon.show()
             grid.attach(buttons[i], i, 0, 1, 1)
             buttons[i].show()
+
+        alignment.add(grid)
+        grid.show()
+        self._attach(alignment)
+        alignment.show()
+
+        return buttons
+
+    def add_list_buttons(self, button_names):
+        # Psuedo-selection-list buttons
+        alignment = Gtk.Alignment.new(0.5, 0.5, 0, 0)
+        grid = Gtk.Grid()
+        grid.set_row_spacing(style.DEFAULT_SPACING)
+        grid.set_column_spacing(style.DEFAULT_SPACING)
+        grid.set_border_width(style.DEFAULT_SPACING * 2)
+
+        buttons = []
+        x = 0
+        y = 0
+        for i, button_name in enumerate(button_names[0:-2]):
+            buttons.append(Gtk.Button(button_name, name='select-button'))
+            grid.attach(buttons[i], x, y, 1, 1)
+            x += 1
+            if x == 2:
+                x = 0
+                y += 1
+            buttons[i].show()
+        buttons.append(Gtk.Button(button_names[-1], name='select-button'))
+        grid.attach(buttons[-1], 0, y + 1, 2, 1)
+        buttons[-1].show()
+
         alignment.add(grid)
         grid.show()
         self._attach(alignment)
