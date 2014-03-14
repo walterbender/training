@@ -24,7 +24,7 @@ from gi.repository import GObject
 from sugar3.graphics import style
 from sugar3.graphics.radiotoolbutton import RadioToolButton
 
-from activity import NAME_UID, EMAIL_UID, SCHOOL_UID
+from activity import NAME_UID, EMAIL_UID, SCHOOL_UID, ROLE_UID
 import utils
 
 from soupdesk import Attachment, Ticket, FieldHelper, ZendeskError
@@ -191,6 +191,7 @@ class HelpPanel(Gtk.Grid):
         name = self._task_master.read_task_data(NAME_UID)
         email = self._task_master.read_task_data(EMAIL_UID)
         school = self._task_master.read_task_data(SCHOOL_UID)
+        role = self._task_master.read_task_data(ROLE_UID)
 
         # We cannot send name w/o email
         # http://developer.zendesk.com/documentation/rest_api/tickets.html
@@ -199,8 +200,9 @@ class HelpPanel(Gtk.Grid):
 
         self._data = {'ticket': self._mode, 'section': section_name,
                       'task': task_index, 'body': text, 'log': log_file_path,
-                      'name': name, 'email': email, 'school': school}
-        
+                      'name': name, 'email': email, 'school': school,
+                      'role': role}
+
         if self._check_button.get_active():
             # idle_add is not sufficient... waiting for graphics to refresh
             GObject.timeout_add(2000, self._take_screen_shot_and_send)
@@ -217,6 +219,8 @@ class HelpPanel(Gtk.Grid):
         fields.append(helper.get_field(1, data['task']))
         if data['school']:
             fields.append(helper.get_field(2, data['school']))
+        if data['role']:
+            fields.append(helper.get_field(3, data['role']))
 
         uploads = []
         if 'screenshot' in data:
