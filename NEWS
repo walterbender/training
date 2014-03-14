@@ -5,6 +5,7 @@ NEWS
 * Added Role name to Assessment task
 * Auto complete Assessment task for some roles
 * Added correct file name to copy Portfolio to USB task
+* Merged Martin's patch to the reporter to include Role
 
 2
 * Updated Assessment Documents from Paul
