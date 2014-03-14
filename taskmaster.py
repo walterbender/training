@@ -242,9 +242,14 @@ class TaskMaster(Gtk.Alignment):
         section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
         if task.after_button_press():
-            self.current_task += 1
-            self.write_task_data('current_task', self.current_task)
-            self.task_master()
+            if self._yes_task is not None:
+                self._jump_to_task_cb(None, 'yes')
+            elif self._no_task is not None:
+                self._jump_to_task_cb(None, 'no')
+            else:
+                self.current_task += 1
+                self.write_task_data('current_task', self.current_task)
+                self.task_master()
 
     def _my_turn_button_cb(self, button):
         ''' Take me to the Home Page and select favorites view. '''

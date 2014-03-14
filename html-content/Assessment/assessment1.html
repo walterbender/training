@@ -4,6 +4,32 @@
 <meta charset="utf-8">
 <title>One Academy</title>
 <link href="../main.css" rel="stylesheet" type="text/css">
+
+<script language="javascript">
+  var QueryString = function () {
+  // This function grabs parameters from the URL, e.g., name=foo
+  // the return value is assigned to QueryString, e.g., QueryString.foo
+    var query_string = {};
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+      var pair = vars[i].split("=");
+      var res = unescape(pair[1])
+      if (typeof query_string[pair[0]] === "undefined") {
+        query_string[pair[0]] = res;
+    	// If second entry with this name
+      } else if (typeof query_string[pair[0]] === "string") {
+        var arr = [ query_string[pair[0]], res ];
+        query_string[pair[0]] = arr;
+    	// If third or later entry with this name
+      } else {
+        query_string[pair[0]].push(res);
+      }
+    } 
+    return query_string;
+  } ();
+</script>
+
 </head>
 
 <body>
@@ -13,9 +39,9 @@
   </div>
   <p>Wow! You're right at the very end.</p>
   <p>That wasn't too hard, was it?</p>
-  <p>If you're a teacher, you just have one assessment left to complete. If you're a teacher hit Yes below.</p>
-  <p>If you're not a teacher, or do not require additional XOs for your classroom, then hit No below.</p>
-  <p>Are you a teacher, or do you require classroom XOs?</p>
+  <p>If you're a <script>document.write(QueryString.NAME);</script>, you just have one assessment left to complete. If you're a <script>document.write(QueryString.NAME);</script> hit Yes below.</p>
+  <p>If you're not a <script>document.write(QueryString.NAME);</script>, or do not require additional XOs for your classroom, then hit No below.</p>
+  <p>Are you a <script>document.write(QueryString.NAME);</script>, or do you require classroom XOs?</p>
 </div>
 </body>
 </html>

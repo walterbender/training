@@ -2482,8 +2482,10 @@ class Assessment1Task(HTMLTask):
         HTMLTask.__init__(self, task_master)
         self._name = _('Assessment')
         self.uid = 'assessment-1-task'
-        self._uri = 'Assessment/assessment1.html'
+        self._uri = ['Assessment/assessment1.html',
+                     'Assessment/assessment1a.html']
         self._result = None
+        self._yes_no_required = True
 
     def get_requires(self):
         required =  [_WELCOME_BADGE_TASK, _CONNECTED_BADGE_TASK,
@@ -2495,14 +2497,39 @@ class Assessment1Task(HTMLTask):
         return required
 
     def get_yes_no_tasks(self):
-        return _ASSESSMENT_DOCUMENT_TASK, _ASSESSMENT_BADGE_TASK
+        if self._yes_no_required:
+            return _ASSESSMENT_DOCUMENT_TASK, _ASSESSMENT_BADGE_TASK
+        else:
+            return None, _ASSESSMENT_BADGE_TASK
 
     def test(self, task_data):
         return self._task_master.button_was_pressed
 
     def get_graphics(self):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
-                           self._uri)
+        role = self._task_master.read_task_data(ROLE_UID)
+        if role is not None:
+            role = utils.get_safe_text(role)
+        else:
+            role = None
+
+        for key in _ROLES.keys():
+            if key == role:
+                role = _ROLES[key][0]
+                self._yes_no_required = _ROLES[key][1]
+                break
+        if role is None:
+            role = _('Other')
+            self._yes_no_required = True
+
+        _logger.debug('%s %s' % (role, str(self._yes_no_required)))
+
+        if self._yes_no_required:
+            url = os.path.join(self._task_master.get_bundle_path(),
+                               'html-content',
+                               '%s?NAME=%s' % (self._uri[0], role))
+        else:
+            url = os.path.join(self._task_master.get_bundle_path(),
+                               'html-content', self._uri[1])
 
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url, height=self._height)
