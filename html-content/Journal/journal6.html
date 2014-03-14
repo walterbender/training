@@ -4,6 +4,32 @@
 <meta charset="utf-8">
 <title>Getting to Know the Journal</title>
 <link href="../main.css" rel="stylesheet" type="text/css">
+
+<script language="javascript">
+  var QueryString = function () {
+  // This function grabs parameters from the URL, e.g., name=foo
+  // the return value is assigned to QueryString, e.g., QueryString.foo
+    var query_string = {};
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+      var pair = vars[i].split("=");
+      var res = unescape(pair[1])
+      if (typeof query_string[pair[0]] === "undefined") {
+        query_string[pair[0]] = res;
+    	// If second entry with this name
+      } else if (typeof query_string[pair[0]] === "string") {
+        var arr = [ query_string[pair[0]], res ];
+        query_string[pair[0]] = arr;
+    	// If third or later entry with this name
+      } else {
+        query_string[pair[0]].push(res);
+      }
+    } 
+    return query_string;
+  } ();
+</script>
+
 </head>
 
 <body>
@@ -13,7 +39,7 @@
   </div>
   <p>Now that you've made a presentation with Portfolio <img src="../images/activity-portfolio.svg" width="55" height="55" alt=""/> why don't we copy it onto a USB stick?</p>
   <p>You should already have a USB stick plugged into the XO, so that part is taken care of.</p>
-  <p>In the next task you'll:<li>Open the Journal using the <img src="../images/system-search.svg" width="55" height="55" alt=""/> key;</li><li>Select the &quot;My Portfolio&quot; document you just created;</li><li>Then you'll press the Copy to USB button <img src="../images/edit-copy.svg" width="55" height="55" alt=""/> in the Toolbar;</li><li>Finally you'll check the USB to confirm that it copied by clicking the USB icon <img src="../images/drive.svg" width="55" height="55" alt=""/>.</li></p>
+  <p>In the next task you'll:<li>Open the Journal using the <img src="../images/system-search.svg" width="55" height="55" alt=""/> key;</li><li>Select the <script>document.write(QueryString.NAME);</script> document you just created;</li><li>Then you'll press the Copy to USB button <img src="../images/edit-copy.svg" width="55" height="55" alt=""/> in the Toolbar;</li><li>Finally you'll check the USB to confirm that it copied by clicking the USB icon <img src="../images/drive.svg" width="55" height="55" alt=""/>.</li></p>
   <p>Hit Next to watch it happen before you try.</p>
 </div>
 </body>

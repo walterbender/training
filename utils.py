@@ -73,6 +73,10 @@ battery_model = None
 proxy = None
 
 
+def recently(time):
+    return time - (60 * 60)  # within the hour
+
+
 def get_log_file(bundle_id):
     log_dir = os.path.join(env.get_profile_path(), 'logs')
     log_files = glob.glob(os.path.join(log_dir, '%s*.log' % bundle_id))

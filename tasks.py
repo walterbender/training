@@ -1446,6 +1446,21 @@ class Journal6Task(HTMLTask):
         self.uid = 'journal-6-task'
         self._uri = 'Journal/journal6.html'
 
+    def get_graphics(self):
+        name = utils.get_safe_text('"%s %s"' % (utils.get_nick(),
+                                                _('Portfolio')))
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           '%s?NAME=%s' % (self._uri, name))
+                            
+        graphics = Graphics()
+        webkit = graphics.add_uri('file://' + url, height=self._height)
+        graphics.set_zoom_level(self._zoom_level)
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
+
+        return graphics, self._prompt
+
 
 class Journal7Task(HTMLTask):
 
