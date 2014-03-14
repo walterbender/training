@@ -73,15 +73,11 @@ _ROLES = {
     'Assistant Teacher': [_('Assistant Teacher'), True],
     'Assistant Principal': [_('Assistant Principal'), True],
     'Volunteer': [_('Volunteer'), False],
-    'Employee': [_('Employee'), True],
-    'Ex-Principal': [_('Ex-Principal'), True],
-    'Program Stakeholder': [_('Program Stakeholder'), True],
-    'Regional Coordinator': [_('Regional Coordinator'), True],
-    'School Administrator': [_('School Administrator'), False],
-    'Sponsor/Donor': [_('Sponsor/Donor'), False],
+    'Parent': [_('Parent'), False],
+    'Community': [_('Community'), False],
+    'School Administrator': [_('School Administrator'), True],
     'Curriculum Coach': [_('Curriculum Coach'), True],
-    'Pre Service Teachers': [_('Pre Service Teacher'), True],
-    'International': [_('International'), False]}
+    'Pre Service Teachers': [_('Pre-service Teacher'), True]}
 
 
 def get_tasks(task_master):
@@ -94,6 +90,7 @@ def get_tasks(task_master):
                    Welcome4Task(task_master),
                    Welcome5Task(task_master),
                    Welcome6Task(task_master),
+                   Connected6aTask(task_master),
                    Welcome7Task(task_master, 0)]},
         {'name': _('Getting to Know the Toolbar'),
          'icon': 'badge-toolbar',
@@ -1073,7 +1070,7 @@ class Connected6aTask(HTMLTask):
     def _role_button_callback(self, widget, roll):
         for button in self._buttons:
             button.set_sensitive(not button == widget)
-        self._role = 'None'
+        self._role = 'Other'
         for key in _ROLES.keys():
             if _ROLES[key][0] == roll:
                 self._role = key
@@ -1095,11 +1092,18 @@ class Connected6aTask(HTMLTask):
         roles = []
         for key in sorted(_ROLES.keys()):
             roles.append(_ROLES[key][0])
-        roles.append(_('None of the above'))
+        roles.append(_('Other'))
+
+        self._role = self._task_master.read_task_data(ROLE_UID)
 
         self._buttons = graphics.add_list_buttons(roles)
         for i, button in enumerate(self._buttons):
             button.connect('clicked', self._role_button_callback, roles[i])
+            if self._role in _ROLES.keys() and \
+               _ROLES[self._role][0] == roles[i]:
+                button.set_sensitive(False)
+        if self._role == 'Other':
+            self._buttons[-1].set_sensitive(False)
 
         self._task_master.activity.set_copy_widget(webkit=webkit)
         self._task_master.activity.set_paste_widget()
