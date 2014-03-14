@@ -29,8 +29,6 @@ from graphics import Graphics, FONT_SIZES
 import utils
 from reporter import Reporter
 
-_HOUR = 60 * 60
-
 # These tasks are requirements for other tasks
 _ENTER_NAME_TASK = 'enter-name-task'
 _ENTER_EMAIL_TASK = 'enter-email-task'
@@ -90,7 +88,6 @@ def get_tasks(task_master):
                    Welcome4Task(task_master),
                    Welcome5Task(task_master),
                    Welcome6Task(task_master),
-                   Connected6aTask(task_master),
                    Welcome7Task(task_master, 0)]},
         {'name': _('Getting to Know the Toolbar'),
          'icon': 'badge-toolbar',
@@ -1213,11 +1210,11 @@ class Activities3Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.RecordActivity',
-                                    task_data['start_time'] - _HOUR):
+                                    utils.recently(task_data['start_time'])):
             return False
         paths = utils.get_jpg()
         return len(paths) > 0 and (utils.get_modified_time(paths[0]) >
-                                   task_data['start_time'] - _HOUR)
+                                   utils.recently(task_data['start_time']))
 
 
 class Activities4Task(HTMLTask):
@@ -1251,7 +1248,7 @@ class Activities5Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.AbiWordActivity',
-                                    task_data['start_time'] - _HOUR):
+                                    utils.recently(task_data['start_time'])):
             return False
         # We need the clipboard text for the Speak task
         # if not utils.is_clipboard_text_available():
@@ -1296,7 +1293,7 @@ class Activities7Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('vu.lux.olpc.Speak',
-                                    task_data['start_time'] - _HOUR):
+                                    utils.recently(task_data['start_time'])):
             return False
         # Has any setting changed?
         status = utils.get_speak_settings(
@@ -1429,14 +1426,14 @@ class Journal5Task(HTMLTask):
         if not utils.get_starred_count() > task_data['data']:
             return False
         if not utils.saw_new_launch('org.sugarlabs.PortfolioActivity',
-                                    task_data['start_time'] - _HOUR):
+                                    utils.recently(task_data['start_time'])):
             return False
         paths = utils.get_pdf()
         if len(paths) == 0:
             return False
         for path in paths:
             if utils.get_modified_time(path) > \
-               task_data['start_time'] - _HOUR:
+               utils.recently(task_data['start_time']):
                 return True
         return False
 
@@ -1475,7 +1472,7 @@ class Journal7Task(HTMLTask):
             self._task_master.activity.volume_data[0]['usb_path'], '.pdf')
         for path in paths:
             if utils.get_modified_time(path) > \
-               task_data['start_time'] - _HOUR:
+               utils.recently(task_data['start_time']):
                 return True
         return False
 
@@ -1892,7 +1889,7 @@ class Turtle3Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time'] - _HOUR):
+                                    utils.recently(task_data['start_time'])):
             return False
         activity = utils.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1937,7 +1934,7 @@ class Turtle5Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time'] - _HOUR):
+                                    utils.recently(task_data['start_time'])):
             return False
         activity = utils.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -1975,7 +1972,7 @@ class Turtle7Task(HTMLTask):
 
     def test(self, task_data):
         if not utils.saw_new_launch('org.laptop.TurtleArtActivity',
-                                    task_data['start_time'] - _HOUR):
+                                    utils.recently(task_data['start_time'])):
             return False
         activity = utils.get_most_recent_instance(
             'org.laptop.TurtleArtActivity')
@@ -2059,10 +2056,6 @@ class Turtle11Task(HTMLTask):
             if not utils.find_string(path, 'journal'):
                 return False
         return True
-        # Check to see if they saved the image to the Journal
-        # paths = utils.get_png()
-        # return len(paths) > 0 and (utils.get_modified_time(paths[0]) >
-        # task_data['start_time'] - _HOUR)
 
     def get_my_turn(self):
         return True
@@ -2091,12 +2084,9 @@ class Physics2Task(HTMLTask):
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK]
 
-    # def is_collectable(self):
-    #     return True
-
     def test(self, task_data):
         return utils.saw_new_launch('org.laptop.physics',
-                                    task_data['start_time'] - _HOUR)
+                                    utils.recently(task_data['start_time']))
 
     def get_my_turn(self):
         return True
