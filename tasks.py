@@ -2607,9 +2607,10 @@ class Assessment2Task(HTMLTask):
                     task_data['data'] + '.xlw'))
 
     def get_graphics(self):
-        name = utils.get_safe_text('"%s-%s%s"' % (_('Assessment'),
-                                                  self._get_user_name(),
-                                                  _ASSESSMENT_SUFFIX))
+        name = utils.get_safe_text('"%s-%s%s" and "%s"' %
+                                   (_('Assessment'), self._get_user_name(),
+                                    _ASSESSMENT_SUFFIX,
+                                    _('Assessment-Instructions.pdf')))
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s' % (self._uri, name))
                             
