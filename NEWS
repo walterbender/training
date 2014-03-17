@@ -1,5 +1,8 @@
 NEWS
 
+2.3
+* Add reporter function to idle_add
+
 2.2
 * Copy edits to Assessment tasks
 * Require name to be at least 2 characters long

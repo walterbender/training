@@ -393,7 +393,7 @@ class BadgeTask(HTMLTask):
                 icon=self._task_master.get_section_icon(self._section_index))
             self._task_master.write_task_data(self.uid, task_data)
 
-        self._report_progress()
+        GObject.idle_add(self._report_progress)
         return True
 
     def test(self, task_data):
