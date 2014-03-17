@@ -429,11 +429,7 @@ class Welcome2Task(Task):
 
     def test(self, task_data):
         self._task_data = task_data
-
-        if len(self._entry.get_text()) == 0:
-            return False
-        else:
-            return True
+        return len(self._entry.get_text()) > 1
 
     def after_button_press(self):
         self._task_master.write_task_data(NAME_UID, self._entry.get_text())
