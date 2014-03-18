@@ -944,6 +944,7 @@ class Connected6Task(HTMLTask):
         self._entry = None
         self._buttons = []
         self._schools = []
+        self._sf_ids = []
         self._completer = None
         self._task_data = None
 
@@ -963,8 +964,19 @@ class Connected6Task(HTMLTask):
         if self._completer is None:
             f = open(os.path.join(self._task_master.activity.bundle_path,
                                   'schools.txt'), 'r')
-            self._schools = f.read().split('\n')
+            schools = f.read().split('\n')
             f.close()
+            self._schools = []
+            self._sf_ids = []
+            _logger.debug(len(schools))
+            _logger.debug(schools[0])
+            for school in schools:
+                try:
+                    name, city, state, postal_code, sf_id = school.split(',')
+                    self._schools.append('%s, %s, %s' % (name, city, state))
+                    self._sf_ids.append(sf_id)
+                except:
+                    _logger.debug(school)
             self._completer = utils.Completer(self._schools)
 
         if len(self._entry.get_text()) == 0:
@@ -995,6 +1007,7 @@ class Connected6Task(HTMLTask):
 
     def _yes_no_cb(self, widget, arg):
         if arg == 'yes':
+            self._task_master.write_task_data(SCHOOL_UID, None)
             self._task_master.current_task += 1
             self._task_master.write_task_data('current_task',
                                               self._task_master.current_task)
@@ -1002,8 +1015,9 @@ class Connected6Task(HTMLTask):
 
     def after_button_press(self):
         school = self._entry.get_text()
-        self._task_master.write_task_data(SCHOOL_UID, school)
         if school in self._schools:
+            i = self._schools.index(school)
+            self._task_master.write_task_data(SCHOOL_UID, self._sf_ids[i])
             return True
         else:
             # Confirm that it is OK to use a school not in the list.

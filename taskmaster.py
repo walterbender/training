@@ -636,8 +636,10 @@ class TaskMaster(Gtk.Alignment):
                 # Last time, we couldn't read, so let's make sure the data
                 # sets are in sync.
                 _logger.error('Resyncing data sets')
-                self.activity.sync_data_from_USB(usb_data_path)
-                self._resync_required = False
+                status = self.activity.sync_data_from_USB(usb_data_path)
+                if not status:
+                    _logger.error('RESYNC FAILED')
+                self._resync_required = not status
             try:
                 fd = open(usb_data_path, 'r')
                 json_data = fd.read()

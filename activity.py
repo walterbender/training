@@ -43,7 +43,7 @@ except:
 
 NAME_UID = 'name'
 EMAIL_UID = 'email_address'
-SCHOOL_UID = 'school_name'
+SCHOOL_UID = 'school_sf_id'
 ROLE_UID = 'role'
 TRAINING_DATA_UID = 'training_data_uid'
 VERSION_NUMBER = 'version_number'
@@ -398,9 +398,20 @@ class TrainingActivity(activity.Activity):
 
             # Finally, write to the USB and ...
             json_data = json.dumps(data_one)
-            fd = open(usb_data_path, 'w')
-            fd.write(json_data)
-            fd.close()
+            try:
+                fd = open(usb_data_path, 'w')
+                fd.write(json_data)
+                fd.close()
+            except Exception, e:
+                _logger.error('Could not write to %s: %s' %
+                              (usb_data_path, e))
+                alert = ConfirmationAlert()
+                alert.props.title = _('USB key problem')
+                alert.props.msg = _('Please reinsert your USB key.')
+                alert.connect('response', self._remove_alert_cb)
+                self.add_alert(alert)
+                self._load_intro_graphics(file_name='insert-usb.html')
+                return False
 
             # ...save a shadow copy in Sugar
             fd = open(sugar_data_path, 'w')
