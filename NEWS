@@ -1,8 +1,15 @@
 NEWS
 
+2.4
+
+* Added SCHOOL_NAME back to School Name task (QT-32)
+
 2.3
 * Add reporter function to idle_add
 * Pulled in Paul's copy edits
+* Updated schools DB (AD-34)
+* Added SF_ID to School Name task (AD-34)
+* Added check to address QT-30
 
 2.2
 * Copy edits to Assessment tasks

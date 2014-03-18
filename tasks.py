@@ -24,7 +24,7 @@ from sugar3.datastore import datastore
 import logging
 _logger = logging.getLogger('training-activity-tasks')
 
-from activity import NAME_UID, EMAIL_UID, SCHOOL_UID, ROLE_UID
+from activity import NAME_UID, EMAIL_UID, SCHOOL_UID, ROLE_UID, SCHOOL_NAME
 from graphics import Graphics, FONT_SIZES
 import utils
 from reporter import Reporter
@@ -1008,6 +1008,8 @@ class Connected6Task(HTMLTask):
     def _yes_no_cb(self, widget, arg):
         if arg == 'yes':
             self._task_master.write_task_data(SCHOOL_UID, None)
+            school = self._entry.get_text()
+            self._task_master.write_task_data(SCHOOL_NAME, school)
             self._task_master.current_task += 1
             self._task_master.write_task_data('current_task',
                                               self._task_master.current_task)
@@ -1018,6 +1020,7 @@ class Connected6Task(HTMLTask):
         if school in self._schools:
             i = self._schools.index(school)
             self._task_master.write_task_data(SCHOOL_UID, self._sf_ids[i])
+            self._task_master.write_task_data(SCHOOL_NAME, school)
             return True
         else:
             # Confirm that it is OK to use a school not in the list.
