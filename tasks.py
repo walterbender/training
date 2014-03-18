@@ -1032,7 +1032,7 @@ class Connected6Task(HTMLTask):
             return False
 
     def get_graphics(self):
-        target = self._task_master.read_task_data(SCHOOL_UID)
+        target = self._task_master.read_task_data(SCHOOL_NAME)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
