@@ -24,7 +24,7 @@ from gi.repository import GObject
 from sugar3.graphics import style
 from sugar3.graphics.radiotoolbutton import RadioToolButton
 
-from activity import NAME_UID, EMAIL_UID, SCHOOL_UID, ROLE_UID
+from activity import NAME_UID, EMAIL_UID, SCHOOL_HUMAN_UID, ROLE_UID
 import utils
 
 from soupdesk import Attachment, Ticket, FieldHelper, ZendeskError
@@ -190,7 +190,7 @@ class HelpPanel(Gtk.Grid):
         section_name = self._task_master.get_section_name(section_index)
         name = self._task_master.read_task_data(NAME_UID)
         email = self._task_master.read_task_data(EMAIL_UID)
-        school = self._task_master.read_task_data(SCHOOL_UID)
+        school = self._task_master.read_task_data(SCHOOL_HUMAN_UID)
         role = self._task_master.read_task_data(ROLE_UID)
 
         # We cannot send name w/o email

@@ -44,6 +44,7 @@ except:
 NAME_UID = 'name'
 EMAIL_UID = 'email_address'
 SCHOOL_UID = 'school_sf_id'
+SCHOOL_HUMAN_UID = 'school_name'
 ROLE_UID = 'role'
 TRAINING_DATA_UID = 'training_data_uid'
 VERSION_NUMBER = 'version_number'
