@@ -408,10 +408,11 @@ class TrainingActivity(activity.Activity):
                               (usb_data_path, e))
                 alert = ConfirmationAlert()
                 alert.props.title = _('USB key problem')
-                alert.props.msg = _('Please reinsert your USB key.')
+                alert.props.msg = \
+                    _('Please insert your USB key into a different slot.')
                 alert.connect('response', self._remove_alert_cb)
                 self.add_alert(alert)
-                self._load_intro_graphics(file_name='insert-usb.html')
+                self._load_intro_graphics(file_name='reinsert-usb.html')
                 return False
 
             # ...save a shadow copy in Sugar
