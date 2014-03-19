@@ -74,6 +74,21 @@ class Graphics(Gtk.Alignment):
         self._grid.attach(widget3, 4, self._row, 1, 1)
         self._row += 1
 
+    def _attach_four(self, widget1, widget2, widget3, widget4):
+        alignment = Gtk.Alignment.new(0, 0.5, 0, 0)
+        alignment.add(widget1)
+        self._grid.attach(alignment, 1, self._row, 1, 1)
+        alignment.show()
+        alignment = Gtk.Alignment.new(0, 0.5, 0, 0)
+        alignment.add(widget2)
+        self._grid.attach(alignment, 3, self._row, 1, 1)
+        alignment.show()
+
+        self._row += 1
+        self._grid.attach(widget3, 1, self._row, 1, 1)
+        self._grid.attach(widget4, 3, self._row, 1, 1)
+        self._row += 1
+
     def _attach_center(self, widget):
         self._grid.attach(widget, 2, self._row, 1, 1)
         self._row += 1
@@ -170,9 +185,43 @@ class Graphics(Gtk.Alignment):
         offset = style.GRID_CELL_SIZE
         entry.set_size_request(offset * 8, -1)
         entry.set_text(text)
-        self._attach(entry)
+        self._attach_center(entry)
         entry.show()
         return entry
+
+    def add_two_entries(self, labeltext1='', text1='', labeltext2='', text2=''):
+        offset = style.GRID_CELL_SIZE
+        size = 'large'
+        color = style.COLOR_BLACK.get_html()
+        justify = Gtk.Justification.LEFT
+
+        label1 = Gtk.Label()
+        label1.set_use_markup(True)
+        label1.set_justify(justify)
+        span = '<span foreground="%s" size="%s">' % (color, size)
+        label1.set_markup(span + labeltext1 + '</span>')
+
+        entry1 = Gtk.Entry()
+        entry1.set_size_request(offset * 4, -1)
+        entry1.set_text(text1)
+
+        label2 = Gtk.Label()
+        label2.set_use_markup(True)
+        label2.set_justify(justify)
+        span = '<span foreground="%s" size="%s">' % (color, size)
+        label2.set_markup(span + labeltext2 + '</span>')
+
+        entry2 = Gtk.Entry()
+        entry2.set_size_request(offset * 4, -1)
+        entry2.set_text(text2)
+
+        self._attach_four(label1, label2, entry1, entry2)
+
+        label1.show()
+        label2.show()
+        entry1.show()
+        entry2.show()
+        return entry1, entry2
 
     def add_image(self, image):
         image = Gtk.Image.new_from_file(image)

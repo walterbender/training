@@ -3,6 +3,7 @@ NEWS
 2.5
 * Round completion percentage to nearest 5%
 * New copy for reinsert task (w/Paul)
+* Break name entry into two fields (AD-34)
 
 2.4
 

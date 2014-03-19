@@ -210,9 +210,9 @@ class TaskMaster(Gtk.Alignment):
             self._graphics = graphics
             url = os.path.join(self.get_bundle_path(), 'html-content',
                                'completed.html')
-            self._graphics.add_uri('file://' + url + '?NAME=' +
-                                   utils.get_safe_text(
-                                       self.read_task_data(NAME_UID)))
+            self._graphics.add_uri(
+                'file://' + url + '?NAME=' + utils.get_safe_text(
+                    self.read_task_data(NAME_UID).replace(',', ' ')))
             self._graphics.set_zoom_level(0.667)
             self._graphics_grid.attach(self._graphics, 0, 0, 1, 1)
             self._graphics.show()
@@ -510,7 +510,7 @@ class TaskMaster(Gtk.Alignment):
         return len(self._task_list)
 
     def get_section_name(self, section_index):
-        return self._task_list[section_index][NAME_UID]
+        return self._task_list[section_index]['name']
 
     def get_section_icon(self, section_index):
         return self._task_list[section_index]['icon']
@@ -839,6 +839,8 @@ class TaskMaster(Gtk.Alignment):
 
             if self._name is None:
                 self._name = self.read_task_data(NAME_UID)
+            if self._name is not None:
+                self._name = self._name.replace(',', ' ')
             if self._email is None:
                 self._email = self.read_task_data(EMAIL_UID)
             if self._name is not None and self._email is not None:
@@ -852,7 +854,7 @@ class TaskMaster(Gtk.Alignment):
 
             self._progress_bar = ProgressBar(
                 name,
-                self._task_list[section_index][NAME_UID],
+                self._task_list[section_index]['name'],
                 uid,
                 buttons,
                 self._prev_task_button_cb,

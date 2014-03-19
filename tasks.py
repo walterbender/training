@@ -417,22 +417,33 @@ class Welcome2Task(Task):
         self._name = _('Enter Your Name')
         self.uid = _ENTER_NAME_TASK
         self._uri = 'Welcome/welcome2.html'
-        self._entry = None
+        self._first_entry = None
+        self._last_entry = None
         self._height = 400
         self._task_data = None
 
     def is_collectable(self):
         return True
 
-    def _enter_entered(self, widget):
-        self._task_master.enter_entered(self._task_data, self.uid)
+    def _first_enter_entered(self, widget):
+        # Switch focus to last entry
+        if len(self._first_entry.get_text()) > 1:
+            self.grab_focus()
+
+    def _last_enter_entered(self, widget):
+        if len(self._first_entry.get_text()) > 1 and \
+           len(self._last_entry.get_text()) > 1:
+            self._task_master.enter_entered(self._task_data, self.uid)
 
     def test(self, task_data):
         self._task_data = task_data
-        return len(self._entry.get_text()) > 1
+        return len(self._first_entry.get_text()) > 1 and \
+            len(self._last_entry.get_text()) > 1
 
     def after_button_press(self):
-        self._task_master.write_task_data(NAME_UID, self._entry.get_text())
+        name = '%s,%s' % (self._first_entry.get_text(),
+                          self._last_entry.get_text())
+        self._task_master.write_task_data(NAME_UID, name)
         self._task_master.activity.update_activity_title()
         return True
 
@@ -444,20 +455,35 @@ class Welcome2Task(Task):
         graphics = Graphics()
         graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
-        if target is not None:
-            self._entry = graphics.add_entry(text=target)
-        else:
-            self._entry = graphics.add_entry()
 
-        self._entry.connect('activate', self._enter_entered)
-        self._task_master.activity.set_copy_widget(text_entry=self._entry)
-        self._task_master.activity.set_paste_widget(text_entry=self._entry)
+        if target is not None and len(target) > 0:
+            first, last = target.split(',')
+        else:
+            first = ''
+            last = ''
+        self._first_entry, self._last_entry = graphics.add_two_entries(
+            _('First name(s):'), first, _('Last name(s):'), last)
+
+        self._first_entry.connect('activate', self._first_enter_entered)
+        self._last_entry.connect('activate', self._last_enter_entered)
 
         return graphics, self._prompt
 
     def grab_focus(self):
-        self._entry.set_can_focus(True)
-        self._entry.grab_focus()
+        self._first_entry.set_can_focus(True)
+        self._last_entry.set_can_focus(True)
+        if len(self._first_entry.get_text()) == 0:
+            self._first_entry.grab_focus()
+            self._task_master.activity.set_copy_widget(
+                text_entry=self._last_entry)
+            self._task_master.activity.set_paste_widget(
+                text_entry=self._first_entry)
+        else:
+            self._last_entry.grab_focus()
+            self._task_master.activity.set_copy_widget(
+                text_entry=self._first_entry)
+            self._task_master.activity.set_paste_widget(
+                text_entry=self._last_entry)
 
 
 class Welcome3Task(HTMLTask):
@@ -469,7 +495,7 @@ class Welcome3Task(HTMLTask):
         self._uri = 'Welcome/welcome3.html'
 
     def get_graphics(self):
-        name = self._get_user_name().split()[0]
+        name = self._get_user_name().split(',')[0]
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s' %
                            (self._uri, utils.get_safe_text(name)))
@@ -664,7 +690,7 @@ class Welcome7Task(BadgeTask):
         self._uri = 'Welcome/welcome7.html'
 
     def get_graphics(self):
-        name = self._get_user_name().split()[0]
+        name = self._get_user_name().split(',')[0]
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s' %
                            (self._uri, utils.get_safe_text(name)))
@@ -2573,7 +2599,7 @@ class Assessment2Task(HTMLTask):
         if not 'data' in task_data or task_data['data'] is None:
             task_data['data'] = '%s-%s%s' % (
                 _('Assessment'),
-                self._get_user_name().replace(' ', '-'),
+                self._get_user_name().replace(',', '-'),
                 _ASSESSMENT_SUFFIX)
             self._task_master.write_task_data(self.uid, task_data)
 
@@ -2621,7 +2647,8 @@ class Assessment2Task(HTMLTask):
 
     def get_graphics(self):
         name = utils.get_safe_text('"%s-%s%s" and "%s"' %
-                                   (_('Assessment'), self._get_user_name(),
+                                   (_('Assessment'),
+                                    self._get_user_name().replace(',','-'),
                                     _ASSESSMENT_SUFFIX,
                                     _('Assessment-Instructions.pdf')))
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
