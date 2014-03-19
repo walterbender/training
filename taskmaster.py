@@ -891,9 +891,10 @@ class TaskMaster(Gtk.Alignment):
         self.update_completion_percentage()
 
     def update_completion_percentage(self):
-        completion_percentage = int(
-            (self._get_number_of_completed_collectables() * 100.)
-            / self._get_number_of_collectables())
+        # Round to nearest 5%
+        completion_percentage = self._get_number_of_completed_collectables() \
+            * 100. / self._get_number_of_collectables()
+        completion_percentage = (int(completion_percentage + 2.5) / 5) * 5
         self.activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
