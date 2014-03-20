@@ -1,5 +1,8 @@
 NEWS
 
+2.7
+* Skipping 2.6 because that is a special NZ spin
+
 2.5
 * Round completion percentage to nearest 5%
 * New copy for reinsert task (w/Paul)
