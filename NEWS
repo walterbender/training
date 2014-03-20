@@ -4,6 +4,7 @@ NEWS
 * Skipping 2.6 because that is a special NZ spin
 * Refactored school name task as per AD-34
 * New school database
+* Scrubbed database of bad enties and completed missing addresses where possible
 
 2.5
 * Round completion percentage to nearest 5%
