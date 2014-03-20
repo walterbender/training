@@ -1021,7 +1021,6 @@
 0019000000EW0HB,Buxton Primary School,,2208 Maroondah Hwy,Buxton,VIC,3711
 0019000000EVzim,Buxton Public School,,70 Hassall Rd,Buxton,NSW,2571
 0019000000EVz2K,Bwgcolman Community School,,Creek Rd,Palm Island,QLD,4816
-0019000000EWecy,Byabarra Public School,,,,,
 0019000000EW0aV,Byfield State School,,2233 Byfield Rd,Byfield,QLD,4703
 0019000000EVzHG,Byford John Calvin School,,30 Soldiers Rd,Byford,WA,6122
 0019000000EW0x9,Byford Primary School,,30 Clifton Rd,Byford,WA,6122
@@ -1251,7 +1250,6 @@
 0019000000EVzqk,Cathedral Primary School,,98 George St,Bathurst,NSW,2795
 0019000000EVz7O,Cathedral School of St Anne and St James,,Ross River Rd,Mundingburra,QLD,4812
 0019000000EW0j6,Catherine McAuley School,,210 Adams Rd,Craigmore,SA,5114
-0019000000HJTP3,Catholic Education Agency,Kiunga , Western Province,,,,
 0019000000EVzoq,Cattai Public School,,487 Cattai Rd,Cattai,NSW,2756
 0019000000EW2Ad,Caulfield Grammar Pre-Prep,,74-82 Jells Road,Wheelers Hill,VIC,3150
 0019000000EVz0f,Caulfield Grammar School,,72-84 Jells Rd,Wheelers Hill,VIC,3150
@@ -3165,7 +3163,6 @@
 0019000000EVzZ2,Jilliby Public School,,Jilliby Rd,Wyong,NSW,2259
 0019000000EW0Rc,Jimboomba State School,,Mt Lindesay Highway,Jimboomba,QLD,4280
 0019000000EW0Tl,Jimbour State School,,Dalby-Jandowae Rd,Jimbour,QLD,4352
-0019000000HJTPI,Jim Taylor School,Banz, Jiwaka Province,,,,
 0019000000EW10D,Jindabyne Central School,,4 Park Rd,Jindabyne,NSW,2627
 0019000000EW0OG,Jindalee State School,,114 Burrendah Rd,Jindalee,QLD,4074
 0019000000EVzsE,Jindera Public School,,131 Dight St,Jindera,NSW,2642
@@ -3917,7 +3914,6 @@
 0019000000EVzlR,Manifold Public School,,Kyogle Rd,Bentley,NSW,2480
 0019000000EVzyy,Manildra Public School,,Molong Rd,Manildra,NSW,2865
 0019000000EVz4E,Manilla Central School,,Court St,Manilla,NSW,2346
-0019000000EWefP,Maningrida Homelands,,,,,
 0019000000EVzJk,Maningrida School,,Maningrida via,Winnellie,NT,0822
 0019000000EVzGB,Manjimup Education Support Centre,,Finch St,Manjimup,WA,6258
 0019000000EW0rd,Manjimup Primary School,,Rutherford St,Manjimup,WA,6258
@@ -4583,7 +4579,6 @@
 0019000000EW0HR,Myrrhee Primary School,,1673 Benalla Whitfield Rd,Myrrhee,VIC,3732
 0019000000EW0HU,Myrtleford P-12 College,Prince Street Campus,Prince St,Myrtleford,VIC,3737
 0019000000EVzei,Nabiac Public School,,56 Clarkson St,Nabiac,NSW,2312
-0019000000FRi9f,Nabua Sanatan Primary School,,,,,
 0019000000EW0FD,Nagambie Primary School,,31 Goulburn St,Nagambie,VIC,3608
 0019000000EW0Zb,Nagoorin State School,,Cnr Degalgil & Ubobo Sts,Nagoorin,QLD,4680
 0019000000EW0hx,Nailsworth Primary School,,2 Balfour St,Nailsworth,SA,5083
@@ -5360,7 +5355,6 @@
 0019000000EW0Y3,Proston State School,,1 Rodney St,Proston,QLD,4613
 0019000000EVzQN,Prouille Primary School,,5 Water St,Wahroonga,NSW,2076
 0019000000EW0GF,Puckapunyal Primary School,,Alamein Rd,Puckapunyal,VIC,3662
-0019000000nEuXr,Pukehina Primary School,,1762 Old Coach Rd,  ,,,Ohinepanea,3186
 0019000000EVzJP,Pularumpi School,,Pularumpi via,Winnellie,NT,0822
 0019000000EW0OB,Pullenvale State School,,120 Grandview Rd,Pullenvale,QLD,4069
 0019000000EVz7f,Pulteney Grammar School,,190 South Terrace,Adelaide,SA,5000
@@ -6006,7 +6000,6 @@
 0019000000EW0sF,Spencer Park Primary School,,26 Hardie Rd,Spencer Park,WA,6330
 0019000000EVzq6,Spencer Public School,,Ferry Rd,Spencer,NSW,2775
 0019000000EVzwY,Spensley Street Primary School,,193 Spensley St,Clifton Hill,VIC,3068
-0019000000K1zmZ,Spinifex State College,,,,,
 0019000000EW15M,Spirit of Play Learning Centre,,Old Post Office Building Inlet Dr,Denmark,WA,6333
 0019000000EW001,Spotswood Primary School,,600 Melbourne Rd,Newport,VIC,3015
 0019000000EW13M,Sprent Primary School,,1245 Castra Rd,Ulverstone,TAS,7315
@@ -6466,7 +6459,6 @@
 0019000000EVzYu,St John the Baptist Primary School,,21a Dulkara Rd,Woy Woy South,NSW,2256
 0019000000EW0ML,St John the Baptist School,,Station St,Koo Wee Rup,VIC,3981
 0019000000EW01a,St John the Baptist School,,17 Forest Rd,Ferntree Gully,VIC,3156
-0019000000ltUml,St John the Evangelist Catholic School,,14 B Otara Road,,Otara,Auckland,
 0019000000EVziG,St John the Evangelist Primary School,,133 Lindesay St,Campbelltown,NSW,2560
 0019000000EW0QX,St John Vianney's Primary School,,15 Oceana Terrace,Manly,QLD,4179
 0019000000EW03o,St John Vianney's School,,Brisbane Terrace,Parkdale East,VIC,3195
@@ -7354,10 +7346,7 @@
 0019000000EW01j,Tecoma Primary School,,1536 Burwood Hwy,Tecoma,VIC,3160
 0019000000EW0VH,Teelba State School,,Billinbah Rd,Via Glenmorgan,QLD,4423
 0019000000EW0DC,Teesdale Primary School,,Main Rd,Teesdale,VIC,3328
-0019000000HJTPD,Tekin Primary School,Oksapmin, Sandaun Province,,,,
 0019000000EYTOt,Te Kura a iwi o Whakatupuranga Rua Mano,,143 Tasman Road,Otaki,,5542
-0019000000FUvB7,Te Kura Kaupapa Māori o Manawatū,,,,,
-0019000000EX67g,Te Kura Toitu o Te Whalti Nui a Toi,,,,,
 0019000000EVzes,Telarah Public School,,Raymond St,Telarah,NSW,2320
 0019000000EVzcY,Telegraph Point Public School,,Pacific Hwy,Telegraph Point,NSW,2441
 0019000000EVz9Y,Telethon Speech and Hearing Centre,,Dodd St,Wembley,WA,6014
@@ -7738,7 +7727,7 @@
 0019000000EW0ja,Uraidla Primary School,,17 Kidney St,Uraidla,SA,5142
 0019000000EVz4J,Uralla Central School,,24-28 Park St,Uralla,NSW,2358
 0019000000EVyyc,Urana Central School,,William St,Urana,NSW,2645
-0019000000Nwd7f,Urandangi State School,,Margaret St, Via Mt Isa,Urandangie,QLD,4825
+0019000000Nwd7f,Urandangi State School,,Margaret St via Mt Isa,Urandangie,QLD,4825
 0019000000EW0Ye,Urangan Point State School,,Miller St,Urangan,QLD,4655
 0019000000EVzt1,Uranquinty Public School,,Pearson St,Uranquinty,NSW,2652
 0019000000EVzJv,Urapunga School,,Blyth St,Rittaruangu,NT,0850
@@ -8413,3 +8402,14 @@
 0019000000EW0Fs,Zeerust Primary School,,255 Zeerust Rd,Tallygaroopna,VIC,3634
 0019000000EVzqX,Zig Zag Public School,,21 Victoria Ave,Lithgow,NSW,2790
 0019000000EW0NH,Zillmere State School,,70 Murphy Rd,Zillmere,QLD,4034
+0019000000EWecy,Byabarra Public School,,1099 Comboyne Rd,Byabarra,NSW,2446
+0019000000HJTP3,Catholic Education Agency,,Kiunga,Western Province,PNG,1111
+0019000000HJTPI,Jim Taylor School,,Banz,Jiwaka Province,PNG,1111
+0019000000nEuXr,Pukehina Primary School,,1762 Old Coach Rd,Ohinepanea,NZ,3186
+0019000000K1zmZ,Spinifex State College,,6-12 Fifth Avenue,Mount Isa,QLD,4825
+0019000000ltUml,St John the Evangelist Catholic School,,14 B Otara Road,Otara Manukau Auckland,NZ,2159 
+0019000000HJTPD,Tekin Primary School,,Oksapmin,Sandaun Province,PNG,1111
+0019000000FUvB7,Te Kura Kaupapa Māori o Manawatū,,88 Rhodes Drive,Kelvin Grove Palmerston North,NZ,4414
+0019000000EX67g,Te Kura Toitu o Te Whalti Nui a Toi,,49 Minginui Road,Te Whaiti Rotorua,NZ,3046
+0019000000EWefP,Maningrida Homelands,,,,NT,0822
+0019000000FRi9f,Nabua Sanatan Primary School,,,,Fiji,1111
