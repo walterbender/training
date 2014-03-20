@@ -24,7 +24,8 @@ from sugar3.datastore import datastore
 import logging
 _logger = logging.getLogger('training-activity-tasks')
 
-from activity import NAME_UID, EMAIL_UID, SCHOOL_UID, ROLE_UID, SCHOOL_NAME
+from activity import (NAME_UID, EMAIL_UID, SCHOOL_UID, ROLE_UID, SCHOOL_NAME,
+                      POSTAL_CODE)
 from graphics import Graphics, FONT_SIZES
 import utils
 from reporter import Reporter
@@ -128,10 +129,10 @@ def get_tasks(task_master):
                    Connected4Task(task_master),
                    # Connected5Task(task_master),
                    Connected6Task(task_master),
-                   Connected6aTask(task_master),
-                   # Connected7Task(task_master),
-                   Connected8Task(task_master),
-                   Connected9Task(task_master, 4)]},
+                   Connected7Task(task_master),
+                   # Connected8Task(task_master),
+                   Connected9Task(task_master),
+                   Connected10Task(task_master, 4)]},
         {'name': _('Getting to Know Sugar Activities'),
          'icon': 'badge-activities',
          'tasks': [Activities1Task(task_master),
@@ -964,20 +965,56 @@ class Connected6Task(HTMLTask):
         HTMLTask.__init__(self, task_master)
         self._name = _('Enter School Name')
         self.uid = _ENTER_SCHOOL_TASK
-        self._uri = 'Connected/connected6.html'
+        self._uri = ['Connected/connected6a.html',
+                     'Connected/connected6b.html']
         self._height = 60
         self._graphics = None
-        self._entry = None
+        self._school_entry = None
+        self._postal_code_entry = None
+        self._postal_code_changed = True
+        self._postal_code = -1
         self._buttons = []
         self._schools = []
         self._sf_ids = []
+        self._default_sf_id = '0019000000pETbT'
         self._completer = None
         self._task_data = None
 
     def is_collectable(self):
         return True
 
-    def _enter_entered(self, widget):
+    def _postal_code_enter_entered(self, widget):
+        if self._is_valid_postal_code_entry():
+            self._school_entry.grab_focus()
+            self._is_valid_school_entry()
+
+    def _postal_code_entry_cb(self, widget, event):
+        if self._is_valid_postal_code_entry():
+            self._is_valid_school_entry()
+
+    def _is_valid_postal_code_entry(self, target=None):
+        if target is None:
+            target = self._postal_code_entry.get_text()
+        _logger.debug('_is_valid_postal_code_entry %s' % target)
+        if len(target) < 3:
+            return False
+        try:
+            i = int(target)
+        except:
+            return False
+        if i > 99 and i < 9999:
+            if self._postal_code != i:
+                _logger.debug('Saw a new postal code %d' % i)
+                self._postal_code_changed = True
+                self._postal_code = i
+                self._task_master.write_task_data(POSTAL_CODE, target)
+            else:
+                self._postal_code_changed = False
+            return True
+        else:
+            return False
+
+    def _school_enter_entered(self, widget):
         if self._is_valid_school_entry():
             self._task_master.enter_entered(self._task_data, self.uid)
 
@@ -987,35 +1024,69 @@ class Connected6Task(HTMLTask):
         return self._is_valid_school_entry()
 
     def _is_valid_school_entry(self):
-        if self._completer is None:
+        # build a completer for this postal code
+        if self._postal_code < 0:
+            return False
+
+        if self._postal_code_changed:
+            _logger.debug('Building school list for %d' % (self._postal_code))
+            # get rid of any old buttons
+            for button in self._buttons:
+                button.destroy()
+
             f = open(os.path.join(self._task_master.activity.bundle_path,
                                   'schools.txt'), 'r')
             schools = f.read().split('\n')
             f.close()
             self._schools = []
             self._sf_ids = []
-            _logger.debug(len(schools))
-            _logger.debug(schools[0])
             for school in schools:
                 try:
-                    name, city, state, postal_code, sf_id = school.split(',')
-                    self._schools.append('%s, %s, %s' % (name, city, state))
+                    sf_id, name, campus, address, city, state, postal_code = \
+                        school.split(',')
+                    if name == 'One Education School':
+                        self._default_sf_id = sf_id
+                    try:
+                        if int(postal_code) != self._postal_code:
+                            continue
+                    except:
+                        _logger.error('bad postal code? (%s: %s)' % 
+                                      (name, postal_code))
+                        continue
+                    if len(campus) > 0:
+                        self._schools.append('%s %s, %s, %s' %
+                                             (name, campus, city, state))
+                    else:
+                        self._schools.append('%s, %s, %s' %
+                                             (name, city, state))
                     self._sf_ids.append(sf_id)
                 except:
-                    _logger.debug(school)
+                    _logger.debug('bad school data? %s' % school)
+            _logger.debug('%d schools in the list' %  (len(self._schools)))
             self._completer = utils.Completer(self._schools)
+            if len(self._schools) < 10:
+                for i in range(len(self._schools)):
+                    self._buttons.append(
+                        self._graphics.add_button(
+                            self._schools[i], self._button_cb,
+                            arg=self._schools[i]))
+                    self._buttons[-1].show()
 
-        if len(self._entry.get_text()) == 0:
+        self._postal_code_changed = False
+        if len(self._school_entry.get_text()) == 0:
             return False
         else:
             return True
 
     def _button_cb(self, widget, text):
-        self._entry.set_text(text)
+        self._school_entry.set_text(text)
         for button in self._buttons:
             button.destroy()
 
-    def _entry_cb(self, widget, event):
+    def _school_entry_cb(self, widget, event):
+        if not self._is_valid_postal_code_entry():
+            _logger.debug('postal code entry is not valid')
+            return
         results = self._completer.complete(
             widget.get_text() + Gdk.keyval_name(event.keyval), 0)
         if len(results) == 1:
@@ -1034,15 +1105,21 @@ class Connected6Task(HTMLTask):
     def _yes_no_cb(self, widget, arg):
         if arg == 'yes':
             self._task_master.write_task_data(SCHOOL_UID, None)
-            school = self._entry.get_text()
+            school = self._school_entry.get_text()
+            postal_code = self._postal_code_entry.get_text()
+            self._task_data[SCHOOL_NAME] = school
+            self._task_data[POSTAL_CODE] = postal_code
+            self._task_master.write_task_data(self._uid, self._task_data)
             self._task_master.write_task_data(SCHOOL_NAME, school)
+            self._task_master.write_task_data(POSTAL_CODE, postal_code)
+            self._task_master.write_task_data(SCHOOL_UID, self._default_sf_id)
             self._task_master.current_task += 1
             self._task_master.write_task_data('current_task',
                                               self._task_master.current_task)
         self._task_master.task_master()
 
     def after_button_press(self):
-        school = self._entry.get_text()
+        school = self._school_entry.get_text()
         if school in self._schools:
             i = self._schools.index(school)
             self._task_master.write_task_data(SCHOOL_UID, self._sf_ids[i])
@@ -1058,38 +1135,66 @@ class Connected6Task(HTMLTask):
             return False
 
     def get_graphics(self):
-        target = self._task_master.read_task_data(SCHOOL_NAME)
-        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
-                           self._uri)
-
         self._graphics = Graphics()
+
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri[0])
         self._graphics.add_uri('file://' + url, height=self._height)
         self._graphics.set_zoom_level(self._zoom_level)
-        if target is not None:
-            self._entry = self._graphics.add_entry(text=target)
+
+        target = self._task_master.read_task_data(POSTAL_CODE)
+        if target is not None and \
+           self._is_valid_postal_code_entry(target=target):
+            self._postal_code_entry = self._graphics.add_entry(text=target)
         else:
-            self._entry = self._graphics.add_entry()
+            self._postal_code_entry = self._graphics.add_entry()
 
-        self._entry.connect('key_press_event', self._entry_cb)
-        self._entry.connect('activate', self._enter_entered)
+        self._postal_code_entry.connect('key-press-event',
+                                        self._postal_code_entry_cb)
+        self._postal_code_entry.connect('activate',
+                                        self._postal_code_enter_entered)
 
-        self._task_master.activity.set_copy_widget(text_entry=self._entry)
-        self._task_master.activity.set_paste_widget(text_entry=self._entry)
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri[1])
+        self._graphics.add_uri('file://' + url, height=self._height)
+        self._graphics.set_zoom_level(self._zoom_level)
+
+        target = self._task_master.read_task_data(SCHOOL_NAME)
+        if target is not None:
+            self._school_entry = self._graphics.add_entry(text=target)
+        else:
+            self._school_entry = self._graphics.add_entry()
+
+        self._school_entry.connect('key-press-event', self._school_entry_cb)
+        self._school_entry.connect('focus-in-event', self._school_entry_cb)
+        self._school_entry.connect('activate', self._school_enter_entered)
+
+        self._postal_code_entry.grab_focus()
 
         return self._graphics, self._prompt
 
     def grab_focus(self):
-        self._entry.set_can_focus(True)
-        self._entry.grab_focus()
+        self._postal_code_entry.set_can_focus(True)
+        self._school_entry.set_can_focus(True)
+        if len(self._postal_code_entry.get_text()) < 3:
+            self._task_master.activity.set_copy_widget(
+                text_entry=self._postal_code_entry)
+            self._task_master.activity.set_paste_widget(
+                text_entry=self._postal_code_entry)
+        else:
+            self._task_master.activity.set_copy_widget(
+                text_entry=self._school_entry)
+            self._task_master.activity.set_paste_widget(
+                text_entry=self._school_entry)
 
 
-class Connected6aTask(HTMLTask):
+class Connected7Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Enter Roll')
         self.uid = _ENTER_ROLE_TASK
-        self._uri = 'Connected/connected6a.html'
+        self._uri = 'Connected/connected7.html'
         self._height = 60
         self._graphics = None
         self._role = None
@@ -1147,13 +1252,13 @@ class Connected6aTask(HTMLTask):
         return graphics, self._prompt
 
 '''
-class Connected7Task(HTMLTask):
+class Connected8Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Connected')
-        self.uid = 'connected-7-task'
-        self._uri = 'Connected/connected7.html'
+        self.uid = 'connected-8-task'
+        self._uri = 'Connected/connected8.html'
 
     def get_requires(self):
         return [_ENTER_NAME_TASK, _VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK,
@@ -1191,22 +1296,22 @@ class Connected7Task(HTMLTask):
         return graphics, self._prompt
 '''
 
-class Connected8Task(HTMLTask):
+class Connected9Task(HTMLTask):
 
     def __init__(self, task_master):
         HTMLTask.__init__(self, task_master)
         self._name = _('Notifications')
-        self.uid = 'connected-8-task'
-        self._uri = 'Connected/connected8.html'
+        self.uid = 'connected-9-task'
+        self._uri = 'Connected/connected9.html'
 
 
-class Connected9Task(BadgeTask):
+class Connected10Task(BadgeTask):
 
     def __init__(self, task_master, section_index):
         BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Connected Badge')
         self.uid = _CONNECTED_BADGE_TASK
-        self._uri = 'Connected/connected9.html'
+        self._uri = 'Connected/connected10.html'
 
 
 class Activities1Task(HTMLTask):
