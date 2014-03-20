@@ -984,6 +984,8 @@ class Connected6Task(HTMLTask):
         return True
 
     def _postal_code_enter_entered(self, widget):
+        # Force new list
+        self._postal_code_changed = True
         if self._is_valid_postal_code_entry():
             self._school_entry.grab_focus()
             self._is_valid_school_entry()
@@ -1044,6 +1046,7 @@ class Connected6Task(HTMLTask):
                 try:
                     sf_id, name, campus, address, city, state, postal_code = \
                         school.split(',')
+                    # save the SF_ID from One Education in case we need it
                     if name == 'One Education School':
                         self._default_sf_id = sf_id
                     try:
@@ -1083,6 +1086,11 @@ class Connected6Task(HTMLTask):
         for button in self._buttons:
             button.destroy()
 
+    def _school_entry_focus_cb(self, widget, event):
+        if not self._is_valid_postal_code_entry():
+            _logger.debug('postal code entry is not valid')
+            return
+
     def _school_entry_cb(self, widget, event):
         if not self._is_valid_postal_code_entry():
             _logger.debug('postal code entry is not valid')
@@ -1109,7 +1117,7 @@ class Connected6Task(HTMLTask):
             postal_code = self._postal_code_entry.get_text()
             self._task_data[SCHOOL_NAME] = school
             self._task_data[POSTAL_CODE] = postal_code
-            self._task_master.write_task_data(self._uid, self._task_data)
+            self._task_master.write_task_data(self.uid, self._task_data)
             self._task_master.write_task_data(SCHOOL_NAME, school)
             self._task_master.write_task_data(POSTAL_CODE, postal_code)
             self._task_master.write_task_data(SCHOOL_UID, self._default_sf_id)
@@ -1166,7 +1174,8 @@ class Connected6Task(HTMLTask):
             self._school_entry = self._graphics.add_entry()
 
         self._school_entry.connect('key-press-event', self._school_entry_cb)
-        self._school_entry.connect('focus-in-event', self._school_entry_cb)
+        self._school_entry.connect('focus-in-event',
+                                   self._school_entry_focus_cb)
         self._school_entry.connect('activate', self._school_enter_entered)
 
         self._postal_code_entry.grab_focus()

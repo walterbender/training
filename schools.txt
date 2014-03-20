@@ -4919,7 +4919,7 @@
 0019000000EVz4t,Olivet Christian College,,89 Main Rd,Campbells Creek,VIC,3451
 0019000000EW0Kw,Omeo Primary School,,167 Day Ave,Omeo,VIC,3898
 0019000000EVzBA,One Arm Point Remote Community School,,One Arm Point Community via,Broome,WA,6725
-0019000000pETbT,One Education School,,Level 1, 93 Bathurst St,Sydney,NSW,1111
+0019000000pETbT,One Education School,Level 1, 93 Bathurst St,Sydney,NSW,1111
 0019000000EW0XW,One Mile State School,,7 John St,Gympie,QLD,4570
 0019000000EW0jA,One Tree Hill Primary School,,McGilp Rd,One Tree Hill,SA,5114
 0019000000EW0sK,Ongerup Primary School,,Carpenter St,Ongerup,WA,6336
