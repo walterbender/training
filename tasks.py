@@ -997,7 +997,6 @@ class Connected6Task(HTMLTask):
     def _is_valid_postal_code_entry(self, target=None):
         if target is None:
             target = self._postal_code_entry.get_text()
-        _logger.debug('_is_valid_postal_code_entry %s' % target)
         if len(target) < 3:
             return False
         try:
@@ -1005,8 +1004,7 @@ class Connected6Task(HTMLTask):
         except:
             return False
         if i > 99 and i < 9999:
-            if self._postal_code != i:
-                _logger.debug('Saw a new postal code %d' % i)
+            if self._postal_code != i or self._postal_code_changed:
                 self._postal_code_changed = True
                 self._postal_code = i
                 self._task_master.write_task_data(POSTAL_CODE, target)
@@ -1043,43 +1041,48 @@ class Connected6Task(HTMLTask):
             self._schools = []
             self._sf_ids = []
             for school in schools:
+                if len(school) == 0:
+                    continue
                 try:
                     sf_id, name, campus, address, city, state, postal_code = \
                         school.split(',')
-                    # save the SF_ID from One Education in case we need it
-                    if name == 'One Education School':
-                        self._default_sf_id = sf_id
-                    try:
-                        if int(postal_code) != self._postal_code:
-                            continue
-                    except:
-                        _logger.error('bad postal code? (%s: %s)' % 
-                                      (name, postal_code))
-                        continue
-                    if len(campus) > 0:
-                        self._schools.append('%s %s, %s, %s' %
-                                             (name, campus, city, state))
-                    else:
-                        self._schools.append('%s, %s, %s' %
-                                             (name, city, state))
-                    self._sf_ids.append(sf_id)
                 except:
-                    _logger.debug('bad school data? %s' % school)
+                    _logger.debug('bad school data? (%s)' % school)
+                # save the SF_ID from One Education in case we need it
+                if name == 'One Education School':
+                    self._default_sf_id = sf_id
+                try:
+                    if int(postal_code) != self._postal_code:
+                        continue
+                except:
+                    _logger.error('bad postal code? (%s: %s)' % 
+                                  (name, postal_code))
+                    continue
+                if len(campus) > 0:
+                    self._schools.append('%s %s, %s, %s' %
+                                         (name, campus, city, state))
+                else:
+                    self._schools.append('%s, %s, %s' % (name, city, state))
+                self._sf_ids.append(sf_id)
             _logger.debug('%d schools in the list' %  (len(self._schools)))
             self._completer = utils.Completer(self._schools)
             if len(self._schools) < 10:
-                for i in range(len(self._schools)):
-                    self._buttons.append(
-                        self._graphics.add_button(
-                            self._schools[i], self._button_cb,
-                            arg=self._schools[i]))
-                    self._buttons[-1].show()
+                self._make_buttons(self._schools)
 
         self._postal_code_changed = False
         if len(self._school_entry.get_text()) == 0:
             return False
         else:
             return True
+
+    def _make_buttons(self, school_list):
+        for button in self._buttons:
+            button.destroy()
+        self._buttons = []
+        for i, school in enumerate(school_list):
+            self._buttons.append(
+                self._graphics.add_button(school, self._button_cb, arg=school))
+            self._buttons[-1].show()
 
     def _button_cb(self, widget, text):
         self._school_entry.set_text(text)
@@ -1088,12 +1091,12 @@ class Connected6Task(HTMLTask):
 
     def _school_entry_focus_cb(self, widget, event):
         if not self._is_valid_postal_code_entry():
-            _logger.debug('postal code entry is not valid')
             return
+        elif len(widget.get_text()) == 0 and len(self._schools) > 0:
+            self._make_buttons(self._schools)
 
     def _school_entry_cb(self, widget, event):
         if not self._is_valid_postal_code_entry():
-            _logger.debug('postal code entry is not valid')
             return
         results = self._completer.complete(
             widget.get_text() + Gdk.keyval_name(event.keyval), 0)
@@ -1104,11 +1107,7 @@ class Connected6Task(HTMLTask):
         elif len(results) < 10:
             for button in self._buttons:
                 button.destroy()
-            for i in range(len(results)):
-                self._buttons.append(
-                    self._graphics.add_button(
-                        results[i], self._button_cb, arg=results[i]))
-                self._buttons[-1].show()
+            self._make_buttons(results)
 
     def _yes_no_cb(self, widget, arg):
         if arg == 'yes':
