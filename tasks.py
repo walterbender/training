@@ -1280,7 +1280,7 @@ class Connected8Task(HTMLTask):
         email = self._task_master.read_task_data(EMAIL_UID)
         if email is None:  # Should never happen
             email = ''
-        school = self._task_master.read_task_data(SCHOOL_UID)
+        school = self._task_master.read_task_data(SCHOOL_NAME)
         if school is None:  # Should never happen
             school = ''
         role = self._task_master.read_task_data(ROLE_UID)
