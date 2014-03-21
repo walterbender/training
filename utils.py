@@ -213,6 +213,25 @@ def look_for_training_data(path):
     return glob.glob(os.path.join(path, 'training-data-*'))
 
 
+def look_for_xlw(path):
+    return glob.glob(os.path.join(path, '*.xlw'))
+
+
+def look_for_xls(path):
+    return glob.glob(os.path.join(path, '*.xls'))
+
+
+def remove_xlw_suffix(path):
+    if os.path.exists(path):
+        if path[-4:] == '.xlw':
+            results = subprocess.check_output(['mv', path, path[:-4]])
+
+
+def set_read_write(path):
+    if os.path.exists(path):
+        results = subprocess.check_output(['chmod', '666', path])
+
+
 def unexpected_training_data_files(path, name):
     ''' There should be at most one file training-data-XXXX-XXXX and it should
         match the volume path basename. '''

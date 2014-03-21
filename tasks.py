@@ -2659,6 +2659,14 @@ class Assessment1Task(HTMLTask):
         if self._yes_no_required:
             return _ASSESSMENT_DOCUMENT_TASK, _ASSESSMENT_BADGE_TASK
         else:
+            # Mark _ASSESSMENT_DOCUMENT_TASK as complete
+            task_data = self._task_master.read_task_data(
+                _ASSESSMENT_DOCUMENT_TASK)
+            if task_data is None:
+                task_data = {}
+            task_data['completed'] = True
+            self._task_master.write_task_data(_ASSESSMENT_DOCUMENT_TASK,
+                                              task_data)
             return None, _ASSESSMENT_BADGE_TASK
 
     def test(self, task_data):
@@ -2756,14 +2764,22 @@ class Assessment2Task(HTMLTask):
                 dsobject.destroy()
             return False
         else:
+            # Workaround to Sugar mimetype bug that causes file copied
+            # to USB has .xlw extension...
+            targets = utils.look_for_xlw(
+                self._task_master.activity.volume_data[0]['usb_path'])
+            for target in targets:
+                utils.remove_xlw_suffix(target)
+            # ...and read_only
+            targets = utils.look_for_xls(
+                self._task_master.activity.volume_data[0]['usb_path'])
+            for target in targets:
+                utils.set_read_write(target)
+
             # Look for the assessment document on the USB stick
-            # FIX ME: What if they changed the name???
-            # FIX ME: File copied to USB has .xlw extension
             return os.path.exists(os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
-                task_data['data'])) or os.path.exists(os.path.join(
-                    self._task_master.activity.volume_data[0]['usb_path'],
-                    task_data['data'] + '.xlw'))
+                task_data['data']))
 
     def get_graphics(self):
         name = utils.get_safe_text('"%s-%s%s" and "%s"' %
@@ -2795,7 +2811,8 @@ class Assessment3Task(BadgeTask):
         self._prompt = _('Finish!')
 
     def after_button_press(self):
-        self._task_master.activity.close()
+        self._task_master.update_completion_percentage()
+        GObject.idle_add(self._task_master.activity.close)
         return True
 
     def test(self, task_data):
