@@ -2667,6 +2667,10 @@ class Assessment1Task(HTMLTask):
             task_data['completed'] = True
             self._task_master.write_task_data(_ASSESSMENT_DOCUMENT_TASK,
                                               task_data)
+            self._task_master.update_completion_percentage()
+            _logger.debug('reporting...')
+            reporter = Reporter(self._task_master.activity)
+            reporter.report([self._task_master.read_task_data()])
             return None, _ASSESSMENT_BADGE_TASK
 
     def test(self, task_data):
@@ -2716,6 +2720,12 @@ class Assessment2Task(HTMLTask):
         self.uid = _ASSESSMENT_DOCUMENT_TASK
         self._uri = 'Assessment/assessment-yes.html'
         self.collectable = True
+
+    def after_button_press(self):
+        self._task_master.update_completion_percentage()
+        _logger.debug('reporting...')
+        reporter = Reporter(self._task_master.activity)
+        reporter.report([self._task_master.read_task_data()])
 
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK]
@@ -2811,7 +2821,6 @@ class Assessment3Task(BadgeTask):
         self._prompt = _('Finish!')
 
     def after_button_press(self):
-        self._task_master.update_completion_percentage()
         GObject.idle_add(self._task_master.activity.close)
         return True
 
