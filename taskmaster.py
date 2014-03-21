@@ -243,8 +243,10 @@ class TaskMaster(Gtk.Alignment):
         task = self._task_list[section_index]['tasks'][task_index]
         if task.after_button_press():
             if self._yes_task is not None:
+                self.update_completion_percentage()
                 self._jump_to_task_cb(None, 'yes')
             elif self._no_task is not None:
+                self.update_completion_percentage()
                 self._jump_to_task_cb(None, 'no')
             else:
                 self.current_task += 1

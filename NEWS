@@ -4,6 +4,8 @@ NEWS
 * Merge Paul's new assessment copy
 * Fixed various problems with school entry task (AD-34)
 * Reset adjusters as per (AD-34)
+* Fixed 95% problem (AD-34)
+* Add confirmation of School and Role
 
 2.7
 * Skipping 2.6 because that is a special NZ spin

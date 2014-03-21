@@ -130,7 +130,7 @@ def get_tasks(task_master):
                    # Connected5Task(task_master),
                    Connected6Task(task_master),
                    Connected7Task(task_master),
-                   # Connected8Task(task_master),
+                   Connected8Task(task_master),
                    Connected9Task(task_master),
                    Connected10Task(task_master, 4)]},
         {'name': _('Getting to Know Sugar Activities'),
@@ -1266,7 +1266,7 @@ class Connected7Task(HTMLTask):
 
         return graphics, self._prompt
 
-'''
+
 class Connected8Task(HTMLTask):
 
     def __init__(self, task_master):
@@ -1309,7 +1309,7 @@ class Connected8Task(HTMLTask):
         self._task_master.activity.set_paste_widget()
 
         return graphics, self._prompt
-'''
+
 
 class Connected9Task(HTMLTask):
 
