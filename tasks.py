@@ -2726,6 +2726,7 @@ class Assessment2Task(HTMLTask):
         _logger.debug('reporting...')
         reporter = Reporter(self._task_master.activity)
         reporter.report([self._task_master.read_task_data()])
+        return True
 
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK]
