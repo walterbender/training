@@ -8403,13 +8403,13 @@
 0019000000EVzqX,Zig Zag Public School,,21 Victoria Ave,Lithgow,NSW,2790
 0019000000EW0NH,Zillmere State School,,70 Murphy Rd,Zillmere,QLD,4034
 0019000000EWecy,Byabarra Public School,,1099 Comboyne Rd,Byabarra,NSW,2446
-0019000000HJTP3,Catholic Education Agency,,Kiunga,Western Province,PNG,1111
-0019000000HJTPI,Jim Taylor School,,Banz,Jiwaka Province,PNG,1111
+0019000000HJTP3,Catholic Education Agency,,Kiunga,Western Province,PNG,0000
+0019000000HJTPI,Jim Taylor School,,Banz,Jiwaka Province,PNG,0000
 0019000000nEuXr,Pukehina Primary School,,1762 Old Coach Rd,Ohinepanea,NZ,3186
 0019000000K1zmZ,Spinifex State College,,6-12 Fifth Avenue,Mount Isa,QLD,4825
 0019000000ltUml,St John the Evangelist Catholic School,,14 B Otara Road,Otara Manukau Auckland,NZ,2159 
-0019000000HJTPD,Tekin Primary School,,Oksapmin,Sandaun Province,PNG,1111
+0019000000HJTPD,Tekin Primary School,,Oksapmin,Sandaun Province,PNG,0000
 0019000000FUvB7,Te Kura Kaupapa Māori o Manawatū,,88 Rhodes Drive,Kelvin Grove Palmerston North,NZ,4414
 0019000000EX67g,Te Kura Toitu o Te Whalti Nui a Toi,,49 Minginui Road,Te Whaiti Rotorua,NZ,3046
 0019000000EWefP,Maningrida Homelands,,,,NT,0822
-0019000000FRi9f,Nabua Sanatan Primary School,,,,Fiji,1111
+0019000000FRi9f,Nabua Sanatan Primary School,,,,Fiji,0000

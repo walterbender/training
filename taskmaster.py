@@ -464,6 +464,8 @@ class TaskMaster(Gtk.Alignment):
         task.set_font_size(self.activity.font_size)
         task.set_zoom_level(self.activity.zoom_level)
 
+        self.activity.reset_scrolled_window_adjustments()
+
         if self._graphics is not None:
             self._graphics.destroy()
         graphics, label = task.get_graphics()

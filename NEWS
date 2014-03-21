@@ -1,5 +1,10 @@
 NEWS
 
+2.8
+* Merge Paul's new assessment copy
+* Fixed various problems with school entry task (AD-34)
+* Reset adjusters as per (AD-34)
+
 2.7
 * Skipping 2.6 because that is a special NZ spin
 * Refactored school name task as per AD-34

@@ -45,7 +45,7 @@ NAME_UID = 'name'
 EMAIL_UID = 'email_address'
 SCHOOL_UID = 'school_sf_id'
 SCHOOL_NAME = 'school_name'
-POSTAL_CODE = 'postal_code'
+POST_CODE = 'post_code'
 ROLE_UID = 'role'
 TRAINING_DATA_UID = 'training_data_uid'
 VERSION_NUMBER = 'version_number'
@@ -510,6 +510,14 @@ class TrainingActivity(activity.Activity):
         self._update_completed_sections()
         self._check_connected_task_status()
         self._task_master.task_master()
+
+    def reset_scrolled_window_adjustments(self):
+        adj = self._scrolled_window.get_hadjustment()
+        if adj is not None:
+            adj.set_value(0)
+        adj = self._scrolled_window.get_vadjustment()
+        if adj is not None:
+            adj.set_value(0)
 
     def load_graphics_area(self, widget):
         self._graphics_area.add(widget)
