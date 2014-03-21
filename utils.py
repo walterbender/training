@@ -229,7 +229,7 @@ def remove_xlw_suffix(path):
 
 def set_read_write(path):
     if os.path.exists(path):
-        results = subprocess.check_output(['chmod', '666', path])
+        results = subprocess.check_output(['chmod', '+w', path])
 
 
 def unexpected_training_data_files(path, name):
