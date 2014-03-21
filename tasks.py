@@ -2659,18 +2659,6 @@ class Assessment1Task(HTMLTask):
         if self._yes_no_required:
             return _ASSESSMENT_DOCUMENT_TASK, _ASSESSMENT_BADGE_TASK
         else:
-            # Mark _ASSESSMENT_DOCUMENT_TASK as complete
-            task_data = self._task_master.read_task_data(
-                _ASSESSMENT_DOCUMENT_TASK)
-            if task_data is None:
-                task_data = {}
-            task_data['completed'] = True
-            self._task_master.write_task_data(_ASSESSMENT_DOCUMENT_TASK,
-                                              task_data)
-            self._task_master.update_completion_percentage()
-            _logger.debug('reporting...')
-            reporter = Reporter(self._task_master.activity)
-            reporter.report([self._task_master.read_task_data()])
             return None, _ASSESSMENT_BADGE_TASK
 
     def test(self, task_data):
@@ -2820,6 +2808,33 @@ class Assessment3Task(BadgeTask):
         self._uri = 'Assessment/assessment-no.html'
         self._height = 500
         self._prompt = _('Finish!')
+
+    def get_graphics(self):
+        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
+                           self._uri)
+
+        graphics = Graphics()
+        webkit = graphics.add_uri('file://' + url, height=self._height)
+        graphics.set_zoom_level(self._zoom_level)
+
+        self._task_master.activity.set_copy_widget(webkit=webkit)
+        self._task_master.activity.set_paste_widget()
+
+        # Special check in case we said 'no'
+        task_data = self._task_master.read_task_data(_ASSESSMENT_DOCUMENT_TASK)
+        if task_data is None:
+            task_data = {}
+        if not 'completed' in task_data or not task_data['completed']:
+            # Mark _ASSESSMENT_DOCUMENT_TASK as complete
+            task_data['completed'] = True
+            self._task_master.write_task_data(
+                _ASSESSMENT_DOCUMENT_TASK, task_data)
+            self._task_master.update_completion_percentage()
+            _logger.debug('reporting...')
+            reporter = Reporter(self._task_master.activity)
+            reporter.report([self._task_master.read_task_data()])
+
+        return graphics, self._prompt
 
     def after_button_press(self):
         GObject.idle_add(self._task_master.activity.close)
