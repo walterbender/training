@@ -25,7 +25,7 @@ import logging
 _logger = logging.getLogger('training-activity-tasks')
 
 from activity import (NAME_UID, EMAIL_UID, SCHOOL_UID, ROLE_UID, SCHOOL_NAME,
-                      POSTAL_CODE)
+                      POST_CODE)
 from graphics import Graphics, FONT_SIZES
 import utils
 from reporter import Reporter
@@ -976,6 +976,7 @@ class Connected6Task(HTMLTask):
         self._buttons = []
         self._schools = []
         self._sf_ids = []
+        self._results = []
         self._default_sf_id = '0019000000pETbT'
         self._completer = None
         self._task_data = None
@@ -1003,13 +1004,13 @@ class Connected6Task(HTMLTask):
             i = int(target)
         except:
             return False
-        if i > 99 and i < 9999:
-            if self._postal_code != i or self._postal_code_changed:
-                self._postal_code_changed = True
-                self._postal_code = i
-                self._task_master.write_task_data(POSTAL_CODE, target)
-            else:
-                self._postal_code_changed = False
+        if i >= 0 and i < 9999:
+            # if self._postal_code != i or self._postal_code_changed:
+            self._postal_code_changed = True
+            self._postal_code = i
+            self._task_master.write_task_data(POST_CODE, target)
+            # else:
+            #     self._postal_code_changed = False
             return True
         else:
             return False
@@ -1029,7 +1030,6 @@ class Connected6Task(HTMLTask):
             return False
 
         if self._postal_code_changed:
-            _logger.debug('Building school list for %d' % (self._postal_code))
             # get rid of any old buttons
             for button in self._buttons:
                 button.destroy()
@@ -1064,7 +1064,7 @@ class Connected6Task(HTMLTask):
                 else:
                     self._schools.append('%s, %s, %s' % (name, city, state))
                 self._sf_ids.append(sf_id)
-            _logger.debug('%d schools in the list' %  (len(self._schools)))
+            # _logger.debug('%d schools in the list' %  (len(self._schools)))
             self._completer = utils.Completer(self._schools)
             if len(self._schools) < 10:
                 self._make_buttons(self._schools)
@@ -1095,19 +1095,21 @@ class Connected6Task(HTMLTask):
         elif len(widget.get_text()) == 0 and len(self._schools) > 0:
             self._make_buttons(self._schools)
 
-    def _school_entry_cb(self, widget, event):
+    def _school_entry_release_cb(self, widget, event):
+        if len(self._results) == 1:
+            widget.set_text(self._results[0])
+            for button in self._buttons:
+                button.destroy()
+        elif len(self._results) < 10:
+            for button in self._buttons:
+                button.destroy()
+            self._make_buttons(self._results)
+
+    def _school_entry_press_cb(self, widget, event):
         if not self._is_valid_postal_code_entry():
             return
-        results = self._completer.complete(
+        self._results = self._completer.complete(
             widget.get_text() + Gdk.keyval_name(event.keyval), 0)
-        if len(results) == 1:
-            widget.set_text(results[0])
-            for button in self._buttons:
-                button.destroy()
-        elif len(results) < 10:
-            for button in self._buttons:
-                button.destroy()
-            self._make_buttons(results)
 
     def _yes_no_cb(self, widget, arg):
         if arg == 'yes':
@@ -1115,10 +1117,10 @@ class Connected6Task(HTMLTask):
             school = self._school_entry.get_text()
             postal_code = self._postal_code_entry.get_text()
             self._task_data[SCHOOL_NAME] = school
-            self._task_data[POSTAL_CODE] = postal_code
+            self._task_data[POST_CODE] = postal_code
             self._task_master.write_task_data(self.uid, self._task_data)
             self._task_master.write_task_data(SCHOOL_NAME, school)
-            self._task_master.write_task_data(POSTAL_CODE, postal_code)
+            self._task_master.write_task_data(POST_CODE, postal_code)
             self._task_master.write_task_data(SCHOOL_UID, self._default_sf_id)
             self._task_master.current_task += 1
             self._task_master.write_task_data('current_task',
@@ -1149,13 +1151,15 @@ class Connected6Task(HTMLTask):
         self._graphics.add_uri('file://' + url, height=self._height)
         self._graphics.set_zoom_level(self._zoom_level)
 
-        target = self._task_master.read_task_data(POSTAL_CODE)
+        target = self._task_master.read_task_data(POST_CODE)
         if target is not None and \
            self._is_valid_postal_code_entry(target=target):
             self._postal_code_entry = self._graphics.add_entry(text=target)
         else:
             self._postal_code_entry = self._graphics.add_entry()
 
+        self._postal_code_entry.connect('key-release-event',
+                                        self._postal_code_entry_cb)
         self._postal_code_entry.connect('key-press-event',
                                         self._postal_code_entry_cb)
         self._postal_code_entry.connect('activate',
@@ -1172,7 +1176,10 @@ class Connected6Task(HTMLTask):
         else:
             self._school_entry = self._graphics.add_entry()
 
-        self._school_entry.connect('key-press-event', self._school_entry_cb)
+        self._school_entry.connect('key-release-event',
+                                   self._school_entry_release_cb)
+        self._school_entry.connect('key-press-event',
+                                   self._school_entry_press_cb)
         self._school_entry.connect('focus-in-event',
                                    self._school_entry_focus_cb)
         self._school_entry.connect('activate', self._school_enter_entered)
