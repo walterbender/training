@@ -1,5 +1,8 @@
 NEWS
 
+3.1
+* Use stat to create chown flags
+
 3
 * New release for 33032 build
 
