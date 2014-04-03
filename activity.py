@@ -102,7 +102,7 @@ class TrainingActivity(activity.Activity):
     transfer_failed_signal = GObject.Signal('failed', arg_types=([]))
 
     def __init__(self, handle):
-        ''' Initialize the toolbars and the game board '''
+        ''' Initialize the toolbars and restore any saved data '''
         try:
             super(TrainingActivity, self).__init__(handle)
         except dbus.exceptions.DBusException as e:
@@ -410,10 +410,10 @@ class TrainingActivity(activity.Activity):
                 alert = ConfirmationAlert()
                 alert.props.title = _('USB key problem')
                 alert.props.msg = \
-                    _('Please insert your USB key into a different slot.')
-                alert.connect('response', self._remove_alert_cb)
+                    _('We need to run a file check.')
+                alert.connect('response', self._dos_fsck_alert_cb)
                 self.add_alert(alert)
-                self._load_intro_graphics(file_name='reinsert-usb.html')
+                self._load_intro_graphics(file_name='fsck-usb.html')
                 return False
 
             # ...save a shadow copy in Sugar
@@ -447,6 +447,7 @@ class TrainingActivity(activity.Activity):
         elif hasattr(self, 'progress_toolbar_button') and \
              self.progress_toolbar_button.is_expanded():
             return True
+        return False
 
     def _launch_task_master(self):
         # Most things need only be done once
@@ -1101,6 +1102,16 @@ class TrainingActivity(activity.Activity):
 
     def _remove_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
+
+    def _dos_fsck_alert_cb(self, alert, response_id):
+        self.remove_alert(alert)
+        if response_id is Gtk.ResponseType.OK:
+            _logger.debug('dos_fsck: looking for mount for %s' %
+                          self.volume_data[0]['usb_path'])
+            target = utils.get_device_path(self.volume_data[0]['usb_path'])
+            if target is not None:
+                _logger.error('running dosfsck -a %s' % target)
+                utils.dos_fsck(target)
 
     def _close_alert_cb(self, alert, response_id):
         self.remove_alert(alert)

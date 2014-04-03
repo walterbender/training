@@ -371,6 +371,30 @@ def get_volume_paths():
     return paths
 
 
+def get_device_path(target):
+    # There must be a Gio.VolumeMonitor way of doing this
+    results = subprocess.check_output(['df']).split('\n')
+    for line in results:
+        mount = line.split(' ')
+        if mount[-1] == target:
+            return mount[0]
+    return None
+
+
+def dos_fsck(target):
+    _logger.error('Using VTE to dosfsck -a %s' % target)
+    vt = Vte.Terminal()
+    success_, pid = vt.fork_command_full(
+        Vte.PtyFlags.DEFAULT,
+        os.environ["HOME"],
+        ['/usr/bin/sudo', '/usr/sbin/dosfsck', '-a', target],
+        [],
+        GLib.SpawnFlags.DO_NOT_REAP_CHILD,
+        None,
+        None)
+    _logger.error('VTE %s %s' % (str(success_), str(pid)))
+
+
 def get_number_of_mounted_volumes():
     global volume_monitor
     if volume_monitor is None:

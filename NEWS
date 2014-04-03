@@ -1,7 +1,13 @@
 NEWS
 
+3.2
+* Fix for Read Only USB problem (related to AD-33)
+
 3.1
+* Attempt to fix 95% problem (SD-1)
 * Use stat to create chown flags
+* Add missing return False to expanded test
+* PEP8 cleanup
 
 3
 * New release for 33032 build
