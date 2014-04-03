@@ -1055,7 +1055,7 @@ class Connected6Task(HTMLTask):
                     if int(postal_code) != self._postal_code:
                         continue
                 except:
-                    _logger.error('bad postal code? (%s: %s)' % 
+                    _logger.error('bad postal code? (%s: %s)' %
                                   (name, postal_code))
                     continue
                 if len(campus) > 0:
@@ -1610,7 +1610,7 @@ class Journal6Task(HTMLTask):
                                                 _('Portfolio')))
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s' % (self._uri, name))
-                            
+
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
@@ -2647,10 +2647,10 @@ class Assessment1Task(HTMLTask):
         self._yes_no_required = True
 
     def get_requires(self):
-        required =  [_WELCOME_BADGE_TASK, _CONNECTED_BADGE_TASK,
-                     _TOOLBAR_BADGE_TASK, _ACTIVITIES_BADGE_TASK,
-                     _JOURNAL_BADGE_TASK, _VIEWS_BADGE_TASK,
-                     _FRAME_BADGE_TASK, _SETTINGS_BADGE_TASK]
+        required = [_WELCOME_BADGE_TASK, _CONNECTED_BADGE_TASK,
+                    _TOOLBAR_BADGE_TASK, _ACTIVITIES_BADGE_TASK,
+                    _JOURNAL_BADGE_TASK, _VIEWS_BADGE_TASK,
+                    _FRAME_BADGE_TASK, _SETTINGS_BADGE_TASK]
         if utils.is_XO():
             required.append(_XO_BADGE_TASK)
         return required
@@ -2719,9 +2719,6 @@ class Assessment2Task(HTMLTask):
     def get_requires(self):
         return [_VALIDATE_EMAIL_TASK, _ENTER_SCHOOL_TASK]
 
-    def is_collectable(self):
-        return self.collectable
-
     def test(self, task_data):
         if not 'data' in task_data or task_data['data'] is None:
             task_data['data'] = '%s-%s%s' % (
@@ -2783,12 +2780,12 @@ class Assessment2Task(HTMLTask):
     def get_graphics(self):
         name = utils.get_safe_text('"%s-%s%s" and "%s"' %
                                    (_('Assessment'),
-                                    self._get_user_name().replace(',','-'),
+                                    self._get_user_name().replace(',', '-'),
                                     _ASSESSMENT_SUFFIX,
                                     _('Assessment-Instructions.pdf')))
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s' % (self._uri, name))
-                            
+
         graphics = Graphics()
         webkit = graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
