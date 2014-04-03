@@ -553,15 +553,15 @@ class Welcome4Task(HTMLTask):
         return True
 
     def get_graphics(self):
-        email = self._task_master.read_task_data(EMAIL_UID)
+        email_address = self._task_master.read_task_data(EMAIL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
         graphics = Graphics()
         graphics.add_uri('file://' + url, height=self._height)
         graphics.set_zoom_level(self._zoom_level)
-        if email is not None:
-            self._entry = graphics.add_entry(text=email)
+        if email_address is not None:
+            self._entry = graphics.add_entry(text=email_address)
         else:
             self._entry = graphics.add_entry()
 
@@ -625,21 +625,21 @@ class Welcome5Task(HTMLTask):
 
     def get_graphics(self):
         self._entries = []
-        email = self._task_master.read_task_data(EMAIL_UID)
+        email_address = self._task_master.read_task_data(EMAIL_UID)
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            self._uri)
 
         graphics = Graphics()
-        if email is None:
+        if email_address is None:
             # This should not happen except if data file is corrupted
             self._entries.append(graphics.add_entry(text=''))
             _logger.error('email was missing in Task %s' % self.uid)
         else:
-            self._entries.append(graphics.add_entry(text=email))
+            self._entries.append(graphics.add_entry(text=email_address))
         graphics.add_uri('file://' + url, height=400)
         graphics.set_zoom_level(self._zoom_level)
-        if email is None:  # Should never happen
-            email = ''
+        if email_address is None:  # Should never happen
+            email_address = ''
         self._entries.append(graphics.add_entry())
 
         self._entries[0].connect('activate', self._enter_entered)
@@ -936,20 +936,20 @@ class Connected5Task(HTMLTask):
         name = self._task_master.read_task_data(NAME_UID)
         if name is None:  # Should never happen
             name = ''
-        email = self._task_master.read_task_data(EMAIL_UID)
-        if email is None:  # Should never happen
-            email = ''
+        email_address = self._task_master.read_task_data(EMAIL_UID)
+        if email_address is None:  # Should never happen
+            email_address = ''
         url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
                            '%s?NAME=%s&EMAIL=%s' %
                            (self._uri,
                             utils.get_safe_text(name),
-                            utils.get_safe_text(email)))
+                            utils.get_safe_text(email_address)))
 
         graphics = Graphics()
         graphics.add_uri('file://' + url, height=400)
         graphics.set_zoom_level(self._zoom_level)
         self._entries.append(graphics.add_entry(text=name))
-        self._entries.append(graphics.add_entry(text=email))
+        self._entries.append(graphics.add_entry(text=email_address))
         # Copy/Paste to second entry
         self._task_master.activity.set_copy_widget(text_entry=self._entries[1])
         self._task_master.activity.set_paste_widget(
@@ -1284,9 +1284,9 @@ class Connected8Task(HTMLTask):
         name = self._task_master.read_task_data(NAME_UID)
         if name is None:  # Should never happen
             name = ''
-        email = self._task_master.read_task_data(EMAIL_UID)
-        if email is None:  # Should never happen
-            email = ''
+        email_address = self._task_master.read_task_data(EMAIL_UID)
+        if email_address is None:  # Should never happen
+            email_address = ''
         school = self._task_master.read_task_data(SCHOOL_NAME)
         if school is None:  # Should never happen
             school = ''
@@ -1297,7 +1297,7 @@ class Connected8Task(HTMLTask):
                            '%s?NAME=%s&EMAIL=%s&SCHOOL=%s&ROLE=%s' %
                            (self._uri,
                             utils.get_safe_text(name),
-                            utils.get_safe_text(email),
+                            utils.get_safe_text(email_address),
                             utils.get_safe_text(school),
                             utils.get_safe_text(role)))
 
