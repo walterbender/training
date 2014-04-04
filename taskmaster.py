@@ -217,7 +217,6 @@ class TaskMaster(Gtk.Alignment):
             self._graphics_grid.attach(self._graphics, 0, 0, 1, 1)
             self._graphics.show()
             self.task_button.set_label(_('Exit'))
-            self.activity.complete = True
 
     def enter_entered(self, task_data, uid):
         ''' Enter was entered in a text entry '''

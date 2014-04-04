@@ -507,7 +507,6 @@ class TrainingActivity(activity.Activity):
         self.set_canvas(self._fixed)
         self._fixed.show()
 
-        self.completed = False
         self._update_completed_sections()
         self._check_connected_task_status()
         self._task_master.task_master()
