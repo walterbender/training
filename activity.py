@@ -1112,6 +1112,14 @@ class TrainingActivity(activity.Activity):
                 _logger.error('running dosfsck -a %s' % target)
                 utils.dos_fsck(target)
 
+                alert = ConfirmationAlert()
+                alert.props.title = _('The USB filesystem has been checked')
+                alert.props.msg = \
+                    _('Please remove and reinsert your USB.')
+                alert.connect('response', self._close_alert_cb)
+                self.add_alert(alert)
+                self._load_intro_graphics(file_name='reinsert-usb.html')
+
     def _close_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
         if response_id is Gtk.ResponseType.OK:
