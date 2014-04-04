@@ -2803,47 +2803,15 @@ class Assessment3Task(BadgeTask):
         self._name = _('Assessment Badge')
         self.uid = _ASSESSMENT_BADGE_TASK
         self._uri = 'Assessment/assessment-no.html'
-        self._height = 500
         self._prompt = _('Finish!')
 
-    def get_graphics(self):
-        url = os.path.join(self._task_master.get_bundle_path(), 'html-content',
-                           self._uri)
-
-        graphics = Graphics()
-        webkit = graphics.add_uri('file://' + url, height=self._height)
-        graphics.set_zoom_level(self._zoom_level)
-
-        self._task_master.activity.set_copy_widget(webkit=webkit)
-        self._task_master.activity.set_paste_widget()
-
-        # Special check in case we said 'no'
-        task_data = self._task_master.read_task_data(_ASSESSMENT_DOCUMENT_TASK)
-        if task_data is None:
-            task_data = {}
-        if not 'completed' in task_data or not task_data['completed']:
-            # Mark _ASSESSMENT_DOCUMENT_TASK as complete
-            task_data['completed'] = True
-            self._task_master.write_task_data(
-                _ASSESSMENT_DOCUMENT_TASK, task_data)
-            self._task_master.update_completion_percentage()
-            _logger.debug('reporting...')
-            reporter = Reporter(self._task_master.activity)
-            reporter.report([self._task_master.read_task_data()])
-
-        return graphics, self._prompt
+    def is_collectable(self):
+        return True
 
     def after_button_press(self):
-        GObject.idle_add(self._task_master.activity.close)
         return True
 
     def test(self, task_data):
-        # If we arrive here and _ASSESSMENT_DOCUMENT_TASK is not
-        # complete, then the user chose not to do that task, so we
-        # need to mark that task as not collectable.
-        task = self._task_master.uid_to_task(_ASSESSMENT_DOCUMENT_TASK)
-        if not task.is_completed:
-            task.collectable = False
-            self._task_master.update_completion_percentage()
-
-        return self._task_master.button_was_pressed
+        # All done, so inform the user even before task is "collected"
+        self._task_master.update_completion_percentage(finished=True)
+        return True

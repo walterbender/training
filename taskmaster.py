@@ -28,6 +28,7 @@ _logger = logging.getLogger('training-activity-taskmaster')
 import tasks
 from progressbar import ProgressBar
 import utils
+from reporter import Reporter
 from graphics import Graphics
 from activity import (TRAINING_DATA_UID, NAME_UID, EMAIL_UID,
                       VERSION_NUMBER, COMPLETION_PERCENTAGE)
@@ -205,6 +206,12 @@ class TaskMaster(Gtk.Alignment):
             self._first_time = True
             self._run_task(section_index, task_index)
         else:
+            self.update_completion_percentage(finished=True)
+            _logger.debug('Sending final report.')
+            self._reported = True
+            reporter = Reporter(self.activity)
+            reporter.report([self.read_task_data()])
+
             self._destroy_graphics()
             graphics = Graphics()
             self._graphics = graphics
@@ -241,7 +248,13 @@ class TaskMaster(Gtk.Alignment):
         section_index, task_index = self.get_section_and_task_index()
         task = self._task_list[section_index]['tasks'][task_index]
         if task.after_button_press():
-            if self._yes_task is not None:
+            if self.current_task == self._get_number_of_tasks():
+                # We want to make sure that the final report is sent, hence
+                # the delay before closing.
+                self.activity.busy_cursor()
+                _logger.debug('All done: closing in 5 seconds')
+                GObject.timeout_add(5000, self.activity.close)
+            elif self._yes_task is not None:
                 self.update_completion_percentage()
                 self._jump_to_task_cb(None, 'yes')
             elif self._no_task is not None:
@@ -895,11 +908,15 @@ class TaskMaster(Gtk.Alignment):
 
         self.update_completion_percentage()
 
-    def update_completion_percentage(self):
-        # Round to nearest 5%
-        completion_percentage = self._get_number_of_completed_collectables() \
-            * 100. / self._get_number_of_collectables()
-        completion_percentage = (int(completion_percentage + 2.5) / 5) * 5
+    def update_completion_percentage(self, finished=False):
+        if finished:
+            completion_percentage = 100
+        else:
+            # Round to nearest 5%
+            completion_percentage = \
+                self._get_number_of_completed_collectables() \
+                * 100. / self._get_number_of_collectables()
+            completion_percentage = (int(completion_percentage + 2.5) / 5) * 5
         self.activity.progress_label.set_markup(
             '<span foreground="%s" size="%s"><b>%s</b></span>' %
             (style.COLOR_WHITE.get_html(), 'x-large',
