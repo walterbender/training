@@ -2,6 +2,7 @@ NEWS
 
 3.2
 * Fix for Read Only USB problem (related to AD-33)
+* Copy edits by Paul (fsck-usb.html)
 
 3.1
 * Attempt to fix 95% problem (SD-1)
