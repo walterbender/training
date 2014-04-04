@@ -3,6 +3,8 @@ NEWS
 3.2
 * More work on 95% problem.
 * Worked on Read Only USB problem (related to AD-33)
+ - added fsck
+ - added unmount
 * Copy edits by Paul (fsck-usb.html)
 
 3.1

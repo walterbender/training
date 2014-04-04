@@ -115,8 +115,10 @@ class TrainingActivity(activity.Activity):
         self.connect('failed', self.__transfer_failed_cb)
 
         self.volume_monitor = Gio.VolumeMonitor.get()
-        self.volume_monitor.connect('mount-added', self._mount_added_cb)
-        self.volume_monitor.connect('mount-removed', self._mount_removed_cb)
+        self._mount_added_id = self.volume_monitor.connect(
+            'mount-added', self._mount_added_cb)
+        self._mount_removed_id = self.volume_monitor.connect(
+            'mount-removed', self._mount_removed_cb)
 
         if hasattr(self, 'metadata') and 'font_size' in self.metadata:
             self.font_size = int(self.metadata['font_size'])
@@ -1109,8 +1111,12 @@ class TrainingActivity(activity.Activity):
                           self.volume_data[0]['usb_path'])
             target = utils.get_device_path(self.volume_data[0]['usb_path'])
             if target is not None:
+                self.volume_monitor.disconnect(self._mount_added_id)
+                self.volume_monitor.disconnect(self._mount_removed_id)
+
                 _logger.error('running dosfsck -a %s' % target)
                 utils.dos_fsck(target)
+                utils.unmount(self.volume_data[0]['usb_path'])
 
                 alert = ConfirmationAlert()
                 alert.props.title = _('The USB filesystem has been checked')

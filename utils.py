@@ -359,6 +359,27 @@ def get_modified_time(path):
     return int(os.path.getmtime(path))
 
 
+def unmount(path):
+    global volume_monitor
+
+    if volume_monitor is None:
+        volume_monitor = Gio.VolumeMonitor.get()
+
+    target = None
+    for mount in volume_monitor.get_mounts():
+        if mount.get_root().get_path() == path:
+            target = mount
+            break
+
+    def __unmount_cb(mount, result, user_data):
+        logging.debug('__unmount_cb %r %r', mount, result)
+        mount.unmount_with_operation_finish(result)
+
+    if target is not None:
+        _logger.debug('unmounting %s' % path)
+        target.unmount_with_operation(0, None, None, __unmount_cb, None)
+
+
 def get_volume_paths():
     global volume_monitor
     if volume_monitor is None:
