@@ -31,7 +31,7 @@ from sugar3.graphics.radiotoolbutton import RadioToolButton
 from sugar3.graphics.toolbutton import ToolButton
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics.toolbarbox import ToolbarButton
-from sugar3.graphics.alert import ConfirmationAlert
+from sugar3.graphics.alert import ConfirmationAlert, NotifyAlert
 from sugar3.graphics import style
 
 try:
@@ -143,6 +143,7 @@ class TrainingActivity(activity.Activity):
         self._webkit = None
         self._clipboard_text = ''
         self._fixed = None
+        self._fatal_error = False
         self._notify_transfer_status = False
 
         if self._load_extension() and self.check_volume_data():
@@ -179,6 +180,12 @@ class TrainingActivity(activity.Activity):
         # Before we begin (and before each task),
         # we need to find any and all USB keys
         # and any and all training-data files on them.
+
+        if self._fatal_error:
+            # We need to resolve the error before continuing
+            _logger.error('Saw a fatal error, '
+                          'so shutting down instead of checking volume data.')
+            self.close()
 
         _logger.debug(utils.get_volume_paths())
         self.volume_data = []
@@ -283,6 +290,12 @@ class TrainingActivity(activity.Activity):
         # We need to sync up file on USB with file on disk,
         # but only if the email addresses match. Otherwise,
         # raise an error.
+        if self._fatal_error:
+            # We need to resolve the error before continuing
+            _logger.error('Saw a fatal error, '
+                          'so shutting down instead of syncing data.')
+            self.close()
+
         if usb_data_path is not None:
             usb_data = {}
             if os.path.exists(usb_data_path):
@@ -407,8 +420,14 @@ class TrainingActivity(activity.Activity):
                 fd.write(json_data)
                 fd.close()
             except Exception, e:
-                _logger.error('Could not write to %s: %s' %
+                self._fatal_error = True
+                _logger.error('Fatal error: could not write to %s: %s' %
                               (usb_data_path, e))
+
+                # Don't try remounting since we are going to close.
+                self.volume_monitor.disconnect(self._mount_added_id)
+                self.volume_monitor.disconnect(self._mount_removed_id)
+
                 alert = ConfirmationAlert()
                 alert.props.title = _('USB key problem')
                 alert.props.msg = \
@@ -1111,9 +1130,6 @@ class TrainingActivity(activity.Activity):
                           self.volume_data[0]['usb_path'])
             target = utils.get_device_path(self.volume_data[0]['usb_path'])
             if target is not None:
-                self.volume_monitor.disconnect(self._mount_added_id)
-                self.volume_monitor.disconnect(self._mount_removed_id)
-
                 _logger.error('running dosfsck -a %s' % target)
                 utils.dos_fsck(target)
                 utils.unmount(self.volume_data[0]['usb_path'])
