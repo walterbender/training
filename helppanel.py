@@ -208,6 +208,13 @@ class HelpPanel(Gtk.Grid):
         GObject.idle_add(self._prepare_send_data)
 
     def _prepare_send_data(self):
+        email = self._email_entry.get_text()
+        if not utils.is_valid_email_entry(email):
+            # We cannot send w/o valid email.
+            self._email_entry.set_text(_EMAIL_TEXT)
+            self._send_button.set_sensitive(False)
+            return
+
         if len(self._task_master.activity.volume_data) == 1:
             training_data_path = usb_data_path = os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
@@ -219,18 +226,14 @@ class HelpPanel(Gtk.Grid):
         text = self._text_buffer.get_text(bounds[0], bounds[1], True)
 
         log_file_path = utils.get_log_file('org.sugarlabs.Training')
+
         section_index, task_index = \
             self._task_master.get_section_and_task_index()
         section_name = self._task_master.get_section_name(section_index)
+
         name = self._task_master.read_task_data(NAME_UID)
-        email = self._email_entry.get_text()
         school = self._task_master.read_task_data(SCHOOL_NAME)
         role = self._task_master.read_task_data(ROLE_UID)
-
-        # We cannot send name w/o email
-        # http://developer.zendesk.com/documentation/rest_api/tickets.html
-        if email is None:
-            name = None
 
         self._data = {'ticket': self._mode, 'section': section_name,
                       'task': task_index, 'body': text, 'log': log_file_path,
