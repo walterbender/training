@@ -173,10 +173,10 @@ class TaskMaster(Gtk.Alignment):
 
         # Recheck USB status each time
         if not self.activity.check_volume_data():
-            _logger.debug('Check volume data failed')
+            _logger.error('Check volume data failed')
             # return
 
-        _logger.debug('Running task %d' % (self.current_task))
+        _logger.error('Running task %d' % (self.current_task))
         self._destroy_graphics()
         self.activity.button_was_pressed = False
         if self.current_task < self._get_number_of_tasks():
@@ -207,7 +207,7 @@ class TaskMaster(Gtk.Alignment):
             self._run_task(section_index, task_index)
         else:
             self.update_completion_percentage(finished=True)
-            _logger.debug('Sending final report.')
+            _logger.error('Sending final report.')
             self._reported = True
             reporter = Reporter(self.activity)
             reporter.report([self.read_task_data()])
