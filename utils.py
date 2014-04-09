@@ -21,6 +21,8 @@ import urllib
 from random import uniform
 import tempfile
 import cairo
+import email.utils
+import re
 
 from gi.repository import Vte
 from gi.repository import Gio
@@ -71,6 +73,17 @@ _DBUS_PATH = '/org/sugarlabs/SugarServices'
 volume_monitor = None
 battery_model = None
 proxy = None
+
+
+def is_valid_email_entry(entry):
+    if len(entry) == 0:
+        return False
+    realname, email_address = email.utils.parseaddr(entry)
+    if email_address == '':
+        return False
+    if not re.match(r'[^@]+@[^@]+\.[^@]+', email_address):
+        return False
+    return True
 
 
 def recently(time):

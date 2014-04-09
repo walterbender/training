@@ -11,8 +11,6 @@
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 import os
-import email.utils
-import re
 from gettext import gettext as _
 
 from gi.repository import GObject
@@ -538,14 +536,7 @@ class Welcome4Task(HTMLTask):
 
     def _is_valid_email_entry(self):
         entry = self._entry.get_text()
-        if len(entry) == 0:
-            return False
-        realname, email_address = email.utils.parseaddr(entry)
-        if email_address == '':
-            return False
-        if not re.match(r'[^@]+@[^@]+\.[^@]+', email_address):
-            return False
-        return True
+        return utils.is_valid_email_entry(entry)
 
     def after_button_press(self):
         _logger.debug('Writing email address: %s' % self._entry.get_text())
@@ -611,12 +602,7 @@ class Welcome5Task(HTMLTask):
             return False
         if entry0.lower() != entry1.lower():
             return False
-        realname, email_address = email.utils.parseaddr(entry0)
-        if email_address == '':
-            return False
-        if not re.match(r'[^@]+@[^@]+\.[^@]+', email_address):
-            return False
-        return True
+        return utils.is_valid_email_entry(entry0)
 
     def after_button_press(self):
         self._task_master.write_task_data(EMAIL_UID,
@@ -919,12 +905,7 @@ class Connected5Task(HTMLTask):
         entry1 = self._entries[1].get_text()
         if len(entry0) == 0 or len(entry1) == 0:
             return False
-        realname, email_address = email.utils.parseaddr(entry1)
-        if email_address == '':
-            return False
-        if not re.match(r'[^@]+@[^@]+\.[^@]+', email_address):
-            return False
-        return True
+        return utils.is_valid_email_entry(entry1)
 
     def after_button_press(self):
         self._task_master.write_task_data(EMAIL_UID,

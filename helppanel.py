@@ -38,7 +38,7 @@ _ACTIVE_TEXT = _('Type your question or comment here...')
 _INACTIVE_TEXT = _('You must be online to use this form. If you are having '
                    'trouble connecting, please contact us via the phone '
                    'number or email address above.')
-
+_EMAIL_TEXT = _('Please enter your email address.')
 
 class HelpPanel(Gtk.Grid):
 
@@ -50,6 +50,7 @@ class HelpPanel(Gtk.Grid):
         self.set_border_width(style.DEFAULT_SPACING)
 
         self._task_master = task_master
+        self._connected = False
         self._mode = _FEEDBACK_TICKET
 
         alignment = Gtk.Alignment.new(0., 0.5, 0., 0.)
@@ -77,6 +78,16 @@ class HelpPanel(Gtk.Grid):
         self.attach(alignment, 0, 4, 4, 1)
         alignment.show()
 
+        self._email_entry = Gtk.Entry()
+        email_address = self._task_master.read_task_data(EMAIL_UID)
+        if email_address is not None:
+            self._email_entry.set_text(email_address)
+        else:
+            self._email_entry.set_text(_EMAIL_TEXT)
+        self.attach(self._email_entry, 0, 5, 4, 1)
+        self._email_entry.show()
+        self._email_entry.set_can_focus(True)
+
         grid = Gtk.Grid()
         self._feedback_button = RadioToolButton(group=None)
         self._feedback_button.set_icon_name('edit-description')
@@ -95,7 +106,7 @@ class HelpPanel(Gtk.Grid):
         alignment = Gtk.Alignment.new(0., 0.5, 0., 0.)
         alignment.add(grid)
         grid.show()
-        self.attach(alignment, 0, 5, 2, 1)
+        self.attach(alignment, 0, 6, 2, 1)
         alignment.show()
 
         grid = Gtk.Grid()
@@ -116,7 +127,7 @@ class HelpPanel(Gtk.Grid):
         alignment = Gtk.Alignment.new(0., 0.5, 0., 0.)
         alignment.add(grid)
         grid.show()
-        self.attach(alignment, 2, 5, 2, 1)
+        self.attach(alignment, 2, 6, 2, 1)
         alignment.show()
 
         self._feedback_button.set_active(True)
@@ -126,34 +137,49 @@ class HelpPanel(Gtk.Grid):
         self._text_view.set_size_request(-1, style.GRID_CELL_SIZE * 2)
         self._text_buffer = self._text_view.get_buffer()
         self._text_buffer.set_text(_ACTIVE_TEXT)
-        self.attach(self._text_view, 0, 6, 4, 4)
+        self.attach(self._text_view, 0, 7, 4, 4)
         self._text_view.show()
         self._text_view.connect('focus-in-event', self._text_focus_in_cb)
 
         self._check_button = Gtk.CheckButton(label=_('Include screenshot?'))
         self._check_button.set_active(True)
-        self.attach(self._check_button, 0, 10, 2, 1)
+        self.attach(self._check_button, 0, 11, 2, 1)
         self._check_button.show()
 
         self._send_button = Gtk.Button(_('Send'))
-        self.attach(self._send_button, 3, 10, 1, 1)
+        self.attach(self._send_button, 3, 11, 1, 1)
         self._send_button.connect('clicked', self._send_button_cb)
         self._send_button.show()
+
+    def _email_focus_in_cb(self, widget, event):
+        email = self._email_entry.get_text()
+        if email == _EMAIL_TEXT:
+            self._email_entry.set_text('')
+        elif utils.is_valid_email_entry(email) and self._connected:
+            self._send_button.set_sensitive(True)
 
     def _text_focus_in_cb(self, widget, event):
         bounds = self._text_buffer.get_bounds()
         text = self._text_buffer.get_text(bounds[0], bounds[1], True)
+        email = self._email_entry.get_text()
         if text == _ACTIVE_TEXT:
             self._text_buffer.set_text('')
+        if utils.is_valid_email_entry(email) and self._connected:
+            self._send_button.set_sensitive(True)
 
     def set_connected(self, connected):
+        self._connected = connected
         if connected:
             bounds = self._text_buffer.get_bounds()
             text = self._text_buffer.get_text(bounds[0], bounds[1], True)
             if text == _INACTIVE_TEXT:
                 self._text_buffer.set_text(_ACTIVE_TEXT)
             self._text_view.set_sensitive(True)
-            self._send_button.set_sensitive(True)
+            email = self._email_entry.get_text()
+            if utils.is_valid_email_entry(email):
+                self._send_button.set_sensitive(True)
+            else:
+                self._send_button.set_sensitive(False)
         else:
             bounds = self._text_buffer.get_bounds()
             text = self._text_buffer.get_text(bounds[0], bounds[1], True)
@@ -182,14 +208,22 @@ class HelpPanel(Gtk.Grid):
         GObject.idle_add(self._prepare_send_data)
 
     def _prepare_send_data(self):
+        if len(self._task_master.activity.volume_data) == 1:
+            training_data_path = usb_data_path = os.path.join(
+                self._task_master.activity.volume_data[0]['usb_path'],
+                self._task_master.activity.volume_data[0]['uid'])
+        else:
+            training_data_path = None
+
         bounds = self._text_buffer.get_bounds()
         text = self._text_buffer.get_text(bounds[0], bounds[1], True)
+
         log_file_path = utils.get_log_file('org.sugarlabs.Training')
         section_index, task_index = \
             self._task_master.get_section_and_task_index()
         section_name = self._task_master.get_section_name(section_index)
         name = self._task_master.read_task_data(NAME_UID)
-        email = self._task_master.read_task_data(EMAIL_UID)
+        email = self._email_entry.get_text()
         school = self._task_master.read_task_data(SCHOOL_NAME)
         role = self._task_master.read_task_data(ROLE_UID)
 
@@ -202,6 +236,8 @@ class HelpPanel(Gtk.Grid):
                       'task': task_index, 'body': text, 'log': log_file_path,
                       'name': name, 'email': email, 'school': school,
                       'role': role}
+        if training_data_path is not None:
+            self._data['data'] = training_data_path
 
         if self._check_button.get_active():
             # idle_add is not sufficient... waiting for graphics to refresh
