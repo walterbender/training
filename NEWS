@@ -6,6 +6,8 @@ NEWS
  - added fsck
  - added unmount
 * Copy edits by Paul (fsck-usb.html)
+* Require email in zendesk tickets (AD-38)
+* Add training data to zendesk tickets (AD-38) w/Martin
 
 3.1
 * Attempt to fix 95% problem (SD-1)
