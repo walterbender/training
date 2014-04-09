@@ -231,6 +231,10 @@ class HelpPanel(Gtk.Grid):
             attachment = Attachment()
             attachment.create(data['log'], 'log.txt', 'text/plain')
             uploads.append(attachment.token())
+        if 'data' in data:
+            attachment = Attachment()
+            attachment.create(data['data'], 'data.txt', 'text/plain')
+            uploads.append(attachment.token())
 
         ticket = Ticket()
         ticket.create(subject, body, uploads,
