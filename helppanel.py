@@ -233,8 +233,12 @@ class HelpPanel(Gtk.Grid):
             uploads.append(attachment.token())
         if 'data' in data:
             attachment = Attachment()
-            attachment.create(data['data'], 'data.txt', 'text/plain')
-            uploads.append(attachment.token())
+            try:
+                attachment.create(data['data'], 'data.txt', 'text/plain')
+            except IOError as e:
+                logging.error('Could not include training data: %s' % e)
+            else:
+                uploads.append(attachment.token())
 
         ticket = Ticket()
         ticket.create(subject, body, uploads,
