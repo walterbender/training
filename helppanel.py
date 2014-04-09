@@ -41,6 +41,7 @@ _INACTIVE_TEXT = _('You must be online to use this form. If you are having '
                    'number or email address above.')
 _EMAIL_TEXT = _('Please enter your email address.')
 
+
 class HelpPanel(Gtk.Grid):
 
     def __init__(self, task_master):
@@ -220,13 +221,6 @@ class HelpPanel(Gtk.Grid):
             GObject.idle_add(self._prepare_send_data)
 
     def _prepare_send_data(self):
-        if len(self._task_master.activity.volume_data) == 1:
-            training_data_path = usb_data_path = os.path.join(
-                self._task_master.activity.volume_data[0]['usb_path'],
-                self._task_master.activity.volume_data[0]['uid'])
-        else:
-            training_data_path = None
-
         bounds = self._text_buffer.get_bounds()
         text = self._text_buffer.get_text(bounds[0], bounds[1], True)
 
@@ -246,7 +240,11 @@ class HelpPanel(Gtk.Grid):
                       'task': task_index, 'body': text, 'log': log_file_path,
                       'name': name, 'email': email, 'school': school,
                       'role': role}
-        if training_data_path is not None:
+
+        if len(self._task_master.activity.volume_data) == 1:
+            training_data_path = os.path.join(
+                self._task_master.activity.volume_data[0]['usb_path'],
+                self._task_master.activity.volume_data[0]['uid'])
             self._data['data'] = training_data_path
 
         if self._check_button.get_active():
