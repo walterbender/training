@@ -86,6 +86,7 @@ class HelpPanel(Gtk.Grid):
             self._email_entry.set_text(_EMAIL_TEXT)
         self.attach(self._email_entry, 0, 5, 4, 1)
         self._email_entry.show()
+        self._email_entry.connect('changed', self._email_changed_cb)
         self._email_entry.set_can_focus(True)
 
         grid = Gtk.Grid()
@@ -151,12 +152,14 @@ class HelpPanel(Gtk.Grid):
         self._send_button.connect('clicked', self._send_button_cb)
         self._send_button.show()
 
-    def _email_focus_in_cb(self, widget, event):
+    def _email_changed_cb(self, widget):
         email = self._email_entry.get_text()
         if email == _EMAIL_TEXT:
             self._email_entry.set_text('')
-        elif utils.is_valid_email_entry(email) and self._connected:
+        if utils.is_valid_email_entry(email) and self._connected:
             self._send_button.set_sensitive(True)
+        else:
+            self._send_button.set_sensitive(False)
 
     def _text_focus_in_cb(self, widget, event):
         bounds = self._text_buffer.get_bounds()
@@ -166,6 +169,8 @@ class HelpPanel(Gtk.Grid):
             self._text_buffer.set_text('')
         if utils.is_valid_email_entry(email) and self._connected:
             self._send_button.set_sensitive(True)
+        else:
+            self._send_button.set_sensitive(False)
 
     def set_connected(self, connected):
         self._connected = connected
@@ -202,19 +207,18 @@ class HelpPanel(Gtk.Grid):
         self._help_button.set_icon_name('toolbar-help')
 
     def _send_button_cb(self, widget=None):
-        self._task_master.activity.help_palette.popdown(immediate=True)
-        self._task_master.activity.help_panel_visible = False
-        self._task_master.activity.busy_cursor()
-        GObject.idle_add(self._prepare_send_data)
-
-    def _prepare_send_data(self):
         email = self._email_entry.get_text()
         if not utils.is_valid_email_entry(email):
             # We cannot send w/o valid email.
             self._email_entry.set_text(_EMAIL_TEXT)
             self._send_button.set_sensitive(False)
-            return
+        else:
+            self._task_master.activity.help_palette.popdown(immediate=True)
+            self._task_master.activity.help_panel_visible = False
+            self._task_master.activity.busy_cursor()
+            GObject.idle_add(self._prepare_send_data)
 
+    def _prepare_send_data(self):
         if len(self._task_master.activity.volume_data) == 1:
             training_data_path = usb_data_path = os.path.join(
                 self._task_master.activity.volume_data[0]['usb_path'],
@@ -230,6 +234,8 @@ class HelpPanel(Gtk.Grid):
         section_index, task_index = \
             self._task_master.get_section_and_task_index()
         section_name = self._task_master.get_section_name(section_index)
+
+        email = self._email_entry.get_text()
 
         name = self._task_master.read_task_data(NAME_UID)
         school = self._task_master.read_task_data(SCHOOL_NAME)
