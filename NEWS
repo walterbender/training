@@ -5,6 +5,8 @@ NEWS
 * If there is more than one set of training data, check the
   email_addresses; if they all match, resume with the data set with
   maximum completion.
+* Always jump to connection task if not already completed when reaching
+  assessment task.
 
 3.3
 * Remove star test from Journal task (possible solution to OEP-99)

@@ -2634,7 +2634,13 @@ class Assessment1Task(HTMLTask):
                     _FRAME_BADGE_TASK, _SETTINGS_BADGE_TASK]
         if utils.is_XO():
             required.append(_XO_BADGE_TASK)
-        return required
+
+        # If the connected section is not completed, just to it.
+        if not self._task_master.uid_to_task(
+                _CONNECTED_BADGE_TASK, section=None).is_completed():
+            return [_CONNECTED_BADGE_TASK]
+        else:
+            return required
 
     def get_yes_no_tasks(self):
         if self._yes_no_required:
