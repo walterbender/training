@@ -14,6 +14,7 @@ import dbus
 import os
 import json
 import subprocess
+from time import sleep
 from ConfigParser import ConfigParser
 from gettext import gettext as _
 
@@ -31,7 +32,7 @@ from sugar3.graphics.radiotoolbutton import RadioToolButton
 from sugar3.graphics.toolbutton import ToolButton
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics.toolbarbox import ToolbarButton
-from sugar3.graphics.alert import ConfirmationAlert
+from sugar3.graphics.alert import ConfirmationAlert, NotifyAlert
 from sugar3.graphics import style
 
 try:
@@ -135,6 +136,7 @@ class TrainingActivity(activity.Activity):
 
         self.bundle_path = activity.get_bundle_path()
         self.volume_data = []
+        self.saved_uid = None
 
         self.help_palette = None
         self.help_panel_visible = False
@@ -147,7 +149,8 @@ class TrainingActivity(activity.Activity):
         self._notify_transfer_status = False
 
         if self._load_extension() and self.check_volume_data():
-            self._launcher()
+            if self.volume_data[0]['uid'] is not None:
+                GObject.idle_add(self._launcher)
 
     def _launcher(self):
         get_power_manager().inhibit_suspend()
@@ -268,7 +271,24 @@ class TrainingActivity(activity.Activity):
                           volume['uid'])
             return True
         else:
-            _logger.error('MULTIPLE TRAINING-DATA FILES FOUND')
+            _logger.error('Multiple training-data files found.')
+            if self.saved_uid is not None:
+                # Make sure the saved uid is in the list
+                logging.debug(self.saved_uid)
+                logging.debug(volume['files'])
+                if os.path.join(volume['usb_path'],
+                                self.saved_uid) in volume['files']:
+                    volume['uid'] = self.saved_uid
+                    return True
+                else:
+                    # FIXME: need better feedback to the user here
+                    alert = NotifyAlert()
+                    alert.props.title = _('Multiple training-data files found.')
+                    alert.props.msg = _('Your taining data seems to be '
+                                        'missing.')
+                    self._load_intro_graphics(message=alert.props.msg)
+                    return False
+
             email_list = []
             completed_list = []
             for file_name in volume['files']:
@@ -282,9 +302,9 @@ class TrainingActivity(activity.Activity):
                     emails_match = False
                     break
 
-            # If the email is set and is the same in all of the files,
-            # then we'll use the dataset that has the most completed
-            # tasks.
+            # If the email address is set and is the same in all of
+            # the training-data files, then we'll use the dataset that
+            # has the most completed tasks.
             if email_list[0] is not None and emails_match:
                 max_index = 0
                 max_completed = completed_list[0]
@@ -300,17 +320,48 @@ class TrainingActivity(activity.Activity):
                                completed_list[max_index]))
                 volume['uid'] = 'training-data-%s' % \
                                 volume['files'][max_index][-9:]
+                self.saved_uid = volume['uid']
                 return True
 
-            alert = ConfirmationAlert()
+            # If the email address is set and is *not* the same in all
+            # of the training-data files, then we'll prompt the user
+            # to select the correct one.
+            alert = NotifyAlert()
             alert.props.title = _('Multiple training-data files found.')
-            alert.props.msg = _('There can only be one set of training '
-                                'data per USB key.')
+            alert.props.msg = _('Please select the training data that '
+                                'corresponds to your session.')
             logging.error(email_list)
-            alert.connect('response', self._close_alert_cb)
+            alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
-            self._load_intro_graphics(message=alert.props.msg)
-            return False
+            self._load_selection_graphics(email_list,
+                                          self._select_file_button_cb)
+            volume['uid'] = None
+            return True
+
+    def _load_selection_graphics(self, email_list, callback):
+        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
+        graphics = Graphics()
+        # FIXME: need some instructions here
+        graphics.add_text(
+            _('Please select your email address from the list below.'))
+        for i, email in enumerate(email_list):
+            # FIXME: what if all of the emails are none?
+            if email is None:
+                continue
+            button = graphics.add_button(email, callback, arg=i)
+            button.show()
+
+        center_in_panel.add(graphics)
+        graphics.show()
+        self.set_canvas(center_in_panel)
+        center_in_panel.show()
+
+    def _select_file_button_cb(self, widget, i):
+        volume = self.volume_data[0]
+        logging.error('Opting for %s' % (volume['files'][i]))
+        volume['uid'] = 'training-data-%s' % volume['files'][i][-9:]
+        self.saved_uid = volume['uid']
+        self._launcher()
 
     def _check_for_USB_data(self):
         usb_path = os.path.join(self.volume_data[0]['usb_path'],
