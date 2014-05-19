@@ -257,6 +257,28 @@ def get_email_from_training_data(path):
         return None
 
 
+def get_name_from_training_data(path):
+    try:
+        fd = open(path, 'r')
+        json_data = fd.read()
+        fd.close()
+    except Exception, e:
+        _logger.error('Could not read from %s: %s' % (path, e))
+        return None
+    try:
+        if len(json_data) > 0:
+            data = json.loads(json_data)
+        else:
+            return None
+    except ValueError, e:
+        _logger.error('Cannot read training data: %s' % e)
+        return None
+    if 'name' in data:
+        return data['name'].replace(',', ' ')
+    else:
+        return None
+
+
 def get_completed_from_training_data(path):
     try:
         fd = open(path, 'r')

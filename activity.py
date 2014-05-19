@@ -291,11 +291,13 @@ class TrainingActivity(activity.Activity):
 
             email_list = []
             completed_list = []
+            name_list = []
             for file_name in volume['files']:
                 path = os.path.join(volume['usb_path'], file_name)
                 email_list.append(utils.get_email_from_training_data(path))
                 completed_list.append(
                     utils.get_completed_from_training_data(path))
+                name_list.append(utils.get_name_from_training_data(path))
             emails_match = True
             for email in email_list:
                 if email != email_list[0]:
@@ -314,9 +316,11 @@ class TrainingActivity(activity.Activity):
                         max_completed = completed
                 logging.error(email_list)
                 logging.error(completed_list)
-                logging.error('Opting for %s (%s, %d)' %
+                logging.error(name_list)
+                logging.error('Opting for %s (%s, %s, %d)' %
                               (volume['files'][max_index],
                                email_list[max_index],
+                               name_list[max_index],
                                completed_list[max_index]))
                 volume['uid'] = 'training-data-%s' % \
                                 volume['files'][max_index][-9:]
@@ -330,26 +334,32 @@ class TrainingActivity(activity.Activity):
             alert.props.title = _('Multiple training-data files found.')
             alert.props.msg = _('Please select the training data that '
                                 'corresponds to your session.')
-            logging.error(email_list)
+            logging.error('%s <%s>' % (name_list, email_list))
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
-            self._load_selection_graphics(email_list,
+            self._load_selection_graphics(email_list, name_list,
                                           self._select_file_button_cb)
             volume['uid'] = None
             return True
 
-    def _load_selection_graphics(self, email_list, callback):
+    def _load_selection_graphics(self, email_list, name_list, callback):
         center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
         graphics = Graphics()
-        # FIXME: need some instructions here
+        # FIXME: need some better instructions here
         graphics.add_text(
-            _('Please select your email address from the list below.'))
-        for i, email in enumerate(email_list):
-            # FIXME: what if all of the emails are none?
-            if email is None:
-                continue
-            button = graphics.add_button(email, callback, arg=i)
+            _('Please select your name/email from the list below.'))
+        for i in range(len(email_list)):
+            # Use str so as to accept None as a valid name or email
+            name = str(name_list[i])
+            email = str(email_list[i])
+
+            button = graphics.add_button('%s <%s>' % (name_list[i], email),
+                                         callback, arg=i)
             button.show()
+
+        button = graphics.add_button(_('My name/email is not in the list.'),
+                                     callback, arg=-1)
+        button.show()
 
         center_in_panel.add(graphics)
         graphics.show()
@@ -357,6 +367,17 @@ class TrainingActivity(activity.Activity):
         center_in_panel.show()
 
     def _select_file_button_cb(self, widget, i):
+        if i < 0:
+            # Name not in list
+            alert = NotifyAlert()
+            alert.props.title = _('No match in training data found.')
+            alert.props.msg = _('Please contact One Education.')
+            logging.error(alert.props.msg)
+            alert.connect('response', self._close_alert_cb)
+            self.add_alert(alert)
+            self._load_intro_graphics(message=alert.props.msg)
+            return
+
         volume = self.volume_data[0]
         logging.error('Opting for %s' % (volume['files'][i]))
         volume['uid'] = 'training-data-%s' % volume['files'][i][-9:]
