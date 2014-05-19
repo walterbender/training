@@ -31,7 +31,7 @@ from sugar3.graphics.radiotoolbutton import RadioToolButton
 from sugar3.graphics.toolbutton import ToolButton
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics.toolbarbox import ToolbarButton
-from sugar3.graphics.alert import ConfirmationAlert, NotifyAlert
+from sugar3.graphics.alert import ConfirmationAlert
 from sugar3.graphics import style
 
 try:

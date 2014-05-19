@@ -18,6 +18,7 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 
 from sugar3.datastore import datastore
+from sugar3.graphics.alert import NotifyAlert
 
 import logging
 _logger = logging.getLogger('training-activity-tasks')
@@ -2638,9 +2639,18 @@ class Assessment1Task(HTMLTask):
         # If the connected section is not completed, just to it.
         if not self._task_master.uid_to_task(
                 _CONNECTED_BADGE_TASK, section=None).is_completed():
+            alert = NotifyAlert()
+            alert.props.title = _('Jumping to Connection Task')
+            alert.props.msg = _('You must complete the connection tasks '
+                                'before completing the assessment.')
+            alert.connect('response', self._remove_alert_cb)
+            self._task_master.activity.add_alert(alert)
             return [_CONNECTED_BADGE_TASK]
         else:
             return required
+
+    def _remove_alert_cb(self, alert, response_id):
+        self.remove_alert(alert)
 
     def get_yes_no_tasks(self):
         if self._yes_no_required:
