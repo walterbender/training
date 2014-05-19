@@ -223,7 +223,60 @@ def look_for_file_type(path, suffix):
 
 
 def look_for_training_data(path):
-    return glob.glob(os.path.join(path, 'training-data-*'))
+    training_data = []
+    glob_data = glob.glob(os.path.join(path, 'training-data-*'))
+    for path in glob_data:
+        # Ignore files starting with # or ending with ~
+        if path[0] == '#':
+            continue
+        if path[-1] == '~':
+            continue
+        training_data.append(path)
+    return training_data
+
+
+def get_email_from_training_data(path):
+    try:
+        fd = open(path, 'r')
+        json_data = fd.read()
+        fd.close()
+    except Exception, e:
+        _logger.error('Could not read from %s: %s' % (path, e))
+        return None
+    try:
+        if len(json_data) > 0:
+            data = json.loads(json_data)
+        else:
+            return None
+    except ValueError, e:
+        _logger.error('Cannot read training data: %s' % e)
+        return None
+    if 'email_address' in data:
+        return data['email_address']
+    else:
+        return None
+
+
+def get_completed_from_training_data(path):
+    try:
+        fd = open(path, 'r')
+        json_data = fd.read()
+        fd.close()
+    except Exception, e:
+        _logger.error('Could not read from %s: %s' % (path, e))
+        return None
+    try:
+        if len(json_data) > 0:
+            data = json.loads(json_data)
+        else:
+            return None
+    except ValueError, e:
+        _logger.error('Cannot read training data: %s' % e)
+        return None
+    if 'completion_percentage' in data:
+        return data['completion_percentage']
+    else:
+        return None
 
 
 def look_for_xlw(path):

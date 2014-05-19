@@ -1563,8 +1563,8 @@ class Journal5Task(HTMLTask):
             task_data['data'] = utils.get_starred_count()
             self._task_master.write_task_data(self.uid, task_data)
             return False
-        if not utils.get_starred_count() > task_data['data']:
-            return False
+        # if not utils.get_starred_count() > task_data['data']:
+        #     return False
         if not utils.saw_new_launch('org.sugarlabs.PortfolioActivity',
                                     utils.recently(task_data['start_time'])):
             return False

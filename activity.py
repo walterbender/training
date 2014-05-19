@@ -269,10 +269,44 @@ class TrainingActivity(activity.Activity):
             return True
         else:
             _logger.error('MULTIPLE TRAINING-DATA FILES FOUND')
+            email_list = []
+            completed_list = []
+            for file_name in volume['files']:
+                path = os.path.join(volume['usb_path'], file_name)
+                email_list.append(utils.get_email_from_training_data(path))
+                completed_list.append(
+                    utils.get_completed_from_training_data(path))
+            emails_match = True
+            for email in email_list:
+                if email != email_list[0]:
+                    emails_match = False
+                    break
+
+            # If the email is set and is the same in all of the files,
+            # then we'll use the dataset that has the most completed
+            # tasks.
+            if email_list[0] is not None and emails_match:
+                max_index = 0
+                max_completed = completed_list[0]
+                for i, completed in enumerate(completed_list):
+                    if completed > max_completed:
+                        max_index = i
+                        max_completed = completed
+                logging.error(email_list)
+                logging.error(completed_list)
+                logging.error('Opting for %s (%s, %d)' %
+                              (volume['files'][max_index],
+                               email_list[max_index],
+                               completed_list[max_index]))
+                volume['uid'] = 'training-data-%s' % \
+                                volume['files'][max_index][-9:]
+                return True
+
             alert = ConfirmationAlert()
             alert.props.title = _('Multiple training-data files found.')
             alert.props.msg = _('There can only be one set of training '
                                 'data per USB key.')
+            logging.error(email_list)
             alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=alert.props.msg)

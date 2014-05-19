@@ -664,6 +664,7 @@ class TaskMaster(Gtk.Alignment):
                 # Maybe USB key has been pulled?
                 _logger.error('Could not read from %s: %s' %
                               (usb_data_path, e))
+                json_data = ''
                 usb_read_failed = True
             try:
                 if len(json_data) > 0:
@@ -683,6 +684,7 @@ class TaskMaster(Gtk.Alignment):
                     json_data = fd.read()
                     fd.close()
                 except Exception, e:
+                    json_data = ''
                     _logger.error('Could not read from %s: %s' %
                                   (sugar_data_path, e))
                 if len(json_data) > 0:
@@ -726,6 +728,7 @@ class TaskMaster(Gtk.Alignment):
                 # Maybe USB key has been pulled?
                 _logger.error('Could not read from %s: %s' %
                               (usb_data_path, e))
+                json_data = ''
                 usb_read_failed = True
             if len(json_data) > 0:
                 try:
@@ -744,6 +747,7 @@ class TaskMaster(Gtk.Alignment):
                 except Exception, e:
                     _logger.error('Could not read from %s: %s' %
                                   (sugar_data_path, e))
+                    json_data = ''
                     sugar_read_failed = True
                 if len(json_data) > 0:
                     try:

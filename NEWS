@@ -1,5 +1,14 @@
 NEWS
 
+3.4
+* Ignore files starting with # or ending with ~
+* If there is more than one set of training data, check the
+  email_addresses; if they all match, resume with the data set with
+  maximum completion.
+
+3.3
+* Remove star test from Journal task (possible solution to OEP-99)
+
 3.2
 * More work on 95% problem.
 * Worked on Read Only USB problem (related to AD-33)
