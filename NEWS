@@ -8,6 +8,7 @@ NEWS
 * Always jump to connection task if not already completed when reaching
   assessment task.
 * Allow user to select among multiple training data sets.
+* Allow user to launch new session if multiple training data sets are found.
 
 3.3
 * Remove star test from Journal task (possible solution to OEP-99)

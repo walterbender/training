@@ -411,6 +411,14 @@ def get_volume_names():
     return names
 
 
+def generate_uid(left=None):
+    if left is None:
+        left = '%04x' % int(uniform(0, int(0xFFFF)))
+    right = '%04x' % int(uniform(0, int(0xFFFF)))
+    uid = '%s-%s' % (left, right)
+    return uid.upper()
+
+
 def format_volume_name(name):
     ''' Looking for XXXX-XXXX format '''
 
@@ -419,13 +427,6 @@ def format_volume_name(name):
             if not c in '0123456789ABCDEF':
                 return False
         return True
-
-    def generate_uid(left=None):
-        if left is None:
-            left = '%04x' % int(uniform(0, int(0xFFFF)))
-        right = '%04x' % int(uniform(0, int(0xFFFF)))
-        uid = '%s-%s' % (left, right)
-        return uid.upper()
 
     if not '-' in name:
         return generate_uid()

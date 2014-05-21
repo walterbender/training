@@ -53,6 +53,9 @@ VERSION_NUMBER = 'version_number'
 COMPLETION_PERCENTAGE = 'completion_percentage'
 TRAINING_DATA_EMAIL = 'training_data_email'
 TRAINING_DATA_FULLNAME = 'training_data_fullname'
+_TRAINING_DATA_ = 'training-data-%s'
+_NEW_TRAINING_SESSION = -1
+_TRAINING_DATA_NOT_FOUND = -2
 
 from tasks import GET_CONNECTED_TASK
 from taskmaster import TaskMaster
@@ -136,7 +139,8 @@ class TrainingActivity(activity.Activity):
 
         self.bundle_path = activity.get_bundle_path()
         self.volume_data = []
-        self.saved_uid = None
+        self._saved_uid = None
+        self._new_session = False
 
         self.help_palette = None
         self.help_panel_visible = False
@@ -159,12 +163,14 @@ class TrainingActivity(activity.Activity):
         # * Is there a data file to sync on the USB key?
         # * Do we create a new data file on the USB key?
         path = self._check_for_USB_data()
+        logging.debug('USB path is %s' % (path))
         if path is None:
             self._launch_task_master()
         elif self.sync_data_from_USB(path):
             self._copy_data_from_USB()
-            # Flash a welcome back screen.
-            self._load_intro_graphics(file_name='welcome-back.html')
+            if not self._new_session:
+                # Flash a welcome back screen.
+                self._load_intro_graphics(file_name='welcome-back.html')
             GObject.timeout_add(1500, self._launch_task_master)
 
     def can_close(self):
@@ -260,25 +266,25 @@ class TrainingActivity(activity.Activity):
         #     volume path;
         # (b) If there is one file with a valid UID, we use that UID;
         if len(volume['files']) == 0:
-            volume['uid'] = 'training-data-%s' % \
+            volume['uid'] = _TRAINING_DATA_ % \
                             utils.format_volume_name(volume['basename'])
             _logger.debug('No training data found. Using UID %s' %
                           volume['uid'])
             return True
         elif len(volume['files']) == 1:
-            volume['uid'] = 'training-data-%s' % volume['files'][0][-9:]
+            volume['uid'] = _TRAINING_DATA_ % volume['files'][0][-9:]
             _logger.debug('Training data found. Using UID %s' %
                           volume['uid'])
             return True
         else:
-            _logger.error('Multiple training-data files found.')
-            if self.saved_uid is not None:
+            _logger.error('MULTIPLE TRAINING-DATA FILES FOUND.')
+            if self._saved_uid is not None:
                 # Make sure the saved uid is in the list
-                logging.debug(self.saved_uid)
+                logging.debug(self._saved_uid)
                 logging.debug(volume['files'])
                 if os.path.join(volume['usb_path'],
-                                self.saved_uid) in volume['files']:
-                    volume['uid'] = self.saved_uid
+                                self._saved_uid) in volume['files']:
+                    volume['uid'] = self._saved_uid
                     return True
                 else:
                     # FIXME: need better feedback to the user here
@@ -314,17 +320,9 @@ class TrainingActivity(activity.Activity):
                     if completed > max_completed:
                         max_index = i
                         max_completed = completed
-                logging.error(email_list)
-                logging.error(completed_list)
-                logging.error(name_list)
-                logging.error('Opting for %s (%s, %s, %d)' %
-                              (volume['files'][max_index],
-                               email_list[max_index],
-                               name_list[max_index],
-                               completed_list[max_index]))
-                volume['uid'] = 'training-data-%s' % \
+                volume['uid'] = _TRAINING_DATA_ % \
                                 volume['files'][max_index][-9:]
-                self.saved_uid = volume['uid']
+                self._saved_uid = volume['uid']
                 return True
 
             # If the email address is set and is *not* the same in all
@@ -334,7 +332,6 @@ class TrainingActivity(activity.Activity):
             alert.props.title = _('Multiple training-data files found.')
             alert.props.msg = _('Please select the training data that '
                                 'corresponds to your session.')
-            logging.error('%s <%s>' % (name_list, email_list))
             alert.connect('response', self._remove_alert_cb)
             self.add_alert(alert)
             self._load_selection_graphics(email_list, name_list,
@@ -357,8 +354,12 @@ class TrainingActivity(activity.Activity):
                                          callback, arg=i)
             button.show()
 
+        button = graphics.add_button(_('Start a new training session.'),
+                                     callback, arg=_NEW_TRAINING_SESSION)
+        button.show()
+
         button = graphics.add_button(_('My name/email is not in the list.'),
-                                     callback, arg=-1)
+                                     callback, arg=_TRAINING_DATA_NOT_FOUND)
         button.show()
 
         center_in_panel.add(graphics)
@@ -366,8 +367,52 @@ class TrainingActivity(activity.Activity):
         self.set_canvas(center_in_panel)
         center_in_panel.show()
 
+    def _is_uid_unique(self, uid):
+        for file_name in self.volume_data[0]['files']:
+            if file_name == _TRAINING_DATA_ % (uid):
+                return False
+            return True
+
     def _select_file_button_cb(self, widget, i):
-        if i < 0:
+        logging.debug('SELECT FILE BUTTON %d' % i)
+        if i == _NEW_TRAINING_SESSION:
+            # Start a new session
+            uid = utils.generate_uid()
+            while not self._is_uid_unique(uid):
+                uid = utils.generate_uid()
+            logging.error('Creating new uid %s' % (uid))
+            self._saved_uid = self.volume_data[0]['uid'] = \
+                             _TRAINING_DATA_ % (uid)
+
+            # Create new session on volume
+            data = {}
+            data[TRAINING_DATA_UID] = self.volume_data[0]['uid']
+            data[VERSION_NUMBER] = self.get_activity_version()
+            json_data = json.dumps(data)
+
+            write_failed = False
+            usb_data_path = os.path.join(self.volume_data[0]['usb_path'],
+                                         self.volume_data[0]['uid'])
+            try:
+                fd = open(usb_data_path, 'w')
+                fd.write(json_data)
+                fd.close()
+            except Exception, e:
+                write_failed = True
+                _logger.error('Could not write to USB %s: %s' %
+                              (usb_data_path, e))
+            if write_failed:
+                alert = NotifyAlert()
+                alert.props.title = _('Could not launch new session.')
+                alert.props.msg = _('Please contact One Education.')
+                logging.error(alert.props.msg)
+                alert.connect('response', self._close_alert_cb)
+                self.add_alert(alert)
+                self._load_intro_graphics(message=alert.props.msg)
+            else:
+                self._new_session = True
+                self._launcher()
+        elif i == _TRAINING_DATA_NOT_FOUND:
             # Name not in list
             alert = NotifyAlert()
             alert.props.title = _('No match in training data found.')
@@ -376,13 +421,13 @@ class TrainingActivity(activity.Activity):
             alert.connect('response', self._close_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=alert.props.msg)
-            return
-
-        volume = self.volume_data[0]
-        logging.error('Opting for %s' % (volume['files'][i]))
-        volume['uid'] = 'training-data-%s' % volume['files'][i][-9:]
-        self.saved_uid = volume['uid']
-        self._launcher()
+        else:
+            # Continue with selected session
+            volume = self.volume_data[0]
+            logging.error('Opting for %s' % (volume['files'][i]))
+            volume['uid'] = _TRAINING_DATA_ % volume['files'][i][-9:]
+            self._saved_uid = volume['uid']
+            self._launcher()
 
     def _check_for_USB_data(self):
         usb_path = os.path.join(self.volume_data[0]['usb_path'],
