@@ -176,7 +176,6 @@ class TaskMaster(Gtk.Alignment):
             _logger.error('Check volume data failed')
             # return
 
-        _logger.error('Running task %d' % (self.current_task))
         self._destroy_graphics()
         self.activity.button_was_pressed = False
         if self.current_task < self._get_number_of_tasks():
@@ -324,6 +323,9 @@ class TaskMaster(Gtk.Alignment):
 
         task = self._task_list[section_index]['tasks'][task_index]
         if self._first_time:
+            _logger.error('Running task %d: %s' % (self.current_task,
+                                                   task.uid))
+
             self._uid = task.uid
             '''
             title, help_file = task.get_help_info()
