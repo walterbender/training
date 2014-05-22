@@ -214,7 +214,7 @@ class TrainingActivity(activity.Activity):
             alert.props.title = _('USB key required')
             alert.props.msg = _('You must insert a USB key before launching '
                                 'this activity.')
-            alert.connect('response', self._remove_alert_cb)
+            alert.connect('response', self.remove_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(file_name='insert-usb.html')
             return False
@@ -228,7 +228,7 @@ class TrainingActivity(activity.Activity):
                                 'running this program.\nPlease remove any '
                                 'additional USB keys before launching '
                                 'this activity.')
-            alert.connect('response', self._remove_alert_cb)
+            alert.connect('response', self.remove_alert_cb)
             self.add_alert(alert)
             self._load_intro_graphics(message=alert.props.msg)
             return False
@@ -332,7 +332,7 @@ class TrainingActivity(activity.Activity):
             alert.props.title = _('Multiple training-data files found.')
             alert.props.msg = _('Please select the training data that '
                                 'corresponds to your session.')
-            alert.connect('response', self._remove_alert_cb)
+            alert.connect('response', self.remove_alert_cb)
             self.add_alert(alert)
             self._load_selection_graphics(email_list, name_list,
                                           self._select_file_button_cb)
@@ -1271,7 +1271,7 @@ class TrainingActivity(activity.Activity):
         self.add_alert(alert)
         self._load_intro_graphics(message=message)
 
-    def _remove_alert_cb(self, alert, response_id):
+    def remove_alert_cb(self, alert, response_id=None):
         self.remove_alert(alert)
 
     def _dos_fsck_alert_cb(self, alert, response_id):
