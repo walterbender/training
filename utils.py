@@ -23,6 +23,7 @@ import tempfile
 import cairo
 import email.utils
 import re
+import time
 
 from gi.repository import Vte
 from gi.repository import Gio
@@ -445,7 +446,11 @@ def format_volume_name(name):
 
 
 def get_modified_time(path):
-    return int(os.path.getmtime(path))
+    try:
+        return int(os.path.getmtime(path))
+    except OSError as e:
+        logging.error('Could not get modified time for %s: %s' % (path, e))
+        return time.time()
 
 
 def unmount(path):
@@ -952,13 +957,13 @@ def click_uitree_node(name):
 def select_list_view():
     # FIXME: hangs interface
     # click_uitree_node('List view')
-    _logger.error('select_list_view is broken')
+    _logger.warning('select_list_view is broken')
 
 
 def select_favorites_view():
     # FIXME: hangs interface
     # click_uitree_node('Favorites view')
-    _logger.error('select_favorites_view is broken')
+    _logger.warning('select_favorites_view is broken')
 
 
 def find_string(path, string):
