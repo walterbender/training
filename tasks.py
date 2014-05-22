@@ -2640,10 +2640,11 @@ class Assessment1Task(HTMLTask):
         if not self._task_master.uid_to_task(
                 _CONNECTED_BADGE_TASK, section=None).is_completed():
             alert = NotifyAlert()
-            alert.props.title = _('Jumping to Connection Task')
-            alert.props.msg = _('You must complete the connection tasks '
-                                'before completing the assessment.')
-            alert.connect('response', self._remove_alert_cb)
+            alert.props.title = _('Opening chapter: Getting Connected')
+            alert.props.msg = _('You must complete the getting connected '
+                                'tasks before you can finish One Academy.')
+            alert.connect('response',
+                          self._task_master.activity.remove_alert_cb)
             self._task_master.activity.add_alert(alert)
             return [_CONNECTED_BADGE_TASK]
         else:
