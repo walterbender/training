@@ -282,14 +282,24 @@ class TaskMaster(Gtk.Alignment):
 
         # Don't skip off the end
         if section_index == self.get_number_of_sections():
+            logging.debug('Do not skip off the end.')
             section_index = 0
             task_index = 0
 
         # Don't skip to last section unless all requirements are met
         if section_index == self.get_number_of_sections() - 1 and \
            not self.requirements_are_met(section_index, 0, switch_task=False):
-            section_index = 0
-            task_index = 0
+            logging.debug('Checking requirements for last section.')
+            if not self.uid_to_task(
+                    tasks.CONNECTED_BADGE_TASK, section=None).is_completed():
+                logging.debug('Connecting Chapter not complete')
+                self.current_task = self.uid_to_task_number(
+                    tasks.CONNECTED_BADGE_TASK)
+                section_index, task_index = self.get_section_and_task_index()
+            else:
+                logging.debug('Connecting Chapter complete!')
+                section_index = 0
+                task_index = 0
 
         task = self._task_list[section_index]['tasks'][0]
         self.current_task = self.uid_to_task_number(task.uid)

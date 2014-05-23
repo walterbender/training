@@ -37,7 +37,7 @@ _WELCOME_BADGE_TASK = 'welcome-badge-task'
 _TOOLBAR_BADGE_TASK = 'toolbar-badge-task'
 _ENTER_SCHOOL_TASK = 'enter-school-task'
 _ENTER_ROLE_TASK = 'enter-role-task'
-_CONNECTED_BADGE_TASK = 'connected-badge-task'
+CONNECTED_BADGE_TASK = 'connected-badge-task'
 _RECORD_SAVE_TASK = 'record-save-task'
 _WRITE_SAVE_TASK = 'write-save-task'
 _ACTIVITIES_BADGE_TASK = 'activity-badge-task'
@@ -1307,7 +1307,7 @@ class Connected10Task(BadgeTask):
     def __init__(self, task_master, section_index):
         BadgeTask.__init__(self, task_master, section_index)
         self._name = _('Connected Badge')
-        self.uid = _CONNECTED_BADGE_TASK
+        self.uid = CONNECTED_BADGE_TASK
         self._uri = 'Connected/connected10.html'
 
 
@@ -1564,6 +1564,7 @@ class Journal5Task(HTMLTask):
             task_data['data'] = utils.get_starred_count()
             self._task_master.write_task_data(self.uid, task_data)
             return False
+        # Portfolio will check for starred items, so no need to check here.
         # if not utils.get_starred_count() > task_data['data']:
         #     return False
         if not utils.saw_new_launch('org.sugarlabs.PortfolioActivity',
@@ -2629,7 +2630,7 @@ class Assessment1Task(HTMLTask):
         self._yes_no_required = True
 
     def get_requires(self):
-        required = [_WELCOME_BADGE_TASK, _CONNECTED_BADGE_TASK,
+        required = [_WELCOME_BADGE_TASK, CONNECTED_BADGE_TASK,
                     _TOOLBAR_BADGE_TASK, _ACTIVITIES_BADGE_TASK,
                     _JOURNAL_BADGE_TASK, _VIEWS_BADGE_TASK,
                     _FRAME_BADGE_TASK, _SETTINGS_BADGE_TASK]
@@ -2638,7 +2639,7 @@ class Assessment1Task(HTMLTask):
 
         # If the connected section is not completed, just to it.
         if not self._task_master.uid_to_task(
-                _CONNECTED_BADGE_TASK, section=None).is_completed():
+                CONNECTED_BADGE_TASK, section=None).is_completed():
             alert = NotifyAlert()
             alert.props.title = _('Opening chapter: Getting Connected')
             alert.props.msg = _('You must complete the getting connected '
@@ -2646,7 +2647,7 @@ class Assessment1Task(HTMLTask):
             alert.connect('response',
                           self._task_master.activity.remove_alert_cb)
             self._task_master.activity.add_alert(alert)
-            return [_CONNECTED_BADGE_TASK]
+            return [CONNECTED_BADGE_TASK]
         else:
             return required
 
