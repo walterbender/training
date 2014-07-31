@@ -53,9 +53,10 @@ VERSION_NUMBER = 'version_number'
 COMPLETION_PERCENTAGE = 'completion_percentage'
 TRAINING_DATA_EMAIL = 'training_data_email'
 TRAINING_DATA_FULLNAME = 'training_data_fullname'
-_TRAINING_DATA_ = 'training-data-%s'
 _NEW_TRAINING_SESSION = -1
 _TRAINING_DATA_NOT_FOUND = -2
+
+from utils import TRAINING_DATA, TRAINING_SUFFIX
 
 from tasks import GET_CONNECTED_TASK
 from taskmaster import TaskMaster
@@ -259,20 +260,27 @@ class TrainingActivity(activity.Activity):
             return False
 
         # (5) Only one set of training data per USB key
-        # We expect UIDs to formated as XXXX-XXXX
+        # We expect UIDs to formated as XXXX-XXXX.txt
         # We need to make sure we have proper UIDs associated with
         # the USBs and the files on them match the UID.
         # (a) If there are no files, we will assign the UID based on the
         #     volume path;
         # (b) If there is one file with a valid UID, we use that UID;
         if len(volume['files']) == 0:
-            volume['uid'] = _TRAINING_DATA_ % \
-                            utils.format_volume_name(volume['basename'])
+            _logger.debug('0 FILES FOUND')
+            basename = TRAINING_DATA % \
+                       utils.format_volume_name(volume['basename'])
+            _logger.debug('volume basename: %s' % basename)
+            volume['uid'] = basename + TRAINING_SUFFIX
             _logger.debug('No training data found. Using UID %s' %
                           volume['uid'])
             return True
         elif len(volume['files']) == 1:
-            volume['uid'] = _TRAINING_DATA_ % volume['files'][0][-9:]
+            _logger.debug('1 FILE FOUND')
+            volume['uid'] = utils.check_volume_suffix(volume['files'][0])
+            # In case we renamed the files, rescan
+            volume['files'] = utils.look_for_training_data(path)
+            _logger.debug(volume['files'])
             _logger.debug('Training data found. Using UID %s' %
                           volume['uid'])
             return True
@@ -320,8 +328,8 @@ class TrainingActivity(activity.Activity):
                     if completed > max_completed:
                         max_index = i
                         max_completed = completed
-                volume['uid'] = _TRAINING_DATA_ % \
-                                volume['files'][max_index][-9:]
+                volume['uid'] = utils.check_volume_suffix(
+                    volume['files'][max_index])
                 self._saved_uid = volume['uid']
                 return True
 
@@ -369,7 +377,11 @@ class TrainingActivity(activity.Activity):
 
     def _is_uid_unique(self, uid):
         for file_name in self.volume_data[0]['files']:
-            if file_name == _TRAINING_DATA_ % (uid):
+            if file_name == TRAINING_DATA % (uid):
+                return False
+            elif file_name == TRAINING_DATA % (uid) + TRAINING_SUFFIX:
+                return False
+            elif file_name == TRAINING_DATA % (uid) + '.bin':  # See SEP-33
                 return False
             return True
 
@@ -382,7 +394,7 @@ class TrainingActivity(activity.Activity):
                 uid = utils.generate_uid()
             logging.error('Creating new uid %s' % (uid))
             self._saved_uid = self.volume_data[0]['uid'] = \
-                             _TRAINING_DATA_ % (uid)
+                             TRAINING_DATA % (uid) + TRAINING_SUFFIX
 
             # Create new session on volume
             data = {}
@@ -425,7 +437,7 @@ class TrainingActivity(activity.Activity):
             # Continue with selected session
             volume = self.volume_data[0]
             logging.error('Opting for %s' % (volume['files'][i]))
-            volume['uid'] = _TRAINING_DATA_ % volume['files'][i][-9:]
+            volume['uid'] = TRAINING_DATA % volume['files'][i][-9:]
             self._saved_uid = volume['uid']
             self._launcher()
 

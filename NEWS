@@ -1,5 +1,13 @@
 NEWS
 
+3.5
+* Add .txt suffix to training data as possible fix to SUP-33
+  (Also checking for no suffix and .bin suffix)
+
+3.41
+* Added debugging statements to capture time and content of school data
+  reporting
+
 3.4
 * Ignore files starting with # or ending with ~
 * If there is more than one set of training data, check the

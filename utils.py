@@ -75,6 +75,9 @@ volume_monitor = None
 battery_model = None
 proxy = None
 
+TRAINING_DATA = 'training-data-%s'
+TRAINING_SUFFIX = '.txt'
+
 
 def is_valid_email_entry(entry):
     if len(entry) == 0:
@@ -223,14 +226,54 @@ def look_for_file_type(path, suffix):
     return glob.glob(os.path.join(path, '*' + suffix))
 
 
+def check_volume_suffix(volume_file):
+    _logger.debug('check_volume_suffix %s' % (volume_file))
+    if volume_file.endswith(TRAINING_SUFFIX):
+        _logger.debug('return %s' % (TRAINING_DATA % volume_file[-13:]))
+        return TRAINING_DATA % volume_file[-13:]
+    elif volume_file.endswith('.bin'):  # See SEP-33
+        new_volume_file = volume_file[:-4] + TRAINING_SUFFIX
+        print new_volume_file
+        os.rename(volume_file, new_volume_file)
+        _logger.debug('return %s' % (TRAINING_DATA % new_volume_file[-13:]))
+        return TRAINING_DATA % new_volume_file[-13:]
+    else:  # No suffix
+        _logger.debug('NO SUFFIX: %s' % volume_file)
+        new_volume_file = volume_file + TRAINING_SUFFIX
+        _logger.debug(new_volume_file)
+        os.rename(volume_file, new_volume_file)
+        _logger.debug('return %s' % (TRAINING_DATA % new_volume_file[-13:]))
+        return TRAINING_DATA % new_volume_file[-13:]
+
+
 def look_for_training_data(path):
+    ''' look for .txt suffix, .bin suffix, and finally, no suffix '''
     training_data = []
+    glob_data = glob.glob(os.path.join(path, 'training-data-*.txt'))
+    for path in glob_data:
+        # Ignore files starting with # or ending with ~
+        if path[0] == '#':
+            continue
+        if path[-1] == '~':
+            continue
+        training_data.append(path)
+    glob_data = glob.glob(os.path.join(path, 'training-data-*.bin'))
+    for path in glob_data:
+        # Ignore files starting with # or ending with ~
+        if path[0] == '#':
+            continue
+        if path[-1] == '~':
+            continue
+        training_data.append(path)
     glob_data = glob.glob(os.path.join(path, 'training-data-*'))
     for path in glob_data:
         # Ignore files starting with # or ending with ~
         if path[0] == '#':
             continue
         if path[-1] == '~':
+            continue
+        # Make sure we are not adding the same file twice
+        if path in training_data:
             continue
         training_data.append(path)
     return training_data

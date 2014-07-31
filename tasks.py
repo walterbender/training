@@ -1104,6 +1104,7 @@ class Connected6Task(HTMLTask):
             self._task_master.write_task_data(SCHOOL_NAME, school)
             self._task_master.write_task_data(POST_CODE, postal_code)
             self._task_master.write_task_data(SCHOOL_UID, self._default_sf_id)
+            _logger.debug('Wrote SCHOOL_UID AND SCHOOL_NAME to task_data file')
             self._task_master.current_task += 1
             self._task_master.write_task_data('current_task',
                                               self._task_master.current_task)
@@ -1115,6 +1116,7 @@ class Connected6Task(HTMLTask):
             i = self._schools.index(school)
             self._task_master.write_task_data(SCHOOL_UID, self._sf_ids[i])
             self._task_master.write_task_data(SCHOOL_NAME, school)
+            _logger.debug('Wrote SCHOOL_UID AND SCHOOL_NAME to task_data file')
             return True
         else:
             # Confirm that it is OK to use a school not in the list.
