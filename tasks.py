@@ -1833,14 +1833,27 @@ class Views5Task(HTMLTask):
     def get_my_turn(self):
         return True
 
+    def get_data(self):
+        favorites_list = utils.get_favorites()
+        # logging.error('%s: get length of favorites list: %d' % 
+        #               (self._name, len(favorites_list.keys())))
+        return self._task_master.activity.favorites_count
+        # return len(favorites_list.keys())
+
     def test(self, task_data):
-        if task_data['data'] is None:
+        if not 'data' in task_data or task_data['data'] is None:
             favorites_list = utils.get_favorites()
-            task_data['data'] = len(favorites_list)
+            task_data['data'] = self._task_master.activity.favorities_count
+            # task_data['data'] = len(favorites_list)
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            return len(utils.get_favorites()) > task_data['data']
+            # logging.error('%s: %d > %d???' % 
+            #               (self._name, len(utils.get_favorites().keys()),
+            #                self._task_master.activity.favorites_count))
+            # return len(utils.get_favorites().keys()) > task_data['data']
+            return len(utils.get_favorites().keys()) > \
+                   self._task_master.activity.favorites_count
 
 
 class Views6Task(HTMLTask):
@@ -1863,15 +1876,27 @@ class Views6Task(HTMLTask):
     def get_my_turn(self):
         return True
 
+    def get_data(self):
+        favorites_list = utils.get_favorites()
+        # logging.error('%s: get length of favorites list: %d' % 
+        #               (self._name, len(favorites_list)))
+        return self._task_master.activity.favorites_count
+        # return len(favorites_list)
+
     def test(self, task_data):
-        if task_data['data'] is None:
+        if not 'data' in task_data or task_data['data'] is None:
             favorites_list = utils.get_favorites()
-            task_data['data'] = len(favorites_list)
+            task_data['data'] = self._task_master.activity.favorites_count
+            # task_data['data'] = len(favorites_list.keys())
             self._task_master.write_task_data(self.uid, task_data)
             return False
         else:
-            return len(utils.get_favorites()) < task_data['data']
-
+            # logging.error('%s: %d < %d' % 
+            #               (self._name, len(utils.get_favorites().keys()),
+            #                self._task_master.activity.favorites_count))
+            # return len(utils.get_favorites().keys()) < task_data['data']
+            return len(utils.get_favorites().keys()) < \
+                   self._task_master.activity.favorites_count
 
 class Views7Task(HTMLTask):
 

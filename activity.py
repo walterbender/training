@@ -55,6 +55,7 @@ TRAINING_DATA_EMAIL = 'training_data_email'
 TRAINING_DATA_FULLNAME = 'training_data_fullname'
 _NEW_TRAINING_SESSION = -1
 _TRAINING_DATA_NOT_FOUND = -2
+_USB_NOT_FOUND = -3
 
 from utils import TRAINING_DATA, TRAINING_SUFFIX
 
@@ -140,6 +141,7 @@ class TrainingActivity(activity.Activity):
 
         self.bundle_path = activity.get_bundle_path()
         self.volume_data = []
+        self._selected_volume = None
         self._saved_uid = None
         self._new_session = False
 
@@ -230,9 +232,16 @@ class TrainingActivity(activity.Activity):
                                 'additional USB keys before launching '
                                 'this activity.')
             alert.connect('response', self.remove_alert_cb)
-            self.add_alert(alert)
-            self._load_intro_graphics(message=alert.props.msg)
-            return False
+            # self.add_alert(alert)
+            # self._load_intro_graphics(message=alert.props.msg)
+            # return False
+            self._load_usb_selection_graphics(self._select_usb_button_cb)
+            # FIX ME: we need to wait for the user input here.
+            volume = self.volume_data[self._selected_volume]
+            if self._selected_volume is None:
+                self.add_alert(alert)
+                self._load_intro_graphics(message=alert.props.msg)
+                return False
 
         volume = self.volume_data[0]
 
@@ -347,6 +356,29 @@ class TrainingActivity(activity.Activity):
             volume['uid'] = None
             return True
 
+    def _load_usb_selection_graphics(self, callback):
+        center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
+        graphics = Graphics()
+        # FIXME: need some better instructions here
+        graphics.add_text(
+            _('Please select your USB key from the list below.'))
+        for i, volume in enumerate(self.volume_data):
+            # FIXME: temporary kludge for NextGen machine
+            if not 'Volume' in volume['basename']:
+                self._selected_volume = i
+                return True
+            button = graphics.add_button(volume['basename'], callback, arg=i)
+            button.show()
+
+        button = graphics.add_button(_('My USB is not in the list.'),
+                                     callback, arg=-1)
+        button.show()
+
+        center_in_panel.add(graphics)
+        graphics.show()
+        self.set_canvas(center_in_panel)
+        center_in_panel.show()
+
     def _load_selection_graphics(self, email_list, name_list, callback):
         center_in_panel = Gtk.Alignment.new(0.5, 0, 0, 0)
         graphics = Graphics()
@@ -384,6 +416,13 @@ class TrainingActivity(activity.Activity):
             elif file_name == TRAINING_DATA % (uid) + '.bin':  # See SEP-33
                 return False
             return True
+
+    def _select_usb_button_cb(self, widget, i):
+        logging.debug('SELECT USB BUTTON %d' % i)
+        if i < 0:
+            self._selected_volume = None
+        else:
+            self._selected_volume = i
 
     def _select_file_button_cb(self, widget, i):
         logging.debug('SELECT FILE BUTTON %d' % i)
@@ -663,6 +702,8 @@ class TrainingActivity(activity.Activity):
             self._graphics_area.show()
             self._fixed.put(self._scrolled_window, 0, 0)
             self._scrolled_window.show()
+
+            self.favorites_count = len(utils.get_favorites())
 
             self._task_master = TaskMaster(self)
             self._task_master.show()

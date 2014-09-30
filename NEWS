@@ -1,5 +1,8 @@
 NEWS
 
+3.6
+* Reread favorites data on each launch to circumvent OEP-460
+
 3.5
 * Add .txt suffix to training data as possible fix to SUP-33
   (Also checking for no suffix and .bin suffix)
