@@ -69,6 +69,9 @@ class Reporter(GObject.GObject):
         self._activity = activity
 
     def report(self, tasks_data_list):
+        # No reporting of data for ES version
+        return
+
         if not self._url or not self._api_key:
             _logger.error('reporter is missing URL or API-KEY')
             self._activity.transfer_failed_signal.emit()
