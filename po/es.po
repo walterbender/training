@@ -1,0 +1,665 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <walter@sugarlabs.org>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-02-25 13:12-0500\n"
+"PO-Revision-Date: 2014-03-01 12:53-0500\n"
+"Last-Translator: Claudia Urrea <claudia@laptop.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.0.5\n"
+
+#: activity/activity.info:2
+msgid "One Academy"
+msgstr "Aprendiendo Sugar"
+
+#: activity/activity.info:3
+msgid "a series of Sugar \"How-to\" exercises from One Academy"
+msgstr "una serie de ejercicios sobre Sugar del programa One Academy"
+
+#: helppanel.py:35
+msgid "Feedback Ticket"
+msgstr "Tiquete de retroalimentación"
+
+#: helppanel.py:36
+msgid "Help Ticket"
+msgstr "Tiquete de ayuda"
+
+#: helppanel.py:37
+msgid "Type your question or comment here..."
+msgstr "Escriba su pregunta o comentario aquí..."
+
+#: helppanel.py:38
+msgid "You must be online to use this form. If you are having trouble connecting, please contact us via the phone number or email address above."
+msgstr "Usted debe estar conectado para poder utilizar esta forma. Si usted está teniendo problemas para conectarse, por favor póngase en contacto con nosotros a través del número de teléfono o dirección de correo electrónico adjunto."
+
+#: helppanel.py:61
+msgid ""
+"Call: 1-800 ONE EDU\n"
+"Email: info@one-education.org"
+msgstr ""
+"Teléfono: 1-800 ONE EDU\n"
+"Correo electrónico: info@one-education.org"
+
+#: helppanel.py:74
+msgid "Or use the form below:"
+msgstr "O utilice la siguiente forma:"
+
+#: helppanel.py:91
+msgid "Send feedback"
+msgstr "Enviar comentarios"
+
+#: helppanel.py:112
+msgid "Ask for help"
+msgstr "Pida ayuda"
+
+#: helppanel.py:133
+msgid "Include screenshot?"
+msgstr "Incluir captura de pantalla?"
+
+#: helppanel.py:138
+msgid "Send"
+msgstr "Enviar "
+
+#: activity.py:187
+msgid "USB key required"
+msgstr "Se requiere una memoria USB"
+
+#: activity.py:188
+msgid "You must insert a USB key before launching this activity."
+msgstr "Debe insertar una memoria USB antes de iniciar esta actividad."
+
+#: activity.py:199
+msgid "Multiple USB keys found"
+msgstr "Se encontraron múltiples memorias USB"
+
+#: activity.py:200
+msgid ""
+"Only one USB key must be inserted while running this program.\n"
+"Please remove any additional USB keys before launching this activity."
+msgstr ""
+"Sólo una memoria USB debe ser insertada durante la ejecución de este programa.\n"
+"Por favor retirar las memorias USB adicionales antes de iniciar esta Actividad."
+
+#: activity.py:216
+msgid "USB key is full"
+msgstr "Memoria USB está llena"
+
+#: activity.py:217
+msgid "No room on USB"
+msgstr "No hay espacio en la memoria USB"
+
+#: activity.py:227
+msgid "Cannot write to USB"
+msgstr "No se puede escribir en la memoria USB"
+
+#: activity.py:228
+msgid "USB key seems to be read-only."
+msgstr "Memoria USB parece ser de sólo lectura."
+
+#: activity.py:255
+msgid "Multiple training-data files found."
+msgstr "Se han encontrado múltiples archivos de datos de entrenamiento."
+
+#: activity.py:256
+msgid "There can only be one set of training data per USB key."
+msgstr "Sólo puede haber un conjunto de datos de entrenamiento por memoria USB."
+
+#: activity.py:328
+msgid "Data mismatch"
+msgstr "Discrepancia de datos"
+
+#: activity.py:329
+#, python-format
+msgid "Are you %(usb)s or %(sugar)s?"
+msgstr "¿Eres %(usb)s o %(sugar)s?"
+
+#: activity.py:602
+#, python-format
+msgid "%(name)s %(bundle)s Activity"
+msgstr "%(name)s %(bundle)s Actividad"
+
+#: activity.py:623
+msgid "View"
+msgstr "Vista"
+
+#: activity.py:631
+msgid "Fullscreen"
+msgstr "Pantalla completa"
+
+#: activity.py:638
+msgid "Increase size"
+msgstr "Aumentar el tamaño"
+
+#: activity.py:644
+msgid "Decrease size"
+msgstr "Disminuir el tamaño"
+
+#: activity.py:650
+msgid "Restore original size"
+msgstr "Restaurar tamaño original"
+
+#: activity.py:660
+msgid "Edit"
+msgstr "Editar"
+
+#: activity.py:668
+msgid "Copy"
+msgstr "Copiar"
+
+#: activity.py:676
+msgid "Paste"
+msgstr "Pegar"
+
+#: activity.py:686
+msgid "Check progress"
+msgstr "Revisar el progreso"
+
+#: activity.py:694
+msgid "Help"
+msgstr "Ayuda"
+
+#: activity.py:703
+#: activity.py:783
+msgid "Training data upload status"
+msgstr "Estado de carga de datos de entrenamiento"
+
+#: activity.py:788
+msgid "Data transfer started"
+msgstr "Transferencia de datos se inició"
+
+#: activity.py:792
+msgid "Data transfer progressing"
+msgstr "Transferencia de datos en progreso"
+
+#: activity.py:797
+msgid "Data transfer completed"
+msgstr "Transferencia de datos terminada"
+
+#: activity.py:802
+msgid "Data transfer failed"
+msgstr "Transferencia de datos fallida"
+
+#: activity.py:958
+msgid "Sugar upgrade required."
+msgstr "Se requiere una actualización de Sugar."
+
+#: activity.py:973
+#: activity.py:981
+#: activity.py:988
+#: activity.py:1007
+msgid "System error."
+msgstr "Error del sistema."
+
+#: activity.py:1011
+msgid "Restart required"
+msgstr "Se requiere reiniciar"
+
+#: activity.py:1012
+msgid ""
+"We needed to install some software on your system.\n"
+"Sugar must be restarted before sugarservices can commence."
+msgstr ""
+"Tenemos que instalar algún software en su sistema. \n"
+"Sugar debe ser reiniciado antes de que los servicios de Sugar pueden comenzar."
+
+#: activity.py:1018
+msgid "Sugar restart required."
+msgstr "Reinicio de Sugar requerido."
+
+#: activity.py:1025
+msgid ""
+"We are unable to install some software on your system.\n"
+"Sugar must be upgraded before this activity can be run."
+msgstr ""
+"No es posible instalar algún software en su sistema.\n"
+"Sugar debe actualizarse antes de que esta Actividad se pueda ejecutar. "
+
+#: taskmaster.py:87
+msgid "Refresh"
+msgstr "Actualizar"
+
+#: taskmaster.py:101
+#: graphics.py:207
+msgid "Yes"
+msgstr "Si"
+
+#: taskmaster.py:106
+#: tasks.py:199
+#: tasks.py:289
+msgid "Next"
+msgstr "Próximo"
+
+#: taskmaster.py:111
+#: graphics.py:209
+msgid "No"
+msgstr "No"
+
+#: taskmaster.py:121
+msgid "My Turn"
+msgstr "Mi Turno"
+
+#: taskmaster.py:128
+msgid "Skip this section"
+msgstr "Omita esta sección"
+
+#: taskmaster.py:800
+#, python-format
+msgid "Completed: %d%%"
+msgstr "Terminado: %d%%"
+
+#: tasks.py:53
+msgid "Welcome to One Academy"
+msgstr "Bienvenido a Aprendiendo Sugar"
+
+#: tasks.py:62
+msgid "Getting to Know the Toolbar"
+msgstr "Conociendo la barra de herramientas"
+
+#: tasks.py:73
+#: tasks.py:758
+#: tasks.py:1952
+msgid "Getting Connected"
+msgstr "Conectándose"
+
+#: tasks.py:83
+#: tasks.py:1009
+msgid "Getting to Know Sugar Activities"
+msgstr "Conociendo Actividades de Sugar"
+
+#: tasks.py:93
+#: tasks.py:1318
+msgid "Getting to Know the Frame"
+msgstr "Conociendo el Cuadro"
+
+#: tasks.py:103
+#: tasks.py:1448
+msgid "Getting to Know the Views"
+msgstr "Conociendo las Vistas"
+
+#: tasks.py:113
+#: tasks.py:1158
+msgid "Getting to Know the Journal"
+msgstr "Conociendo el Diario"
+
+#: tasks.py:123
+msgid "Getting to Know Settings"
+msgstr "Conociendo los Ajustes "
+
+#: tasks.py:135
+#: tasks.py:2082
+msgid "Learning More About the XO"
+msgstr "Aprendiendo más sobre la XO"
+
+#: tasks.py:150
+msgid "Getting to Know more Activities"
+msgstr "Conociendo mas Actividades"
+
+#: tasks.py:166
+msgid "Getting to Know Collaboration"
+msgstr "Conociendo Colaboración "
+
+#: tasks.py:179
+#: tasks.py:2227
+#: tasks.py:2256
+#: tasks.py:2269
+msgid "Assessment"
+msgstr "Valoración del aprendizaje"
+
+#: tasks.py:236
+msgid "Success!"
+msgstr "¡Éxito!"
+
+#: tasks.py:240
+msgid "Keep trying"
+msgstr "Sigue intentándolo"
+
+#: tasks.py:335
+msgid "Badge Task"
+msgstr "Tarea de Medallas"
+
+#: tasks.py:368
+msgid "Welcome"
+msgstr "Bienvenido"
+
+#: tasks.py:371
+msgid "Let's go!"
+msgstr "¡Vamos!"
+
+#: tasks.py:378
+msgid "Enter Your Name"
+msgstr "Ingrese Su Nombre"
+
+#: tasks.py:425
+msgid "Greetings"
+msgstr "Saludos"
+
+#: tasks.py:448
+msgid "Enter Your Email"
+msgstr "Ingrese Su Correo Electrónico"
+
+#: tasks.py:503
+msgid "Validate Email"
+msgstr "Valide Correo electrónico"
+
+#: tasks.py:566
+msgid "Sections"
+msgstr "Secciones"
+
+#: tasks.py:592
+msgid "Welcome Badge"
+msgstr "Medalla de Bienvenida"
+
+#: tasks.py:616
+msgid "Introduction to the Toolbar"
+msgstr "Conociendo la Barra de Herramientas"
+
+#: tasks.py:625
+msgid "Stopping an Activity"
+msgstr "Deteniendo una Actividad"
+
+#: tasks.py:634
+msgid "Stopping an Activity (Video)"
+msgstr "Deteniendo una Actividad (Video)"
+
+#: tasks.py:669
+msgid "More re Toolbars"
+msgstr "Mas acerca de la Barra de Herramientas"
+
+#: tasks.py:678
+msgid "Using the View Menu"
+msgstr "Utilizando el Menú de Vistas"
+
+#: tasks.py:687
+msgid "Trying Full Screen"
+msgstr "Probando la Pantalla Completa"
+
+#: tasks.py:718
+msgid "The Activity Toolbar"
+msgstr "La Actividad de Barra de Herramientas"
+
+#: tasks.py:727
+msgid "Enter a Description"
+msgstr "Ingrese una Descripción "
+
+#: tasks.py:748
+msgid "Toolbar Badge"
+msgstr "Medalla de Barra de Herramientas"
+
+#: tasks.py:767
+msgid "The Network View"
+msgstr "La Vista de Vecindario"
+
+#: tasks.py:776
+msgid "Connecting to a WiFi Network"
+msgstr "Conexión a una red WiFi"
+
+#: tasks.py:785
+msgid "Connecting to a WiFi Network (Video)"
+msgstr "Conexión a una red WiFi (Video)"
+
+#: tasks.py:864
+msgid "Enter School Name"
+msgstr "Ingrese el Nombre de la Escuela"
+
+#: tasks.py:926
+msgid "Your school does not appear in our list of schools in Australia. OK to continue?"
+msgstr "Su escuela no aparece en nuestra lista de escuelas. Aceptar para continuar?"
+
+#: tasks.py:960
+msgid "Connected"
+msgstr "conectado"
+
+#: tasks.py:999
+msgid "Connected Badge"
+msgstr "Medalla de Conexión"
+
+#: tasks.py:1018
+msgid "Take a Picture with Record"
+msgstr "Tomar una Foto con Grabar"
+
+#: tasks.py:1027
+msgid "Take a Picture with Record (Video)"
+msgstr "Tomar una Foto con Grabar (Video)"
+
+#: tasks.py:1056
+msgid "Insert a Picture into a Write Document"
+msgstr "Insertar una imagen en un Documento de Escribir"
+
+#: tasks.py:1065
+msgid "Insert a Picture into a Write Document (Video)"
+msgstr "Insertar una imagen en un Documento de Escribir (Video)"
+
+#: tasks.py:1101
+msgid "Make Speak Talk to You"
+msgstr "Hacer que Hablar hable contigo"
+
+#: tasks.py:1110
+msgid "Make Speak Talk to You (Video)"
+msgstr "Hacer que Hablar hable contigo (Video)"
+
+#: tasks.py:1148
+msgid "Activities Badge"
+msgstr "Medalla de Actividades"
+
+#: tasks.py:1167
+msgid "Viewing the Journal"
+msgstr "Viendo el Diario"
+
+#: tasks.py:1176
+msgid "Viewing the Journal (Video)"
+msgstr "Viendo el Diario (Video)"
+
+#: tasks.py:1218
+msgid "Introducing the Portfolio"
+msgstr "Conociendo el Portafolio"
+
+#: tasks.py:1227
+msgid "Using the Portfolio (Video)"
+msgstr "Utilizando el Portafolio (Video)"
+
+#: tasks.py:1269
+msgid "Copy your Presentation to USB"
+msgstr "Copiar su Presentación a la memoria USB"
+
+#: tasks.py:1278
+msgid "Copy your Presentation to USB (Video)"
+msgstr "Copiar su Presentación a la memoria USB (Video)"
+
+#: tasks.py:1308
+msgid "Journal Badge"
+msgstr "Medalla de Diario "
+
+#: tasks.py:1327
+msgid "Three Ways to Open the Frame"
+msgstr "Tres Formas de Abrir el Cuadro"
+
+#: tasks.py:1338
+msgid "Checking the Battery"
+msgstr "Revisando la Batería"
+
+#: tasks.py:1386
+msgid "Changing the Volume"
+msgstr "Revisando el Volumen"
+
+#: tasks.py:1409
+msgid "Using the Frame to Read Text"
+msgstr "Usando el Cuadro para Leer Texto"
+
+#: tasks.py:1420
+msgid "Bottom of the Frame Recap"
+msgstr "Resumen de la Parte Inferior del Cuadro"
+
+#: tasks.py:1429
+msgid "Top of the Frame Recap"
+msgstr "Resumen de la Parte Superior del Cuadro"
+
+#: tasks.py:1438
+msgid "Frame Badge"
+msgstr "Medalla del Cuadro"
+
+#: tasks.py:1457
+msgid "The Four Views of Sugar"
+msgstr "Las Cuatro Vistas de Sugar"
+
+#: tasks.py:1466
+msgid "The Views of Sugar (Video)"
+msgstr "Las Vistas de Sugar (Video)"
+
+#: tasks.py:1478
+msgid "Adding a Favourite to the Home View"
+msgstr "Adicionando un Favorito a la Vista de Hogar "
+
+#: tasks.py:1487
+msgid "Adding a Favourite to the Home View (Video)"
+msgstr "Adicionando un Favorito a la Vista de Hogar (Video)"
+
+#: tasks.py:1517
+msgid "Removing a Favourite from the Home View"
+msgstr "Eliminando un Favorito de la Vista de Hogar "
+
+#: tasks.py:1547
+msgid "Switch Between the Four Views"
+msgstr "Cambiar Entre las Cuatro Vistas"
+
+#: tasks.py:1575
+msgid "Views Badge"
+msgstr "Medalla de Vistas"
+
+#: tasks.py:1585
+msgid "Exploring the Sugar Settings"
+msgstr "Explorando los Ajustes de Sugar"
+
+#: tasks.py:1594
+msgid "Changing the XO Nickname and Colours"
+msgstr "Cambiando El Nombre y los Colores del XO"
+
+#: tasks.py:1603
+msgid "Changing the XO Nickname and Colours (Video)"
+msgstr "Cambiando El Nombre y los Colores del XO"
+
+#: tasks.py:1639
+msgid "Important Settings"
+msgstr "Ajustes Importantes"
+
+#: tasks.py:1648
+msgid "Other Settings"
+msgstr "Otros Ajustes"
+
+#: tasks.py:1657
+#: tasks.py:1667
+msgid "Badge Settings"
+msgstr "Medalla de Ajustes"
+
+#: tasks.py:1677
+msgid "Learning About More Activities"
+msgstr "Aprendiendo sobre Más Actividades"
+
+#: tasks.py:1686
+msgid "Turtle Blocks Introduction"
+msgstr "Introducción a Turtle Blocks (Bloques de la Tortuga)"
+
+#: tasks.py:1695
+#: tasks.py:1740
+msgid "Turtle Square"
+msgstr "Cuadrado de la Tortuga"
+
+#: tasks.py:1704
+#: tasks.py:1749
+msgid "Turtle Square (Video)"
+msgstr "Cuadrado de la Tortuga (Video)"
+
+#: tasks.py:1778
+#: tasks.py:1787
+msgid "Turtle Pen"
+msgstr "Pluma de la Tortuga"
+
+#: tasks.py:1819
+#: tasks.py:1828
+msgid "Turtle Show Text"
+msgstr "Tortuga Muestra Texto"
+
+#: tasks.py:1856
+#: tasks.py:1865
+msgid "Turtle Show Image"
+msgstr "Tortuga Muestra Imagen"
+
+#: tasks.py:1896
+msgid "Physics Play"
+msgstr "Jugando con Física"
+
+#: tasks.py:1905
+msgid "Physics Play (Video)"
+msgstr "Jugando con Física (Video)"
+
+#: tasks.py:1930
+msgid "More Activities Badge"
+msgstr "Medalla de Más Actividades"
+
+#: tasks.py:1943
+msgid "Introduction to Collaboration"
+msgstr "Introducción a la Colaboración"
+
+#: tasks.py:1961
+msgid "Collaborating with Physics"
+msgstr "Colaborando con la Física "
+
+#: tasks.py:1970
+msgid "Collaborating with Physics (Video)"
+msgstr "Colaborando con la Física (Video)"
+
+#: tasks.py:1997
+#: tasks.py:2006
+#: tasks.py:2024
+msgid "Collaboration"
+msgstr "Colaboración"
+
+#: tasks.py:2033
+msgid "Collaboration Badge"
+msgstr "Medalla de Colaboración "
+
+#: tasks.py:2091
+msgid "Switch to Tablet Mode"
+msgstr "Cambiar a modo Tableta"
+
+#: tasks.py:2100
+msgid "Switch to Tablet Mode (Video)"
+msgstr "Cambiar a modo Tableta (Video)"
+
+#: tasks.py:2121
+msgid "Play with the Gamepad Keys"
+msgstr "Jugar con las Teclas de Control de Juegos "
+
+#: tasks.py:2155
+msgid "Switch Back to Laptop Mode"
+msgstr "Volver al Modo de Computador Portátil"
+
+#: tasks.py:2164
+msgid "Switch Back to Laptop Mode (Video)"
+msgstr "Volver al Modo de Computador Portátil (Video)"
+
+#: tasks.py:2185
+msgid "Change the Screen Orientation"
+msgstr "Cambiar la Orientación de la Pantalla"
+
+#: tasks.py:2217
+msgid "XO Badge"
+msgstr "Medalla de XO"
+
+#: tasks.py:2303
+msgid "Assessment Badge"
+msgstr "Medalla de Valoración"
+
+#: tasks.py:2311
+msgid "All done!"
+msgstr "¡Has Terminado!"
+

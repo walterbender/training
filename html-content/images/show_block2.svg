@@ -8,7 +8,7 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    version="1.1"
-   width="216"
+   width="248"
    height="46"
    id="svg2">
   <metadata
@@ -26,16 +26,16 @@
   <defs
      id="defs10" />
   <g
-     transform="scale(2,2)"
+     transform="matrix(2,0,0,2,32,0)"
      id="g4"
      style="fill:#c0ff00;fill-opacity:1;stroke:#80a000;stroke-opacity:1">
     <path
-       d="m 0.5,8.5 0,-4 c 0,-2.0943951 1.9056049,-4 4,-4 l 4,0 0,2 10,0 0,-2 18,0 4,0 c 2.094395,0 4,1.9056049 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.094395 -1.905605,4 -4,4 l -4,0 -18,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.0943951,0 -4,-1.905605 -4,-4 l 0,-4 z"
+       d="m -15.5,8.5 0,-4 c 0,-2.0943951 1.905605,-4 4,-4 l 4,0 0,2 10,0 0,-2 34,0 4,0 c 2.094395,0 4,1.9056049 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.094395 -1.905605,4 -4,4 l -4,0 -34,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.094395,0 -4,-1.905605 -4,-4 l 0,-4 z"
        id="path6"
        style="fill:#c0ff00;fill-opacity:1;stroke:#80a000;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
   </g>
   <g
-     transform="matrix(2,0,0,2,74,0)"
+     transform="matrix(2,0,0,2,106,0)"
      id="g3065"
      style="fill:#c0ff00;fill-opacity:1;stroke:#80a000;stroke-opacity:1">
     <path
@@ -52,15 +52,15 @@
        x="6.383234"
        y="29.947266"
        id="tspan3079"
-       style="font-size:24px">show</tspan></text>
+       style="font-size:24px">mostrar</tspan></text>
   <text
-     x="117.99402"
+     x="135.99402"
      y="29.736328"
      id="text3849"
      xml:space="preserve"
      style="font-size:288px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"><tspan
-       x="117.99402"
+       x="135.99402"
        y="29.736328"
        id="tspan3851"
-       style="font-size:24px">Turtle!</tspan></text>
+       style="font-size:24px">Tortuga!</tspan></text>
 </svg>

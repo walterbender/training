@@ -8,7 +8,7 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    version="1.1"
-   width="76"
+   width="120"
    height="50"
    id="svg2">
   <metadata
@@ -30,7 +30,7 @@
      id="g4"
      style="fill:#ffff00;fill-opacity:1;stroke:#a0a000;stroke-opacity:1">
     <path
-       d="m 0.5,14.5 0,-4 c 0,-2.0943951 1.9056049,-4 4,-4 l 4,0 5,-6 5,6 11,0 4,0 c 2.094395,0 4,1.9056049 4,4 l 0,4 0,4 c 0,2.094395 -1.905605,4 -4,4 l -4,0 -11,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.0943951,0 -4,-1.905605 -4,-4 z"
+       d="m 0.5,14.5 0,-4 c 0,-2.0943951 1.9056049,-4 4,-4 l 4,0 5,-6 5,6 33,0 4,0 c 2.094395,0 4,1.9056049 4,4 l 0,4 0,4 c 0,2.094395 -1.905605,4 -4,4 l -4,0 -33,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.0943951,0 -4,-1.905605 -4,-4 z"
        id="path6"
        style="fill:#ffff00;fill-opacity:1;stroke:#a0a000;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
   </g>
@@ -43,5 +43,5 @@
        x="8.6992188"
        y="35.660156"
        id="tspan2991"
-       style="font-size:24px">start</tspan></text>
+       style="font-size:24px">empezar</tspan></text>
 </svg>

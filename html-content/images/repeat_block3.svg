@@ -8,7 +8,7 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    version="1.1"
-   width="226"
+   width="238"
    height="148"
    id="svg2">
   <metadata
@@ -43,7 +43,7 @@
        x="25.018824"
        y="26.917969"
        id="tspan3079"
-       style="font-size:24px">repeat</tspan></text>
+       style="font-size:24px">repetir</tspan></text>
   <g
      transform="matrix(2,0,0,2,116,0)"
      id="g3065"
@@ -64,46 +64,42 @@
        id="tspan3851"
        style="font-size:24px">4</tspan></text>
   <g
-     transform="translate(-0.084746,0.220342)"
-     id="g4016">
-    <g
-       transform="matrix(2,0,0,2,18.084746,41.779658)"
-       id="g4-3">
-      <path
-         d="m 0.5,8.5 0,-4 c 0,-2.0943951 1.9056049,-4 4,-4 l 4,0 0,2 10,0 0,-2 33,0 4,0 c 2.094395,0 4,1.9056049 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.094395 -1.905605,4 -4,4 l -4,0 -33,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.0943951,0 -4,-1.905605 -4,-4 l 0,-4 z"
-         id="path6-6"
-         style="fill:#00ff00;fill-opacity:1;stroke:#00a000;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
-    </g>
-    <g
-       transform="matrix(2,0,0,2,122.08475,41.779658)"
-       id="g3065-3"
-       style="fill:#ff00ff;fill-opacity:1;stroke:#a000a0;stroke-opacity:1">
-      <path
-         d="m 8.5,0.5 43,0 0,20 -43,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
-         id="path3067-1"
-         style="fill:#ff00ff;fill-opacity:1;stroke:#a000a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
-    </g>
-    <text
-       x="24.467979"
-       y="71.726921"
-       id="text3077-4"
-       xml:space="preserve"
-       style="font-size:288px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"><tspan
-         x="24.467979"
-         y="71.726921"
-         id="tspan3079-7"
-         style="font-size:24px">forward</tspan></text>
-    <text
-       x="158.07877"
-       y="71.515984"
-       id="text3849-5"
-       xml:space="preserve"
-       style="font-size:288px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"><tspan
-         x="158.07877"
-         y="71.515984"
-         id="tspan3851-8"
-         style="font-size:24px">100</tspan></text>
+     transform="matrix(2,0,0,2,18,42)"
+     id="g4-3">
+    <path
+       d="m 0.5,8.5 0,-4 c 0,-2.0943951 1.9056049,-4 4,-4 l 4,0 0,2 10,0 0,-2 39,0 4,0 c 2.094395,0 4,1.9056049 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.094395 -1.905605,4 -4,4 l -4,0 -39,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.0943951,0 -4,-1.905605 -4,-4 l 0,-4 z"
+       id="path6-6"
+       style="fill:#00ff00;fill-opacity:1;stroke:#00a000;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
   </g>
+  <g
+     transform="matrix(2,0,0,2,134,42)"
+     id="g3065-3"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#a000a0;stroke-opacity:1">
+    <path
+       d="m 8.5,0.5 43,0 0,20 -43,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
+       id="path3067-1"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#a000a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
+  </g>
+  <text
+     x="24.383234"
+     y="71.947266"
+     id="text3077-4"
+     xml:space="preserve"
+     style="font-size:288px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"><tspan
+       x="24.383234"
+       y="71.947266"
+       id="tspan3079-7"
+       style="font-size:24px">adelante</tspan></text>
+  <text
+     x="169.99402"
+     y="71.736328"
+     id="text3849-5"
+     xml:space="preserve"
+     style="font-size:288px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"><tspan
+       x="169.99402"
+       y="71.736328"
+       id="tspan3851-8"
+       style="font-size:24px">100</tspan></text>
   <g
      transform="translate(18,84)"
      id="g4108">
@@ -111,12 +107,12 @@
        transform="scale(2,2)"
        id="g4-2">
       <path
-         d="m 0.5,8.5 0,-4 c 0,-2.0943951 1.9056049,-4 4,-4 l 4,0 0,2 10,0 0,-2 18,0 4,0 c 2.094395,0 4,1.9056049 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.094395 -1.905605,4 -4,4 l -4,0 -18,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.0943951,0 -4,-1.905605 -4,-4 l 0,-4 z"
+         d="m 0.5,8.5 0,-4 c 0,-2.0943951 1.9056049,-4 4,-4 l 4,0 0,2 10,0 0,-2 36,0 4,0 c 2.094395,0 4,1.9056049 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.094395 -1.905605,4 -4,4 l -4,0 -36,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.0943951,0 -4,-1.905605 -4,-4 l 0,-4 z"
          id="path6-2"
          style="fill:#00ff00;fill-opacity:1;stroke:#00a000;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
     </g>
     <g
-       transform="matrix(2,0,0,2,74,0)"
+       transform="matrix(2,0,0,2,110,0)"
        id="g3065-9"
        style="fill:#ff00ff;fill-opacity:1;stroke:#a000a0;stroke-opacity:1">
       <path
@@ -133,14 +129,14 @@
          x="6.383234"
          y="29.947266"
          id="tspan3079-4"
-         style="font-size:24px">right</tspan></text>
+         style="font-size:24px">derecha</tspan></text>
     <text
-       x="117.99402"
+       x="153.99402"
        y="29.736328"
        id="text3849-9"
        xml:space="preserve"
        style="font-size:288px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"><tspan
-         x="117.99402"
+         x="153.99402"
          y="29.736328"
          id="tspan3851-83"
          style="font-size:24px">90</tspan></text>
