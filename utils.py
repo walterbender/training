@@ -620,6 +620,7 @@ def is_journal_open():
 
 
 def is_activity_view():
+    """
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
@@ -633,9 +634,12 @@ def is_activity_view():
         return False
 
     return zoom_level == shell.ShellModel.ZOOM_ACTIVITY
+    """
+    return True
 
 
 def is_home_view():
+    """
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
@@ -649,9 +653,12 @@ def is_home_view():
         return False
 
     return zoom_level == shell.ShellModel.ZOOM_HOME
+    """
+    return True
 
 
 def is_neighborhood_view():
+    """
     global proxy
     if proxy is None:
         bus = dbus.SessionBus()
@@ -665,6 +672,8 @@ def is_neighborhood_view():
         return False
 
     return zoom_level == shell.ShellModel.ZOOM_MESH
+    """
+    return True
 
 
 def goto_activity_view():

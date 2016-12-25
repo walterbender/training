@@ -518,7 +518,8 @@ class TaskMaster(Gtk.Alignment):
             self._refresh_button.hide()
 
         if task.get_my_turn():
-            self._my_turn_button.show()
+            self._next_task_button_cb(None)
+            #self._my_turn_button.show()
         else:
             self._my_turn_button.hide()
 
