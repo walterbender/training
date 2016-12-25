@@ -559,7 +559,7 @@ gconftool-2 --set /desktop/sugar/services/training/url
 * Added support for HTML/JS content
 * Added initial task for entering email address
 * Recording start and end times for each task
-* Created new icon based on One Academy
+* Created new icon based on Sugar Labs Academy
 
 1
 

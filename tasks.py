@@ -80,7 +80,7 @@ _ROLES = {
 
 def get_tasks(task_master):
     task_list = [
-        {'name': _('Welcome to One Academy'),
+        {'name': _('Welcome to Sugar Labs Academy'),
          'icon': 'badge-intro',
          'tasks': [Welcome1Task(task_master),
                    Welcome2Task(task_master),
@@ -2670,7 +2670,7 @@ class Assessment1Task(HTMLTask):
             alert = NotifyAlert()
             alert.props.title = _('Opening chapter: Getting Connected')
             alert.props.msg = _('You must complete the getting connected '
-                                'tasks before you can finish One Academy.')
+                                'tasks before you can finish Sugar Labs Academy.')
             alert.connect('response',
                           self._task_master.activity.remove_alert_cb)
             self._task_master.activity.add_alert(alert)

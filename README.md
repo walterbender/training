@@ -1,7 +1,7 @@
 Learn Sugar
 ===========
 
-Sugar Activity for learning about Sugar developed for One Academy.
+Sugar Activity for learning about Sugar developed for Sugar Labs Academy.
 
 Explores Sugar basics, such as the toolbar, journal, views, frame, and settings.
 

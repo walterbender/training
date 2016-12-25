@@ -1192,7 +1192,7 @@ class TrainingActivity(activity.Activity):
                 self.help_panel_visible = False
                 self._help_button.set_expanded(False)
 
-    def add_badge(self, msg, icon="training-trophy", name="One Academy"):
+    def add_badge(self, msg, icon="training-trophy", name="Sugar Labs Academy"):
         sugar_icons = os.path.join(os.path.expanduser('~'), '.icons')
         if not os.path.exists(sugar_icons):
             try:

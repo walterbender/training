@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: activity/activity.info:2
-msgid "One Academy"
+msgid "Sugar Labs Academy"
 msgstr ""
 
 #: activity/activity.info:3
-msgid "a series of Sugar \"How-to\" exercises from One Academy"
+msgid "a series of Sugar \"How-to\" exercises from Sugar Labs Academy"
 msgstr ""
 
 #: helppanel.py:36
@@ -343,7 +343,7 @@ msgid "Pre-service Teacher"
 msgstr ""
 
 #: tasks.py:83
-msgid "Welcome to One Academy"
+msgid "Welcome to Sugar Labs Academy"
 msgstr ""
 
 #: tasks.py:92

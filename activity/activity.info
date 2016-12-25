@@ -1,11 +1,11 @@
 [Activity]
-name = One Academy
+name = Sugar Labs Academy
 exec = sugar-activity activity.TrainingActivity
 bundle_id = org.sugarlabs.Training
-icon = one-academy
+icon = sugar-labs-academy
 activity_version = 3.6
 show_launcher = yes
 license = GPLv3
 single_instance = yes
-summary = a series of Sugar "How-to" exercises from One Academy
+summary = a series of Sugar "How-to" exercises from Sugar Labs Academy
 
