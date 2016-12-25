@@ -35,13 +35,6 @@ from sugar3.graphics.toolbarbox import ToolbarButton
 from sugar3.graphics.alert import ConfirmationAlert, NotifyAlert
 from sugar3.graphics import style
 
-try:
-    from jarabe.webservice import account
-    _WEBSERVICES_AVAILABLE = True
-    _WEBSERVICE_PATHS = ['/usr/share/sugar/extensions/webservice']
-except:
-    _WEBSERVICES_AVAILABLE = False
-
 NAME_UID = 'name'
 EMAIL_UID = 'email_address'
 SCHOOL_UID = 'school_sf_id'
@@ -155,7 +148,7 @@ class TrainingActivity(activity.Activity):
         self._fatal_error = False
         self._notify_transfer_status = False
 
-        if self._load_extension() and self.check_volume_data():
+        if self.check_volume_data():
             if self.volume_data[0]['uid'] is not None:
                 GObject.idle_add(self._launcher)
 
@@ -1192,8 +1185,7 @@ class TrainingActivity(activity.Activity):
             # FIXME: is_up() is always returning False, so we
             # "debounce" using help_panel_visible.
             if not self.help_palette.is_up() and not self.help_panel_visible:
-                self.help_palette.popup(
-                    immediate=True, state=self.help_palette.SECONDARY)
+                self.help_palette.popup(immediate=True)
                 self.help_panel_visible = True
             else:
                 self.help_palette.popdown(immediate=True)
@@ -1230,99 +1222,6 @@ class TrainingActivity(activity.Activity):
             self.metadata['comments'] = json.dumps(comments)
         else:
             self.metadata['comments'] = json.dumps([badge])
-
-    def _load_extension(self):
-        # Make sure this version of Sugar supports webservices
-        if not _WEBSERVICES_AVAILABLE:
-            _logger.error('Webservices not available on this version of Sugar')
-            self._webservice_alert(_('Sugar upgrade required.'))
-            return False
-
-        # First, check to see if the webservice is already installed
-        extensions_path = os.path.join(os.path.expanduser('~'), '.sugar',
-                                       'default', 'extensions')
-        webservice_path = os.path.join(extensions_path, 'webservice')
-        _WEBSERVICE_PATHS.append(os.path.join(extensions_path, 'webservice'))
-        
-        sugar_service_installed = False
-        for webservice_path in _WEBSERVICE_PATHS:
-            if os.path.exists(os.path.join(webservice_path, 'sugarservices')):
-                sugar_service_installed = True
-
-        # Next, check the version number
-        if sugar_service_installed:
-            if utils.get_sugarservices_version() < \
-               _REQUIRED_SUGARSERVICES_VERSION:
-                _logger.error('Found old SugarServices version. Installing...')
-            else:
-                # We have the proper version, so we good to go
-                return True
-        else:
-            _logger.error('SugarServices not found. Installing...')
-
-
-        # If we are here, we need to install the webservice
-        sugar_services_path = os.path.join(self.bundle_path, 'sugarservices')
-        init_path = os.path.join(self.bundle_path, 'sugarservices',
-                                 '__init__.py')
-
-        # Make sure we have an extensions path to work with
-        if not os.path.exists(extensions_path):
-            try:
-                subprocess.call(['mkdir', extensions_path])
-            except OSError as e:
-                _logger.error('Could not mkdir %s, %s' % (extensions_path, e))
-                self._webservice_alert(_('System error.'))
-                return False
-
-        # Make sure we have a webservices path to work with
-        webservice_path = os.path.join(extensions_path, 'webservice')
-        if not os.path.exists(webservice_path):
-            try:
-                subprocess.call(['mkdir', webservice_path])
-            except OSError as e:
-                _logger.error('Could not mkdir %s, %s' % (webservice_path, e))
-                self._webservice_alert(_('System error.'))
-                return False
-            try:
-                subprocess.call(['cp', init_path, webservice_path])
-            except OSError as e:
-                _logger.error('Could not cp %s to %s, %s' %
-                              (init_path, webservice_path, e))
-                self._webservice_alert(_('System error.'))
-                return False
-
-        # Copy in sugarservices and prompt for a reboot
-        try:
-            subprocess.call(['cp', '-r', sugar_services_path, webservice_path])
-        except OSError as e:
-            _logger.error('Could not copy %s to %s, %s' %
-                          (sugarservices_path, webservice_path, e))
-            self._webservice_alert(_('System error.'))
-            return False
-
-        alert = ConfirmationAlert()
-        alert.props.title = _('Restart required')
-        alert.props.msg = _('We needed to install some software on your '
-                            'system.\nSugar must be restarted before '
-                            'sugarservices can commence.')
-
-        alert.connect('response', self._reboot_alert_cb)
-        self.add_alert(alert)
-        self._load_intro_graphics(file_name='restart.html')
-
-        return False
-
-    def _webservice_alert(self, message):
-        alert = ConfirmationAlert()
-        alert.props.title = message
-        alert.props.msg = _('We are unable to install some software on your '
-                            'system.\nSugar must be upgraded before this '
-                            'activity can be run.')
-
-        alert.connect('response', self._close_alert_cb)
-        self.add_alert(alert)
-        self._load_intro_graphics(message=message)
 
     def remove_alert_cb(self, alert, response_id=None):
         self.remove_alert(alert)
