@@ -1030,8 +1030,8 @@ class Connected6Task(HTMLTask):
                         school.split(',')
                 except:
                     _logger.debug('bad school data? (%s)' % school)
-                # save the SF_ID from One Education in case we need it
-                if name == 'One Education School':
+                # save the SF_ID from Sugar Labs in case we need it
+                if name == 'Sugar Labs School':
                     self._default_sf_id = sf_id
                 try:
                     if int(postal_code) != self._postal_code:
