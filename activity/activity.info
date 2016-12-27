@@ -1,9 +1,9 @@
 [Activity]
 name = Sugar Labs Academy
 exec = sugar-activity activity.TrainingActivity
-bundle_id = org.sugarlabs.Training
+bundle_id = org.sugarlabs.SugarTraining
 icon = sugar-labs-academy
-activity_version = 3.6
+activity_version = 1.0
 show_launcher = yes
 license = GPLv3
 single_instance = yes
